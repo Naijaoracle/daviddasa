@@ -28,7 +28,7 @@
     <p>Upload below.</p>
     <p>Note! This is not to be used for clinical use or for use in any production environment.</p>
     <p>Please get in touch if you have any enquiries: <a href="https://www.linkedin.com/in/daviddasa">LinkedIn | David Dasa</a></p>
-    <form id="imageUploadForm" action="https://daviddasa.azurewebsites.net/api/httptrigger1" method="post" enctype="multipart/form-data">
+    <form id="imageUploadForm" action="https://daviddasa.azurewebsites.net/api/HttpInitTrigger?" method="post" enctype="multipart/form-data">
         <input type="file" name="imageFile" accept=".jpg,.jpeg,.png,.gif"> <!-- Only image files -->
         <input type="submit" value="Upload">
     </form>
@@ -60,7 +60,7 @@
   
                   if (response.ok) {
                       // File uploaded to Blob Storage, trigger Azure Function
-                      const functionResponse = await fetch('https://your-azure-function-url-here', {
+                      const functionResponse = await fetch('https://daviddasa.azurewebsites.net/api/HttpInitTrigger?', {
                           method: 'POST',
                           body: formData
                       });
