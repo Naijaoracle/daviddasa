@@ -12,19 +12,12 @@ window.addEventListener('DOMContentLoaded', async (event) => {
   const fileInput = document.querySelector('input[name="imageFile"]');
   const submitButton = document.querySelector('input[type="submit"]');
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
+  submitButton.addEventListener('submit', async () => {
     const file = fileInput.files[0];
     if (!file) {
       alert('Please select a file.');
       return;
     }
-
-    const formData = new FormData();
-    formData.append('imageFile', file);
-
-    submitButton.disabled = true; // Disable the button during submission
 
     try {
       const randomString = generateRandomString(8);
