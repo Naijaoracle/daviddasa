@@ -34,7 +34,7 @@ function generateRandomString(length) {
         const blobName = `kerastb${randomString}`;
 
         // Your blob storage URL for uploading the image
-        const uploadURL = `https://csb10032002a3ba9f46.blob.core.windows.net/azure-webjobs-hosts/${blobName}`;
+        const uploadURL = `https://csb10032002a3ba9f46.blob.core.windows.net/azure-webjobs-hosts/?sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2025-01-01T02:55:18Z&st=2024-01-01T18:55:18Z&spr=https&sig=Dv4J0eRIeVG4L8QupHGYZf94vVk1OthT25XnR5FFsZw%3D`;
 
         const response = await fetch(uploadURL, {
           method: 'PUT',
@@ -46,7 +46,7 @@ function generateRandomString(length) {
 
         if (response.ok) {
           // File uploaded to Blob Storage, trigger Azure Function
-          const functionResponse = await fetch('https://daviddasa.azurewebsites.net/api/HttpInitTrigger?', {
+          const functionResponse = await fetch('https://daviddasa.azurewebsites.net/api/HttpInitTrigger?clientId=blobs_extension', {
             method: 'POST',
             body: formData
           });
