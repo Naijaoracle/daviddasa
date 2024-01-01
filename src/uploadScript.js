@@ -1,72 +1,72 @@
 function generateRandomString(length) {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-    for (let i = 0; i < length; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
+  return result;
+}
 
-  window.addEventListener('DOMContentLoaded', (event) => {
-    const form = document.getElementById('imageUploadForm');
-    const fileInput = document.querySelector('input[name="imageFile"]');
-    const submitButton = document.querySelector('input[type="submit"]');
+window.addEventListener('DOMContentLoaded', async (event) => {
+  const form = document.getElementById('imageUploadForm');
+  const fileInput = document.querySelector('input[name="imageFile"]');
+  const submitButton = document.querySelector('input[type="submit"]');
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-      const file = fileInput.files[0];
-      if (!file) {
-        alert('Please select a file.');
-        return;
-      }
+    const file = fileInput.files[0];
+    if (!file) {
+      alert('Please select a file.');
+      return;
+    }
 
-      const formData = new FormData();
-      formData.append('file', file);
+    const formData = new FormData();
+    formData.append('imageFile', file);
 
-      submitButton.disabled = true; // Disable the button during submission
+    submitButton.disabled = true; // Disable the button during submission
 
-      try {
-        // Generate a random 8-character alphanumeric string
-        const randomString = generateRandomString(8);
+    try {
+      const randomString = generateRandomString(8);
+      const blobName = `kerastb${randomString}`;
 
-        // Construct the blob name
-        const blobName = `kerastb${randomString}`;
+      const uploadURL = process.env.UPLOAD_URL;
 
-        // Your blob storage URL for uploading the image
-        const uploadURL = `https://csb10032002a3ba9f46.blob.core.windows.net/azure-webjobs-hosts/?sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2025-01-01T02:55:18Z&st=2024-01-01T18:55:18Z&spr=https&sig=Dv4J0eRIeVG4L8QupHGYZf94vVk1OthT25XnR5FFsZw%3D`;
+      const response = await fetch(uploadURL, {
+        method: 'PUT',
+        body: file,
+        headers: {
+          'Content-Type': file.type,
+        },
+      });
 
-        const response = await fetch(uploadURL, {
-          method: 'PUT',
-          body: file,
+      if (response.ok) {
+        alert('Image uploaded to Blob Storage.');
+
+        const functionResponse = await fetch('https://daviddasa.azurewebsites.net/api/HttpInitTrigger?clientId=blobs_extension', {
+          method: 'POST',
+          body: JSON.stringify({ blobName }), // Sending the constructed blob name
           headers: {
-            'Content-Type': file.type
-          }
+            'Content-Type': 'application/json',
+          },
         });
 
-        if (response.ok) {
-          // File uploaded to Blob Storage, trigger Azure Function
-          const functionResponse = await fetch('https://daviddasa.azurewebsites.net/api/HttpInitTrigger?clientId=blobs_extension', {
-            method: 'POST',
-            body: formData
-          });
-
-          if (functionResponse.ok) {
-            const result = await functionResponse.json();
-            alert('Prediction result: ' + JSON.stringify(result));
-          } else {
-            alert('Failed to trigger Azure Function.');
-          }
-
-          form.reset(); // Reset the form to clear the file input
+        if (functionResponse.ok) {
+          const result = await functionResponse.text();
+          alert('Prediction result: ' + result);
         } else {
-          alert('Failed to upload image to Blob Storage.');
+          throw new Error('Failed to trigger Azure Function.');
         }
-      } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred. Please try again later.');
-      } finally {
-        submitButton.disabled = false; // Enable the button after processing
+
+        form.reset(); // Reset the form to clear the file input
+      } else {
+        throw new Error('Failed to upload image to Blob Storage.');
       }
-    });
+    } catch (error) {
+      console.error('Error:', error);
+      alert('An error occurred. Please try again later.');
+    } finally {
+      submitButton.disabled = false; // Enable the button after processing
+    }
   });
+});
