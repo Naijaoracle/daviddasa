@@ -7,10 +7,11 @@ function generateRandomString(length) {
   return result;
 }
 
-window.addEventListener('DOMContentLoaded', async (event) => {
+document.addEventListener('DOMContentLoaded', async (event) => {
   const form = document.getElementById('imageUploadForm');
   const fileInput = document.querySelector('input[name="imageFile"]');
   const submitButton = document.querySelector('input[type="submit"]');
+  const sasToken = document.getElementById('sasToken').value;
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault(); // Prevent form submission
@@ -24,10 +25,10 @@ window.addEventListener('DOMContentLoaded', async (event) => {
     try {
       const randomString = generateRandomString(8);
       const blobName = `kerastb${randomString}`;
+      const formAction = form.action + '?' + sasToken; // Include the SAS token in the query string
+      form.action = formAction;
 
-      const uploadURL = 'https://csb10032002a3ba9f46.blob.core.windows.net/azure-webjobs-hosts?sp=racw&st=2024-01-01T23:43:03Z&se=2025-01-01T07:43:03Z&spr=https&sv=2022-11-02&sr=c&sig=ryiM2t6bGsOVNdJyPL%2BaURpHOIAuQgzMwOmZAn5arhU%3D';
-
-      const response = await fetch(uploadURL, {
+      const response = await fetch(form.action, {
         method: 'PUT',
         body: file,
         headers: {
