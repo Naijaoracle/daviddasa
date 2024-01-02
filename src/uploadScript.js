@@ -12,7 +12,9 @@ window.addEventListener('DOMContentLoaded', async (event) => {
   const fileInput = document.querySelector('input[name="imageFile"]');
   const submitButton = document.querySelector('input[type="submit"]');
 
-  submitButton.addEventListener('submit', async () => {
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault(); // Prevent form submission
+
     const file = fileInput.files[0];
     if (!file) {
       alert('Please select a file.');
@@ -23,7 +25,7 @@ window.addEventListener('DOMContentLoaded', async (event) => {
       const randomString = generateRandomString(8);
       const blobName = `kerastb${randomString}`;
 
-      const uploadURL = process.env.UPLOAD_URL;
+      const uploadURL = 'https://csb10032002a3ba9f46.blob.core.windows.net/azure-webjobs-hosts?sp=racw&st=2024-01-01T23:43:03Z&se=2025-01-01T07:43:03Z&spr=https&sv=2022-11-02&sr=c&sig=ryiM2t6bGsOVNdJyPL%2BaURpHOIAuQgzMwOmZAn5arhU%3D';
 
       const response = await fetch(uploadURL, {
         method: 'PUT',
