@@ -35,19 +35,6 @@
       <input type="hidden" id="sasToken" name="sasToken" value="sp=racw&st=2024-01-01T23:43:03Z&se=2025-01-01T07:43:03Z&spr=https&sv=2022-11-02&sr=c&sig=ryiM2t6bGsOVNdJyPL%2BaURpHOIAuQgzMwOmZAn5arhU%3D">
       <input type="submit" value="Upload">
   </form>
-  
-<script>
-    document.getElementById('imageUploadForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent the form from submitting before updating the action
-        
-        const sasToken = document.getElementById('sasToken').value;
-        const formAction = this.action + '?' + sasToken; // Include the SAS token in the query string
-        this.action = formAction;
-        
-        // Now submit the form
-        this.submit();
-    });
-</script>
 <script src="uploadScript.js">
 </script>
   
