@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
     try {
       const randomString = generateRandomString(8);
       const blobName = `kerastb${randomString}`;
-      const formAction = form.action + '?' + sasToken; // Include the SAS token in the query string
+      const formAction = form.action + '?' + sasToken; // Include SAS token in query string
       form.action = formAction;
 
       const response = await fetch(form.action, {
@@ -36,35 +36,30 @@ document.addEventListener('DOMContentLoaded', async (event) => {
         },
       });
 
-    if (response.ok) {
-      alert('Image uploaded to Blob Storage.');
-    
-      const functionResponse = await fetch('https://daviddasa.azurewebsites.net/api/HttpInitTrigger?clientId=blobs_extension', {
-        method: 'POST',
-        body: JSON.stringify({ blobName }), // Sending the constructed blob name
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-    
-      if (functionResponse.ok) {
-        try {
-          const result = await functionResponse.text();
-          alert('Prediction result: ' + result); // Display prediction result to the user
-        } catch (error) {
-          console.error('Error fetching prediction result:', error);
-          alert('Failed to fetch prediction result.');
+      if (response.ok) {
+        alert('Image uploaded to Blob Storage.');
+
+        const functionResponse = await fetch('https://daviddasa.azurewebsites.net/api/HttpInitTrigger?clientId=blobs_extension', {
+          method: 'POST',
+          body: JSON.stringify({ blobName }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (functionResponse.ok) {
+          try {
+            const result = await functionResponse.text();
+            alert('Prediction result: ' + result);
+          } catch (error) {
+            console.error('Error fetching prediction result:', error);
+            alert('Failed to fetch prediction result.');
+          }
+        } else {
+          throw new Error('Failed to trigger Azure Function.');
         }
-      } else {
-        throw new Error('Failed to trigger Azure Function.');
-      }
-    
-      form.reset(); // Reset the form to clear the file input
-    } else {
-      throw new Error('Failed to upload image to Blob Storage.');
-    }
-        
-        form.reset(); // Reset the form to clear the file input
+
+        form.reset();
       } else {
         throw new Error('Failed to upload image to Blob Storage.');
       }
