@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
       form.action = formAction;
 
       const response = await fetch(form.action, {
-        method: 'POST',
+        method: 'PUTT',
         body: file,
         headers: {
           'Content-Type': file.type,
