@@ -30,11 +30,24 @@
     <p>Please get in touch if you have any enquiries: <a href="https://www.linkedin.com/in/daviddasa">LinkedIn | David Dasa</a></p>
     
       
-  <form id="imageUploadForm" action="https://csb10032002a3ba9f46.blob.core.windows.net/azure-webjobs-hosts/" method="PUT" enctype="multipart/form-data">
+  <form id="imageUploadForm" action="https://csb10032002a3ba9f46.blob.core.windows.net/azure-webjobs-hosts/" method="post" enctype="multipart/form-data">
       <input type="file" name="imageFile" accept=".jpg,.jpeg,.png,.gif"> <!-- Only image files -->
-      <input type="hidden" id="sasToken" name="sasToken" value="sp=racw&st=2024-01-01T23:43:03Z&se=2025-01-01T07:43:03Z&spr=https&sv=2022-11-02&sr=c&sig=ryiM2t6bGsOVNdJyPL%2BaURpHOIAuQgzMwOmZAn5arhU%3D">
+      <input type="hidden" id="sasToken" name="sasToken" value="{REDACTED_SAS_TOKEN}">
       <input type="submit" value="Upload">
   </form>
+  
+  <script>
+      document.getElementById('imageUploadForm').addEventListener('submit', function(event) {
+          event.preventDefault(); // Prevent the form from submitting before updating the action
+          
+          const sasToken = document.getElementById('sasToken').value;
+          const formAction = document.getElementById('imageUploadForm').action + sasToken;
+          document.getElementById('imageUploadForm').action = formAction;
+          
+          // Now submit the form
+          this.submit();
+      });
+  </script>
 <script src="uploadScript.js">
 </script>
   
