@@ -36,24 +36,34 @@ document.addEventListener('DOMContentLoaded', async (event) => {
         },
       });
 
-      if (response.ok) {
-        alert('Image uploaded to Blob Storage.');
-
-        const functionResponse = await fetch('https://daviddasa.azurewebsites.net/api/HttpInitTrigger?clientId=blobs_extension', {
-          method: 'POST',
-          body: JSON.stringify({ blobName }), // Sending the constructed blob name
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (functionResponse.ok) {
+    if (response.ok) {
+      alert('Image uploaded to Blob Storage.');
+    
+      const functionResponse = await fetch('https://daviddasa.azurewebsites.net/api/HttpInitTrigger?clientId=blobs_extension', {
+        method: 'POST',
+        body: JSON.stringify({ blobName }), // Sending the constructed blob name
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    
+      if (functionResponse.ok) {
+        try {
           const result = await functionResponse.text();
-          alert('Prediction result: ' + result);
-        } else {
-          throw new Error('Failed to trigger Azure Function.');
+          alert('Prediction result: ' + result); // Display prediction result to the user
+        } catch (error) {
+          console.error('Error fetching prediction result:', error);
+          alert('Failed to fetch prediction result.');
         }
-
+      } else {
+        throw new Error('Failed to trigger Azure Function.');
+      }
+    
+      form.reset(); // Reset the form to clear the file input
+    } else {
+      throw new Error('Failed to upload image to Blob Storage.');
+    }
+        
         form.reset(); // Reset the form to clear the file input
       } else {
         throw new Error('Failed to upload image to Blob Storage.');
