@@ -235,15 +235,6 @@ button {
   background-color: #f39c12; /* Orange for overweight */
 }
 
-/* ... (previous styles) ... */
-
-#result {
-  text-align: center;
-  margin: 20px;
-  font-size: 24px;
-  position: relative;
-}
-
 /* Custom styling for alerts/messages */
 .alert {
   padding: 10px;
