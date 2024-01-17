@@ -48,7 +48,8 @@ function updateCategoryBar(bmi) {
 
   if (categoryIndex !== -1) {
     const categoryBarWidth = categoryBar.offsetWidth; // Get the width of the category bar
-    const pointerPosition = (bmi - categories[categoryIndex].min) / (categories[categoryIndex].max - categories[categoryIndex].min) * categoryBarWidth;
+    const categoryWidth = categoryBarWidth / categories.length; // Get the width of each category
+    const pointerPosition = categoryIndex * categoryWidth + ((bmi - categories[categoryIndex].min) / (categories[categoryIndex].max - categories[categoryIndex].min)) * categoryWidth;
     pointer.style.left = `${pointerPosition}px`; // Set the left position of the pointer
 
     const categoryElements = categoryBar.children;
