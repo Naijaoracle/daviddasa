@@ -13,7 +13,6 @@ function calculateBMI() {
   updateCategoryBar(bmi);
 }
 
-// Update the category bar based on the BMI value
 function updateCategoryBar(bmi) {
   const categoryBar = document.getElementById("categoryBar");
   const pointer = document.querySelector("#categoryBar .pointer");
@@ -25,18 +24,27 @@ function updateCategoryBar(bmi) {
     { class: "obese", min: 35, max: Infinity },
   ];
 
-  let category = null;
-  for (const cat of categories) {
-    if (bmi >= cat.min && bmi <= cat.max) {
-      category = cat;
+  let categoryIndex = -1;
+  for (let i = 0; i < categories.length; i++) {
+    if (bmi >= categories[i].min && bmi <= categories[i].max) {
+      categoryIndex = i;
       break;
     }
   }
 
-  if (category) {
-    const percentage = (bmi - category.min) / (category.max - category.min) * 100;
-    pointer.style.left = `calc(${percentage}% - 5px)`;
-    categoryBar.className = `category ${category.class}`;
+  if (categoryIndex !== -1) {
+    const categoryWidth = 100 / categories.length;
+    const pointerPosition = (bmi - categories[categoryIndex].min) / (categories[categoryIndex].max - categories[categoryIndex].min) * categoryWidth;
+    pointer.style.left = `calc(${pointerPosition}% - 5px)`;
+
+    const categoryElements = categoryBar.children;
+    for (let i = 0; i < categoryElements.length; i++) {
+      if (i === categoryIndex) {
+        categoryElements[i].classList.add("active");
+      } else {
+        categoryElements[i].classList.remove("active");
+      }
+    }
   }
 }
 
