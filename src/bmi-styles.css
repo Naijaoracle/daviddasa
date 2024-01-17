@@ -195,19 +195,9 @@ button {
   transition: background-color 0.3s ease-in-out;
 }
 
-/* Custom result styling */
-#result {
-  text-align: center;
-  margin: 20px;
-  font-size: 24px;
-}
-
-#bmiValue {
-  font-weight: bold;
-}
-
-/* Custom category bar styling */
 #categoryBar {
+  display: flex; /* Add flex display */
+  justify-content: space-between; /* Arrange items with equal space between */
   position: relative;
   height: 20px;
   background-color: #ccc;
@@ -226,31 +216,30 @@ button {
 
 #categoryBar .category {
   height: 100%;
-  position: left;
 }
 
 .underweight {
-  width: 20%;
+  flex: 1; /* Use flex property to distribute equal width */
   background-color: #e74c3c; /* Red */
 }
 
 .mild {
-  width: 20%;
+  flex: 1; /* Use flex property to distribute equal width */
   background-color: #f39c12; /* Orange */
 }
 
 .normal {
-  width: 20%;
+  flex: 1; /* Use flex property to distribute equal width */
   background-color: #2ecc71; /* Green */
 }
 
 .overweight {
-  width: 20%;
+  flex: 1; /* Use flex property to distribute equal width */
   background-color: #f39c12; /* Orange */
 }
 
 .obese {
-  width: 20%;
+  flex: 1; /* Use flex property to distribute equal width */
   background-color: #e74c3c; /* Red */
 }
 
