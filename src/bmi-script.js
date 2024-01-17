@@ -8,19 +8,7 @@ function calculateBMI() {
   }
 
   const bmi = weight / (height / 100) ** 2;
-
-  let category = "";
-  if (bmi < 18.5) {
-    category = "Underweight";
-  } else if (bmi < 25) {
-    category = "Normal weight";
-  } else if (bmi < 30) {
-    category = "Overweight";
-  } else {
-    category = "Obese";
-  }
-
-  document.getElementById("result").textContent = `Your BMI is ${bmi.toFixed(2)}. It is classified as ${category}.`;
+  document.getElementById("result").textContent = `Your BMI is ${bmi.toFixed(2)}.`;
 
   updateCategoryBar(bmi);
 }
@@ -47,8 +35,7 @@ function updateCategoryBar(bmi) {
   if (categoryIndex !== -1) {
     const categoryWidth = 100 / categories.length;
     const pointerPosition = (bmi - categories[categoryIndex].min) / (categories[categoryIndex].max - categories[categoryIndex].min) * categoryWidth;
-    pointer.style.left = `0`;
-    pointer.style.width = `100%`;
+    pointer.style.left = `calc(${pointerPosition}% - 5px)`;
 
     const categoryElements = categoryBar.children;
     for (let i = 0; i < categoryElements.length; i++) {
