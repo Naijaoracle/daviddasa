@@ -48,7 +48,7 @@ function updateCategoryBar(bmi) {
     }
   }
   //set the HTML
-  categoryBar.innerHTML == categoryBarHTML;
+  categoryBar.innerHTML = categoryBarHTML;
 }
 
 function calculateGradientColor(category, percentage) {
