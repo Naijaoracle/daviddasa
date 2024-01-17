@@ -29,9 +29,6 @@ function calculateBMI() {
 function updateCategoryBar(bmi) {
   const categoryBar = document.getElementById('categoryBar');
 
-  // Clear previous categories
-  categoryBar.innerHTML = '';
-
   // Define BMI categories and corresponding colors
   const categories = [
     { class: 'underweight', min: 0, max: 17.0 },
