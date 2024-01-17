@@ -214,6 +214,7 @@ button {
   border-right: 5px solid transparent;
   border-bottom: 10px solid black;
   transform: rotate(180deg); /* Rotate the triangle to be inverted */
+  transition: left 0.3s ease-in-out;
 }
 
 #categoryBar .category {
