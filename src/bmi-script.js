@@ -41,10 +41,10 @@ function updateCategoryBar(bmi) {
   let categoryBarHTML = ''; //Accumulate HTML 
 
   for (const category of categories) {
-    if (bmi >= category.min && bmi <= category.max) {
-      const percentage = (bmi - category.min) / (category.max - category.min) * 100;
-      const color = calculateGradientColor(category, percentage);
-      categoryBar.innerHTML += `<div class="category" style="width: ${percentage}%; background-color: ${color};"></div>`;
+   if (bmi >= category.min && bmi <= category.max) {
+   const percentage = (bmi - category.min) / (category.max - category.min) * 100;
+    const color = calculateGradientColor(category, percentage);
+    categoryBarHTML += `<div class="category" style="width: ${percentage}%; background-color: ${color};"></div>`;
     }
   }
   //set the HTML
