@@ -28,25 +28,16 @@ function calculateBMI() {
 
 function updateCategoryBar(height, bmi) {
   const categoryBar = document.getElementById('categoryBar');
-  const pointer = document.getElementById('pointer');
-
-  // Define BMI categories and corresponding colors
-  const categories = [
-    { class: 'underweight', min: 0, max: 17.0 },
-    { class: 'mild', min: 17.0, max: 18.4 },
-    { class: 'normal', min: 18.5, max: 24.9 },
-    { class: 'overweight', min: 25, max: 29.9 },
-    { class: 'obese', min: 30.0, max: Infinity },
-  ];
+  const pointer = document.querySelector('.pointer');
 
   let categoryBarHTML = ''; // Accumulate HTML 
   let pointerPosition = 0; // Position of the pointer
 
   for (const category of categories) {
     const percentage = (category.max - category.min) / height * 100;
-    const color = calculateGradientColor(category, percentage);
+    const color = colors[category.class];
 
-    categoryBarHTML += `<div class="category" style="width: ${percentage}%; background-color: ${color};"></div>`;
+    categoryBarHTML += `<div class="category ${category.class}" style="width: ${percentage}%; background-color: ${color};"></div>`;
 
     if (bmi >= category.min && bmi <= category.max) {
       pointerPosition = (bmi - category.min) / (category.max - category.min) * percentage;
