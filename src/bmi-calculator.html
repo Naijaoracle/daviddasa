@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BMI Calculator</title>
+  <!-- CSS file goes here -->
+  <link rel="stylesheet" href="bmi-styles.css">
+</head>
+<body>
+
+  <!-- Navigation Section -->
+  <nav>
+    <ul>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/static_web_app/blob/main/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+      <li><a href="https://www.daviddasa.com/about">About</a></li>
+      <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
+      <li><a href="https://www.daviddasa.com/skills">Skills</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <h1>BMI Calculator</h1>
+    <form>
+      <label for="height">Height (cm):</label>
+      <input type="number" id="height" name="height" required />
+
+      <label for="weight">Weight (kg):</label>
+      <input type="number" id="weight" name="weight" required />
+
+      <button type="button" onclick="calculateBMI()">Calculate</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script src="bmi-script.js"></script>
+  <!-- Footer Section -->
+  <footer>
+    <p>&copy; 2023 David Dasa</p>
+  </footer>
+</body>
+</html>
