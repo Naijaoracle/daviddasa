@@ -22,7 +22,7 @@ function calculateBMI() {
   }
 
   // Update the note with BMI classification
-  const noteElement = document.getElementById("note");
+  const noteElement = document.getElementById("result");
   noteElement.textContent = `Which is classified as ${classification}.`;
   updateCategoryBar(bmi);
 }
