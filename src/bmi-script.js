@@ -1,3 +1,21 @@
+//Define BMI categories
+const categories = [
+  { class: 'underweight', min: 0, max: 17.0 },
+  { class: 'mild', min: 17.0, max: 18.4 },
+  { class: 'normal', min: 18.5, max: 24.9 },
+  { class: 'overweight', min: 25, max: 29.9 },
+  { class: 'obese', min: 30.0, max: Infinity },
+];
+
+// Define colors for each category
+const colors = {
+  underweight: '#e74c3c', // Red
+  mild: '#f39c12',       // Orange
+  normal: '#2ecc71',     // Green
+  overweight: '#f39c12', // Orange
+  obese: '#e74c3c',      // Red
+};
+
 function calculateBMI() {
   const height = document.getElementById("height").value / 100;
   const weight = document.getElementById("weight").value;
