@@ -34,9 +34,9 @@ function updateCategoryBar(bmi) {
 
   if (categoryIndex !== -1) {
     const categoryWidth = 100 / categories.length;
-    const pointerPosition = (bmi - categories[categoryIndex].min) / (categories[categoryIndex].max - categories[categoryIndex].min) * categoryWidth;
+    const pointerPosition = ((bmi - categories[categoryIndex].min) / (categories[categoryIndex].max - categories[categoryIndex].min)) * 100;
     pointer.style.left = `calc(${pointerPosition}% - 5px)`;
-
+  
     const categoryElements = categoryBar.children;
     for (let i = 0; i < categoryElements.length; i++) {
       if (i === categoryIndex) {
@@ -46,7 +46,6 @@ function updateCategoryBar(bmi) {
       }
     }
   }
-}
 
 function calculateGradientColor(category, percentage) {
   // Define color stops for the gradient
