@@ -27,6 +27,14 @@ function calculateBMI() {
   updateCategoryBar(bmi);
 }
 
+window.onload = function() {
+  const categoryBar = document.getElementById("categoryBar");
+  const pointer = document.querySelector("#categoryBar .pointer");
+
+  // Set the pointer to the middle of the category bar
+  pointer.style.left = `${categoryBar.offsetWidth / 2}px`;
+};
+
 function updateCategoryBar(bmi) {
   const categoryBar = document.getElementById("categoryBar");
   const pointer = document.querySelector("#categoryBar .pointer");
