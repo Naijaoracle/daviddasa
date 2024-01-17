@@ -1,62 +1,43 @@
-//Define BMI categories
-const categories = [
-  { class: 'underweight', min: 0, max: 17.0 },
-  { class: 'mild', min: 17.0, max: 18.4 },
-  { class: 'normal', min: 18.5, max: 24.9 },
-  { class: 'overweight', min: 25, max: 29.9 },
-  { class: 'obese', min: 30.0, max: Infinity },
-];
-
 function calculateBMI() {
-  const height = document.getElementById("height").value / 100;
-  const weight = document.getElementById("weight").value;
-  const bmi = weight / (height * height);
-  const result = document.getElementById("result");
+  const height = parseFloat(document.getElementById("height").value);
+  const weight = parseFloat(document.getElementById("weight").value);
 
-  if (bmi < 18.5) {
-    result.innerHTML = `Your BMI is ${bmi.toFixed(
-      1
-    )}, which means you are underweight.`;
-  } else if (bmi >= 18.5 && bmi <= 24.9) {
-    result.innerHTML = `Your BMI is ${bmi.toFixed(
-      1
-    )}, which means you have a normal weight.`;
-  } else if (bmi >= 25 && bmi <= 29.9) {
-    result.innerHTML = `Your BMI is ${bmi.toFixed(
-      1
-    )}, which means you are overweight.`;
-  } else {
-    result.innerHTML = `Your BMI is ${bmi.toFixed(
-      1
-    )}, which means you are obese.`;
+  if (isNaN(height) || isNaN(weight)) {
+    document.getElementById("result").textContent = "Please enter valid height and weight.";
+    return;
   }
-  
-  // Update the BMI category display
-  updateCategoryBar(height, bmi);
+
+  const bmi = weight / (height / 100) ** 2;
+  document.getElementById("result").textContent = `Your BMI is ${bmi.toFixed(2)}.`;
+
+  updateCategoryBar(bmi);
 }
 
-function updateCategoryBar(height, bmi) {
-  const categoryBar = document.getElementById('categoryBar');
-  const pointer = document.querySelector('.pointer');
+// Update the category bar based on the BMI value
+function updateCategoryBar(bmi) {
+  const categoryBar = document.getElementById("categoryBar");
+  const pointer = document.querySelector("#categoryBar .pointer");
+  const categories = [
+    { class: "underweight", min: 0, max: 18.4 },
+    { class: "mild", min: 18.5, max: 24.9 },
+    { class: "normal", min: 25, max: 29.9 },
+    { class: "overweight", min: 30, max: 34.9 },
+    { class: "obese", min: 35, max: Infinity },
+  ];
 
-  let gradient = ''; // Accumulate gradient colors
-  let pointerPosition = 0;
-
-  for (const category of categories) {
-    const percentage = (category.max - category.min) / height * 100;
-
-    if (bmi >= category.min && bmi <= category.max) {
-      pointerPosition = (bmi - category.min) / (category.max - category.min) * percentage;
+  let category = null;
+  for (const cat of categories) {
+    if (bmi >= cat.min && bmi <= cat.max) {
+      category = cat;
+      break;
     }
-
-    gradient += `${percentage}% ${calculateGradientColor(category, 0)}, `;
   }
 
-  // Remove trailing comma and space
-  gradient = gradient.slice(0, -2);
-
-  categoryBar.style.background = `linear-gradient(to right, ${gradient})`;
-  pointer.style.left = `${pointerPosition}%`;
+  if (category) {
+    const percentage = (bmi - category.min) / (category.max - category.min) * 100;
+    pointer.style.left = `calc(${percentage}% - 5px)`;
+    categoryBar.className = `category ${category.class}`;
+  }
 }
 
 function calculateGradientColor(category, percentage) {
