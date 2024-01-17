@@ -204,7 +204,49 @@ button {
   text-align: center;
   margin: 20px;
   font-size: 24px;
-  /* You can add specific styles for the result section if needed */
+  position: relative; /* Positioning for the category bar */
+}
+
+#bmiValue {
+  font-weight: bold;
+}
+
+#categoryBar {
+  height: 20px;
+  background-color: #f2f2f2;
+  margin-top: 10px;
+  border-radius: 5px;
+}
+
+#categoryBar .category {
+  height: 100%;
+  width: 10%;
+  float: left;
+  border-radius: 5px;
+}
+
+/* Additional styling for each category */
+#categoryBar .underweight {
+  background-color: #e74c3c; /* Red for underweight */
+}
+
+#categoryBar .normal {
+  background-color: #2ecc71; /* Green for normal weight */
+}
+
+#categoryBar .overweight {
+  background-color: #f39c12; /* Orange for overweight */
+}
+
+/* styles.css */
+
+/* ... (previous styles) ... */
+
+#result {
+  text-align: center;
+  margin: 20px;
+  font-size: 24px;
+  position: relative;
 }
 
 /* Custom styling for alerts/messages */
