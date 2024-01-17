@@ -39,21 +39,23 @@ function updateCategoryBar(height, bmi) {
   const categoryBar = document.getElementById('categoryBar');
   const pointer = document.querySelector('.pointer');
 
-  let categoryBarHTML = ''; // Accumulate HTML 
-  let pointerPosition = 0; // Position of the pointer
+  let gradient = ''; // Accumulate gradient colors
+  let pointerPosition = 0;
 
   for (const category of categories) {
     const percentage = (category.max - category.min) / height * 100;
-    const color = colors[category.class];
-
-    categoryBarHTML += `<div class="category ${category.class}" style="width: ${percentage}%; background-color: ${color};"></div>`;
 
     if (bmi >= category.min && bmi <= category.max) {
       pointerPosition = (bmi - category.min) / (category.max - category.min) * percentage;
     }
+
+    gradient += `${percentage}% ${calculateGradientColor(category, 0)}, `;
   }
 
-  // Set the HTML and position of the pointer
+  // Remove trailing comma and space
+  gradient = gradient.slice(0, -2);
+
+  categoryBar.style.background = `linear-gradient(to right, ${gradient})`;
   pointer.style.left = `${pointerPosition}%`;
 }
 
