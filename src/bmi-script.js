@@ -7,15 +7,6 @@ const categories = [
   { class: 'obese', min: 30.0, max: Infinity },
 ];
 
-// Define colors for each category
-const colors = {
-  underweight: '#e74c3c', // Red
-  mild: '#f39c12',       // Orange
-  normal: '#2ecc71',     // Green
-  overweight: '#f39c12', // Orange
-  obese: '#e74c3c',      // Red
-};
-
 function calculateBMI() {
   const height = document.getElementById("height").value / 100;
   const weight = document.getElementById("weight").value;
@@ -63,7 +54,6 @@ function updateCategoryBar(height, bmi) {
   }
 
   // Set the HTML and position of the pointer
-  categoryBar.innerHTML = categoryBarHTML + '</div>'; // Add closing </div> tag
   pointer.style.left = `${pointerPosition}%`;
 }
 
