@@ -2,7 +2,7 @@ function calculateBMI() {
   const height = document.getElementById("height").value / 100;
   const weight = document.getElementById("weight").value;
   const bmi = weight / (height * height);
-  const result = document.getElementById("result"); // Update this line
+  const result = document.getElementById("result");
 
   if (bmi < 18.5) {
     result.innerHTML = `Your BMI is ${bmi.toFixed(
@@ -23,11 +23,12 @@ function calculateBMI() {
   }
   
   // Update the BMI category display
-  updateCategoryBar(bmi);
+  updateCategoryBar(height, bmi);
 }
 
-function updateCategoryBar(bmi) {
+function updateCategoryBar(height, bmi) {
   const categoryBar = document.getElementById('categoryBar');
+  const pointer = document.getElementById('pointer');
 
   // Define BMI categories and corresponding colors
   const categories = [
@@ -38,17 +39,23 @@ function updateCategoryBar(bmi) {
     { class: 'obese', min: 30.0, max: Infinity },
   ];
 
-  let categoryBarHTML = ''; //Accumulate HTML 
+  let categoryBarHTML = ''; // Accumulate HTML 
+  let pointerPosition = 0; // Position of the pointer
 
   for (const category of categories) {
-   if (bmi >= category.min && bmi <= category.max) {
-   const percentage = (bmi - category.min) / (category.max - category.min) * 100;
+    const percentage = (category.max - category.min) / height * 100;
     const color = calculateGradientColor(category, percentage);
+
     categoryBarHTML += `<div class="category" style="width: ${percentage}%; background-color: ${color};"></div>`;
+
+    if (bmi >= category.min && bmi <= category.max) {
+      pointerPosition = (bmi - category.min) / (category.max - category.min) * percentage;
     }
   }
-  //set the HTML
+
+  // Set the HTML and position of the pointer
   categoryBar.innerHTML = categoryBarHTML;
+  pointer.style.left = `${pointerPosition}%`;
 }
 
 function calculateGradientColor(category, percentage) {
