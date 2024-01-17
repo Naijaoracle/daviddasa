@@ -38,7 +38,7 @@ function updateCategoryBar(bmi) {
     { class: 'obese', min: 30.0, max: Infinity },
   ];
 
-  letCategoryBarHTML - ''; //Accumulate HTML 
+  letCategoryBarHTML = ''; //Accumulate HTML 
 
   for (const category of categories) {
     if (bmi >= category.min && bmi <= category.max) {
