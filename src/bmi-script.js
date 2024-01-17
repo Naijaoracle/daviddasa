@@ -63,7 +63,7 @@ function updateCategoryBar(height, bmi) {
   }
 
   // Set the HTML and position of the pointer
-  categoryBar.innerHTML = categoryBarHTML;
+  categoryBar.innerHTML = categoryBarHTML + '</div>'; // Add closing </div> tag
   pointer.style.left = `${pointerPosition}%`;
 }
 
