@@ -206,14 +206,28 @@ button {
   font-weight: bold;
 }
 
+/* Custom category bar styling */
 #categoryBar {
+  display: flex;
   height: 40px;
   background-color: #f2f2f2;
   margin-top: 10px;
   border-radius: 5px;
 }
 
+#categoryBar .triangle {
+  position: absolute;
+  top: -15px; /* Adjust this value based on your design */
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 15px solid #fff; /* Set the background color you prefer */
+}
+
 #categoryBar .category {
+  flex: 1;
   height: 100%;
   width: 10%;
   float: left;
