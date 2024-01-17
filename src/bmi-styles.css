@@ -227,20 +227,36 @@ button {
 
 #categoryBar .category {
   height: 100%;
-  float: left;
+  position: relative;
 }
 
-/* Additional styling for each category */
-#categoryBar .underweight {
-  background-color: #e74c3c; /* Red for underweight */
+.category:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 
-#categoryBar .normal {
-  background-color: #2ecc71; /* Green for normal weight */
+.underweight:before {
+  background-color: #e74c3c; /* Red */
 }
 
-#categoryBar .overweight {
-  background-color: #f39c12; /* Orange for overweight */
+.mild:before {
+  background-color: #f39c12; /* Orange */
+}
+
+.normal:before {
+  background-color: #2ecc71; /* Green */
+}
+
+.overweight:before {
+  background-color: #f39c12; /* Orange */
+}
+
+.obese:before {
+  background-color: #e74c3c; /* Red */
 }
 
 /* Custom styling for alerts/messages */
