@@ -31,11 +31,10 @@ function updateCategoryBar(bmi) {
   const categoryBar = document.getElementById("categoryBar");
   const pointer = document.querySelector("#categoryBar .pointer");
   const categories = [
-    { class: "underweight", min: 0, max: 18.4 },
-    { class: "mild", min: 18.5, max: 24.9 },
-    { class: "normal", min: 25, max: 29.9 },
-    { class: "overweight", min: 30, max: 34.9 },
-    { class: "obese", min: 35, max: Infinity },
+    { class: "underweight", min: 0, max: 18.499 },
+    { class: "normal", min: 18.5, max: 24.999 },
+    { class: "overweight", min: 25, max: 29.999 },
+    { class: "obese", min: 30, max: Infinity },
   ];
 
   let categoryIndex = -1;
@@ -48,7 +47,7 @@ function updateCategoryBar(bmi) {
 
   if (categoryIndex !== -1) {
     const categoryBarWidth = categoryBar.offsetWidth;
-    const categoryWidth = categoryBarWidth / 5; // 20% width for each category
+    const categoryWidth = categoryBarWidth / 4; // 25% width for each category
     const categoryOffset = categoryIndex * categoryWidth; // Offset for the current category
 
     // Adjusted pointer position within the category:
@@ -72,7 +71,6 @@ function calculateGradientColor(category, percentage) {
   // Define color stops for the gradient
   const colors = {
     underweight: '#e74c3c', // Red
-    mild: '#f39c12',       // Orange
     normal: '#2ecc71',     // Green
     overweight: '#f39c12', // Orange
     obese: '#e74c3c',      // Red
@@ -89,7 +87,7 @@ function calculateGradientColor(category, percentage) {
 function getNextCategory(category) {
   // Get the next category in the list for gradient calculation
   const categories = [
-    'underweight', 'mild', 'normal', 'overweight', 'obese'
+    'underweight', 'normal', 'overweight', 'obese'
   ];
 
   const currentIndex = categories.indexOf(category.class);

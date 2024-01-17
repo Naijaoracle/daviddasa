@@ -225,11 +225,6 @@ button {
   background-color: #e74c3c; /* Red */
 }
 
-.mild {
-  flex: 1; /* Use flex property to distribute equal width */
-  background-color: #f39c12; /* Orange */
-}
-
 .normal {
   flex: 1; /* Use flex property to distribute equal width */
   background-color: #2ecc71; /* Green */
