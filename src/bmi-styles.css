@@ -234,22 +234,22 @@ button {
   background-color: #e74c3c; /* Red */
 }
 
-.mild:before {
+.mild {
   width: 20%;
   background-color: #f39c12; /* Orange */
 }
 
-.normal:before {
+.normal {
   width: 20%;
   background-color: #2ecc71; /* Green */
 }
 
-.overweight:before {
+.overweight {
   width: 20%;
   background-color: #f39c12; /* Orange */
 }
 
-.obese:before {
+.obese {
   width: 20%;
   background-color: #e74c3c; /* Red */
 }
