@@ -5,10 +5,6 @@ function calculateBMI() {
   // Calculate BMI
   const bmi = weight / ((height / 100) ** 2);
 
-  // Display BMI result
-  const resultElement = document.getElementById("result");
-  resultElement.textContent = `Your BMI is ${bmi.toFixed(2)}.`;
-
   // Determine BMI classification
   let classification;
   if (bmi < 18.5) {
@@ -23,7 +19,7 @@ function calculateBMI() {
 
   // Update the note with BMI classification
   const noteElement = document.getElementById("result");
-  noteElement.textContent = `Which is classified as ${classification}.`;
+  noteElement.textContent = `Your BMI is ${bmi.toFixed(2)}. Which is classified as ${classification}.`;
   updateCategoryBar(bmi);
 }
 
@@ -42,7 +38,7 @@ function updateCategoryBar(bmi) {
     { class: "underweight", min: 0, max: 18.499 },
     { class: "normal", min: 18.5, max: 24.999 },
     { class: "overweight", min: 25, max: 29.999 },
-    { class: "obese", min: 30, max: Infinity },
+    { class: "obese", min: 30, max: 55 },
   ];
 
   let categoryIndex = -1;
