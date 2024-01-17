@@ -2,14 +2,28 @@ function calculateBMI() {
   const height = parseFloat(document.getElementById("height").value);
   const weight = parseFloat(document.getElementById("weight").value);
 
-  if (isNaN(height) || isNaN(weight)) {
-    document.getElementById("result").textContent = "Please enter valid height and weight.";
-    return;
+  // Calculate BMI
+  const bmi = weight / ((height / 100) ** 2);
+
+  // Display BMI result
+  const resultElement = document.getElementById("result");
+  resultElement.textContent = `Your BMI is ${bmi.toFixed(2)}.`;
+
+  // Determine BMI classification
+  let classification;
+  if (bmi < 18.5) {
+    classification = "Underweight";
+  } else if (bmi < 25) {
+    classification = "Normal weight";
+  } else if (bmi < 30) {
+    classification = "Overweight";
+  } else {
+    classification = "Obese";
   }
 
-  const bmi = weight / (height / 100) ** 2;
-  document.getElementById("result").textContent = `Your BMI is ${bmi.toFixed(2)}.`;
-
+  // Update the note with BMI classification
+  const noteElement = document.getElementById("note");
+  noteElement.textContent = `Which is classified as ${classification}.`;
   updateCategoryBar(bmi);
 }
 
