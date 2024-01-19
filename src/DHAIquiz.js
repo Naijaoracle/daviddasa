@@ -503,7 +503,7 @@ function showResult() {
     resultContainer.innerHTML = `Your Score: ${score} out of ${selectedQuestions.length}`;
     document.getElementById('options').innerHTML = '';
     document.querySelector('button').style.display = 'none';
-    document.getElementById('timer').classList.add('hidden'); // Add the 'hidden' class to hide the timer
+    document.getElementById('timer').classList.remove('visible'); // Remove the 'visible' class to hide the timer
 }
 
 function updateProgressBar(currentQuestionIndex, totalQuestions) {

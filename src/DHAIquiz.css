@@ -289,7 +289,6 @@ h2 {
     margin-bottom: 20px;
     text-align: center;
     font-weight: bold;
-    color: inherit; /* Reset the color to inherit */
 }
 
 #result.correct {
@@ -304,8 +303,8 @@ h2 {
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
-    background-color: #ede9da;
-    color: #ede9da;
+    background-color: #fff;
+    color: #fff;
 }
 
 #timer {
