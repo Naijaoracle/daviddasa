@@ -282,3 +282,8 @@ button {
   
   /*Any other decorations*/
   
+/* style for hearing decision tree */
+#tree-container {
+  width: 400px;
+  margin: 50px auto;
+}
