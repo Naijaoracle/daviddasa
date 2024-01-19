@@ -388,12 +388,16 @@ let currentQuestionIndex = 0;
 let score = 0;
 let intervalId;
 
+let startTime; // Variable to store the start time of the timer
+let requestId; // Variable to store the requestAnimationFrame ID
+let endTime; // Variable to store the end time of the timer
+
+// Start the timer at the beginning of the quiz
+startTimer(300); // Start the timer with a duration of 5 minutes
+
 function loadQuestion() {
     const currentQuestion = selectedQuestions[currentQuestionIndex];
     document.getElementById('question').textContent = currentQuestion.question;
-
-    const timerElement = document.getElementById('timer');
-    startTimer(300, timerElement); // Start the timer at the beginning of the quiz <-- duration of 5 minutes
 
     const optionsContainer = document.getElementById('options');
     optionsContainer.innerHTML = '';
@@ -450,14 +454,11 @@ function provideFeedback(isCorrect, score) {
     resultContainer.style.color = isCorrect ? '#4caf50' : '#f44336';
 }
 
-let startTime; // Variable to store the start time of the timer
-let requestId; // Variable to store the requestAnimationFrame ID
-
 function startTimer(duration, timerElement) {
     startTime = Date.now(); // Store the current time as the start time
-    const endTime = startTime + duration * 1000; // Calculate the end time
+    endTime = startTime + duration * 1000; // Calculate the end time
 
-    updateTimer(timerElement, endTime); // Call the updateTimer function to start the timer updates
+    updateTimer(); // Call the updateTimer function to start the timer updates
 }
 
 function updateTimer(timerElement, endTime) {
@@ -477,9 +478,9 @@ function updateTimer(timerElement, endTime) {
     // Format the minutes and seconds with leading zeros if necessary
     const formattedTime = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 
-    timerElement.textContent = formattedTime; // Update the timer display
+    document.getElementById('timer').textContent = formattedTime; // Update the timer display
 
-    requestId = requestAnimationFrame(() => updateTimer(timerElement, endTime)); // Call updateTimer again on the next frame
+    requestId = requestAnimationFrame(updateTimer); // Call updateTimer again on the next frame
 }
 
 function stopTimer() {
