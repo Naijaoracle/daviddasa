@@ -396,6 +396,7 @@ function shuffleArray(array) {
     optionsContainer.innerHTML = '';
   
     currentQuestion.options.forEach((option, index) => {
+    const optionContainer = document.createElement('div');
       const input = document.createElement('input');
       input.type = 'radio';
       input.name = 'answer';
@@ -411,8 +412,9 @@ function shuffleArray(array) {
       label.setAttribute('for', `option${index}`);
       label.innerHTML = option;
   
-      optionsContainer.appendChild(input);
-      optionsContainer.appendChild(label);
+      optionContainer.appendChild(input);  
+      optionContainer.appendChild(label);  
+      optionsContainer.appendChild(optionContainer);     
     });
       // Start the timer for each question
   startTimer(60, document.getElementById('timer'));
@@ -465,7 +467,7 @@ function shuffleArray(array) {
   function startTimer(duration, displayElement) {
     let timer = duration;
     let minutes, seconds;
-    setInterval(function () {
+    const intervalId = setInterval(function () {  // Modified line
       minutes = parseInt(timer / 60, 10);
       seconds = parseInt(timer % 60, 10);
   
@@ -476,10 +478,12 @@ function shuffleArray(array) {
   
       if (--timer < 0) {
         // Timer has ended, perform necessary actions
-        // For example, show result or move to the next question
+        clearInterval(intervalId);  // New line
+        alert('Time up!');  // New line
+        window.location.href = 'https://www.daviddasa.com/DHAIquiz';  // New line
       }
     }, 1000);
-  }
+  }  
   
   function updateProgressBar(currentQuestionIndex, totalQuestions) {
     const progressBar = document.getElementById('progress-bar');
