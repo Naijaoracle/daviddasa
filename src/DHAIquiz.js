@@ -373,82 +373,80 @@ const allQuestions = [
 // Function to shuffle an array randomly
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
     }
-}
-
-// Shuffle all questions randomly
-shuffleArray(allQuestions);
-
-// Select 10 random questions for the quiz session
-const selectedQuestions = allQuestions.slice(0, 10);
-
-let currentQuestionIndex = 0;
-let score = 0;
-
-function loadQuestion() {
+  }
+  
+  // Shuffle all questions randomly
+  shuffleArray(allQuestions);
+  
+  // Select 10 random questions for the quiz session
+  const selectedQuestions = allQuestions.slice(0, 10);
+  
+  let currentQuestionIndex = 0;
+  let score = 0;
+  
+  function loadQuestion() {
     const currentQuestion = selectedQuestions[currentQuestionIndex];
     document.getElementById('question').innerHTML = currentQuestion.question;
-
+  
     const optionsContainer = document.getElementById('options');
     optionsContainer.innerHTML = '';
-
+  
     currentQuestion.options.forEach((option, index) => {
-        const input = document.createElement('input');
-        input.type = 'radio';
-        input.name = 'answer';
-        input.value = option;
-        input.id = `option${index}`;
-
-        const label = document.createElement('label');
-        label.className = 'option';
-        label.setAttribute('for', `option${index}`);
-        label.innerHTML = option;
-
-        optionsContainer.appendChild(input);
-        optionsContainer.appendChild(label);
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = 'answer';
+      input.value = option;
+      input.id = `option${index}`;
+  
+      const label = document.createElement('label');
+      label.className = 'option';
+      label.setAttribute('for', `option${index}`);
+      label.innerHTML = option;
+  
+      optionsContainer.appendChild(input);
+      optionsContainer.appendChild(label);
     });
-}
-
-function checkAnswer(selectedOption) {
+  }
+  
+  function checkAnswer(selectedOption) {
     const currentQuestion = selectedQuestions[currentQuestionIndex];
     if (selectedOption === currentQuestion.correctAnswer) {
-        score++;
+      score++;
     }
-
+  
     if (currentQuestionIndex < selectedQuestions.length - 1) {
-        currentQuestionIndex++;
-        loadQuestion();
+      currentQuestionIndex++;
+      loadQuestion();
     } else {
-        showResult();
+      showResult();
     }
-}
-
-function showResult() {
+  }
+  
+  function showResult() {
     const resultContainer = document.getElementById('result');
     resultContainer.innerHTML = `Your Score: ${score} out of ${selectedQuestions.length}`;
     document.getElementById('options').innerHTML = '';
     document.querySelector('button').style.display = 'none';
-}
-
-function nextQuestion() {
+  }
+  
+  function nextQuestion() {
     if (currentQuestionIndex < selectedQuestions.length - 1) {
-        currentQuestionIndex++;
-        loadQuestion();
+      currentQuestionIndex++;
+      loadQuestion();
     } else {
-        showResult();
+      showResult();
     }
-}
-
-loadQuestion();
-
-function provideFeedback(isCorrect) {
+  }
+  
+  function provideFeedback(isCorrect) {
     const resultContainer = document.getElementById('result');
     resultContainer.innerHTML = isCorrect ? 'Correct!' : 'Incorrect!';
     resultContainer.classList.add(isCorrect ? 'correct' : 'incorrect');
   }
-
+  
   function startTimer(duration, displayElement) {
     let timer = duration;
     let minutes, seconds;
@@ -467,10 +465,11 @@ function provideFeedback(isCorrect) {
       }
     }, 1000);
   }
-
+  
   function updateProgressBar(currentQuestionIndex, totalQuestions) {
     const progressBar = document.getElementById('progress-bar');
     const progressPercentage = ((currentQuestionIndex + 1) / totalQuestions) * 100;
     progressBar.style.width = progressPercentage + '%';
   }
   
+  loadQuestion();

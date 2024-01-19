@@ -8,6 +8,7 @@ body {
     background-image: linear-gradient(to right, #2ecc71, #092917);
     position: relative;
     z-index: 2;
+    margin-top: 70px;
   }
   
   /* Container Styles */
