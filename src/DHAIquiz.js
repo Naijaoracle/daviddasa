@@ -370,188 +370,182 @@ const allQuestions = [
     },    
     ];
 
-    // Function to shuffle an array randomly
+// Function to shuffle an array randomly
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
 
-    function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
-        
-        // Shuffle all questions randomly
-        shuffleArray(allQuestions);
-        
-        // Select 10 random questions for the quiz session
-        const selectedQuestions = allQuestions.slice(0, 10);
-        
-        let currentQuestionIndex = 0;
-        let score = 0;
-        
-        function loadQuestion() {
-            const currentQuestion = selectedQuestions[currentQuestionIndex];
-            document.getElementById('question').textContent = currentQuestion.question;
+// Shuffle all questions randomly
+shuffleArray(allQuestions);
 
-            const timerElement = document.getElementById('timer');
-            startTimer(180, timerElement);
-        
-            const optionsContainer = document.getElementById('options');
-            optionsContainer.innerHTML = '';
-        
-            currentQuestion.options.forEach((option, index) => {
-            const optionContainer = document.createElement('div');
-                const input = document.createElement('input');
-                input.type = 'radio';
-                input.name = 'answer';
-                input.value = option;
-                input.id = `option${index}`;
+// Select 10 random questions for the quiz session
+const selectedQuestions = allQuestions.slice(0, 10);
 
-                input.addEventListener('change', () => {
-                    checkAnswer(option);
-                });
-            
-                const label = document.createElement('label');
-                label.className = 'option';
-                label.setAttribute('for', `option${index}`);
-                label.innerHTML = option;
-        
-                optionContainer.appendChild(input);  
-                optionContainer.appendChild(label);  
-                optionsContainer.appendChild(optionContainer);     
-            });
-                // Start the timer for each question
-        startTimer(60, document.getElementById('timer'));
-        updateProgressBar(currentQuestionIndex, selectedQuestions.length);
+let currentQuestionIndex = 0;
+let score = 0;
+let intervalId;
 
-        // Update the progress bar
-        }
-        
-        function checkAnswer(selectedOption) {
-                // Provide feedback on the answer
-            const currentQuestion = selectedQuestions[currentQuestionIndex];
-            const isCorrect = selectedOption === currentQuestion.correctAnswer;
-        
-            provideFeedback(isCorrect);
-        
-            if (isCorrect) {
-                score++;
-            }
-        
-            if (currentQuestionIndex < selectedQuestions.length - 1) {
-                currentQuestionIndex++;
-                loadQuestion();
-            } else {
-                showResult();
-                stopTimer();
-            }
-        }
-        
-        function provideFeedback(isCorrect) {
-            const resultContainer = document.getElementById('result');
-            resultContainer.innerHTML = isCorrect ? 'Your previous answer was: Correct!' : 'Your previous answer was: Incorrect!';
-            resultContainer.classList.add(isCorrect ? 'correct' : 'incorrect');
-        }
-        
-        let intervalId;
+function loadQuestion() {
+    const currentQuestion = selectedQuestions[currentQuestionIndex];
+    document.getElementById('question').textContent = currentQuestion.question;
 
-        let startTime; // Variable to store the start time of the timer
-        let requestId; // Variable to store the requestAnimationFrame ID
+    const timerElement = document.getElementById('timer');
+    startTimer(60, timerElement);
 
-        function startTimer(duration, timerElement) {
-            startTime = Date.now(); // Store the current time as the start time
-            const endTime = startTime + duration * 1000; // Calculate the end time
+    const optionsContainer = document.getElementById('options');
+    optionsContainer.innerHTML = '';
 
-            updateTimer(timerElement,endTime); // Call the updateTimer function to start the timer updates
-          }
-          
-          function updateTimer(timerElement, endTime) {
-            const currentTime = Date.now(); // Get the current time
-            const remainingTime = endTime - currentTime; // Calculate the remaining time
-          
+    currentQuestion.options.forEach((option, index) => {
+        const optionContainer = document.createElement('div');
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'answer';
+        input.value = option;
+        input.id = `option${index}`;
 
-            if (remainingTime <= 0) { // If the remaining time is less than or equal to 0
-                stopTimer(); // Stop the timer
-                window.location.href = "https://www.daviddasa.com/DHAIquiz"; // Reload the page
-                return;
-            }
-
-
-            // Convert the elapsed time to minutes and seconds
-            const minutes = Math.floor(elapsedTime / 60000);
-            const seconds = Math.floor((elapsedTime % 60000) / 1000);
-          
-            // Format the minutes and seconds with leading zeros if necessary
-            const formattedTime = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-          
-            timerElement.textContent = formattedTime; // Update the timer display
-          
-            requestId = requestAnimationFrame(updateTimer); // Call updateTimer again on the next frame
-          }
-          
-          function stopTimer() {
-            cancelAnimationFrame(requestId); // Cancel the requestAnimationFrame loop
-          }
-        
-        function nextQuestion() {
-            clearInterval(intervalId);
-            if (currentQuestionIndex < selectedQuestions.length - 1) {
-                currentQuestionIndex++;
-                loadQuestion();
-            } else {
-                showResult();
-            }
-        }
-
-        function showResult() {
-            clearInterval(intervalId);
-            const resultContainer = document.getElementById('result');
-            resultContainer.innerHTML = `Your Score: ${score} out of ${selectedQuestions.length}`;
-            document.getElementById('options').innerHTML = '';
-            document.querySelector('button').style.display = 'none';
-        }
-
-        function updateProgressBar(currentQuestionIndex, totalQuestions) {
-            const progressBar = document.getElementById('progress-bar');
-            const progressPercentage = ((currentQuestionIndex + 1) / totalQuestions) * 100;
-            progressBar.style.width = progressPercentage + '%';
-        }
-        
-        // Update the result element
-        const resultElement = document.getElementById('result');
-        resultElement.textContent = "Your result goes here";
-
-        // Update the question element
-        const questionElement = document.getElementById('question');
-        questionElement.textContent = allQuestions[currentQuestionIndex].question;
-
-        // Update the options element
-        const optionsElement = document.getElementById('options');
-        optionsElement.innerHTML = '';
-        allQuestions[currentQuestionIndex].options.forEach((option, index) => {
-            const inputElement = document.createElement('input');
-            inputElement.type = 'radio';
-            inputElement.name = 'option';
-            inputElement.value = `option${index + 1}`;
-
-            const labelElement = document.createElement('label');
-            labelElement.htmlFor = `option${index + 1}`;
-            labelElement.textContent = option;
-
-            optionsElement.appendChild(inputElement);
-            optionsElement.appendChild(labelElement);
-            optionsElement.appendChild(document.createElement('br'));
+        input.addEventListener('change', () => {
+            checkAnswer(option);
         });
 
-        // Update the timer element
-        const timerElement = document.getElementById('timer');
-        timerElement.textContent = "00:00";
+        const label = document.createElement('label');
+        label.className = 'option';
+        label.setAttribute('for', `option${index}`);
+        label.innerHTML = option;
 
-        // Update the progress bar element
-        const progressBarElement = document.getElementById('progress-bar');
-        progressBarElement.style.width = "50%";
+        optionContainer.appendChild(input);
+        optionContainer.appendChild(label);
+        optionsContainer.appendChild(optionContainer);
+    });
 
-        // Update the next button element
-        const nextButtonElement = document.querySelector('button');
-        nextButtonElement.disabled = false;
+    updateProgressBar(currentQuestionIndex, selectedQuestions.length);
+}
 
-        document.querySelector('button').addEventListener('click', nextQuestion);        loadQuestion();
+function checkAnswer(selectedOption) {
+    // Provide feedback on the answer
+    const currentQuestion = selectedQuestions[currentQuestionIndex];
+    const isCorrect = selectedOption === currentQuestion.correctAnswer;
+
+    provideFeedback(isCorrect);
+
+    if (isCorrect) {
+        score++;
+    }
+
+    if (currentQuestionIndex < selectedQuestions.length - 1) {
+        currentQuestionIndex++;
+        loadQuestion();
+    } else {
+        showResult();
+        stopTimer();
+    }
+}
+
+function provideFeedback(isCorrect) {
+    const resultContainer = document.getElementById('result');
+    resultContainer.innerHTML = isCorrect ? 'Your previous answer was: Correct!' : 'Your previous answer was: Incorrect!';
+    resultContainer.classList.add(isCorrect ? 'correct' : 'incorrect');
+}
+
+let startTime; // Variable to store the start time of the timer
+let requestId; // Variable to store the requestAnimationFrame ID
+
+function startTimer(duration, timerElement) {
+    startTime = Date.now(); // Store the current time as the start time
+    const endTime = startTime + duration * 1000; // Calculate the end time
+
+    updateTimer(timerElement, endTime); // Call the updateTimer function to start the timer updates
+}
+
+function updateTimer(timerElement, endTime) {
+    const currentTime = Date.now(); // Get the current time
+    const remainingTime = endTime - currentTime; // Calculate the remaining time
+
+    if (remainingTime <= 0) { // If the remaining time is less than or equal to 0
+        stopTimer(); // Stop the timer
+        window.location.href = "https://www.daviddasa.com/DHAIquiz"; // Reload the page
+        return;
+    }
+
+    // Convert the remaining time to minutes and seconds
+    const minutes = Math.floor(remainingTime / 60000);
+    const seconds = Math.floor((remainingTime % 60000) / 1000);
+
+    // Format the minutes and seconds with leading zeros if necessary
+    const formattedTime = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+
+    timerElement.textContent = formattedTime; // Update the timer display
+
+    requestId = requestAnimationFrame(() => updateTimer(timerElement, endTime)); // Call updateTimer again on the next frame
+}
+
+function stopTimer() {
+    cancelAnimationFrame(requestId); // Cancel the requestAnimationFrame loop
+}
+
+function nextQuestion() {
+    clearInterval(intervalId);
+    if (currentQuestionIndex < selectedQuestions.length - 1) {
+        currentQuestionIndex++;
+        loadQuestion();
+    } else {
+        showResult();
+    }
+}
+
+function showResult() {
+    clearInterval(intervalId);
+    const resultContainer = document.getElementById('result');
+    resultContainer.innerHTML = `Your Score: ${score} out of ${selectedQuestions.length}`;
+    document.getElementById('options').innerHTML = '';
+    document.querySelector('button').style.display = 'none';
+}
+
+function updateProgressBar(currentQuestionIndex, totalQuestions) {
+    const progressBar = document.getElementById('progress-bar');
+    const progressPercentage = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+    progressBar.style.width = progressPercentage + '%';
+}
+
+// Update the result element
+const resultElement = document.getElementById('result');
+resultElement.textContent = `Your Score: ${score} out of ${selectedQuestions.length}`;
+
+// Update the question element
+const questionElement = document.getElementById('question');
+questionElement.textContent = allQuestions[currentQuestionIndex].question;
+
+// Update the options element
+const optionsElement = document.getElementById('options');
+optionsElement.innerHTML = '';
+allQuestions[currentQuestionIndex].options.forEach((option, index) => {
+    const inputElement = document.createElement('input');
+    inputElement.type = 'radio';
+    inputElement.name = 'option';
+    inputElement.value = `option${index + 1}`;
+
+    const labelElement = document.createElement('label');
+    labelElement.htmlFor = `option${index + 1}`;
+    labelElement.textContent = option;
+
+    optionsElement.appendChild(inputElement);
+    optionsElement.appendChild(labelElement);
+    optionsElement.appendChild(document.createElement('br'));
+});
+
+// Update the timer element
+const timerElement = document.getElementById('timer');
+timerElement.textContent = "00:00";
+
+// Update the progress bar element
+const progressBarElement = document.getElementById('progress-bar');
+progressBarElement.style.width = "50%";
+
+// Update the next button element
+const nextButtonElement = document.querySelector('button');
+nextButtonElement.disabled = false;
+
+document.querySelector('button').addEventListener('click', nextQuestion);
+loadQuestion();
