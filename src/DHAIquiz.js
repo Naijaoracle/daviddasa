@@ -341,158 +341,201 @@ const allQuestions = [
         ],
         "correctAnswer": "Telehealth involves a broader scope of remote healthcare services than telemedicine"
     },
-    {
-        "question": "What is the primary benefit of Electronic Health Records (EHRs)?",
-        "options": [
-            "EHRs primarily benefit the insurance companies",
-            "EHRs enable better and faster decision making by providing accurate patient information",
-            "EHRs are primarily used for billing purposes"
-        ],
-        "correctAnswer": "EHRs enable better and faster decision making by providing accurate patient information"
-    },
-    {
-        "question": "How can blockchain technology benefit healthcare?",
-        "options": [
-            "Blockchain can ensure secure and tamper-proof storage of patient data",
-            "Blockchain can replace the need for doctors",
-            "Blockchain can automate patient diagnosis"
-        ],
-        "correctAnswer": "Blockchain can ensure secure and tamper-proof storage of patient data"
-    },
-    {
-        "question": "What is the role of robotics in healthcare?",
-        "options": [
-            "Robotics has no role in healthcare",
-            "Robotics is used to replace doctors",
-            "Robotics assists in surgery, rehabilitation, and patient care"
-        ],
-        "correctAnswer": "Robotics assists in surgery, rehabilitation, and patient care"
-    },    
-];
+            {
+                    "question": "What is the primary benefit of Electronic Health Records (EHRs)?",
+                    "options": [
+                            "EHRs primarily benefit the insurance companies",
+                            "EHRs enable better and faster decision making by providing accurate patient information",
+                            "EHRs are primarily used for billing purposes"
+                    ],
+                    "correctAnswer": "EHRs enable better and faster decision making by providing accurate patient information"
+            },
+            {
+                    "question": "How can blockchain technology benefit healthcare?",
+                    "options": [
+                            "Blockchain can ensure secure and tamper-proof storage of patient data",
+                            "Blockchain can replace the need for doctors",
+                            "Blockchain can automate patient diagnosis"
+                    ],
+                    "correctAnswer": "Blockchain can ensure secure and tamper-proof storage of patient data"
+            },
+            {
+                    "question": "What is the role of robotics in healthcare?",
+                    "options": [
+                            "Robotics has no role in healthcare",
+                            "Robotics is used to replace doctors",
+                            "Robotics assists in surgery, rehabilitation, and patient care"
+                    ],
+                    "correctAnswer": "Robotics assists in surgery, rehabilitation, and patient care"
+            },    
+    ];
 
-// Function to shuffle an array randomly
+    // Function to shuffle an array randomly
 
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-  }
-  
-  // Shuffle all questions randomly
-  shuffleArray(allQuestions);
-  
-  // Select 10 random questions for the quiz session
-  const selectedQuestions = allQuestions.slice(0, 10);
-  
-  let currentQuestionIndex = 0;
-  let score = 0;
-  
-  function loadQuestion() {
-    const currentQuestion = selectedQuestions[currentQuestionIndex];
-    document.getElementById('question').innerHTML = currentQuestion.question;
-  
-    const optionsContainer = document.getElementById('options');
-    optionsContainer.innerHTML = '';
-  
-    currentQuestion.options.forEach((option, index) => {
-    const optionContainer = document.createElement('div');
-      const input = document.createElement('input');
-      input.type = 'radio';
-      input.name = 'answer';
-      input.value = option;
-      input.id = `option${index}`;
+    function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+        
+        // Shuffle all questions randomly
+        shuffleArray(allQuestions);
+        
+        // Select 10 random questions for the quiz session
+        const selectedQuestions = allQuestions.slice(0, 10);
+        
+        let currentQuestionIndex = 0;
+        let score = 0;
+        
+        function loadQuestion() {
+            const currentQuestion = selectedQuestions[currentQuestionIndex];
+            document.getElementById('question').textContent = currentQuestion.question;
+        
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+        
+            currentQuestion.options.forEach((option, index) => {
+            const optionContainer = document.createElement('div');
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = 'answer';
+                input.value = option;
+                input.id = `option${index}`;
 
-      input.addEventListener('change', () => {
-        checkAnswer(option);
-      });
-    
-      const label = document.createElement('label');
-      label.className = 'option';
-      label.setAttribute('for', `option${index}`);
-      label.innerHTML = option;
-  
-      optionContainer.appendChild(input);  
-      optionContainer.appendChild(label);  
-      optionsContainer.appendChild(optionContainer);     
-    });
-      // Start the timer for each question
-  startTimer(60, document.getElementById('timer'));
-  updateProgressBar(currentQuestionIndex, selectedQuestions.length);
+                input.addEventListener('change', () => {
+                    checkAnswer(option);
+                });
+            
+                const label = document.createElement('label');
+                label.className = 'option';
+                label.setAttribute('for', `option${index}`);
+                label.innerHTML = option;
+        
+                optionContainer.appendChild(input);  
+                optionContainer.appendChild(label);  
+                optionsContainer.appendChild(optionContainer);     
+            });
+                // Start the timer for each question
+        startTimer(60, document.getElementById('timer'));
+        updateProgressBar(currentQuestionIndex, selectedQuestions.length);
 
-  // Update the progress bar
-  }
-  
-  function checkAnswer(selectedOption) {
-      // Provide feedback on the answer
-    const currentQuestion = selectedQuestions[currentQuestionIndex];
-    const isCorrect = selectedOption === currentQuestion.correctAnswer;
-  
-    provideFeedback(isCorrect);
-  
-    if (isCorrect) {
-      score++;
-    }
-  
-    if (currentQuestionIndex < selectedQuestions.length - 1) {
-      currentQuestionIndex++;
-      loadQuestion();
-    } else {
-      showResult();
-    }
-  }
-  
-  function provideFeedback(isCorrect) {
-    const resultContainer = document.getElementById('result');
-    resultContainer.innerHTML = isCorrect ? 'Your previous answer was: Correct!' : 'Your previous answer was: Incorrect!';
-    resultContainer.classList.add(isCorrect ? 'correct' : 'incorrect');
-  }
-  
-  let intervalId;
+        // Update the progress bar
+        }
+        
+        function checkAnswer(selectedOption) {
+                // Provide feedback on the answer
+            const currentQuestion = selectedQuestions[currentQuestionIndex];
+            const isCorrect = selectedOption === currentQuestion.correctAnswer;
+        
+            provideFeedback(isCorrect);
+        
+            if (isCorrect) {
+                score++;
+            }
+        
+            if (currentQuestionIndex < selectedQuestions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                showResult();
+            }
+        }
+        
+        function provideFeedback(isCorrect) {
+            const resultContainer = document.getElementById('result');
+            resultContainer.innerHTML = isCorrect ? 'Your previous answer was: Correct!' : 'Your previous answer was: Incorrect!';
+            resultContainer.classList.add(isCorrect ? 'correct' : 'incorrect');
+        }
+        
+        let intervalId;
 
-  function startTimer(duration, displayElement) {
-    let timer = duration;
-    let minutes, seconds;
-    intervalId = setInterval(function () {  // Modified line
-      minutes = parseInt(timer / 60, 10);
-      seconds = parseInt(timer % 60, 10);
-  
-      minutes = minutes < 10 ? '0' + minutes : minutes;
-      seconds = seconds < 10 ? '0' + seconds : seconds;
-  
-      displayElement.textContent = minutes + ':' + seconds;
-  
-      if (--timer < 0) {
-        // Timer has ended, perform necessary actions
-        clearInterval(intervalId);  // New line
-        alert('Time up!');  // New line
-        window.location.href = 'https://www.daviddasa.com/DHAIquiz';  // New line
-      }
-    }, 1000);
-  }  
-  
-  function nextQuestion() {
-    clearInterval(intervalId);
-    if (currentQuestionIndex < selectedQuestions.length - 1) {
-      currentQuestionIndex++;
-      loadQuestion();
-    } else {
-      showResult();
-    }
-  }
+        let startTime; // Variable to store the start time of the timer
+        let requestId; // Variable to store the requestAnimationFrame ID
 
-  function showResult() {
-    clearInterval(intervalId);
-    const resultContainer = document.getElementById('result');
-    resultContainer.innerHTML = `Your Score: ${score} out of ${selectedQuestions.length}`;
-    document.getElementById('options').innerHTML = '';
-    document.querySelector('button').style.display = 'none';
-  }
+        function startTimer() {
+            startTime = Date.now(); // Store the current time as the start time
+            updateTimer(); // Call the updateTimer function to start the timer updates
+          }
+          
+          function updateTimer() {
+            const currentTime = Date.now(); // Get the current time
+            const elapsedTime = currentTime - startTime; // Calculate the elapsed time
+          
+            // Convert the elapsed time to minutes and seconds
+            const minutes = Math.floor(elapsedTime / 60000);
+            const seconds = Math.floor((elapsedTime % 60000) / 1000);
+          
+            // Format the minutes and seconds with leading zeros if necessary
+            const formattedTime = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+          
+            timerElement.textContent = formattedTime; // Update the timer display
+          
+            requestId = requestAnimationFrame(updateTimer); // Call updateTimer again on the next frame
+          }
+          
+          function stopTimer() {
+            cancelAnimationFrame(requestId); // Cancel the requestAnimationFrame loop
+          }
+        
+        function nextQuestion() {
+            clearInterval(intervalId);
+            if (currentQuestionIndex < selectedQuestions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                showResult();
+            }
+        }
 
-  function updateProgressBar(currentQuestionIndex, totalQuestions) {
-    const progressBar = document.getElementById('progress-bar');
-    const progressPercentage = ((currentQuestionIndex + 1) / totalQuestions) * 100;
-    progressBar.style.width = progressPercentage + '%';
-  }
-  document.querySelector('button').addEventListener('click', nextQuestion);
-  loadQuestion();
+        function showResult() {
+            clearInterval(intervalId);
+            const resultContainer = document.getElementById('result');
+            resultContainer.innerHTML = `Your Score: ${score} out of ${selectedQuestions.length}`;
+            document.getElementById('options').innerHTML = '';
+            document.querySelector('button').style.display = 'none';
+        }
+
+        function updateProgressBar(currentQuestionIndex, totalQuestions) {
+            const progressBar = document.getElementById('progress-bar');
+            const progressPercentage = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+            progressBar.style.width = progressPercentage + '%';
+        }
+        
+        // Update the result element
+        const resultElement = document.getElementById('result');
+        resultElement.textContent = "Your result goes here";
+
+        // Update the question element
+        const questionElement = document.getElementById('question');
+        questionElement.textContent = "Your question goes here";
+
+        // Update the options element
+        const optionsElement = document.getElementById('options');
+        optionsElement.innerHTML = `
+            <input type="radio" name="option" value="option1">
+            <label for="option1">Option 1</label>
+            <br>
+            <input type="radio" name="option" value="option2">
+            <label for="option2">Option 2</label>
+            <br>
+            <input type="radio" name="option" value="option3">
+            <label for="option3">Option 3</label>
+            <br>
+            <input type="radio" name="option" value="option4">
+            <label for="option4">Option 4</label>
+        `;
+
+        // Update the timer element
+        const timerElement = document.getElementById('timer');
+        timerElement.textContent = "00:00";
+
+        // Update the progress bar element
+        const progressBarElement = document.getElementById('progress-bar');
+        progressBarElement.style.width = "50%";
+
+        // Update the next button element
+        const nextButtonElement = document.querySelector('button');
+        nextButtonElement.disabled = false;
+
+        document.querySelector('button').addEventListener('click', nextQuestion);        loadQuestion();
