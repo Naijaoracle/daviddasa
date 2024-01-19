@@ -270,18 +270,22 @@ h2 {
 }
 
 .option {
-    margin: 30px 0;
-    padding: 30px;
+    margin: 10px 0;
+    padding: 20px;
     color: #333;
     text-align: center;
-    /* border: none;
+    border: none;
     border-radius: 5px;
-    cursor: pointer; */
-
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
 }
 
 .option:hover {
     text-align: center;
+}
+
+.option.selected {
+    border: 2px solid #4caf50;
 }
 
 #result {

@@ -404,23 +404,13 @@ function loadQuestion() {
 
     currentQuestion.options.forEach((option, index) => {
         const optionContainer = document.createElement('div');
-        const input = document.createElement('input');
-        input.type = 'radio';
-        input.name = 'answer';
-        input.value = option;
-        input.id = `option${index}`;
+        optionContainer.className = 'option';
+        optionContainer.textContent = option;
 
-        input.addEventListener('change', () => {
+        optionContainer.addEventListener('click', () => {
             checkAnswer(option);
         });
 
-        const label = document.createElement('label');
-        label.className = 'option';
-        label.setAttribute('for', `option${index}`);
-        label.innerHTML = option;
-
-        optionContainer.appendChild(input);
-        optionContainer.appendChild(label);
         optionsContainer.appendChild(optionContainer);
     });
 
