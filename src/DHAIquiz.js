@@ -391,6 +391,9 @@ const allQuestions = [
         function loadQuestion() {
             const currentQuestion = selectedQuestions[currentQuestionIndex];
             document.getElementById('question').textContent = currentQuestion.question;
+
+            const timerElement = document.getElementById('timer');
+            startTimer(180, timerElement);
         
             const optionsContainer = document.getElementById('options');
             optionsContainer.innerHTML = '';
@@ -439,6 +442,7 @@ const allQuestions = [
                 loadQuestion();
             } else {
                 showResult();
+                stopTimer();
             }
         }
         
@@ -453,15 +457,25 @@ const allQuestions = [
         let startTime; // Variable to store the start time of the timer
         let requestId; // Variable to store the requestAnimationFrame ID
 
-        function startTimer() {
+        function startTimer(duration, timerElement) {
             startTime = Date.now(); // Store the current time as the start time
-            updateTimer(); // Call the updateTimer function to start the timer updates
+            const endTime = startTime + duration * 1000; // Calculate the end time
+
+            updateTimer(timerElement,endTime); // Call the updateTimer function to start the timer updates
           }
           
-          function updateTimer() {
+          function updateTimer(timerElement, endTime) {
             const currentTime = Date.now(); // Get the current time
-            const elapsedTime = currentTime - startTime; // Calculate the elapsed time
+            const remainingTime = endTime - currentTime; // Calculate the remaining time
           
+
+            if (remainingTime <= 0) { // If the remaining time is less than or equal to 0
+                stopTimer(); // Stop the timer
+                window.location.href = "https://www.daviddasa.com/DHAIquiz"; // Reload the page
+                return;
+            }
+
+
             // Convert the elapsed time to minutes and seconds
             const minutes = Math.floor(elapsedTime / 60000);
             const seconds = Math.floor((elapsedTime % 60000) / 1000);
