@@ -386,14 +386,13 @@ const selectedQuestions = allQuestions.slice(0, 10);
 
 let currentQuestionIndex = 0;
 let score = 0;
-let intervalId;
+let requestId;
 
 function loadQuestion() {
     const currentQuestion = selectedQuestions[currentQuestionIndex];
     document.getElementById('question').textContent = currentQuestion.question;
 
     const timerElement = document.getElementById('timer');
-    startTimer(300, timerElement); // Start the timer at the beginning of the quiz <-- duration of 5 minutes
 
     const optionsContainer = document.getElementById('options');
     optionsContainer.innerHTML = '';
@@ -439,7 +438,6 @@ function checkAnswer(selectedOption) {
         loadQuestion();
     } else {
         showResult();
-        stopTimer();
     }
 }
 
@@ -447,15 +445,16 @@ function provideFeedback(isCorrect, score) {
     const resultContainer = document.getElementById('result');
     resultContainer.innerHTML = isCorrect ? 'Your previous answer was: Correct!' : 'Your previous answer was: Incorrect!';
     resultContainer.classList.add(isCorrect ? 'correct' : 'incorrect');
-    resultContainer.style.color = score >= 0.5 ? '#4caf50' : '#f44336';
+    resultContainer.style.color = isCorrect ? '#4caf50' : '#f44336';
 }
 
-let startTime; // Variable to store the start time of the timer
-let requestId; // Variable to store the requestAnimationFrame ID
+let quizStartTime; // Variable to store the start time of the quiz
+
+startTimer(300, timerElement); // Start the timer at the beginning of the script
 
 function startTimer(duration, timerElement) {
-    startTime = Date.now(); // Store the current time as the start time
-    const endTime = startTime + duration * 1000; // Calculate the end time
+    quizStartTime = Date.now(); // Store the current time as the start time
+    const endTime = quizStartTime + duration * 1000; // Calculate the end time
 
     updateTimer(timerElement, endTime); // Call the updateTimer function to start the timer updates
 }
@@ -487,7 +486,6 @@ function stopTimer() {
 }
 
 function nextQuestion() {
-    clearInterval(intervalId);
     if (currentQuestionIndex < selectedQuestions.length - 1) {
         currentQuestionIndex++;
         loadQuestion();
@@ -497,7 +495,6 @@ function nextQuestion() {
 }
 
 function showResult() {
-    clearInterval(intervalId);
     stopTimer(); // Stop the timer at the end of the quiz
     const resultContainer = document.getElementById('result');
     resultContainer.innerHTML = `Your Score: ${score} out of ${selectedQuestions.length}`;
