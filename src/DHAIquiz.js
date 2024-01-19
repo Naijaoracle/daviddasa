@@ -3,8 +3,8 @@ const allQuestions = [
     {
         question: "What is Digital Health?",
         options: [
-            "The use of digital technologies to monitor health",
             "The use of digital technologies to improve health",
+            "The use of digital technologies to monitor health",
             "The use of digital technologies to replace health"
         ],
         correctAnswer: "The use of digital technologies to improve health"
@@ -21,8 +21,8 @@ const allQuestions = [
     {
         question: "How can AI be used in healthcare?",
         options: [
-            "To replace doctors",
             "To assist doctors in diagnosing diseases",
+            "To replace doctors",
             "To make diseases"
         ],
         correctAnswer: "To assist doctors in diagnosing diseases"
@@ -30,8 +30,8 @@ const allQuestions = [
     {
         question: "What is the role of blockchain technology in healthcare?",
         options: [
-            "To replace traditional health records",
             "To secure and decentralize patient data",
+            "To replace traditional health records",
             "To block access to patient data"
         ],
         correctAnswer: "To secure and decentralize patient data"
@@ -68,8 +68,8 @@ const allQuestions = [
     {
         question: "What is the potential of AI in predicting disease outcomes?",
         options: [
-            "AI can predict disease outcomes with 100% accuracy",
             "AI can assist in predicting disease outcomes based on data",
+            "AI can predict disease outcomes with 100% accuracy",
             "AI cannot predict disease outcomes"
         ],
         correctAnswer: "AI can assist in predicting disease outcomes based on data"
@@ -78,8 +78,8 @@ const allQuestions = [
     {
         question: "What is the role of AI in medical imaging?",
         options: [
-            "To replace radiologists",
             "To assist in interpreting medical images",
+            "To replace radiologists",
             "To create medical images"
         ],
         correctAnswer: "To assist in interpreting medical images"
@@ -88,8 +88,8 @@ const allQuestions = [
     {
         question: "What is the role of digital health in managing chronic diseases?",
         options: [
-            "To cure chronic diseases",
             "To assist in monitoring and managing chronic diseases",
+            "To cure chronic diseases",
             "To create chronic diseases"
         ],
         correctAnswer: "To assist in monitoring and managing chronic diseases"
@@ -133,8 +133,8 @@ const allQuestions = [
     {
         question: "What is the role of AI in surgery?",
         options: [
-            "To replace surgeons",
             "To assist surgeons in performing surgeries",
+            "To replace surgeons",
             "To stop surgeries"
         ],
         correctAnswer: "To assist surgeons in performing surgeries"
@@ -226,9 +226,9 @@ const allQuestions = [
     {
         question: "What is the role of AI in health policy?",
         options: [
+            "To assist in analyzing and interpreting health policy data",
             "To stop health policy",
             "To replace health policy makers",
-            "To assist in analyzing and interpreting health policy data"
         ],
         correctAnswer: "To assist in analyzing and interpreting health policy data"
     },
@@ -497,6 +497,7 @@ function nextQuestion() {
 
 function showResult() {
     clearInterval(intervalId);
+    stopTimer(); // Stop the timer at the end of the quiz
     const resultContainer = document.getElementById('result');
     resultContainer.innerHTML = `Your Score: ${score} out of ${selectedQuestions.length}`;
     document.getElementById('options').innerHTML = '';
