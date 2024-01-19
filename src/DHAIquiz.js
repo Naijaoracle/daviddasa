@@ -393,6 +393,7 @@ function loadQuestion() {
     document.getElementById('question').textContent = currentQuestion.question;
 
     const timerElement = document.getElementById('timer');
+    startTimer(300, timerElement); // Start the timer at the beginning of the quiz <-- duration of 5 minutes
 
     const optionsContainer = document.getElementById('options');
     optionsContainer.innerHTML = '';
@@ -422,9 +423,6 @@ function loadQuestion() {
     updateProgressBar(currentQuestionIndex, selectedQuestions.length);
 }
 
-startTimer(document.getElementById('timer'));
-loadQuestion();
-
 function checkAnswer(selectedOption) {
     // Provide feedback on the answer
     const currentQuestion = selectedQuestions[currentQuestionIndex];
@@ -449,20 +447,15 @@ function provideFeedback(isCorrect, score) {
     const resultContainer = document.getElementById('result');
     resultContainer.innerHTML = isCorrect ? 'Your previous answer was: Correct!' : 'Your previous answer was: Incorrect!';
     resultContainer.classList.add(isCorrect ? 'correct' : 'incorrect');
-    resultContainer.style.color = isCorrect ? '#4caf50' : '#f44336';
+    resultContainer.style.color = score >= 0.5 ? '#4caf50' : '#f44336';
 }
 
 let startTime; // Variable to store the start time of the timer
 let requestId; // Variable to store the requestAnimationFrame ID
-const quizDuration = 300; // Duration of the quiz in seconds (5 minutes)
 
-function startTimer(timerElement) {
-    if (startTime) {
-        return; // Timer has already started, do nothing
-    }
-
+function startTimer(duration, timerElement) {
     startTime = Date.now(); // Store the current time as the start time
-    const endTime = startTime + quizDuration * 1000; // Calculate the end time
+    const endTime = startTime + duration * 1000; // Calculate the end time
 
     updateTimer(timerElement, endTime); // Call the updateTimer function to start the timer updates
 }

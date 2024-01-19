@@ -291,6 +291,14 @@ h2 {
     font-weight: bold;
 }
 
+#result.correct {
+    color: #4caf50;
+}
+
+#result.incorrect {
+    color: #f44336;
+}
+
 #next-button { /*blurred out*/
     padding: 10px 20px;
     border: none;
