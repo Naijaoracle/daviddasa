@@ -401,7 +401,11 @@ function shuffleArray(array) {
       input.name = 'answer';
       input.value = option;
       input.id = `option${index}`;
-  
+
+      input.addEventListener('change', () => {
+        checkAnswer(option);
+      });
+    
       const label = document.createElement('label');
       label.className = 'option';
       label.setAttribute('for', `option${index}`);
