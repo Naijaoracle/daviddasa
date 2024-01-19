@@ -393,7 +393,7 @@ function loadQuestion() {
     document.getElementById('question').textContent = currentQuestion.question;
 
     const timerElement = document.getElementById('timer');
-    startTimer(60, timerElement);
+    startTimer(300, timerElement); // Start the timer at the beginning of the quiz <-- duration of 5 minutes
 
     const optionsContainer = document.getElementById('options');
     optionsContainer.innerHTML = '';
