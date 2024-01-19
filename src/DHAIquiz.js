@@ -371,6 +371,8 @@ const allQuestions = [
 ];
 
 // Function to shuffle an array randomly
+document.querySelector('button').addEventListener('click', nextQuestion);
+
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -409,11 +411,21 @@ function shuffleArray(array) {
       optionsContainer.appendChild(input);
       optionsContainer.appendChild(label);
     });
+      // Start the timer for each question
+  startTimer(60, document.getElementById('timer'));
+
+  // Update the progress bar
+  updateProgressBar(currentQuestionIndex, selectedQuestions.length);
   }
   
   function checkAnswer(selectedOption) {
     const currentQuestion = selectedQuestions[currentQuestionIndex];
-    if (selectedOption === currentQuestion.correctAnswer) {
+    const isCorrect = selectedOption === currentQuestion.correctAnswer;
+  
+    // Provide feedback on the answer
+    provideFeedback(isCorrect);
+  
+    if (isCorrect) {
       score++;
     }
   
