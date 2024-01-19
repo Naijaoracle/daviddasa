@@ -443,10 +443,11 @@ function checkAnswer(selectedOption) {
     }
 }
 
-function provideFeedback(isCorrect) {
+function provideFeedback(isCorrect, score) {
     const resultContainer = document.getElementById('result');
     resultContainer.innerHTML = isCorrect ? 'Your previous answer was: Correct!' : 'Your previous answer was: Incorrect!';
     resultContainer.classList.add(isCorrect ? 'correct' : 'incorrect');
+    resultContainer.style.color = score >= 0.5 ? '#4caf50' : '#f44336';
 }
 
 let startTime; // Variable to store the start time of the timer
@@ -502,6 +503,7 @@ function showResult() {
     resultContainer.innerHTML = `Your Score: ${score} out of ${selectedQuestions.length}`;
     document.getElementById('options').innerHTML = '';
     document.querySelector('button').style.display = 'none';
+    document.getElementById('timer').classList.add('hidden'); // Add the 'hidden' class to hide the timer
 }
 
 function updateProgressBar(currentQuestionIndex, totalQuestions) {
