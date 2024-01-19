@@ -442,32 +442,18 @@ function shuffleArray(array) {
     }
   }
   
-  function showResult() {
-    const resultContainer = document.getElementById('result');
-    resultContainer.innerHTML = `Your Score: ${score} out of ${selectedQuestions.length}`;
-    document.getElementById('options').innerHTML = '';
-    document.querySelector('button').style.display = 'none';
-  }
-  
-  function nextQuestion() {
-    if (currentQuestionIndex < selectedQuestions.length - 1) {
-      currentQuestionIndex++;
-      loadQuestion();
-    } else {
-      showResult();
-    }
-  }
-  
   function provideFeedback(isCorrect) {
     const resultContainer = document.getElementById('result');
-    resultContainer.innerHTML = isCorrect ? 'Correct!' : 'Incorrect!';
+    resultContainer.innerHTML = isCorrect ? 'Your previous answer was: Correct!' : 'Your previous answer was: Incorrect!';
     resultContainer.classList.add(isCorrect ? 'correct' : 'incorrect');
   }
   
+  let intervalId;
+
   function startTimer(duration, displayElement) {
     let timer = duration;
     let minutes, seconds;
-    const intervalId = setInterval(function () {  // Modified line
+    intervalId = setInterval(function () {  // Modified line
       minutes = parseInt(timer / 60, 10);
       seconds = parseInt(timer % 60, 10);
   
@@ -485,6 +471,24 @@ function shuffleArray(array) {
     }, 1000);
   }  
   
+  function nextQuestion() {
+    clearInterval(intervalId);
+    if (currentQuestionIndex < selectedQuestions.length - 1) {
+      currentQuestionIndex++;
+      loadQuestion();
+    } else {
+      showResult();
+    }
+  }
+
+  function showResult() {
+    clearInterval(intervalId);
+    const resultContainer = document.getElementById('result');
+    resultContainer.innerHTML = `Your Score: ${score} out of ${selectedQuestions.length}`;
+    document.getElementById('options').innerHTML = '';
+    document.querySelector('button').style.display = 'none';
+  }
+
   function updateProgressBar(currentQuestionIndex, totalQuestions) {
     const progressBar = document.getElementById('progress-bar');
     const progressPercentage = ((currentQuestionIndex + 1) / totalQuestions) * 100;
