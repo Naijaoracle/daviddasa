@@ -116,8 +116,8 @@ const allQuestions = [
         question: "What is the role of AI in precision medicine?",
         options: [
             "To replace doctors in precision medicine",
-            "To assist in personalizing medical treatments based on individual characteristics",
-            "To generalize medical treatments in precision medicine"
+            "To generalize medical treatments in precision medicine",
+            "To assist in personalizing medical treatments based on individual characteristics"
         ],
         correctAnswer: "To assist in personalizing medical treatments based on individual characteristics"
     },
@@ -169,9 +169,9 @@ const allQuestions = [
     {
         question: "What is the role of AI in genomics?",
         options: [
+            "To assist in analyzing and interpreting genomic data",
             "To stop genomics research",
-            "To replace geneticists",
-            "To assist in analyzing and interpreting genomic data"
+            "To replace geneticists"
         ],
         correctAnswer: "To assist in analyzing and interpreting genomic data"
     },
@@ -197,8 +197,8 @@ const allQuestions = [
         question: "What is the role of digital health in health education?",
         options: [
             "To stop health education",
-            "To replace health education",
-            "To enhance health education through technology"
+            "To enhance health education through technology",
+            "To replace health education"            
         ],
         correctAnswer: "To enhance health education through technology"
     },
@@ -216,9 +216,9 @@ const allQuestions = [
     {
         question: "What is the role of digital health in health promotion?",
         options: [
+            "To enhance health promotion through technology",
             "To stop health promotion",
-            "To replace health promotion",
-            "To enhance health promotion through technology"
+            "To replace health promotion"
         ],
         correctAnswer: "To enhance health promotion through technology"
     },
@@ -228,7 +228,7 @@ const allQuestions = [
         options: [
             "To assist in analyzing and interpreting health policy data",
             "To stop health policy",
-            "To replace health policy makers",
+            "To replace health policy makers"
         ],
         correctAnswer: "To assist in analyzing and interpreting health policy data"
     },
@@ -246,8 +246,8 @@ const allQuestions = [
         question: "In what ways can AI improve medication adherence for patients?",
         options: [
             "By removing the need for medication adherence",
-            "By providing reminders and personalized interventions",
-            "By increasing the complexity of medication regimens"    
+            "By increasing the complexity of medication regimens",
+            "By providing reminders and personalized interventions"    
         ],
         correctAnswer: "By providing reminders and personalized interventions"
     },
@@ -264,16 +264,16 @@ const allQuestions = [
         question: "What role can AI play in predicting and preventing disease outbreaks?",
         options: [
             "AI has no role in predicting or preventing disease outbreaks",
-            "By analyzing data patterns to anticipate and mitigate potential outbreaks",
-            "By intentionally spreading diseases for research purposes"
+            "By intentionally spreading diseases for research purposes",
+            "By analyzing data patterns to anticipate and mitigate potential outbreaks"
         ],
         correctAnswer: "By analyzing data patterns to anticipate and mitigate potential outbreaks"
     },
     {
         question: "How does remote patient monitoring contribute to digital health?",
         options: [
-            "By replacing in-person consultations",
             "By enabling real-time monitoring of patients outside traditional healthcare settings",
+            "By replacing in-person consultations",
             "By restricting patient monitoring to specific locations"
         ],
         correctAnswer: "By enabling real-time monitoring of patients outside traditional healthcare settings"
@@ -290,8 +290,8 @@ const allQuestions = [
     {
         question: "In what ways can AI improve medication adherence for patients?",
         options: [
-            "By removing the need for medication adherence",
             "By providing reminders and personalized interventions",
+            "By removing the need for medication adherence",
             "By increasing the complexity of medication regimens"
         ],
         correctAnswer: "By providing reminders and personalized interventions"
@@ -300,8 +300,8 @@ const allQuestions = [
         question: "How can AI-driven chatbots enhance the patient experience?",
         options: [
             "By replacing human interactions with chatbots",
-            "By providing instant and personalized responses to patient queries",
-            "By limiting communication channels to traditional methods"
+            "By limiting communication channels to traditional methods",
+            "By providing instant and personalized responses to patient queries"
         ],
         correctAnswer: "By providing instant and personalized responses to patient queries"
     },
@@ -345,8 +345,8 @@ const allQuestions = [
         question: "What is the primary benefit of Electronic Health Records (EHRs)?",
         options: [
         "EHRs primarily benefit the insurance companies",
-        "EHRs enable better and faster decision making by providing accurate patient information",
-        "EHRs are primarily used for billing purposes"
+        "EHRs are primarily used for billing purposes",
+        "EHRs enable better and faster decision making by providing accurate patient information"
 ],
         correctAnswer: "EHRs enable better and faster decision making by providing accurate patient information"
     },
