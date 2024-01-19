@@ -461,7 +461,7 @@ function startTimer(duration, timerElement) {
     updateTimer(); // Call the updateTimer function to start the timer updates
 }
 
-function updateTimer(timerElement, endTime) {
+function updateTimer() {
     const currentTime = Date.now(); // Get the current time
     const remainingTime = endTime - currentTime; // Calculate the remaining time
 
@@ -505,6 +505,7 @@ function showResult() {
     document.getElementById('options').innerHTML = '';
     document.querySelector('button').style.display = 'none';
     document.getElementById('timer').classList.add('hidden'); // Add the 'hidden' class to hide the timer at the end of the quiz
+    document.getElementById('question').classList.add('hidden'); // Add the 'hidden' class to hide the question at the end of the quiz
 }
 
 function updateProgressBar(currentQuestionIndex, totalQuestions) {
