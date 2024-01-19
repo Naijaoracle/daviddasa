@@ -371,7 +371,6 @@ const allQuestions = [
 ];
 
 // Function to shuffle an array randomly
-document.querySelector('button').addEventListener('click', nextQuestion);
 
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -413,16 +412,16 @@ function shuffleArray(array) {
     });
       // Start the timer for each question
   startTimer(60, document.getElementById('timer'));
+  updateProgressBar(currentQuestionIndex, selectedQuestions.length);
 
   // Update the progress bar
-  updateProgressBar(currentQuestionIndex, selectedQuestions.length);
   }
   
   function checkAnswer(selectedOption) {
+      // Provide feedback on the answer
     const currentQuestion = selectedQuestions[currentQuestionIndex];
     const isCorrect = selectedOption === currentQuestion.correctAnswer;
   
-    // Provide feedback on the answer
     provideFeedback(isCorrect);
   
     if (isCorrect) {
@@ -483,5 +482,5 @@ function shuffleArray(array) {
     const progressPercentage = ((currentQuestionIndex + 1) / totalQuestions) * 100;
     progressBar.style.width = progressPercentage + '%';
   }
-  
+  document.querySelector('button').addEventListener('click', nextQuestion);
   loadQuestion();
