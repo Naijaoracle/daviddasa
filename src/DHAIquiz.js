@@ -315,59 +315,59 @@ const allQuestions = [
         correctAnswer: "By analyzing data patterns to anticipate and mitigate potential outbreaks"
     },
     {
-        "question": "What is the role of Big Data in healthcare?",
-        "options": [
+        question: "What is the role of Big Data in healthcare?",
+        options: [
             "Big Data has no role in healthcare",
             "Big Data helps in storing patient records",
             "Big Data helps in predictive analysis, decision making, and improving patient care"
         ],
-        "correctAnswer": "Big Data helps in predictive analysis, decision making, and improving patient care"
+        correctAnswer: "Big Data helps in predictive analysis, decision making, and improving patient care"
     },
     {
-        "question": "What is the Internet of Medical Things (IoMT)?",
-        "options": [
+        question: "What is the Internet of Medical Things (IoMT)?",
+        options: [
             "A network of medical devices connected to the internet",
             "A network of medical professionals",
             "A network of medical institutions"
         ],
-        "correctAnswer": "A network of medical devices connected to the internet"
+        correctAnswer: "A network of medical devices connected to the internet"
     },
     {
-        "question": "How does telehealth differ from telemedicine?",
-        "options": [
+        question: "How does telehealth differ from telemedicine?",
+        options: [
             "Telehealth involves a broader scope of remote healthcare services than telemedicine",
             "Telemedicine involves a broader scope of remote healthcare services than telehealth",
             "There is no difference between telehealth and telemedicine"
         ],
-        "correctAnswer": "Telehealth involves a broader scope of remote healthcare services than telemedicine"
+        correctAnswer: "Telehealth involves a broader scope of remote healthcare services than telemedicine"
     },
-            {
-                    "question": "What is the primary benefit of Electronic Health Records (EHRs)?",
-                    "options": [
-                            "EHRs primarily benefit the insurance companies",
-                            "EHRs enable better and faster decision making by providing accurate patient information",
-                            "EHRs are primarily used for billing purposes"
-                    ],
-                    "correctAnswer": "EHRs enable better and faster decision making by providing accurate patient information"
-            },
-            {
-                    "question": "How can blockchain technology benefit healthcare?",
-                    "options": [
-                            "Blockchain can ensure secure and tamper-proof storage of patient data",
-                            "Blockchain can replace the need for doctors",
-                            "Blockchain can automate patient diagnosis"
-                    ],
-                    "correctAnswer": "Blockchain can ensure secure and tamper-proof storage of patient data"
-            },
-            {
-                    "question": "What is the role of robotics in healthcare?",
-                    "options": [
-                            "Robotics has no role in healthcare",
-                            "Robotics is used to replace doctors",
-                            "Robotics assists in surgery, rehabilitation, and patient care"
-                    ],
-                    "correctAnswer": "Robotics assists in surgery, rehabilitation, and patient care"
-            },    
+    {
+        question: "What is the primary benefit of Electronic Health Records (EHRs)?",
+        options: [
+        "EHRs primarily benefit the insurance companies",
+        "EHRs enable better and faster decision making by providing accurate patient information",
+        "EHRs are primarily used for billing purposes"
+],
+        correctAnswer: "EHRs enable better and faster decision making by providing accurate patient information"
+    },
+    {
+        question: "How can blockchain technology benefit healthcare?",
+        options: [
+                "Blockchain can ensure secure and tamper-proof storage of patient data",
+                "Blockchain can replace the need for doctors",
+                "Blockchain can automate patient diagnosis"
+        ],
+        correctAnswer: "Blockchain can ensure secure and tamper-proof storage of patient data"
+},
+    {
+        question: "What is the role of robotics in healthcare?",
+        options: [
+                "Robotics has no role in healthcare",
+                "Robotics is used to replace doctors",
+                "Robotics assists in surgery, rehabilitation, and patient care"
+        ],
+        correctAnswer: "Robotics assists in surgery, rehabilitation, and patient care"
+    },    
     ];
 
     // Function to shuffle an array randomly
@@ -522,23 +522,25 @@ const allQuestions = [
 
         // Update the question element
         const questionElement = document.getElementById('question');
-        questionElement.textContent = "Your question goes here";
+        questionElement.textContent = allQuestions[currentQuestionIndex].question;
 
         // Update the options element
         const optionsElement = document.getElementById('options');
-        optionsElement.innerHTML = `
-            <input type="radio" name="option" value="option1">
-            <label for="option1">Option 1</label>
-            <br>
-            <input type="radio" name="option" value="option2">
-            <label for="option2">Option 2</label>
-            <br>
-            <input type="radio" name="option" value="option3">
-            <label for="option3">Option 3</label>
-            <br>
-            <input type="radio" name="option" value="option4">
-            <label for="option4">Option 4</label>
-        `;
+        optionsElement.innerHTML = '';
+        allQuestions[currentQuestionIndex].options.forEach((option, index) => {
+            const inputElement = document.createElement('input');
+            inputElement.type = 'radio';
+            inputElement.name = 'option';
+            inputElement.value = `option${index + 1}`;
+
+            const labelElement = document.createElement('label');
+            labelElement.htmlFor = `option${index + 1}`;
+            labelElement.textContent = option;
+
+            optionsElement.appendChild(inputElement);
+            optionsElement.appendChild(labelElement);
+            optionsElement.appendChild(document.createElement('br'));
+        });
 
         // Update the timer element
         const timerElement = document.getElementById('timer');
