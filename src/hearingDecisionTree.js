@@ -1,13 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-  var yesButton = document.getElementById('hearingYesButton');
-  var noButton = document.getElementById('hearingNoButton');
-  yesButton.addEventListener('click', function () {
-    generatePromptElements(prompts[0].actions[0]);
-  });
-  noButton.addEventListener('click', function () {
-    generatePromptElements(prompts[0].actions[1]);
-  });
-
   // Array to store prompts and actions
   var prompts = [
     {
@@ -93,6 +84,18 @@ document.addEventListener('DOMContentLoaded', function () {
     },
     // Add more prompts and actions as needed
   ];
+
+  // Get the buttons after prompts array definition
+  var yesButton = document.getElementById('hearingYesButton');
+  var noButton = document.getElementById('hearingNoButton');
+
+  // Attach event listeners after prompts array definition
+  yesButton.addEventListener('click', function () {
+    generatePromptElements(prompts[0].actions[0]);
+  });
+  noButton.addEventListener('click', function () {
+    generatePromptElements(prompts[0].actions[1]);
+  });
 
   // Function to generate prompt elements
   function generatePromptElements(prompt) {
