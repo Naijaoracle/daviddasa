@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var yesButton = document.getElementById('hearingYesButton');
   var noButton = document.getElementById('hearingNoButton');
   yesButton.addEventListener('click', function () {
-    generatePromptElements(prompts[0].actions[0].actions[0]);
+    generatePromptElements(prompts[0].actions[0]);
   });
   noButton.addEventListener('click', function () {
     showResult("nothing wrong with your ears or you may have an ear condition not associated with hearing loss.");
