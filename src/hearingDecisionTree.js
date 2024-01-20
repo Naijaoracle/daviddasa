@@ -15,68 +15,65 @@ document.addEventListener('DOMContentLoaded', function () {
       actions: [
         {
           answer: "yes",
+          prompt: "Is the hearing loss sudden? (Yes/No)",
           actions: [
             {
-              prompt: "Is the hearing loss sudden? (Yes/No)",
+              answer: "yes",
+              prompt: "Do you experience pain? (Yes/No)",
               actions: [
                 {
                   answer: "yes",
-                  prompt: "Do you experience pain? (Yes/No)",
-                  actions: [
-                    {
-                      answer: "yes",
-                      action: function () {
-                        showResult("Tympanic Perforation");
-                      },
-                    },
-                  ],
-                },
-                {
-                  answer: "no",
                   action: function () {
-                    showResult("Sensorineural hearing loss or a Foreign Body in your ear");
+                    showResult("Tympanic Perforation");
                   },
                 },
               ],
             },
             {
-              prompt: "Is the hearing loss gradual? (Yes/No)",
+              answer: "no",
+              action: function () {
+                showResult("Sensorineural hearing loss or a Foreign Body in your ear");
+              },
+            },
+          ],
+        },
+        {
+          answer: "no",
+          prompt: "Is the hearing loss gradual? (Yes/No)",
+          actions: [
+            {
+              answer: "yes",
+              prompt: "Do you experience pain? (Yes/No)",
               actions: [
                 {
                   answer: "yes",
-                  prompt: "Do you experience pain? (Yes/No)",
-                  actions: [
-                    {
-                      answer: "yes",
-                      action: function () {
-                        showResult("Otitis Media");
-                      },
-                    },
-                  ],
+                  action: function () {
+                    showResult("Otitis Media");
+                  },
                 },
+              ],
+            },
+            {
+              answer: "no",
+              prompt: "Do you have recent runny nose and/or fevers? (Yes/No)",
+              actions: [
                 {
-                  answer: "no",
-                  prompt: "Do you have recent runny nose and/or fevers? (Yes/No)",
-                  actions: [
-                    {
-                      answer: "yes",
-                      action: function () {
-                        showResult("Labrynthitis");
-                      },
-                    },
-                  ],
+                  answer: "yes",
+                  action: function () {
+                    showResult("Labrynthitis");
+                  },
                 },
+              ],
+            },
+            {
+              answer: "no",
+              prompt: "Do you experience loss of balance? (Yes/No)",
+              actions: [
                 {
-                  answer: "no",
-                  prompt: "Do you experience loss of balance? (Yes/No)",
-                  actions: [
-                    {
-                      answer: "yes",
-                      action: function () {
-                        showResult("Meniere's Disease");
-                      },
-                    },
-                  ],
+                  answer: "yes",
+                  action: function () {
+                    showResult("Meniere's Disease");
+                  },
                 },
                 {
                   answer: "no",
@@ -84,13 +81,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     showResult("Wax Build-up");
                   },
                 },
-                {
-                  answer: "no",
-                  action: function () {
-                    showResult("Further assessment needed");
-                  },
-                },
               ],
+            },
+            {
+              answer: "no",
+              action: function () {
+                showResult("Further assessment needed");
+              },
             },
           ],
         },
@@ -98,6 +95,7 @@ document.addEventListener('DOMContentLoaded', function () {
     },
     // Add more prompts and actions as needed
   ];
+  
 
   // Function to generate prompt elements
   function generatePromptElements(prompt) {
