@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             {
               answer: "no",
+              prompt: "Do you experience pain? (Yes/No)",
               actions: [
                 {
                   answer: "yes",
