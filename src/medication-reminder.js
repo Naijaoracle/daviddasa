@@ -116,3 +116,11 @@ function showNotification() {
         }
     });
 }
+
+window.onload = function () {
+    const setReminderButton = document.getElementById('setReminderButton');
+    if (setReminderButton) {
+      setReminderButton.addEventListener('click', setReminder);
+    }
+  };
+  

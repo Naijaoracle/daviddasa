@@ -193,6 +193,7 @@ button {
   color: white;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
   transition: background-color 0.3s ease-in-out;
+  cursor: pointer;
 }
 
 #categoryBar {
