@@ -70,3 +70,38 @@ function scheduleReminder(time, frequency, days) {
         showNotification();
     }, delay);
 }
+
+function setReminder() {
+    // Get the selected time, frequency, and days from the HTML elements
+    const time = document.getElementById('med-time').value;
+    const frequency = document.getElementById('frequency').value;
+    const days = Array.from(document.getElementById('days').selectedOptions).map(option => option.value);
+
+    // Call the scheduleReminder function with the selected time, frequency, and days
+    scheduleReminder(time, frequency, days);
+}
+
+function showNotification() {
+    // Check if the browser supports notifications
+    if (!("Notification" in window)) {
+        console.log("This browser does not support desktop notifications.");
+        return;
+    }
+
+    // Request permission to display notifications
+    Notification.requestPermission().then(function (permission) {
+        if (permission === "granted") {
+            // Create a new notification
+            const notification = new Notification("Medication Reminder", {
+                body: "It's time to take your medication!",
+                icon: "https://github.com/Naijaoracle/static_web_app/blob/main/src/DD_logo.png?raw=true"// Replace with the path to your notification icon
+            });
+
+            // Handle click event on the notification
+            notification.onclick = function () {
+                // Handle the click event here
+                console.log("Notification clicked.");
+            };
+        }
+    });
+}
