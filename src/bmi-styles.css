@@ -298,4 +298,60 @@ button {
   /* Medication reminder styles */
   .med-reminder {
     text-align: center;
+    margin-top: 20px;
+}
+
+.med-reminder {
+  text-align: center;
+  margin-top: 20px; /* Adjust the spacing from the content above */
+}
+
+/* Adjust the label styling for better spacing */
+.med-reminder label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* Style the input fields for consistency */
+.med-reminder input,
+.med-reminder select {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+/* Style the select dropdown arrow */
+.med-reminder select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: url('path-to-arrow-image.png') no-repeat right center; /* Replace with your arrow image */
+  background-size: 20px; /* Set the size of the arrow image */
+}
+
+/* Style the button */
+#setReminderButton {
+  padding: 12px;
+  margin-top: 10px;
+}
+
+/* Style the notification area */
+#notificationArea {
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #d4edda; /* Example background color for success messages */
+  color: #155724; /* Example text color for success messages */
+  display: none; /* Initially hide the notification area */
+}
+
+/* Show the notification area when there is content */
+#notificationArea:empty {
+  display: none;
+}
+#notificationArea:not(:empty) {
+  display: block;
 }
