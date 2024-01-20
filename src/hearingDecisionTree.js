@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
     generatePromptElements(prompts[0].actions[0]);
   });
   noButton.addEventListener('click', function () {
-    showResult("nothing wrong with your ears or you may have an ear condition not associated with hearing loss.");
+    generatePromptElements(prompts[0].actions[1]);
   });
 
   // Array to store prompts and actions
@@ -39,44 +39,49 @@ document.addEventListener('DOMContentLoaded', function () {
               answer: "no",
               actions: [
                 {
-                  answer: "yes",
-                  action: function () {
-                    showResult("Otitis Media");
-                  },
-                },
-                {
-                  answer: "no",
-                  prompt: "Do you have recent runny nose and/or fevers? (Yes/No)",
+                  prompt: "Do you experience pain? (Yes/No)",
                   actions: [
                     {
                       answer: "yes",
                       action: function () {
-                        showResult("Labrynthitis");
+                        showResult("Otitis Media");
                       },
                     },
                     {
                       answer: "no",
-                      prompt: "Do you experience loss of balance? (Yes/No)",
+                      prompt: "Do you have recent runny nose and/or fevers? (Yes/No)",
                       actions: [
                         {
                           answer: "yes",
                           action: function () {
-                            showResult("Meniere's Disease");
+                            showResult("Labrynthitis");
                           },
                         },
                         {
                           answer: "no",
+                          prompt: "Do you experience loss of balance? (Yes/No)",
+                          actions: [
+                            {
+                              answer: "yes",
+                              action: function () {
+                                showResult("Meniere's Disease");
+                              },
+                            },
+                            {
+                              answer: "no",
+                              action: function () {
+                                showResult("Wax Build-up");
+                              },
+                            },
+                          ],
+                        },
+                        {
+                          answer: "no",
                           action: function () {
-                            showResult("Wax Build-up");
+                            showResult("nothing wrong with your ears or you may have an ear condition not associated with hearing loss.");
                           },
                         },
                       ],
-                    },
-                    {
-                      answer: "no",
-                      action: function () {
-                        showResult("nothing wrong with your ears or you may have an ear condition not associated with hearing loss.");
-                      },
                     },
                   ],
                 },
