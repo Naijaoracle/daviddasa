@@ -5,7 +5,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-function scheduleReminder(time, frequency, days) {
+const reminders = [];
+
+function scheduleReminder(time, frequency, days, medicationName) {
     const selectedTimeArray = time.split(':');
     const hoursInMilliseconds = parseInt(selectedTimeArray[0]) * 60 * 60 * 1000;
     const minutesInMilliseconds = parseInt(selectedTimeArray[1]) * 60 * 1000;
@@ -76,9 +78,30 @@ function scheduleReminder(time, frequency, days) {
         }
     }
 
-    setTimeout(() => {
-        showNotification('It\'s time to take your medication!');
-    }, delay);
+    const reminder = {
+        time: time,
+        frequency: frequency,
+        days: days,
+        medicationName: medicationName,
+        timeoutId: setTimeout(() => {
+            showNotification('It\'s time to take your medication: ' + medicationName);
+        }, delay)
+    };
+
+    reminders.push(reminder);
+}
+
+function updateReminder(index, time, frequency, days, medicationName) {
+    const reminder = reminders[index];
+    clearTimeout(reminder.timeoutId);
+
+    scheduleReminder(time, frequency, days, medicationName);
+}
+
+function cancelReminder(index) {
+    const reminder = reminders[index];
+    clearTimeout(reminder.timeoutId);
+    reminders.splice(index, 1);
 }
 
 function showNotification(message) {
@@ -108,13 +131,14 @@ function showNotification(message) {
 }
 
 function setReminder() {
-    // Get the selected time, frequency, and days from the HTML elements
+    // Get the selected time, frequency, days, and medication name from the HTML elements
     const time = document.getElementById('med-time').value;
     const frequency = document.getElementById('frequency').value;
     const days = Array.from(document.getElementById('days').selectedOptions).map(option => option.value);
+    const medicationName = document.getElementById('medication-name').value;
 
-    // Call the scheduleReminder function with the selected time, frequency, and days
-    scheduleReminder(time, frequency, days);
+    // Call the scheduleReminder function with the selected time, frequency, days, and medication name
+    scheduleReminder(time, frequency, days, medicationName);
 
     // Display a success message on the web page
     showNotification('Reminder set successfully!');
