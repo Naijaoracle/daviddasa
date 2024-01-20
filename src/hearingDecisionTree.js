@@ -97,48 +97,48 @@ document.addEventListener('DOMContentLoaded', function () {
   ];
   
 
-  // Function to generate prompt elements
-  function generatePromptElements(prompt) {
-    var container = document.querySelector('.container');
-    var promptElement = document.createElement('p');
-    promptElement.textContent = prompt.prompt;
-    container.appendChild(promptElement);
+// Function to generate prompt elements
+function generatePromptElements(prompt) {
+  var container = document.querySelector('.container');
 
-    var yesButton = document.createElement('button');
-    yesButton.textContent = 'Yes';
-    yesButton.addEventListener('click', function () {
-      handleAnswer(prompt, 'yes');
-    });
-    container.appendChild(yesButton);
+  // Clear existing content in the container
+  container.innerHTML = '';
 
-    var noButton = document.createElement('button');
-    noButton.textContent = 'No';
-    noButton.addEventListener('click', function () {
-      handleAnswer(prompt, 'no');
+  // Display the current prompt
+  var promptElement = document.createElement('p');
+  promptElement.textContent = prompt.prompt;
+  container.appendChild(promptElement);
+
+  // Create buttons for each possible answer
+  prompt.actions.forEach(function (action) {
+    var button = document.createElement('button');
+    button.textContent = action.answer.charAt(0).toUpperCase() + action.answer.slice(1); // Capitalize the first letter
+    button.addEventListener('click', function () {
+      handleAnswer(action, action.answer);
     });
-    container.appendChild(noButton);
+    container.appendChild(button);
+  });
+}
+
+// Function to handle user's answer
+function handleAnswer(action, answer) {
+  if (action.action) {
+    // If there's a specific action associated with the answer, execute it
+    action.action();
+  } else if (action.actions) {
+    // If there are nested actions, generate the next set of prompts
+    generatePromptElements(action);
+  } else {
+    // Handle any other cases as needed
+    console.error("Unhandled action:", action);
   }
-
-  // Function to handle user's answer
-  function handleAnswer(prompt, answer) {
-    var nextAction = prompt.actions.find(function (action) {
-      return action.answer === answer;
-    });
-
-    if (nextAction) {
-      if (nextAction.prompt) {
-        generatePromptElements(nextAction);
-      } else if (nextAction.action) {
-        nextAction.action();
-      }
-    }
-  }
+}
 
   // Function to display the result
   function showResult(result) {
     var container = document.querySelector('.container');
     var message = document.createElement('p');
-    message.textContent = "You may have " + result + "\nThis is not medical advice, please speak to your doctor. For general hearing tools and tips, click the link below.";
+    message.textContent = "You may have " + result +"."+"\nThis is not medical advice, please speak to your doctor. For general hearing tools and tips, click the link below.";
 
     var link = document.createElement('a');
     link.href = "https://www.daviddasa.com/earCare-advice";
