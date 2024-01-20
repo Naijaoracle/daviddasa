@@ -114,39 +114,61 @@ document.addEventListener('DOMContentLoaded', function () {
   ];
 
   // Function to assess hearing loss
-  function assessHearingLoss() {
-    var currentPrompt = prompts.shift();
-    var answer = prompt(currentPrompt.prompt).toLowerCase();
-
-    var nextAction = currentPrompt.actions.find(function (action) {
+  function assessHearingLoss(promptObj) {
+    var container = document.querySelector('.container');
+    container.innerHTML = ''; // Clear the container
+  
+    var promptText = document.createElement('p');
+    promptText.textContent = promptObj.prompt;
+    container.appendChild(promptText);
+  
+    var buttonYes = document.createElement('button');
+    buttonYes.textContent = 'Yes';
+    buttonYes.addEventListener('click', function () {
+      handleAnswer('yes', promptObj);
+    });
+    container.appendChild(buttonYes);
+  
+    var buttonNo = document.createElement('button');
+    buttonNo.textContent = 'No';
+    buttonNo.addEventListener('click', function () {
+      handleAnswer('no', promptObj);
+    });
+    container.appendChild(buttonNo);
+  }
+  
+  function handleAnswer(answer, promptObj) {
+    var nextAction = promptObj.actions.find(function (action) {
       return action.answer === answer;
     });
-
+  
     if (nextAction) {
       if (nextAction.prompt) {
         assessHearingLoss(nextAction);
       } else if (nextAction.action) {
         nextAction.action();
+      } else if (nextAction.result) {
+        showResult(nextAction.result);
       }
     } else {
       window.location.href = "https://www.daviddasa.com/earcare-advice";
     }
   }
-
+  
   // Call the function to start the assessment
-  assessHearingLoss();
+  assessHearingLoss(prompts[0]);
 
   function showResult(result) {
     var container = document.querySelector('.container');
     var message = document.createElement('p');
     message.textContent = "You may have " + result + "\nThis is not medical advice, please speak to your doctor.";
-
+  
     var link = document.createElement('a');
     link.href = "https://www.daviddasa.com/earcare-advice";
     link.textContent = "For general hearing tools and tips, click here";
     message.appendChild(document.createElement('br'));
     message.appendChild(link);
-
+  
     container.appendChild(message);
   }
 });
