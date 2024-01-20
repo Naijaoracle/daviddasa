@@ -113,8 +113,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   ];
 
-  // Function to assess hearing loss
-  function assessHearingLoss(promptObj) {
+  // Function to generate the HTML elements for the prompt
+  function generatePromptElements(promptObj) {
     var container = document.querySelector('.container');
     container.innerHTML = ''; // Clear the container
   
@@ -137,6 +137,7 @@ document.addEventListener('DOMContentLoaded', function () {
     container.appendChild(buttonNo);
   }
   
+  // Function to handle the user's answer
   function handleAnswer(answer, promptObj) {
     var nextAction = promptObj.actions.find(function (action) {
       return action.answer === answer;
@@ -144,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function () {
   
     if (nextAction) {
       if (nextAction.prompt) {
-        assessHearingLoss(nextAction);
+        generatePromptElements(nextAction);
       } else if (nextAction.action) {
         nextAction.action();
       } else if (nextAction.result) {
@@ -155,17 +156,20 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
   
-  // Call the function to start the assessment
-  assessHearingLoss(prompts[0]);
+  // Function to assess hearing loss
+  function assessHearingLoss() {
+    generatePromptElements(prompts[0]);
+  }
 
+  // Function to show the result
   function showResult(result) {
     var container = document.querySelector('.container');
     var message = document.createElement('p');
-    message.textContent = "You may have " + result + "\nThis is not medical advice, please speak to your doctor.";
+    message.textContent = "You may have " + result + "\nThis is not medical advice, please speak to your doctor. For general hearing tools and tips, click the link below.";
   
     var link = document.createElement('a');
     link.href = "https://www.daviddasa.com/earcare-advice";
-    link.textContent = "For general hearing tools and tips, click here";
+    link.textContent = "Click here";
     message.appendChild(document.createElement('br'));
     message.appendChild(link);
   
