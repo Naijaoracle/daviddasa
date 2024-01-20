@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Array to store prompts and actions
   var prompts = [
     {
-      prompt: "Do you have hearing loss? (Yes/No)",
+      prompt: "Have you noticed a decrease in your hearing? (Yes/No) - Note you can take the hearing test linked at the end.",
       actions: [
         {
           answer: "yes",
@@ -23,30 +23,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
               ]
             },
-            {
-              answer: "no",
-              prompt: "Do you have sensorineural hearing loss? (Yes/No)",
-              actions: [
-                {
-                  answer: "yes",
-                  prompt: "Is it due to a foreign body? (Yes/No)",
-                  actions: [
-                    {
-                      answer: "yes",
-                      action: function () {
-                        showResult("Foreign Body");
-                      }
-                    }
-                  ]
-                },
-                {
-                  answer: "no",
-                  action: function () {
-                    showResult("Further assessment needed");
-                  }
+              {
+                answer: "no",
+                action: function () {
+                  showResult("Sensorineural hearing loss or a Foreign Body in your ear");
                 }
-              ]
-            }
+              }
           ]
         },
         {
@@ -89,17 +71,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
               ]
             },
-            {
-              answer: "no",
-              prompt: "Do you have wax build-up? (Yes/No)",
-              actions: [
                 {
-                  answer: "yes",
+                  answer: "no",
                   action: function () {
                     showResult("Wax Build-up");
                   }
-                }
-              ]
             },
             {
               answer: "no",
