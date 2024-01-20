@@ -2,92 +2,101 @@ document.addEventListener('DOMContentLoaded', function () {
   var button = document.getElementById('hearingButton');
   button.addEventListener('click', assessHearingLoss);
 
-  // Array to store prompts and actions
-  var prompts = [
-    {
-      prompt: "Have you noticed a decrease in your hearing? (Yes/No) - Note you can take the hearing test linked at the end.",
-      actions: [
-        {
-          answer: "yes",
-          prompt: "Is the hearing loss sudden? (Yes/No)",
-          actions: [
-            {
-              answer: "yes",
-              prompt: "Do you experience pain? (Yes/No)",
-              actions: [
-                {
-                  answer: "yes",
-                  action: function () {
-                    showResult("Tympanic Perforation");
-                  }
-                }
-              ]
-            },
+// Array to store prompts and actions
+var prompts = [
+  {
+    prompt: "Hearing Loss?",
+    actions: [
+      {
+        answer: "yes",
+        actions: [
+          {
+            prompt: "Is the hearing loss sudden? (Yes/No)",
+            actions: [
+              {
+                answer: "yes",
+                prompt: "Do you experience pain? (Yes/No)",
+                actions: [
+                  {
+                    answer: "yes",
+                    action: function () {
+                      showResult("Tympanic Perforation");
+                    },
+                  },
+                ],
+              },
               {
                 answer: "no",
                 action: function () {
                   showResult("Sensorineural hearing loss or a Foreign Body in your ear");
-                }
-              }
-          ]
+                },
+              },
+            ],
+          },
+          {
+            prompt: "Is the hearing loss gradual? (Yes/No)",
+            actions: [
+              {
+                answer: "yes",
+                prompt: "Do you experience pain? (Yes/No)",
+                actions: [
+                  {
+                    answer: "yes",
+                    action: function () {
+                      showResult("Otitis Media");
+                    },
+                  },
+                ],
+              },
+              {
+                answer: "no",
+                prompt: "Do you have recent runny nose and/or fevers? (Yes/No)",
+                actions: [
+                  {
+                    answer: "yes",
+                    action: function () {
+                      showResult("Labrynthitis");
+                    },
+                  },
+                ],
+              },
+              {
+                answer: "no",
+                prompt: "Do you experience loss of balance? (Yes/No)",
+                actions: [
+                  {
+                    answer: "yes",
+                    action: function () {
+                      showResult("Meniere's Disease");
+                    },
+                  },
+                ],
+              },
+              {
+                answer: "no",
+                action: function () {
+                  showResult("Wax Build-up");
+                },
+              },
+              {
+                answer: "no",
+                action: function () {
+                  showResult("Further assessment needed");
+                },
+              },
+            ],
+          },
+        ],
+      },
+      {
+        answer: "no",
+        action: function () {
+          showResult("nothing wrong with your ears or you may have an ear condition not associated with hearing loss.");
         },
-        {
-          answer: "no",
-          prompt: "Is the hearing loss gradual? (Yes/No)",
-          actions: [
-            {
-              answer: "yes",
-              prompt: "Do you experience pain? (Yes/No)",
-              actions: [
-                {
-                  answer: "yes",
-                  action: function () {
-                    showResult("Otitis Media");
-                  }
-                }
-              ]
-            },
-            {
-              answer: "no",
-              prompt: "Do you have recent runny nose and/or fevers? (Yes/No)",
-              actions: [
-                {
-                  answer: "yes",
-                  action: function () {
-                    showResult("Labrynthitis");
-                  }
-                }
-              ]
-            },
-            {
-              answer: "no",
-              prompt: "Do you experience loss of balance? (Yes/No)",
-              actions: [
-                {
-                  answer: "yes",
-                  action: function () {
-                    showResult("Meniere's Disease");
-                  }
-                }
-              ]
-            },
-                {
-                  answer: "no",
-                  action: function () {
-                    showResult("Wax Build-up");
-                  }
-            },
-            {
-              answer: "no",
-              action: function () {
-                showResult("Further assessment needed");
-              }
-            }
-          ]
-        }
-      ]
-    }
-  ];
+      },
+    ],
+  },
+];
 
   // Function to generate the HTML elements for the prompt
   function generatePromptElements(promptObj) {
@@ -128,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function () {
         showResult(nextAction.result);
       }
     } else {
-      window.location.href = "https://www.daviddasa.com/earcare-advice";
+      window.location.href = "https://www.daviddasa.com/earCare-advice";
     }
   }
   
@@ -144,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
     message.textContent = "You may have " + result + "\nThis is not medical advice, please speak to your doctor. For general hearing tools and tips, click the link below.";
   
     var link = document.createElement('a');
-    link.href = "https://www.daviddasa.com/earcare-advice";
+    link.href = "https://www.daviddasa.com/earCare-advice";
     link.textContent = "Click here";
     message.appendChild(document.createElement('br'));
     message.appendChild(link);
