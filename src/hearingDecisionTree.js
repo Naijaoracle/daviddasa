@@ -27,23 +27,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     showResult("Tympanic Perforation");
                   },
                 },
+                {
+                  answer: "no",
+                  action: function () {
+                    showResult("Sensorineural hearing loss or a Foreign Body in your ear");
+                  },
+                },
               ],
             },
             {
               answer: "no",
-              action: function () {
-                showResult("Sensorineural hearing loss or a Foreign Body in your ear");
-              },
-            },
-          ],
-        },
-        {
-          answer: "no",
-          prompt: "Is the hearing loss gradual? (Yes/No)",
-          actions: [
-            {
-              answer: "yes",
-              prompt: "Do you experience pain? (Yes/No)",
               actions: [
                 {
                   answer: "yes",
@@ -51,43 +44,43 @@ document.addEventListener('DOMContentLoaded', function () {
                     showResult("Otitis Media");
                   },
                 },
-              ],
-            },
-            {
-              answer: "no",
-              prompt: "Do you have recent runny nose and/or fevers? (Yes/No)",
-              actions: [
-                {
-                  answer: "yes",
-                  action: function () {
-                    showResult("Labrynthitis");
-                  },
-                },
-              ],
-            },
-            {
-              answer: "no",
-              prompt: "Do you experience loss of balance? (Yes/No)",
-              actions: [
-                {
-                  answer: "yes",
-                  action: function () {
-                    showResult("Meniere's Disease");
-                  },
-                },
                 {
                   answer: "no",
-                  action: function () {
-                    showResult("Wax Build-up");
-                  },
+                  prompt: "Do you have recent runny nose and/or fevers? (Yes/No)",
+                  actions: [
+                    {
+                      answer: "yes",
+                      action: function () {
+                        showResult("Labrynthitis");
+                      },
+                    },
+                    {
+                      answer: "no",
+                      prompt: "Do you experience loss of balance? (Yes/No)",
+                      actions: [
+                        {
+                          answer: "yes",
+                          action: function () {
+                            showResult("Meniere's Disease");
+                          },
+                        },
+                        {
+                          answer: "no",
+                          action: function () {
+                            showResult("Wax Build-up");
+                          },
+                        },
+                      ],
+                    },
+                    {
+                      answer: "no",
+                      action: function () {
+                        showResult("nothing wrong with your ears or you may have an ear condition not associated with hearing loss.");
+                      },
+                    },
+                  ],
                 },
               ],
-            },
-            {
-              answer: "no",
-              action: function () {
-                showResult("nothing wrong with your ears or you may have an ear condition not associated with hearing loss.");
-              },
             },
           ],
         },
