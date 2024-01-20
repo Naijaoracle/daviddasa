@@ -1,3 +1,10 @@
+document.addEventListener('DOMContentLoaded', function () {
+    const setReminderButton = document.getElementById('setReminderButton');
+    if (setReminderButton) {
+        setReminderButton.addEventListener('click', setReminder);
+    }
+});
+
 function scheduleReminder(time, frequency, days) {
     const selectedTimeArray = time.split(':');
     const hoursInMilliseconds = parseInt(selectedTimeArray[0]) * 60 * 60 * 1000;
