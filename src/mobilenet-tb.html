@@ -26,24 +26,24 @@
     <!-- Introduction -->
     <section id="introduction">
       <h1>Tuberculosis Prediction</h1>
-      <p>Chest x-rays are a very common imaging tool in healthcare. This means the ability to pick up tuberculosis from a chest x-ray is something that may be beneficial to patients. Eventually we may expand this model to identify other conditions from chest x-rays.</p>
-      <p>In the previous example <a href="https://www.daviddasa.com/tuberculosis-chestxray"> here</a> we used a convolutional neural network to classify x-rays into positive or negative for TB. It was based on the python library pytorch.</p>
-      <p>This model is built on the tensorflow library.</p>
+      <p>Chest x-rays are a very common imaging tool in healthcare. This means the ability to pick up tuberculosis from a chest x-ray is something that may be beneficial to patients.</p>
+      <p>In the previous examples, such as <a href="https://www.daviddasa.com/tensorflowtb"> here</a> we used a custom convolutional neural network to classify x-rays into positive or negative for TB.</p>
+      <p>This model is built on the pretrained MobileNet neural network, it was then trained on the data set.</p>
+      <p>This MobileNet work had a basis in the work of K. Scott Mader. You can read his notebook <a href="https://www.kaggle.com/code/kmader/train-simple-xray-cnn#Create-a-simple-model">here.</a></p>
     </section>
 
     <!-- Notebook Embed -->
-    <iframe
-      src="https://naijaoracle.github.io/jupyterwork/notebooks/index.html?path=tensorflowtb.ipynb&kernel=python&toolbar=1&theme=JupyterLab%20Dark"
+    <!-- <iframe
+      src="https://naijaoracle.github.io/jupyterwork/notebooks/index.html?path=v2MobileNet-x-ray-cnn-multi-classifier.ipynb&kernel=python&toolbar=1&theme=JupyterLab%20Dark"
       width="100%"
-      height="800px" 
-    ></iframe>
+      height="800px" <!-- Adjust the height as needed -->
+    ></iframe> -->
 
     <!-- Conclusion Section -->
     <section id="conclusion">
       <h1>Conclusion</h1>
       <p>The project aims to achieve an accurate and reliable classification model for TB detection in chest X-ray images.</p>
-      <p>One of the previous models <a href="https://www.daviddasa.com/tuberculosis-chestxray">here</a> had a high accuracy.</p>
-      <p>Next we will use a model which is pretrained for image classification to see if it can achieve a better performace at this task. see changes <a href="https://www.daviddasa.com/mobilenet-tb">here</a>.</p>
+      <p>The notebook above showcases the use of a convolutional neural network built on MobileNet. We can view it in comparison to the custom models <a href="https://www.daviddasa.com/tensorflowtb"> here</a>. This model had an accuracy of 88.89% on the testing data (with a validation loss of 0.29039).</p>
       <p>I would like to hear your thoughts. You can <a href="https://www.linkedin.com/in/daviddasa">get in touch</a> via LinkedIn.</p>
     </section>
   </div>
