@@ -85,12 +85,8 @@ function answer(response) {
             position: 'bottom',
             title: {
               display: false,
+              text: ''//to add a title or not to add?
             },
-            ticks: {
-              userCallback: function (value, index, values) {
-                return value.toString();
-              }
-            }
           },
           y: {
             type: 'logarithmic',
