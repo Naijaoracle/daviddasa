@@ -29,23 +29,32 @@
     <label for="frequencyInput">Enter Frequency (Hz): </label>
     <input type="number" id="frequencyInput" min="20" max="20000" step="10" placeholder="e.g., 1000">
 
-    <div class="audio-container">
-    <button onclick="adjustVolume('-')">Volume -</button>
-    <button onclick="playSound()">Play</button>
-    <button onclick="stopSound()">Stop</button>
-    <button onclick="adjustVolume('+')">Volume +</button>
-    </div>
-    <p>Current Volume: <span id="currentVolume">0</span></p>
-    <p>Did you hear the sound?</p>
-    <button onclick="answer('Yes')">Yes</button>
-    <button onclick="answer('No')">No</button>
-
-    <!-- Canvas for chart -->
-    <canvas id="responseChart" width="800" height="400"></canvas>
-    <button onclick="downloadChart()">Download Chart</button>
-
-    <p>This interactive tool relies on JavaScript in your browser to provide a seamless user experience. Rest assured, JavaScript is a standard feature and is most likely already enabled on your browser.</p>
-  </div>
+    <div class="container">
+        <h1>Hearing Screening Tool</h1>
+        <p>The tests and tools provided in this section are NOT meant to be clinical advice. Always consult with your doctor for any health concerns.</p>
+        <p>We recommend using a modern browser for optimal performance. If you encounter any issues, ensure that JavaScript is enabled, and consider updating your browser for the best experience.</p>
+    
+        <label for="frequencyInput">Enter Frequency (Hz): </label>
+        <input type="number" id="frequencyInput" min="20" max="20000" step="10" placeholder="e.g., 1000">
+    
+        <button onclick="adjustVolume('+')">Volume +</button>
+        <button onclick="adjustVolume('-')">Volume -</button>
+    
+        <button onclick="stopSound()">Stop</button>
+        <button onclick="playSound()">Play</button>
+    
+        <p>Current Volume: <span id="currentVolume">0</span></p>
+    
+        <p>Did you hear the sound?</p>
+        <button onclick="answer('Yes')">Yes</button>
+        <button onclick="answer('No')">No</button>
+    
+        <!-- Canvas for chart -->
+        <canvas id="responseChart" width="600" height="400"></canvas>
+        <button onclick="downloadChart()">Download Chart</button>
+    
+        <p>This interactive tool relies on JavaScript in your browser to provide a seamless user experience. Rest assured, JavaScript is a standard feature and is most likely already enabled on your browser.</p>
+      </div>
   
     <script src="hearingScreening.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>    
