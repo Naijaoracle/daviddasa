@@ -63,21 +63,18 @@ function answer(response) {
   const frequencyInput = document.getElementById('frequencyInput');
   const frequency = parseFloat(frequencyInput.value);
 
-  chartData.labels.push(frequency.toString());
-  
-  // Push data based on the response
-  if (response === 'Yes') {
-    chartData.datasets[0].data.push({ x: 0, y: frequency });
-    chartData.datasets[1].data.push(null);
-  } else {
-    chartData.datasets[0].data.push(null);
-    chartData.datasets[1].data.push({ x: 0, y: frequency });
-  }
+  const index = chartData.labels.indexOf(frequency.toString());
 
-  // Destroy the existing chart before creating a new one
-  if (chart) {
-    chart.destroy();
-  }
+  if (index !== -1) {
+    if (response === 'Yes') {
+      chartData.datasets[0].data[index] = { x: 0, y: frequency };
+      chartData.datasets[1].data[index] = null;
+    } else {
+      chartData.datasets[0].data[index] = null;
+      chartData.datasets[1].data[index] = { x: 0, y: frequency };
+    }
+
+
 
   // Create a new chart
   chart = new Chart(document.getElementById('responseChart').getContext('2d'), {
