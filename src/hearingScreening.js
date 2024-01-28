@@ -29,7 +29,7 @@ function initAudioContext() {
   }
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
   oscillator = audioContext.createOscillator();
-  oscillator.connect(audioContext.destination); // Connect oscillator directly to destination
+  oscillator.connect(audioContext.destination);
 }
 
 function playSound() {
@@ -65,11 +65,11 @@ function answer(response) {
 
   chartData.labels.push(frequency.toString());
   if (response === 'Yes') {
-    chartData.datasets[0].data.push({ x: frequency, y: 0 });
+    chartData.datasets[0].data.push({ x: 0, y: frequency });
     chartData.datasets[1].data.push(null);
   } else {
     chartData.datasets[0].data.push(null);
-    chartData.datasets[1].data.push({ x: frequency, y: 0 });
+    chartData.datasets[1].data.push({ x: 0, y: frequency });
   }
 
   if (chart) {
@@ -81,8 +81,11 @@ function answer(response) {
       options: {
         scales: {
           x: {
+            display: false // Hide the x-axis
+          },
+          y: {
             type: 'logarithmic',
-            position: 'bottom',
+            position: 'left',
             title: {
               display: true,
               text: 'Frequency (Hz)'
@@ -91,16 +94,6 @@ function answer(response) {
               userCallback: function (value, index, values) {
                 return value.toString();
               }
-            }
-          },
-          y: {
-            type: 'linear',
-            position: 'left',
-            min: -1, // Adjusted min value to avoid points at the bottom
-            max: 1, // Adjusted max value to avoid points at the top
-            title: {
-              display: true,
-              text: 'Response'
             }
           }
         },
@@ -125,6 +118,18 @@ function answer(response) {
 
 function downloadChart() {
   const canvas = document.getElementById('responseChart');
+  const ctx = canvas.getContext('2d');
+
+  // Save current state
+  const prevFillStyle = ctx.fillStyle;
+
+  // Set background color to white
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Restore previous state
+  ctx.fillStyle = prevFillStyle;
+
   const dataUrl = canvas.toDataURL('image/png');
   const link = document.createElement('a');
   link.href = dataUrl;
