@@ -4,15 +4,12 @@ let chartData = {
   labels: [],
   datasets: [
     {
-      label: 'Yes',
+      label: 'Hearing Thresholds',
       borderColor: 'blue',
       backgroundColor: 'blue',
-      data: []
-    },
-    {
-      label: 'No',
-      borderColor: 'red',
-      backgroundColor: 'red',
+      pointRadius: 5,
+      pointHoverRadius: 8,
+      pointBackgroundColor: 'blue',
       data: []
     }
   ]
@@ -48,30 +45,49 @@ function stopSound() {
   }
 }
 
+function adjustVolume(direction) {
+  const volumeInput = document.getElementById('volumeInput');
+  let currentVolume = parseFloat(volumeInput.value);
+
+  if (isNaN(currentVolume)) {
+    currentVolume = 0;
+  }
+
+  if (direction === '+') {
+    currentVolume += 0.1;
+  } else if (direction === '-') {
+    currentVolume -= 0.1;
+  }
+
+  currentVolume = Math.max(0, Math.min(1, currentVolume)); // Ensure volume is between 0 and 1
+  volumeInput.value = currentVolume.toFixed(1);
+  oscillator.volume = currentVolume;
+}
+
 function answer(response) {
   const frequencyInput = document.getElementById('frequencyInput');
   const frequency = parseFloat(frequencyInput.value);
 
   chartData.labels.push(`${frequency} Hz`);
-  if (response === 'Yes') {
-    chartData.datasets[0].data.push(frequency);
-    chartData.datasets[1].data.push(null);
-  } else {
-    chartData.datasets[0].data.push(null);
-    chartData.datasets[1].data.push(frequency);
-  }
+  chartData.datasets[0].data.push({ x: frequency, y: oscillator.volume * 100 });
 
   if (chart) {
     chart.update(); // Update the chart immediately after the user responds
   } else {
     chart = new Chart(document.getElementById('responseChart').getContext('2d'), {
-      type: 'line',
+      type: 'scatter',
       data: chartData,
       options: {
         scales: {
           x: {
             type: 'linear',
             position: 'bottom'
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Volume (%)'
+            }
           }
         }
       }
