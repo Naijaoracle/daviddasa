@@ -62,7 +62,7 @@ function answer(response) {
   }
 
   if (chart) {
-    chart.update();
+    chart.update(); // Update the chart immediately after the user responds
   } else {
     chart = new Chart(document.getElementById('responseChart').getContext('2d'), {
       type: 'line',
@@ -90,7 +90,6 @@ function downloadChart() {
 
 function answerYes() {
   answer('Yes');
-  alert('Great! Your hearing seems fine.');
 }
 
 function answerNo() {
