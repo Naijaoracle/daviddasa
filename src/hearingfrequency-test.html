@@ -23,17 +23,26 @@
 
   <div class="container">
     <h1>Hearing Screening Tool</h1>
-  
+    <p>The tests and tools provided in this section are NOT meant to be clinical advice. Always consult with your doctor for any health concerns.</p>
+    <p>We recommend using a modern browser for optimal performance. If you encounter any issues, ensure that JavaScript is enabled, and consider updating your browser for the best experience.</p>    
     <label for="frequencyInput">Enter Frequency (Hz): </label>
     <input type="number" id="frequencyInput" min="20" max="20000" step="10" placeholder="e.g., 1000">
   
     <button onclick="playSound()">Play Sound</button>
+    <button onclick="stopSound()">Stop Sound</button>
   
     <p>Did you hear the sound?</p>
     <button onclick="answerYes()">Yes</button>
     <button onclick="answerNo()">No</button>
+
+    <!-- Canvas for chart -->
+    <canvas id="responseChart" width="400" height="200"></canvas>
+    <button onclick="downloadChart()">Download Chart</button>
+
+    <p>This interactive tool relies on JavaScript in your browser to provide a seamless user experience. Rest assured, JavaScript is a standard feature and is most likely already enabled on your browser.</p>
     </div>
     <script src="hearingScreening.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>    
   <!-- Footer Section -->
   <footer>
     <p>&copy; 2023 David Dasa</p>
