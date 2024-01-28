@@ -64,6 +64,8 @@ function answer(response) {
   const frequency = parseFloat(frequencyInput.value);
 
   chartData.labels.push(frequency.toString());
+  
+  // Push data based on the response
   if (response === 'Yes') {
     chartData.datasets[0].data.push({ x: 0, y: frequency });
     chartData.datasets[1].data.push(null);
@@ -72,48 +74,50 @@ function answer(response) {
     chartData.datasets[1].data.push({ x: 0, y: frequency });
   }
 
+  // Destroy the existing chart before creating a new one
   if (chart) {
-    chart.update(); // Update the chart immediately after the user responds
-  } else {
-    chart = new Chart(document.getElementById('responseChart').getContext('2d'), {
-      type: 'scatter',
-      data: chartData,
-      options: {
-        scales: {
-          x: {
-            display: false // Hide the x-axis
+    chart.destroy();
+  }
+
+  // Create a new chart
+  chart = new Chart(document.getElementById('responseChart').getContext('2d'), {
+    type: 'scatter',
+    data: chartData,
+    options: {
+      scales: {
+        x: {
+          display: false // Hide the x-axis
+        },
+        y: {
+          type: 'logarithmic',
+          position: 'left',
+          title: {
+            display: true,
+            text: 'Frequency (Hz)'
           },
-          y: {
-            type: 'logarithmic',
-            position: 'left',
-            title: {
-              display: true,
-              text: 'Frequency (Hz)'
-            },
-            ticks: {
-              userCallback: function (value, index, values) {
-                return value.toString();
-              }
+          ticks: {
+            userCallback: function (value, index, values) {
+              return value.toString();
             }
           }
-        },
-        elements: {
-          point: {
-            hitRadius: 5,
-            hoverRadius: 5
-          }
-        },
-        responsive: false, // Keep the chart size fixed
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: true,
-            position: 'bottom'
-          }
+        }
+      },
+      elements: {
+        point: {
+          hitRadius: 5,
+          hoverRadius: 5
+        }
+      },
+      responsive: false, // Keep the chart size fixed
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom'
         }
       }
-    });
-  }
+    }
+  });
 }
 
 function downloadChart() {
