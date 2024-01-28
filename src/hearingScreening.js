@@ -1,7 +1,7 @@
 let audioContext;
 let oscillator;
 let chartData = {
-  labels: [],
+  labels: ['20', '200', '500', '1000', '2000', '5000', '8000', '10000', '15000', '20000'],
   datasets: [
     {
       label: 'Heard',
@@ -80,19 +80,24 @@ function adjustVolume(direction) {
     oscillator.volume = currentVolume;
     oscillator.start();
   }
+
+  // Display the current volume
+  document.getElementById('currentVolume').innerText = currentVolume.toFixed(1);
 }
 
 function answer(response) {
+  stopSound(); // Stop the sound when answering
+
   const frequencyInput = document.getElementById('frequencyInput');
   const frequency = parseFloat(frequencyInput.value);
 
-  chartData.labels.push(frequency);
+  chartData.labels.push(frequency.toString());
   if (response === 'Yes') {
-    chartData.datasets[0].data.push({ x: frequency, y: oscillator.volume * 120 });
+    chartData.datasets[0].data.push({ x: frequency, y: 120 - oscillator.volume * 120 });
     chartData.datasets[1].data.push(null);
   } else {
     chartData.datasets[0].data.push(null);
-    chartData.datasets[1].data.push({ x: frequency, y: oscillator.volume * 120 });
+    chartData.datasets[1].data.push({ x: frequency, y: 120 - oscillator.volume * 120 });
   }
 
   if (chart) {
@@ -104,7 +109,7 @@ function answer(response) {
       options: {
         scales: {
           x: {
-            type: 'linear',
+            type: 'category',
             position: 'bottom',
             title: {
               display: true,
@@ -120,6 +125,20 @@ function answer(response) {
               display: true,
               text: 'Volume (dB)'
             }
+          }
+        },
+        elements: {
+          point: {
+            hitRadius: 5,
+            hoverRadius: 5
+          }
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom'
           }
         }
       }

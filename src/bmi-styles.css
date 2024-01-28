@@ -343,8 +343,8 @@ button {
   margin-top: 20px;
   padding: 10px;
   border-radius: 5px;
-  background-color: #d4edda; /* Example background color for success messages */
-  color: #155724; /* Example text color for success messages */
+  background-color: #d4edda; 
+  color: #155724; 
   display: none; /* Initially hide the notification area */
 }
 
@@ -359,4 +359,34 @@ button {
 /* Frequency test styles */
 canvas {
   margin-top: 20px;
+  background-color: white;
+}
+
+.audio-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 200px;
+  margin: 10px auto;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.audio-container button:first-child,
+.audio-container button:last-child {
+  flex: 1;
+}
+
+.audio-container button:nth-child(2) {
+  flex: 2; 
+  margin-bottom: 5px; 
+}
+
+.audio-container button {
+  background-color: #4caf50;
+  border: none;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
 }
