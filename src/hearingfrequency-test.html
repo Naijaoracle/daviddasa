@@ -32,21 +32,25 @@
     </div>
 
     <div class="audio-container">
-    <button onclick="playSound()">Play</button>
-    <button onclick="stopSound()">Stop</button>
+      <button class="play" onclick="playSound()">Play</button>
+      <button class="stop" onclick="stopSound()">Stop</button>
+    </div>
+    
+
+    <div class="centered">
+      <p>Try to listen for up to 10 seconds and see if you can hear the sound throughout.</p>
     </div>
 
     <div class="centered">
-    <p>Did you hear the sound?</p>
+    <p>Did you hear the sound till you stopped it?</p>
     <button onclick="answer('Yes')">Yes</button>
     <button onclick="answer('No')">No</button>
     </div>
 
-    <div class="centered">
+
     <!-- Canvas for chart -->
     <canvas id="responseChart" width="600" height="400"></canvas>
     <button onclick="downloadChart()">Download Chart</button>
-    </div>
 
     <p>This interactive tool relies on JavaScript in your browser to provide a seamless user experience. Rest assured, JavaScript is a standard feature and is most likely already enabled on your browser.</p>
   </div>
