@@ -109,16 +109,11 @@ function answer(response) {
       options: {
         scales: {
           x: {
-            type: 'logarithmic',
+            type: 'category',
             position: 'bottom',
             title: {
               display: true,
               text: 'Frequency (Hz)'
-            },
-            ticks: {
-              userCallback: function (value, index, values) {
-                return value.toString();
-              }
             }
           },
           y: {
@@ -152,19 +147,19 @@ function answer(response) {
 }
 
 function downloadChart() {
-    const canvas = document.getElementById('responseChart');
-    const dataUrl = canvas.toDataURL('image/png');
-    const link = document.createElement('a');
-    link.href = dataUrl;
-    link.download = 'hearing_response_chart.png';
-    link.click();
-  }
-  
-  function answerYes() {
-    answer('Yes');
-  }
-  
-  function answerNo() {
-    answer('No');
-    alert('It is recommended to consult with a healthcare professional about your hearing.');
-  }
+  const canvas = document.getElementById('responseChart');
+  const dataUrl = canvas.toDataURL('image/png');
+  const link = document.createElement('a');
+  link.href = dataUrl;
+  link.download = 'hearing_response_chart.png';
+  link.click();
+}
+
+function answerYes() {
+  answer('Yes');
+}
+
+function answerNo() {
+  answer('No');
+  alert('It is recommended to consult with a healthcare professional about your hearing.');
+}
