@@ -63,36 +63,6 @@ function answer(response) {
   const frequencyInput = document.getElementById('frequencyInput');
   const frequency = parseFloat(frequencyInput.value);
 
-<<<<<<< HEAD
-  const index = chartData.labels.indexOf(frequency.toString());
-
-  if (index !== -1) {
-    if (response === 'Yes') {
-      chartData.datasets[0].data[index] = { x: 0, y: frequency };
-      chartData.datasets[1].data[index] = null;
-    } else {
-      chartData.datasets[0].data[index] = null;
-      chartData.datasets[1].data[index] = { x: 0, y: frequency };
-    }
-
-
-
-  // Create a new chart
-  chart = new Chart(document.getElementById('responseChart').getContext('2d'), {
-    type: 'scatter',
-    data: chartData,
-    options: {
-      scales: {
-        x: {
-          display: false // Hide the x-axis
-        },
-        y: {
-          type: 'logarithmic',
-          position: 'left',
-          title: {
-            display: true,
-            text: 'Frequency (Hz)'
-=======
   chartData.labels.push(frequency.toString());
   if (response === 'Yes') {
     chartData.datasets[0].data.push({ x: 0, y: frequency });
@@ -112,7 +82,6 @@ function answer(response) {
         scales: {
           x: {
             display: false // Hide the x-axis
->>>>>>> parent of 42f0b13 (alternate response chart fix)
           },
           y: {
             type: 'logarithmic',
