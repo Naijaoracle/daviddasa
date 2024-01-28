@@ -393,3 +393,7 @@ canvas {
 #currentVolume {
   font-weight: bold;
 }
+
+.centered {
+  align-items: center;
+}

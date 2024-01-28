@@ -1,7 +1,7 @@
 let audioContext;
 let oscillator;
 let chartData = {
-  labels: ['20', '200', '500', '1000', '2000', '5000', '8000', '10000', '15000', '20000'],
+  labels: ['20', '50', '100', '200', '500', '1000', '2000', '5000', '7500', '10000', '15000', '20000'],
   datasets: [
     {
       label: 'Heard',
@@ -77,13 +77,26 @@ function adjustVolume(direction) {
   volumeInput.value = currentVolume.toFixed(1);
 
   if (oscillator) {
-    oscillator.volume = currentVolume;
+    // Stop the current oscillator
+    oscillator.stop();
+    oscillator.disconnect();
+
+    // Create a new oscillator with the updated volume
+    initAudioContext();
+    oscillator.type = 'sine'; // Change the waveform here if needed
+    oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+    oscillator.connect(audioContext.destination);
+    oscillator.gain.setValueAtTime(currentVolume, audioContext.currentTime);
     oscillator.start();
   }
 
-  // Display the current volume
-  document.getElementById('currentVolume').innerText = currentVolume.toFixed(1);
+  // Calculate the volume as a fraction of 120
+  const volumeFraction = (currentVolume * 120).toFixed(1);
+
+  // Display the current volume as a fraction
+  document.getElementById('currentVolume').innerText = `${volumeFraction} / 120`;
 }
+
 
 function answer(response) {
   stopSound(); // Stop the sound when answering
