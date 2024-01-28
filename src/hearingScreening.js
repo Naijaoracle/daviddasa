@@ -63,6 +63,7 @@ function answer(response) {
   const frequencyInput = document.getElementById('frequencyInput');
   const frequency = parseFloat(frequencyInput.value);
 
+<<<<<<< HEAD
   const index = chartData.labels.indexOf(frequency.toString());
 
   if (index !== -1) {
@@ -91,30 +92,59 @@ function answer(response) {
           title: {
             display: true,
             text: 'Frequency (Hz)'
+=======
+  chartData.labels.push(frequency.toString());
+  if (response === 'Yes') {
+    chartData.datasets[0].data.push({ x: 0, y: frequency });
+    chartData.datasets[1].data.push(null);
+  } else {
+    chartData.datasets[0].data.push(null);
+    chartData.datasets[1].data.push({ x: 0, y: frequency });
+  }
+
+  if (chart) {
+    chart.update(); // Update the chart immediately after the user responds
+  } else {
+    chart = new Chart(document.getElementById('responseChart').getContext('2d'), {
+      type: 'scatter',
+      data: chartData,
+      options: {
+        scales: {
+          x: {
+            display: false // Hide the x-axis
+>>>>>>> parent of 42f0b13 (alternate response chart fix)
           },
-          ticks: {
-            userCallback: function (value, index, values) {
-              return value.toString();
+          y: {
+            type: 'logarithmic',
+            position: 'left',
+            title: {
+              display: true,
+              text: 'Frequency (Hz)'
+            },
+            ticks: {
+              userCallback: function (value, index, values) {
+                return value.toString();
+              }
             }
           }
-        }
-      },
-      elements: {
-        point: {
-          hitRadius: 5,
-          hoverRadius: 5
-        }
-      },
-      responsive: false, // Keep the chart size fixed
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: true,
-          position: 'bottom'
+        },
+        elements: {
+          point: {
+            hitRadius: 5,
+            hoverRadius: 5
+          }
+        },
+        responsive: false, // Keep the chart size fixed
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom'
+          }
         }
       }
-    }
-  });
+    });
+  }
 }
 
 function downloadChart() {
