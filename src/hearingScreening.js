@@ -81,7 +81,16 @@ function answer(response) {
       options: {
         scales: {
           x: {
-            display: false // Hide the x-axis
+            type: 'linear', // Change the x-axis type to linear
+            position: 'center', // Center the x-axis
+            title: {
+              display: false,
+            },
+            ticks: {
+              userCallback: function (value, index, values) {
+                return value.toString();
+              }
+            }
           },
           y: {
             type: 'logarithmic',
@@ -118,18 +127,6 @@ function answer(response) {
 
 function downloadChart() {
   const canvas = document.getElementById('responseChart');
-  const ctx = canvas.getContext('2d');
-
-  // Save current state
-  const prevFillStyle = ctx.fillStyle;
-
-  // Set background color to white
-  ctx.fillStyle = 'white';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Restore previous state
-  ctx.fillStyle = prevFillStyle;
-
   const dataUrl = canvas.toDataURL('image/png');
   const link = document.createElement('a');
   link.href = dataUrl;
