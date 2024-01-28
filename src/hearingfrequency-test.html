@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ear & Hearing Inquiries</title>
+  <!-- CSS file goes here -->
+  <link rel="stylesheet" href="bmi-styles.css">
+</head>
+<body>
+
+  <!-- Navigation Section -->
+  <nav>
+    <ul>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/static_web_app/blob/main/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+      <li><a href="https://www.daviddasa.com/about">About</a></li>
+      <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
+      <li><a href="https://www.daviddasa.com/skills">Skills</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <h1>Hearing Screening Tool</h1>
+  
+    <label for="frequencyInput">Enter Frequency (Hz): </label>
+    <input type="number" id="frequencyInput" min="20" max="20000" step="10" placeholder="e.g., 1000">
+  
+    <button onclick="playSound()">Play Sound</button>
+  
+    <p>Did you hear the sound?</p>
+    <button onclick="answerYes()">Yes</button>
+    <button onclick="answerNo()">No</button>
+    </div>
+    <script src="hearingScreening.js"></script>
+  <!-- Footer Section -->
+  <footer>
+    <p>&copy; 2023 David Dasa</p>
+  </footer>
+</body>
+</html>
