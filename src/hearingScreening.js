@@ -66,9 +66,9 @@ function answer(response) {
   chartData.labels.push(frequency.toString());
   if (response === 'Yes') {
     chartData.datasets[0].data.push({ x: 0, y: frequency });
-    chartData.datasets[1].data.push(null);
+    chartData.datasets[1].data.push({ x: frequency, y: 0 }); // Change here
   } else {
-    chartData.datasets[0].data.push(null);
+    chartData.datasets[0].data.push({ x: frequency, y: 0 }); // Change here
     chartData.datasets[1].data.push({ x: 0, y: frequency });
   }
 
