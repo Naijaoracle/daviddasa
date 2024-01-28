@@ -68,11 +68,11 @@ function answer(response) {
   
   if (response === 'Yes') {
     chartData.datasets[0].data.push({ x: middleX, y: frequency });
-    chartData.datasets[1].data.push({ x: frequency, y: middleX });
+    chartData.datasets[1].data.push(null); // No response for 'Not Heard'
   } else {
-    chartData.datasets[0].data.push({ x: frequency, y: middleX });
+    chartData.datasets[0].data.push(null); // No response for 'Heard'
     chartData.datasets[1].data.push({ x: middleX, y: frequency });
-  }  
+  }   
 
   if (chart) {
     chart.update(); // Update the chart immediately after the user responds
@@ -85,10 +85,9 @@ function answer(response) {
           x: {
             type: 'linear',
             position: 'bottom',
-            title: {
-              display: false,
-              text: ''//to add a title or not to add?
-            },
+            ticks: {
+              display: false //To hide the x-axis ticks
+            }
           },
           y: {
             type: 'logarithmic',
