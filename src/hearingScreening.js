@@ -138,7 +138,7 @@ function answer(response) {
             hoverRadius: 5
           }
         },
-        responsive: true,
+        responsive: false, // Keep the chart size fixed
         maintainAspectRatio: false,
         plugins: {
           legend: {

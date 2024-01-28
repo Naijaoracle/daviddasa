@@ -29,11 +29,12 @@
     <label for="frequencyInput">Enter Frequency (Hz): </label>
     <input type="number" id="frequencyInput" min="20" max="20000" step="10" placeholder="e.g., 1000">
 
-    <button onclick="adjustVolume('+')">Volume +</button>
+    <div class="audio-container">
     <button onclick="adjustVolume('-')">Volume -</button>
-
-    <button onclick="stopSound()">Stop</button>
     <button onclick="playSound()">Play</button>
+    <button onclick="stopSound()">Stop</button>
+    <button onclick="adjustVolume('+')">Volume +</button>
+    </div>
 
     <p>Current Volume: <span id="currentVolume">0</span></p>
 
