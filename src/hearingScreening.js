@@ -109,11 +109,16 @@ function answer(response) {
       options: {
         scales: {
           x: {
-            type: 'category',
+            type: 'logarithmic',
             position: 'bottom',
             title: {
               display: true,
               text: 'Frequency (Hz)'
+            },
+            ticks: {
+              userCallback: function (value, index, values) {
+                return value.toString();
+              }
             }
           },
           y: {

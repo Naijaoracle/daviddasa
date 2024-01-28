@@ -29,19 +29,20 @@
     <label for="frequencyInput">Enter Frequency (Hz): </label>
     <input type="number" id="frequencyInput" min="20" max="20000" step="10" placeholder="e.g., 1000">
 
-    <div class="audio-container">
-    <button onclick="adjustVolume('-')">Volume -</button>
-    <button onclick="playSound()">Play</button>
-    <button onclick="stopSound()">Stop</button>
     <button onclick="adjustVolume('+')">Volume +</button>
-    </div>
+    <button onclick="adjustVolume('-')">Volume -</button>
+
+    <button onclick="stopSound()">Stop</button>
+    <button onclick="playSound()">Play</button>
+
     <p>Current Volume: <span id="currentVolume">0</span></p>
+
     <p>Did you hear the sound?</p>
     <button onclick="answer('Yes')">Yes</button>
     <button onclick="answer('No')">No</button>
 
     <!-- Canvas for chart -->
-    <canvas id="responseChart" width="800" height="400"></canvas>
+    <canvas id="responseChart" width="600" height="400"></canvas>
     <button onclick="downloadChart()">Download Chart</button>
 
     <p>This interactive tool relies on JavaScript in your browser to provide a seamless user experience. Rest assured, JavaScript is a standard feature and is most likely already enabled on your browser.</p>
