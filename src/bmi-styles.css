@@ -364,40 +364,13 @@ canvas {
 
 .audio-container {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
-  height: 50px;
-}
-
-.play, .stop {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  position: relative;
-  width: 30px;
-  height: 30px;
-}
-
-.play::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 0;
-  height: 0;
-  border-top: 15px solid transparent;
-  border-bottom: 15px solid transparent;
-  border-left: 30px solid green;
-}
-
-.stop::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 30px;
-  height: 30px;
-  background-color: red;
+  width: 200px;
+  margin: 10px auto;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
 }
 
 .audio-container button:first-child,
