@@ -61,6 +61,10 @@ body {
       width: 10px; /* Adjust width for small screens */
       height: 10px; /* Adjust height for small screens */
     }
+
+    #responseChart {
+      width: 90%;
+    }
   }    
   #video iframe {
     width: 300px;
@@ -387,6 +391,11 @@ canvas {
   background-color: white;
 }
 
+#responseChart {
+  display: block;
+  margin: 0 auto;
+}
+
 .audio-container {
   display: flex;
   justify-content: space-between;
@@ -441,9 +450,4 @@ canvas {
   width: 200px;
   margin: 10px auto;
   padding: 10px;
-}
-
-#responseChart {
-  display: block;
-  margin: 0 auto;
 }
