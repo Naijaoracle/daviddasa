@@ -366,7 +366,7 @@ canvas {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 400px;
+  width: 200px;
   margin: 10px auto;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -389,11 +389,4 @@ canvas {
   padding: 10px 15px;
   font-size: 16px;
   cursor: pointer;
-}
-#currentVolume {
-  font-weight: bold;
-}
-
-.centered {
-  align-items: center;
 }

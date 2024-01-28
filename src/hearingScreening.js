@@ -1,6 +1,5 @@
 let audioContext;
 let oscillator;
-let gainNode; // Added GainNode
 let chartData = {
   labels: ['20', '50', '100', '200', '500', '1000', '2000', '5000', '7500', '10000', '15000', '20000'],
   datasets: [
@@ -30,9 +29,7 @@ function initAudioContext() {
   }
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
   oscillator = audioContext.createOscillator();
-  gainNode = audioContext.createGain(); // Create GainNode
-  oscillator.connect(gainNode); // Connect oscillator to gainNode
-  gainNode.connect(audioContext.destination); // Connect gainNode to destination
+  oscillator.connect(audioContext.destination); // Connect oscillator directly to destination
 }
 
 function playSound() {
@@ -50,7 +47,6 @@ function playSound() {
 
   oscillator.type = 'sine'; // Change the waveform here if needed
   oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-  gainNode.gain.setValueAtTime(1, audioContext.currentTime); // Set gain to 1 (full volume)
   oscillator.start();
 }
 
@@ -61,38 +57,6 @@ function stopSound() {
   }
 }
 
-function adjustVolume(direction) {
-  stopSound(); // Stop the sound if currently playing
-
-  const volumeInput = document.getElementById('volumeInput');
-  let currentVolume = parseFloat(volumeInput.value);
-
-  if (isNaN(currentVolume)) {
-    currentVolume = 0;
-  }
-
-  if (direction === '+') {
-    currentVolume += 0.1;
-  } else if (direction === '-') {
-    currentVolume -= 0.1;
-  }
-
-  currentVolume = Math.max(0, Math.min(1, currentVolume)); // Ensure volume is between 0 and 1
-  volumeInput.value = currentVolume.toFixed(1);
-
-  if (oscillator) {
-    // Set gain to the updated volume
-    gainNode.gain.setValueAtTime(currentVolume, audioContext.currentTime);
-    oscillator.start();
-  }
-
-  // Calculate the volume as a fraction of 120
-  const volumeFraction = (currentVolume * 120).toFixed(1);
-
-  // Display the current volume as a fraction
-  document.getElementById('currentVolume').innerText = `${volumeFraction} / 120`;
-}
-
 function answer(response) {
   stopSound(); // Stop the sound when answering
 
@@ -101,11 +65,11 @@ function answer(response) {
 
   chartData.labels.push(frequency.toString());
   if (response === 'Yes') {
-    chartData.datasets[0].data.push({ x: frequency, y: 120 - oscillator.volume * 120 });
+    chartData.datasets[0].data.push({ x: frequency, y: 0 });
     chartData.datasets[1].data.push(null);
   } else {
     chartData.datasets[0].data.push(null);
-    chartData.datasets[1].data.push({ x: frequency, y: 120 - oscillator.volume * 120 });
+    chartData.datasets[1].data.push({ x: frequency, y: 0 });
   }
 
   if (chart) {
@@ -132,11 +96,11 @@ function answer(response) {
           y: {
             type: 'linear',
             position: 'left',
-            min: 0,
-            max: 120,
+            min: -1, // Adjusted min value to avoid points at the bottom
+            max: 1, // Adjusted max value to avoid points at the top
             title: {
               display: true,
-              text: 'Volume (dB)'
+              text: 'Response'
             }
           }
         },
