@@ -65,18 +65,13 @@ function answer(response) {
 
   chartData.labels.push(frequency.toString());
   const middleX = 10010; // Middle of the x-axis range
-  
-  const lastDataIndex = chartData.labels.length - 1;
 
-  // Update the existing point in the dataset based on the response
   if (response === 'Yes') {
-    chartData.datasets[0].data[lastDataIndex] = { x: middleX, y: frequency };
-    chartData.datasets[1].data[lastDataIndex] = null;
+    chartData.datasets[0].data.push({ x: middleX, y: frequency });
   } else {
-    chartData.datasets[0].data[lastDataIndex] = null;
-    chartData.datasets[1].data[lastDataIndex] = { x: middleX, y: frequency };
-  }   
-
+    chartData.datasets[1].data.push({ x: middleX, y: frequency });
+  }
+  
   if (chart) {
     chart.update(); // Update the chart immediately after the user responds
   } else {
