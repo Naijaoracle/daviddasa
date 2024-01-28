@@ -4,12 +4,19 @@ let chartData = {
   labels: [],
   datasets: [
     {
-      label: 'Hearing Thresholds',
+      label: 'Heard',
       borderColor: 'blue',
       backgroundColor: 'blue',
-      pointRadius: 5,
-      pointHoverRadius: 8,
-      pointBackgroundColor: 'blue',
+      pointRadius: 8,
+      pointHoverRadius: 10,
+      data: []
+    },
+    {
+      label: 'Not Heard',
+      borderColor: 'red',
+      backgroundColor: 'red',
+      pointRadius: 8,
+      pointHoverRadius: 10,
       data: []
     }
   ]
@@ -17,11 +24,16 @@ let chartData = {
 let chart;
 
 function initAudioContext() {
+  if (audioContext) {
+    audioContext.close();
+  }
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
   oscillator = audioContext.createOscillator();
 }
 
 function playSound() {
+  stopSound(); // Stop the sound if already playing
+
   const frequencyInput = document.getElementById('frequencyInput');
   const frequency = parseFloat(frequencyInput.value);
 
@@ -46,6 +58,8 @@ function stopSound() {
 }
 
 function adjustVolume(direction) {
+  stopSound(); // Stop the sound if currently playing
+
   const volumeInput = document.getElementById('volumeInput');
   let currentVolume = parseFloat(volumeInput.value);
 
@@ -61,15 +75,25 @@ function adjustVolume(direction) {
 
   currentVolume = Math.max(0, Math.min(1, currentVolume)); // Ensure volume is between 0 and 1
   volumeInput.value = currentVolume.toFixed(1);
-  oscillator.volume = currentVolume;
+
+  if (oscillator) {
+    oscillator.volume = currentVolume;
+    oscillator.start();
+  }
 }
 
 function answer(response) {
   const frequencyInput = document.getElementById('frequencyInput');
   const frequency = parseFloat(frequencyInput.value);
 
-  chartData.labels.push(`${frequency} Hz`);
-  chartData.datasets[0].data.push({ x: frequency, y: oscillator.volume * 100 });
+  chartData.labels.push(frequency);
+  if (response === 'Yes') {
+    chartData.datasets[0].data.push({ x: frequency, y: oscillator.volume * 120 });
+    chartData.datasets[1].data.push(null);
+  } else {
+    chartData.datasets[0].data.push(null);
+    chartData.datasets[1].data.push({ x: frequency, y: oscillator.volume * 120 });
+  }
 
   if (chart) {
     chart.update(); // Update the chart immediately after the user responds
@@ -81,12 +105,20 @@ function answer(response) {
         scales: {
           x: {
             type: 'linear',
-            position: 'bottom'
-          },
-          y: {
+            position: 'bottom',
             title: {
               display: true,
-              text: 'Volume (%)'
+              text: 'Frequency (Hz)'
+            }
+          },
+          y: {
+            type: 'linear',
+            position: 'left',
+            min: 0,
+            max: 120,
+            title: {
+              display: true,
+              text: 'Volume (dB)'
             }
           }
         }

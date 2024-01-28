@@ -355,3 +355,8 @@ button {
 #notificationArea:not(:empty) {
   display: block;
 }
+
+/* Frequency test styles */
+canvas {
+  margin-top: 20px;
+}
