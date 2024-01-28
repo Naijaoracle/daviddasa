@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         {
                           answer: "no",
                           action: function () {
-                            showResult("Wax Build-up");
+                            showResult("a Wax Build-up");
                           },
                         },
                       ],
