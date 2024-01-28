@@ -395,6 +395,7 @@ canvas {
   width: 200px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  margin: 0 auto;
 }
 
 .play, .stop {
@@ -404,7 +405,8 @@ canvas {
   position: relative;
   width: 80px;
   height: 30px;
-  text-align: center;
+  text-align: right;
+  color: black;
 }
 
 .play::before {
