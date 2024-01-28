@@ -64,13 +64,15 @@ function answer(response) {
   const frequency = parseFloat(frequencyInput.value);
 
   chartData.labels.push(frequency.toString());
+  const middleX = 10010; // Middle of the x-axis range
+  
   if (response === 'Yes') {
-    chartData.datasets[0].data.push({ x: 0, y: frequency });
-    chartData.datasets[1].data.push({ x: frequency, y: 0 }); // Change here
+    chartData.datasets[0].data.push({ x: middleX, y: frequency });
+    chartData.datasets[1].data.push({ x: frequency, y: middleX });
   } else {
-    chartData.datasets[0].data.push({ x: frequency, y: 0 }); // Change here
-    chartData.datasets[1].data.push({ x: 0, y: frequency });
-  }
+    chartData.datasets[0].data.push({ x: frequency, y: middleX });
+    chartData.datasets[1].data.push({ x: middleX, y: frequency });
+  }  
 
   if (chart) {
     chart.update(); // Update the chart immediately after the user responds
