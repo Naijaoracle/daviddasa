@@ -81,8 +81,8 @@ function answer(response) {
       options: {
         scales: {
           x: {
-            type: 'linear', // Change the x-axis type to linear
-            position: 'center', // Center the x-axis
+            type: 'linear',
+            position: 'bottom',
             title: {
               display: false,
             },

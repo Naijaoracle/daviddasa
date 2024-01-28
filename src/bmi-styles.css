@@ -366,29 +366,41 @@ canvas {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 200px;
-  margin: 10px auto;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 10px;
+  height: 50px;
 }
 
-.audio-container button:first-child,
-.audio-container button:last-child {
-  flex: 1;
-}
-
-.audio-container button:nth-child(2) {
-  flex: 2; 
-  margin-bottom: 5px; 
-}
-
-.audio-container button {
-  background-color: #4caf50;
+.play, .stop {
+  background-color: transparent;
   border: none;
-  padding: 10px 15px;
-  font-size: 16px;
   cursor: pointer;
+  position: relative;
+  width: 80px;
+  height: 30px;
+  text-align: center;
+}
+
+.play::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 20px solid green;
+}
+
+.stop::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  background-color: red;
 }
 
 .centered {
