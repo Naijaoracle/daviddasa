@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BP study recuruitment</title>
+  <!-- CSS file goes here -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Navigation Section -->
+  <nav>
+    <ul>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+      <li><a href="https://www.daviddasa.com/about">About</a></li>
+      <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
+      <li><a href="https://www.daviddasa.com/skills">Skills</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <h1><p>Kula da Hawan Jini: Lifelight</h1>
+
+    <!-- Contact Section -->
+    <section id="contact">
+<h2>Kula da Hawan Jini: Inganta Kwarewa</h2>
+<p>•Kuna da cutar hawan jini?</p>
+<p>ko</p>
+<h3>• Shin kai ma'aikacin lafiya ne da ke da hannu wajen sarrafa hawan jini?</h3>
+<p>Muna neman mahalarta don binciken bincike don kimanta sabuwar fasaha da ake kira Lifelight don kula da hawan jini.</p>
+<h3>Nazarin yana nufin fahimtar:</h3>
+<p>• Yadda marasa lafiya ke samun sauƙi da kwanciyar hankali ta amfani da fasahar Lifelight don auna hawan jini ta amfani da kyamarorin wayoyinsu.</p>
+<p>• Ra'ayoyin likitoci game da yuwuwar fa'idodin Lifelight ga marasa lafiya da aikinsu.</p>
+<p>• Sha'awar gudanarwa na ɗaukar fasahar Rayuwa.</p>
+<h3>Idan kai baƙon asibiti ne:</h3>
+<p>Za a tambaye ku don kammala taƙaitaccen tambayoyin kuma a auna hawan jinin ku ta amfani da na'urar lura da al'ada da fasaha ta Lifelight.</p>
+<p>Sannan zaku raba gogewar ku ta amfani da Lifelight ta gajeriyar tambayoyin tambayoyi.</p>
+<p>2</p>
+<h3>Idan kana kiwon lafiya:</h3>
+<p>Za a tambaye ku don kammala takardar tambaya game da gogewar ku game da fasahar sa ido kan hawan jini da abubuwan da kuka fara gani na Hasken Rayuwa.</p>
+<p>Shiga na son rai ne kuma na sirri ne. Duk bayanan za a ɓoye su kafin bincike.</p>
+<p>Babu sanannun kasada masu alaƙa da shiga, fa'idodin sun haɗa da samun kyakkyawar fahimtar fasahar Lifelight da rawar da take takawa wajen lura da hawan jini</p>
+<h3>Don ƙarin bayani ko don bayyana sha'awar ku, tuntuɓi:</h3>
+<p>Dr. David Dasa (Jami'ar Bournemouth)</p>
+<p>Imel: s5629479@bournemouth.ac.uk</p>
+<p>Taimaka mana inganta makomar kula da hawan jini</p>        
+    </section>
+  </div>
+
+  <!-- Footer Section -->
+  <footer>
+    <p>&copy; 2023 David Dasa</p>
+  </footer>
+</body>
+</html>
