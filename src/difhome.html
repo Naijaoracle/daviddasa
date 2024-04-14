@@ -1,85 +1,243 @@
-<!DOCTYPE html>
-<html>
-<head>
+<!DOCTYPE html><html><head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="apple-touch-icon" href="logo.png">
     <link rel="icon" href="logo_favicon.ico">
     <meta name="robots" content="max-image-preview:large">
-    <link rel="stylesheet" id="global-styles" href="../src/wp-content/themes/topol/dist/styles.css" type="text/css" media="all">
-    
-        
-    </style>
-    <link rel="stylesheet" id="line-awesome-css" href="../src/line-awesome.min.css" type="text/css" media="all">
-    <link rel="stylesheet" id="master-css" href="../src/wp-content/themes/topol/dist/styles.css" type="text/css" media="all">
+<style id="global-styles-inline-css" type="text/css">
+body{--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--duotone--dark-grayscale: url('index.html#wp-duotone-dark-grayscale');--wp--preset--duotone--grayscale: url('index.html#wp-duotone-grayscale');--wp--preset--duotone--purple-yellow: url('index.html#wp-duotone-purple-yellow');--wp--preset--duotone--blue-red: url('index.html#wp-duotone-blue-red');--wp--preset--duotone--midnight: url('index.html#wp-duotone-midnight');--wp--preset--duotone--magenta-yellow: url('index.html#wp-duotone-magenta-yellow');--wp--preset--duotone--purple-green: url('index.html#wp-duotone-purple-green');--wp--preset--duotone--blue-orange: url('index.html#wp-duotone-blue-orange');--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+</style>
+<link rel="stylesheet" id="line-awesome-css" href="../maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css" type="text/css" media="all">
+<link rel="stylesheet" id="master-css" href="wp-content/themes/topol/dist/styles.css" type="text/css" media="all">
 
-    <link rel="canonical" href="https://digitalintelligencefoundry.com">
-
-    <!-- <link rel="stylesheet" href="styles.css"> -->
-
+<link rel="canonical" href="https://digitalintelligencefoundry.com">
     <title>Digital Intelligence Foundry</title>
-    <meta name="description" content="">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="@naijaoracle">
-    <meta name="twitter:title" content="Education">
-    <meta name="twitter:description" content="My tweets">
-    <meta name="twitter:creator" content="@naijaoracle">
-    <meta name="twitter:image" content="">
-    <meta property="og:title" content="Digital Intelligence Foundry">
-    <meta property="og:type" content="article">
-    <meta property="og:url" content="https://daviddasa.com/">
-    <meta property="og:image" content="">
-    <meta property="og:image:alt" content="A | B | C">
-    <meta property="og:description" content=""> 
-    <meta property="og:site_name" content="Digital Intelligence Foundry Home">
-</head>
+<meta name="description" content="">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@naijaoracle">
+<meta name="twitter:title" content="Education">
+<meta name="twitter:description" content="My tweets">
+<meta name="twitter:creator" content="@nshcs">
+<meta name="twitter:image" content="">
+<meta property="og:title" content="Digital Intelligence Foundry">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://digitalintelligencefoundry.com/">
+<meta property="og:image" content="">
+<meta property="og:image:alt" content="A | B | C">
+<meta property="og:description" content=""> 
+<meta property="og:site_name" content="Digital Intelligence Foundry Home">
+"></head>
 <body class="body body--home body--cookie">
     <header class="header" role="banner">
-        <h1>Welcome to Digital Intelligence Foundry</h1>
-        <nav>
-            <ul>
-                <li><a href="#services">Services</a></li>
-                <li><a href="#about">About Us</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </nav>
-    </header>  
-    
-    <div class="page page--home">
-        <section id="services">
-            <h2>Our Services</h2>
-            <p>We provide a range of digital intelligence services, including data analysis, machine learning, and more.</p>
-        </section>
-
-        <section id="about">
-            <h2>About Us</h2>
-            <p>Digital Intelligence Foundry is a leading provider of digital intelligence solutions. We are committed to helping our clients make data-driven decisions.</p>
-        </section>
-
-        <section id="contact">
-            <h2>Contact Us</h2>
-            <p>Want to learn more about our services? Get in touch with us today!</p>
-        </section>
+    <div class="header__inner">
+        <div class="header__inner-left">
+            <nav class="nav nav--header">
+                <div class="nav__inner">
+                    <ul id="menu-header" class="outer-menu"><li id="menu-item-75" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home current-menu-item page_item page-item-71 current_page_item menu-item-75"><a href="https://topol.hee.nhs.uk/" aria-current="page">Home</a></li>
+<li id="menu-item-1861" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1861"><a href="https://topol.hee.nhs.uk/the-topol-review/">The Topol Review</a></li>
+<li id="menu-item-578" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-578"><a href="https://topol.hee.nhs.uk/digital-fellowships/">Topol Digital Fellowships</a></li>
+<li id="menu-item-78" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-78"><a href="https://topol.hee.nhs.uk/news/">News</a></li>
+</ul>                </div>
+            </nav>
+            <a href="#" class="nav__toggle"><span class="las la-bars"></span></a>
+        </div>
+        <div class="header__inner-right">
+            <span class="header__logo">
+                <a href="https://digitalintelligencefoundry.com" class="logo logo--heenhs" alt="" title="The Topol Review — NHS Health Education England">
+                    <img src="site images.png" alt="Logo: DD">
+                </a>
+            </span>
+        </div>
     </div>
-
-    <footer class="footer" role="contentinfo">
-        <p>&copy; 2024 Digital Intelligence Foundry. All rights reserved.</p>
+</header>  
+    
+<div class="page page--home">
+    
+    <header class="page__header">
+        <div class="page__inner" id="particles-js">
+                    <div class="owl-carousel">
+                    <section class="card card--report">
+                        <div class="card__inner">
+                            <div class="card__image">
+                                <img src="wp-content/uploads/2019/02/topol-report-cover.jpg">
+                            </div>
+                            <div class="card__content">
+                                <h2 class="card__title">
+                                    <span>Organisation Mission</span>
+                                    Preparing the healthcare workforce to deliver the digital future                                </h2>
+                                <div class="card__excerpt">
+                                                                    </div>
+                                <a href="/wp-content/uploads/HEE-Topol-Review-2019.pdf" download="" class="btn card__button" data-ga="true" data-tracking="button-topol-review-download">Download the report<i class="las la-download"></i></a>
+                            </div>
+                        </div>
+                    </section>
+                                                        <section class="card card--report">
+                        <div class="card__inner">
+                            <div class="card__image">
+                                <img src="wp-content/uploads/2019/02/HEE-Topol-Review-Mental-health-cover.jpg">
+                            </div>
+                            <div class="card__content">
+                                <h2 class="card__title">
+                                    <span>The Topol Review</span>
+                                    Digital Future of Mental Healthcare Report                                </h2>
+                                <div class="card__excerpt">
+                                                                    </div>
+                                <a href="/wp-content/uploads/HEE-Topol-Review-Mental-health-paper.pdf" download="" class="btn card__button" data-ga="true" data-tracking="button-topol-review-mental-health-download">Download the report<i class="las la-download"></i></a>
+                            </div>
+                        </div>
+                    </section>
+                            </div>
+                </div>
+    </header>
+    <main class="page__main">
+                                                    <section class="section section--content">
+    <div class="section__inner">
+                <div class="section__grid two gaps">                            <div class="item">                                        <div class="cta cta--cohort">
+            <a href="https://topol.hee.nhs.uk/the-topol-review/" class="cta__link">
+            <h4 class="cta__title">The Topol Review<span class="cta__icon"><i class="las la-arrow-right"></i></span></h4>
+            <div class="cta__content">
+                <p>Providing intelligent solutions to the challenges of the digital age.</p>
+            </div>
+           
+        </a>
+    </div>   <div class="item">                                        <div class="cta cta--cohort">
+            <a href="https://topol.hee.nhs.uk/digital-fellowships/" class="cta__link">
+            <h4 class="cta__title">Digital Fellowships<span class="cta__icon"><i class="las la-arrow-right"></i></span></h4>
+            <div class="cta__content">
+                <p>Playing our part to improve health accessibility.</p>
+            </div>
+           
+        </a>
+    </div>                </div>                    </div>    </div>
+</section>
+                                            <section class="section section--fellows section--fellows-carousel">
+    <div class="section__inner">
+                <div class="section__header">
+            <h3 class="section__title">Meet our digital fellows</h3>                                    <a href="/digital-fellowships/fellows/" class="section__link">View all current fellows <i class="las la-arrow-right"></i></a>
+        </div>
+                <div class="owl-carousel">
+                            <div class="item card card--fellows card--fellows-carousel">
+    <a href="https://topol.hee.nhs.uk/digital-fellowships/fellows/sam-ingram/" class="card__inner">
+        <div class="card__image" style="background-image:url('wp-content/uploads/2022/05/SamuelIngram1.jpg');">
+            <img src="wp-content/themes/topol/images/blank/card--blog.png">
+        </div>
+        <div class="card__content">
+            <div class="card__align">
+                <h3 class="card__title">
+                    Sam Ingram                </h3>
+                <div class="card__meta">
+                    <ul>
+                        <li><i class="las la-user-tie"></i>Clinical Scientist</li>                        <li><i class="las la-building"></i>The Christie NHS Foundation Trust</li>                                            </ul>
+                </div>
+            </div>
+        </div>
+    </a>
+</div>                            
+<div class="item card card--fellows card--fellows-carousel">
+    <a href="https://topol.hee.nhs.uk/digital-fellowships/fellows/alex-gan/" class="card__inner">
+        <div class="card__image" style="background-image:url('wp-content/uploads/2022/05/AlexGann1.jpg');">
+            <img src="wp-content/themes/topol/images/blank/card--blog.png">
+        </div>
+        <div class="card__content">
+            <div class="card__align">
+                <h3 class="card__title">
+                    Alex Gan                </h3>
+                <div class="card__meta">
+                    <ul>
+                        <li><i class="las la-user-tie"></i>Dermatology Registrar</li>                        <li><i class="las la-building"></i>University Hospitals of Derby and Burton NHS Foundation Trust</li>                                            </ul>
+                </div>
+            </div>
+        </div>
+    </a>
+</div>                            
+<div class="item card card--fellows card--fellows-carousel">
+    <a href="https://topol.hee.nhs.uk/digital-fellowships/fellows/chris-lawrence/" class="card__inner">
+        <div class="card__image" style="background-image:url('wp-content/uploads/2022/05/ChrisLawrence1.jpg');">
+            <img src="wp-content/themes/topol/images/blank/card--blog.png">
+        </div>
+        <div class="card__content">
+            <div class="card__align">
+                <h3 class="card__title">
+                    Chris Lawrence                </h3>
+                <div class="card__meta">
+                    <ul>
+                        <li><i class="las la-user-tie"></i>Infectious diseases Consultant</li>                        <li><i class="las la-building"></i>South Tees NHS Foundation Trust</li>                                            </ul>
+                </div>
+            </div>
+        </div>
+    </a>
+</div>                             <div class="item card card--news card--news-listing">
+    <div class="card__inner">
+        <a href="https://topol.hee.nhs.uk/news/health-education-england-allocates-10-free-places-on-the-topol-fellowship-programmes-machine-learning-in-service-design-and-delivery-course/" class="card__image" style="background-image:url('wp-content/uploads/2021/08/news-ml-topol.jpg');">
+            <img src="wp-content/themes/topol/images/blank/card--blog.png">
+        </a>
+        <div class="card__content">
+            <span class="card__category">Digital Fellowships</span>
+            <h3 class="card__title">
+                <a href="https://topol.hee.nhs.uk/news/health-education-england-allocates-10-free-places-on-the-topol-fellowship-programmes-machine-learning-in-service-design-and-delivery-course/">Health Education England allocates 10 free places on the Topol Fellowship programme’s ‘Machine Learning in Service Design and Delivery’ course</a>
+            </h3>
+            <span class="card__date">17th Aug 2021</span>
+                    </div>
+    </div>
+</div>
+                        </div>                    </div>
+    </div>
+</section>
+                        </main>
+    <footer class="page__footer">
     </footer>
-
-
-    <!-- JavaScript files -->
-    <!-- <script type="text/javascript" src="../ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" id="jquery-js"></script> -->
-    <script type="text/javascript" src="../src/wp-content/themes/topol/dist/vendor.min.js" id="vendor-js"></script>
-    <!-- <script type="text/javascript" id="scripts-js-extra"> -->
-    </script>
-    <script type="text/javascript" src="../src/wp-content/themes/topol/dist/scripts.js" id="scripts-js"></script>
-    <script type="text/javascript" src="../src/wp-content/themes/topol/scripts/frontpage.js" id="frontpage-js"></script>
-    <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'UA-152409906-1');
-    </script>
-</body>
-</html>
+</div>
+    <footer class="footer" role="contentinfo">
+    <div class="footer__container">
+    <!--<section class="footer--logos">
+        <div class="footer__inner">
+            <div class="footer__inner-left">
+                <a href="https://topol.hee.nhs.uk" class="logo logo--heestrapline" alt="" title="">
+                    <img src="https://topol.hee.nhs.uk/wp-content/themes/topol/images/logos/heestrapline.png" alt="Logo: HEE" />
+                </a>
+            </div>
+            <div class="footer__inner-right">
+                <a href="https://topol.hee.nhs.uk" class="logo logo--nhsconst" alt="" title="">
+                    <img src="https://topol.hee.nhs.uk/wp-content/themes/topol/images/logos/nhsconst.png" alt="Logo: HEE" />
+                </a>
+            </div>
+        </div>
+    </section>-->
+    <section class="footer--copyright">    
+        <div class="footer__inner">
+            <div class="footer__inner-left">
+                <nav class="nav nav--footer">
+                    <ul id="menu-footer" class=""><li id="menu-item-82" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home current-menu-item page_item page-item-71 current_page_item menu-item-82"><a href="https://topol.hee.nhs.uk/" aria-current="page">Home</a></li>
+<li id="menu-item-587" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-587"><a href="https://topol.hee.nhs.uk/digital-fellowships/">Topol Digital Fellowships</a></li>
+<li id="menu-item-81" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-81"><a href="https://topol.hee.nhs.uk/news/">News</a></li>
+<li id="menu-item-294" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-294"><a href="https://www.hee.nhs.uk/about/privacy-notice">Privacy Policy</a></li>
+<li id="menu-item-327" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-327"><a href="mailto:Topol.Review@hee.nhs.uk?Subject=Website%20Enquiry">Contact Us</a></li>
+</ul>                </nav>
+            </div>
+            <div class="footer__inner-right">
+                <div class="footer__copyright">
+                    <p>© 2024 <br> Digital Intelligence Foundry</p>
+                </div>
+                <!--<div class="social social--footer">
+                    <ul>
+                        <li><a href="https://www.twitter.com/naijaoracle" alt=""><span class="icon icon--twitter"></span></a></li>
+                        <li><a href="https://www.facebook.com/ddasa3" alt=""><span class="icon icon--facebook"></span></a></li>
+                    </ul>
+                </div>-->
+            </div>
+        </div>
+    </section>
+    </div>
+    <div class="is-mobile"></div>
+    <div class="is-tablet"></div>
+</footer>    
+<script type="text/javascript" src="wp-content/themes/topol/dist/vendor.min.js" id="vendor-js"></script>
+<script type="text/javascript" id="scripts-js-extra">
+/* <![CDATA[ */
+var nshcsdata = {"ajax_url":"https:\/\/topol.hee.nhs.uk\/wp-admin\/admin-ajax.php","nonce":"64d0664a40"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="wp-content/themes/topol/dist/scripts.js" id="scripts-js"></script>
+<script type="text/javascript" src="wp-content/themes/topol/scripts/frontpage.js" id="frontpage-js"></script>
+</body></html>
