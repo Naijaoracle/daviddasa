@@ -242,3 +242,118 @@ p {
   
   /*Any other decorations*/
   
+/* Animation Section Styles */
+.animation-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* Layer Styles */
+.layer {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+/* Circle Styles for Input Layer */
+.input-layer .circle {
+  background-color: #6b6b6b; /* Gray for the input layer */
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  margin: 0 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  color: #fff;
+  transition: transform 0.3s, background-color 0.3s; /* Transition for hover effects */
+}
+
+/* Hover Effect for Input Circles */
+.input-layer .circle:hover {
+  transform: scale(1.1);
+  background-color: #16a085; /* Change to a teal color on hover */
+}
+
+/* Circle Styles for Fully Connected Layers */
+.fully-connected .circle {
+  background-color: #8e44ad; /* Purple for fully connected layers */
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  margin: 0 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  color: #fff;
+  transition: transform 0.3s, background-color 0.3s; /* Transition for hover effects */
+}
+
+/* Hover Effect for Fully Connected Circles */
+.fully-connected .circle:hover {
+  transform: scale(1.1);
+}
+
+/* Circle Styles for Output Layer */
+.output-layer .circle {
+  background-color: #ffd700; /* Gold for the output */
+  border-radius: 50%;
+  width: 100px; /* Larger size for emphasis */
+  height: 100px; /* Larger size for emphasis */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000; /* Black text for contrast */
+  font-weight: bold;
+  transition: transform 0.3s, background-color 0.3s; /* Transition for hover effects */
+}
+
+/* Hover Effect for Output Circle */
+.output-layer .circle:hover {
+  background-color: #f39c12; /* Darker gold on hover */
+  transform: scale(1.1); /* Slightly larger on hover */
+}
+
+/* Tooltip Styles for Layer Labels */
+.circle[data-label]:hover::after {
+  content: attr(data-label); /* Show the label */
+  position: absolute;
+  top: -25px; /* Adjust position as necessary */
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 10; /* Ensure it appears above other elements */
+}
+
+/* Flash Animation for Output Layer */
+@keyframes flash {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.flash {
+  animation: flash 0.5s infinite; /* Flash effect */
+}
+
+/* Responsive Design for Animation Section */
+@media (max-width: 768px) {
+  .input-layer .circle,
+  .fully-connected .circle {
+    width: 50px; /* Smaller size on mobile */
+    height: 50px; /* Smaller size on mobile */
+  }
+
+  .output-layer .circle {
+    width: 80px; /* Adjust output circle size on mobile */
+    height: 80px; /* Adjust output circle size on mobile */
+  }
+}
