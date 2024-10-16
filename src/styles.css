@@ -225,12 +225,12 @@ p {
     text-align: center;
     opacity: 0.8;
     padding: 20px;
-    background-color: transparent; /* Make the footer background transparent */
+    background-image: linear-gradient(to right, #2ecc71, #092917);
     color: #fff;
     position: fixed;
     width: 100%;
     bottom: 0;
-  }  
+  }
   
   /* Links */
   a {
