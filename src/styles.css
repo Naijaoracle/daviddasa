@@ -262,16 +262,19 @@ body {
 .animation-container {
   display: flex;
   justify-content: space-around;
-  align-items: flex-start; /* Align layers to the top */
+  align-items: stretch; /* Evenly distribute layers vertically */
   position: relative;
-  height: 600px; /* Ensure enough height for animation */
+  height: 80vh; /* Adjusted height to use viewport height */
 }
 
+/* Adjusting Layer Spacing */
 .layer {
   display: flex;
   flex-direction: column; /* Vertical alignment of nodes */
   align-items: center; /* Center nodes horizontally */
-  margin: 20px;
+  justify-content: space-around; /* Evenly space nodes vertically */
+  flex: 1; /* Allow layers to stretch equally */
+  margin: 0 10px; /* Horizontal margin */
 }
 
 .layer .circle {
@@ -329,6 +332,7 @@ body {
   opacity: 1; /* Fade to fully opaque when active */
 }
 
+/* Layer Label Styling */
 .layer-label {
   margin-bottom: 10px;
   font-weight: bold;
