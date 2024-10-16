@@ -288,6 +288,7 @@ body {
 }
 
 /* Circle Styles */
+/* Circle Styles for Debugging */
 .circle {
   border: 3px solid;
   border-image: linear-gradient(to right, #bb8fec, #6e3cbc); /* Gradient border */
@@ -298,7 +299,10 @@ body {
   position: relative;
   color: #f0f0f0; /* Lighter text color */
   z-index: 1;
-  background-color: transparent; /* No fill color */
+  
+  /* Debugging background color */
+  background-color: rgba(255, 0, 0, 0.2); /* Light red background for visual clarity */
+  
   cursor: pointer;
   text-align: center;
   padding: 10px;
@@ -308,6 +312,7 @@ body {
   opacity: 0.5; /* Default opacity for the circle */
   transition: opacity 2s ease-in-out, transform 0.3s;
 }
+
 
 .circle.active {
   opacity: 1; /* Fade to fully opaque when active */
