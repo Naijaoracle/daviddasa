@@ -297,13 +297,13 @@ body {
   z-index: 1; /* Ensure circles appear above other elements */
   background-color: transparent; /* No fill color */
   cursor: pointer; /* Indicate interactivity */
-  transition: opacity 1s ease-in-out, transform 0.3s;
+  transition: opacity 2s ease-in-out, transform 0.3s;
   text-align: center; /* Center text */
   padding: 10px; /* Add padding for multi-line text */
   font-size: 14px; /* Adjust font size for readability */
   max-width: 100px; /* Prevent text overflow */
   word-wrap: break-word; /* Break long words */
-  opacity: 0.7; /* Default opacity */
+  opacity: 0.5; /* Default opacity */
 }
 
 .circle.active {
@@ -325,7 +325,7 @@ body {
   background-color: transparent; /* No fill color */
   font-size: 16px; /* Slightly larger font */
   max-width: 140px; /* Adjusted max-width for longer text */
-  opacity: 0.8; /* Default opacity for output circle */
+  opacity: 0.6; /* Default opacity for output circle */
 }
 
 .output-layer .circle.active {
@@ -358,7 +358,7 @@ body {
   left: 50%;
   transform: translateX(-50%);
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: opacity 0.5s;
   pointer-events: none;
   font-size: 12px;
 }
