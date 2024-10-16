@@ -20,7 +20,7 @@ body {
     position: relative;
     border-radius: 20px;
     top: 90px;
-    margin-bottom: 80px;
+    margin-bottom:90px;
   }
   
   /* Media query for smaller screens (max-width: 768px) */
@@ -264,7 +264,7 @@ body {
   justify-content: space-around;
   align-items: center; /* Center items vertically in the container */
   position: relative;
-  height: 80vh; /* Adjusted height to use viewport height */
+  height: 90vh; /* Adjusted height to use viewport height */
   flex-wrap: wrap; /* Ensure that items don't get squished in small containers */
 }
 
@@ -281,16 +281,16 @@ body {
 
 .layer .circle {
   margin: 10px 0;
-  width: 80px;
-  height: 80px;
+  width: 90px;
+  height: 90px;
   border-radius: 50%; /* Ensure the circles are rendered as circles */
   flex-shrink: 0; /* Prevent circles from shrinking or distorting */
 }
 
 /* Circle Styles */
 .circle {
-  width: 80px;
-  height: 80px;
+  width: 90px;
+  height: 90px;
   
   /* Create a circle shape */
   border-radius: 50%;
@@ -435,7 +435,7 @@ footer {
     width: 60px;
     height: 60px;
     font-size: 12px;
-    max-width: 80px;
+    max-width: 90px;
   }
 
   .output-layer .circle {
