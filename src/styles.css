@@ -262,7 +262,7 @@ body {
 .animation-container {
   display: flex;
   justify-content: space-around;
-  align-items: stretch; /* Evenly distribute layers vertically */
+  align-items: center; /* Center items vertically in the container */
   position: relative;
   height: 80vh; /* Adjusted height to use viewport height */
 }
@@ -273,12 +273,15 @@ body {
   flex-direction: column; /* Vertical alignment of nodes */
   align-items: center; /* Center nodes horizontally */
   justify-content: space-around; /* Evenly space nodes vertically */
-  flex: 1; /* Allow layers to stretch equally */
+  flex: 1;
   margin: 0 10px; /* Horizontal margin */
 }
 
 .layer .circle {
-  margin: 10px 0; /* Vertical margin to space out circles */
+  margin: 10px 0;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%; /* Ensure the circles are rendered as circles */
 }
 
 /* Circle Styles */
@@ -286,34 +289,30 @@ body {
   border: 3px solid;
   border-image: linear-gradient(to right, #bb8fec, #6e3cbc); /* Gradient border */
   border-image-slice: 1;
-  border-radius: 50%;
-  width: 80px;
-  height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   color: #f0f0f0; /* Lighter text color */
-  z-index: 1; /* Ensure circles appear above other elements */
+  z-index: 1;
   background-color: transparent; /* No fill color */
-  cursor: pointer; /* Indicate interactivity */
-  text-align: center; /* Center text */
-  padding: 10px; /* Add padding for multi-line text */
-  font-size: 14px; /* Adjust font size for readability */
+  cursor: pointer;
+  text-align: center;
+  padding: 10px;
+  font-size: 14px;
   max-width: 100px; /* Prevent text overflow */
-  word-wrap: break-word; /* Break long words */
+  word-wrap: break-word;
   opacity: 0.5; /* Default opacity for the circle */
-  transition: opacity 2s ease-in-out, transform 0.3s; /* 2s transition for opacity and 0.3s for scaling on hover */
+  transition: opacity 2s ease-in-out, transform 0.3s;
 }
 
 .circle.active {
   opacity: 1; /* Fade to fully opaque when active */
 }
 
-/* To ensure the text fades with the circle, apply opacity to the entire .circle element */
 .circle span, .circle p {
   opacity: inherit; /* Text will inherit the circle's opacity */
-  transition: opacity 2s ease-in-out; /* Text will fade in/out with the circle */
+  transition: opacity 2s ease-in-out;
 }
 
 .circle:hover {
@@ -328,21 +327,21 @@ body {
   width: 120px;
   height: 120px;
   font-weight: bold;
-  background-color: transparent; /* No fill color */
-  font-size: 16px; /* Slightly larger font */
-  max-width: 140px; /* Adjusted max-width for longer text */
-  opacity: 0.6; /* Default opacity for output circle */
+  background-color: transparent;
+  font-size: 16px;
+  max-width: 140px;
+  opacity: 0.6;
 }
 
 .output-layer .circle.active {
-  opacity: 1; /* Fade to fully opaque when active */
+  opacity: 1;
 }
 
 /* Layer Label Styling */
 .layer-label {
   margin-bottom: 10px;
   font-weight: bold;
-  color: #fff; /* White color for better contrast */
+  color: #fff;
   background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background for readability */
   padding: 5px 10px;
   border-radius: 5px;
@@ -360,7 +359,7 @@ body {
   padding: 5px 8px;
   position: absolute;
   z-index: 2;
-  bottom: 110%; /* Position above the circle */
+  bottom: 110%;
   left: 50%;
   transform: translateX(-50%);
   opacity: 0;
@@ -373,7 +372,7 @@ body {
 .tooltip::after {
   content: '';
   position: absolute;
-  top: 100%; /* At the bottom of the tooltip */
+  top: 100%;
   left: 50%;
   transform: translateX(-50%);
   border-width: 5px;
@@ -381,7 +380,6 @@ body {
   border-color: rgba(0, 0, 0, 0.75) transparent transparent transparent;
 }
 
-/* Show Tooltip on Hover */
 .circle:hover .tooltip {
   visibility: visible;
   opacity: 1;
