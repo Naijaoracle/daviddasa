@@ -1,171 +1,171 @@
 /* Body and General Styling */
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 10px;
-    background-color: #092917;
-    color: #fff;
-    background-image: linear-gradient(to right, #2ecc71, #092917);
-    position: relative;
-    z-index: 2;
-  }
-  
-  /* Container Styles */
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #092917;
+  color: #fff;
+  background-image: linear-gradient(to right, #2ecc71, #092917);
+  line-height: 1.6;
+}
+
+/* Container Styles */
+.container {
+  background-color: #ede9da;
+  margin: 0 auto;
+  padding: 20px;
+  width: 80%;
+  color: #333;
+  border-radius: 20px;
+  top: 90px;
+  position: relative;
+  margin-bottom: 80px;
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 768px) {
   .container {
-    background-color: #ede9da;
-    margin: 0 auto;
-    padding: 20px;
-    width: 80%;
-    color: #333;
-    position: relative;
-    border-radius: 20px;
-    top: 90px;
-    margin-bottom: 80px;
-  }
-  
-  /* Media query for smaller screens (max-width: 768px) */
-  @media (max-width: 768px) {
-    .container {
-      width: 90%; /* 90% width for smaller screens */
+      width: 90%;
       top: 90px;
       margin-bottom: 70px;
-    }
   }
-  
-  @media (max-width: 768px) {
-    nav {
+
+  nav {
       width: 100%;
-      height: 70px;
+      height: auto;
       background-image: linear-gradient(to right, #2ecc71, #092917);
       color: #fff;
-    }
-  
-    @media (max-width: 768px) {
-      #video iframe {
-        width: 300px;
-        height: 225px;
-      }
-    }
-    
-    nav ul {
-      position: absolute;
+  }
+
+  #video iframe {
+      width: 100%;
+      height: auto;
+  }
+
+  nav ul {
+      position: relative;
       top: 0;
       left: 0;
       width: 100%;
       padding: 0;
       margin: 0;
       list-style: none;
-    }
-  
-    nav ul li {
       display: block;
-      float: left;
-      margin-right: 3px;
-    }
-  
-    nav ul li a {
-      color: #fff;
-      text-decoration: none;
-      display: block;
-      padding: 3px;
-      text-align: center;
-      font-size: 12px;
-    }
-  
-    nav .home-link {
-      display: none; /* Hide the 'Home' link on mobile devices, the logo should serve.*/
-    }
-  
-    .logo{
-      width: 28px;
-      height: 20px;
-      display: inline-block;
-      margin-right: 0;
-    }
-  }
-  /* Navigation Styles */
-  nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    text-align: center;
-    background-image: linear-gradient(to right, #2ecc71, #092917);
-  }
-  
-  nav ul li {
-    display: inline;
-    margin-right: 10px;
-  }
-  
-  nav ul li:first-child {
-    margin-right: auto; /* Pushes the logo to the left */
-  }
-  
-  nav ul li a {
-    color: #fff;
-    text-decoration: none;
-    padding: 20px;
-    display: inline-block;
-    transition: background-color 0.3s ease-in-out;
-  }
-  
-  nav ul li a:hover {
-    background-color: #16a085;
-    opacity: 0.6;
-  }
-  
-  /* Fixed Navigation Bar */
-  nav {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1; /* Ensuring the navigation bar stays above the content */
-    margin-bottom: 40px; /* Add 60px padding to the top of the navigation bar */
-    
-  }
-  
-  /* Main Content Styles */
-  main {
-    padding: 20px;
-  }
-  
-  /* Sections */
-  #about,
-  #projects,
-  #skills,
-  #contact {
-    background-color: #ede9da;
-    padding: 20px;
-    text-align: left;
-  }
-  
-  /* About section */
-  #about {
-    padding-bottom: 30px;
-  }
-  
-  .about-image {
-    float: left;
-    width: 100px;
-    height: auto;
-    margin-right: 20px;
-  }
-  
-  /* Project Cards */
-  .project-card {
-    background-color: #ede9da;
-    border: 1px solid #ccc;
-    border-radius: 20px;
-    padding: 20px;
-    margin-bottom: 20px;
-  }
-  
-  .project-card h3 {
-    color: #333;
   }
 
-/* Style for the form container */
+  nav ul li {
+      display: block;
+      margin: 0;
+      text-align: center;
+  }
+
+  nav ul li a {
+      padding: 15px;
+      font-size: 14px;
+  }
+
+  nav .home-link {
+      display: none; /* Hide the 'Home' link on mobile devices */
+  }
+
+  .logo {
+      width: 50px;
+      height: auto;
+      display: inline-block;
+      margin-right: 0;
+  }
+}
+
+/* Navigation Styles */
+nav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+  margin-bottom: 40px;
+  background-image: linear-gradient(to right, #2ecc71, #092917);
+}
+
+nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+nav ul li {
+  margin-right: 20px;
+}
+
+nav ul li:first-child {
+  margin-right: auto;
+}
+
+nav ul li a {
+  color: #fff;
+  text-decoration: none;
+  padding: 20px;
+  display: inline-block;
+  transition: background-color 0.3s ease-in-out;
+}
+
+nav ul li a:hover {
+  background-color: #16a085;
+  opacity: 0.8;
+}
+
+/* Main Content Styles */
+main {
+  padding: 20px;
+}
+
+/* Section Styles */
+#about,
+#projects,
+#skills,
+#contact {
+  background-color: #ede9da;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+}
+
+/* About Section */
+#about {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding-bottom: 30px;
+}
+
+.about-image {
+  width: 150px;
+  height: auto;
+  margin-right: 20px;
+  border-radius: 50%;
+}
+
+/* Project Cards */
+.project-card {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.project-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.project-card h3 {
+  color: #333;
+}
+
+/* Form Container */
 form {
   margin-top: 20px;
   display: flex;
@@ -173,7 +173,6 @@ form {
   align-items: center;
 }
 
-/* Style for the file input */
 input[type="file"] {
   margin-bottom: 10px;
   padding: 8px;
@@ -181,7 +180,6 @@ input[type="file"] {
   border: 1px solid #ccc;
 }
 
-/* Style for the submit button */
 input[type="submit"] {
   padding: 10px 20px;
   border: none;
@@ -196,12 +194,7 @@ input[type="submit"]:hover {
   background-color: #138d72;
 }
 
-/* Additional styles for text elements within the form */
-p {
-  margin-bottom: 15px;
-}
-
-/* Custom styling for alerts/messages */
+/* Alerts/Messages */
 .alert {
   padding: 10px;
   border-radius: 5px;
@@ -220,25 +213,81 @@ p {
   border: 1px solid #f5c6cb;
 }
 
-  /* Footer Styles */
-  footer {
-    text-align: center;
-    padding: 20px;
-    color: #fff;
-    z-index: 2;
-  }
-  
-  /* Links */
-  a {
-    color: #16a085;
-    transition: color 0.3s ease-in-out;
-  }
-  
-  a:hover {
-    color: #fff;
-    background-color: #092917;
-    opacity: 1.0;
-  }
-  
-  /*Any other decorations*/
-  
+/* Footer Styles */
+footer {
+  text-align: center;
+  padding: 20px;
+  background-image: linear-gradient(to right, #092917, #2ecc71);
+  color: #fff;
+  position: relative;
+  z-index: 2;
+}
+
+/* Links */
+a {
+  color: #16a085;
+  transition: color 0.3s ease-in-out;
+}
+
+a:hover {
+  color: #fff;
+  background-color: #092917;
+  padding: 2px;
+  border-radius: 5px;
+  opacity: 1.0;
+}
+
+/* Gallery Styles */
+.gallery {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.gallery img {
+  width: 100%;
+  transition: transform 0.3s ease-in-out;
+}
+
+.gallery:hover img {
+  transform: scale(1.1);
+}
+
+.desc {
+  text-align: center;
+  padding: 10px;
+  color: #333;
+  background-color: #fff;
+  opacity: 0.9;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+/* Button Styling */
+.button {
+  display: inline-block;
+  padding: 10px 20px;
+  margin: 10px 0;
+  border-radius: 5px;
+  background-color: #16a085;
+  color: #fff;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.button:hover {
+  background-color: #138d72;
+}
+
+/* Accessibility Improvements */
+:focus {
+  outline: 3px solid #16a085;
+  outline-offset: 2px;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}

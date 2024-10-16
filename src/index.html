@@ -3,131 +3,143 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="David Dasa's portfolio showcasing expertise in Digital Health & AI, featuring projects, skills, and certifications.">
   <title>David Dasa - Digital Health & AI Portfolio</title>
   <!-- CSS file -->
   <link rel="stylesheet" href="styles.css">
+  <!-- JavaScript file for animations -->
+  <script src="scripts.js" defer></script>
 </head>
 <body>
 
-  <!-- Navigation Section -->
-  <nav>
-    <ul>
-      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
-      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
-      <li><a href="https://www.daviddasa.com/about">About</a></li>
-      <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
-      <li><a href="https://www.daviddasa.com/skills">Skills</a></li>
-      <li><a href="https://www.daviddasa.com/contact">Contact</a></li>
-    </ul>
-  </nav>
+  <!-- Header and Navigation Section -->
+  <header>
+    <nav aria-label="Main Navigation">
+      <ul>
+        <li class="logo"><a href="/"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="David Dasa Logo" width="50" height="50"></a></li>
+        <li class="home-link"><a href="/">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/projects">Projects</a></li>
+        <li><a href="/skills">Skills</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
 
-<div class="container">
-  <!-- Main Content -->
-  <main>
+  <!-- Main Content Container -->
+  <div class="container">
+    <main>
       <!-- About Section -->
       <section id="about">    
-      <img src= "https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/david%20dasa.jpeg?raw=true" alt="David Dasa Photo" width="100" height="100" class="about-image">
-      <h1>Welcome to My Digital Health & AI Portfolio</h1>
-      <p>Hello and welcome! I'm David Dasa, a Medical Doctor on a path to explore the intersection of healthcare and 
-technology. Currently pursuing an MSc in Digital Health & Artificial Intelligence, I seek to leverage technology's potential to 
-enhance healthcare solutions.</p>
+        <img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/david%20dasa.jpeg?raw=true" alt="David Dasa Photo" class="about-image">
+        <h1>Welcome to My Digital Health & AI Portfolio</h1>
+        <p>Hello and welcome! I'm David Dasa, a Medical Doctor on a path to explore the intersection of healthcare and technology. Currently pursuing an MSc in Digital Health & Artificial Intelligence, I seek to leverage technology's potential to enhance healthcare solutions.</p>
 
-<p>With years of clinical experience, I've navigated high-pressure medical situations, leading cardiac arrest responses and 
-coordinating postoperative care. My journey is fueled by a vision to integrate innovative technology into healthcare practice, 
-aiming to create impactful solutions to real-world challenges.</p>
+        <p>With years of clinical experience, I've navigated high-pressure medical situations, leading cardiac arrest responses and coordinating postoperative care. My journey is fueled by a vision to integrate innovative technology into healthcare practice, aiming to create impactful solutions to real-world challenges.</p>
 
-<p>From conducting research on the use of blockchain technology in healthchare, to organizing medical outreach missions. I am committed to innovation and patient-centric 
-care.</p>
+        <p>From conducting research on the use of blockchain technology in healthcare, to organizing medical outreach missions, I am committed to innovation and patient-centric care.</p>
 
-<p>Join me in exploring the dynamic realm where medicine meets technology, as we strive to shape the future of healthcare.</p>
-<p>Please take a look around and feel free to <a href="https://www.linkedin.com/in/daviddasa">get in touch</a> on LinkedIn.</p>
-<p>If you would like to test your knowledge on Digital Health & AI, <a href="https://www.daviddasa.com/DHAIquiz">take a short quiz.</a></p>
-    </section>
+        <p>Join me in exploring the dynamic realm where medicine meets technology, as we strive to shape the future of healthcare. Please take a look around and feel free to <a href="https://www.linkedin.com/in/daviddasa">get in touch</a> on LinkedIn.</p>
+        <p>If you would like to test your knowledge on Digital Health & AI, <a href="/DHAIquiz">take a short quiz.</a></p>
+      </section>
 
-    <!-- Projects Section -->
-    <section id="projects">
-      <h2>Featured Project</h2>
-      <!-- Descriptions of projects here -->
-      <div class="project-card">
-        <b>Secure patient monitoring system</b>
-        <p>
-          A project to build a remote patient monitoring system which uses short range bluetooth low energy medical devices, verifies proximity to a trusted device, and sends the data to medical professionals who verify the data is from a trusted device, saving it to a distributed ledger running a proof of authority consensus protocol.</p>
-          <a href="https://github.com/Naijaoracle/remote-patient-monitoring-system"> project github page</a>
+      <!-- Projects Section -->
+      <section id="projects">
+        <h2>Featured Project</h2>
+        <article class="project-card">
+          <h3>Secure Patient Monitoring System</h3>
+          <p>A project to build a remote patient monitoring system which uses short-range Bluetooth Low Energy medical devices, verifies proximity to a trusted device, and sends the data to medical professionals who verify the data is from a trusted device, saving it to a distributed ledger running a proof of authority consensus protocol.</p>
+          <a href="https://github.com/Naijaoracle/remote-patient-monitoring-system">View Project on GitHub</a>
+        </article>
+      </section>
+
+      <!-- Interactive Animation Section -->
+      <section id="interactive-animation" class="purple-background">
+        <h2>Health Data Flow Animation</h2>
+        <div class="animation-container">
+          <!-- Input Layer -->
+          <div class="layer input-layer">
+            <div class="circle" data-label="Wearables">Wearables</div>
+            <div class="circle" data-label="Remote Monitoring">Remote Monitoring</div>
+            <div class="circle" data-label="Health Records">Health Records</div>
+            <div class="circle" data-label="Public Health Data">Public Health Data</div>
+            <div class="circle" data-label="Patient Feedback">Patient Feedback</div>
+          </div>
+          <!-- Fully Connected Layers -->
+          <div class="layer fully-connected">
+            <!-- Layer 1: Data Aggregation -->
+            <div class="circle" data-label="Data Normalization"></div>
+            <div class="circle" data-label="Feature Selection"></div>
+            <div class="circle" data-label="Integration"></div>
+          </div>
+          <div class="layer fully-connected">
+            <!-- Layer 2: Compute -->
+            <div class="circle" data-label="Machine Learning Models"></div>
+            <div class="circle" data-label="Statistical Analysis"></div>
+            <div class="circle" data-label="Predictive Analytics"></div>
+            <div class="circle" data-label="Data Validation"></div>
+          </div>
+          <div class="layer fully-connected">
+            <!-- Layer 3: Human Feedback / Machine Prediction Concordance -->
+            <div class="circle" data-label="Clinical Review"></div>
+            <div class="circle" data-label="User Feedback"></div>
+            <div class="circle" data-label="Outcome Validation"></div>
+          </div>
+          <!-- Output Layer -->
+          <div class="layer output-layer">
+            <div class="circle" id="output-circle">Improve Patient Outcomes</div>
+          </div>
         </div>
-      <!-- More project cards as needed -->
-    </section>
+      </section>
 
-    <section id="video">
-      <h2>Featured video</h2>
-        <p>Doctor Eric Topol is a cardiologist, scientist, and author. He is the founder and director of the Scripps Research Translational Institute and a professor of Molecular Medicine. He was commissioned by the UK government to lead a team to study the impact emerging technologies would have on healthcare. At the end of their work they wrote <a href = "https://topol.hee.nhs.uk/">the Topol report</a>.</p>
-        <p>Here is Dr Topol giving a TED talk which captures his views on current and ongoing changes in healthcare.</p>
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/ll5LY7wI_Xc?si=Bq_CBZ8j8J1bUBxq&amp;start=273" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-    </section>
+      <!-- Video Section -->
+      <section id="video">
+        <h2>Featured Video</h2>
+        <p>Doctor Eric Topol is a cardiologist, scientist, and author. He is the founder and director of the Scripps Research Translational Institute and a professor of Molecular Medicine. He was commissioned by the UK government to lead a team to study the impact emerging technologies would have on healthcare. At the end of their work they wrote <a href="https://topol.hee.nhs.uk/">the Topol report</a>.</p>
+        <p>Here is Dr. Topol giving a TED talk which captures his views on current and ongoing changes in healthcare:</p>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/ll5LY7wI_Xc?start=273" title="Eric Topol TED Talk on Healthcare" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </section>
 
-    <section id="certification">
-      <h2>Featured certification</h2>
-      <!-- Insert the current featured certification here: -->
-       <!-- Image Gallery Grid -->
-      <div class="responsive">
-        <div class="gallery">
+      <!-- Certification Section -->
+      <section id="certification">
+        <h2>Featured Certification</h2>
+        <article class="gallery">
           <a target="_blank" href="https://github.com/Naijaoracle/daviddasa/blob/469fb2d37143f0d84981e2ee0688c9ac8df4d28e/src/img/Quantum%20cloud%20computing%20certification.jpeg?raw=true">
-            <img src="https://github.com/Naijaoracle/daviddasa/blob/469fb2d37143f0d84981e2ee0688c9ac8df4d28e/src/img/Quantum%20cloud%20computing%20certification.jpeg?raw=true" alt="David Dasa - linkedin cloud computing certificate" width="300" height="200">
+            <img src="https://github.com/Naijaoracle/daviddasa/blob/469fb2d37143f0d84981e2ee0688c9ac8df4d28e/src/img/Quantum%20cloud%20computing%20certification.jpeg?raw=true" alt="Quantum Cloud Computing Certification" width="300" height="200">
           </a>
-          <div class="desc"> <b>Quantum cloud computing certification</b></div>
-        </div>
-      </div>
-    </section>
-    <!-- Skills Section -->
+          <div class="desc"><b>Quantum Cloud Computing Certification</b></div>
+        </article>
+      </section>
 
-<script>
-  const galleryElements = document.querySelectorAll('.gallery');
-  for (const galleryElement of galleryElements) {
-  const image = galleryElement.querySelector('img');
-  const description = galleryElement.querySelector('.desc');
+      <!-- Skills Section -->
+      <section id="skills">
+        <h2>Skills</h2> 
+        <ul>
+          <li>Artificial Intelligence model training and testing.</li>
+          <li>Blockchain Development</li>
+          <li>Computer Vision</li>
+          <li>eHealth system design and development: UI design, database design and development, prototype development, product testing.</li>
+          <li>Programming Languages: Python, JavaScript, Solidity, etc.</li>
+          <li>Experience with widely used eHealth systems in frontline clinical practice.</li>
+          <li>Resuscitation & Advanced Life Support.</li>
+        </ul>
+      </section>
 
-  image.addEventListener('mouseover', () => {
-    image.style.transition = 'transform 0.3s ease-in-out';
-    image.style.transform = 'scale(1.1) translateY(-3px)';
-
-    description.style.opacity = 1;
-  });
-
-  image.addEventListener('mouseout', () => {
-    image.style.transition = 'transform 0.3s ease-in-out';
-    image.style.transform = 'scale(1)';
-
-    description.style.opacity = 0;
-  });
-}
-</script>
-    <section id="skills">
-      <h2>Skills</h2> 
-      <ul>
-        <li>Artificial Intelligence model training and testing.</li>
-        <li>Blockchain Development</li>
-        <li>Computer Vision</li>
-        <li>eHealth system design and development: UI design, database design and development, prototype development, product testing.</li>
-        <li>Programming Languages: Python, JavaScript, Solidity etc.</li>
-        <li>Experience with widely used eHealth systems in frontline clinical practice.</li>
-        <li>Resuscitation & Advanced Life Support.</li>
-        <!-- Add more skills as needed -->
-      </ul>
-    </section>
-
-    <!-- Contact Section -->
-     <section id="contact">
-      <h2>Contact Me</h2>
-      <p>If you share my passion for transforming healthcare through technology or if you're interested in collaborating on projects, 
-I'd love to connect with you. Also if you have any inquiries, feel free to reach out:</p>
-      <p>LinkedIn: <a href="https://www.linkedin.com/in/daviddasa">LinkedIn | David Dasa</a></p>
-    </section>
-  </main>
-</div>
+      <!-- Contact Section -->
+      <section id="contact">
+        <h2>Contact Me</h2>
+        <p>If you share my passion for transforming healthcare through technology or if you're interested in collaborating on projects, I'd love to connect with you. Also, if you have any inquiries, feel free to reach out:</p>
+        <p>LinkedIn: <a href="https://www.linkedin.com/in/daviddasa">David Dasa on LinkedIn</a></p>
+      </section>
+    </main>
+  </div>
 
   <!-- Footer Section -->
   <footer>
     <p>&copy; 2023 David Dasa</p>
   </footer>
 
+  <!-- JavaScript File -->
+  <script src="scripts.js"></script>
 </body>
 </html>
