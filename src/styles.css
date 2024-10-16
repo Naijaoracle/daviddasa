@@ -290,27 +290,29 @@ body {
 /* Circle Styles */
 /* Circle Styles */
 .circle {
-  border: 3px solid; /* Ensuring a solid border for the circles */
-  border-image: linear-gradient(to right, #bb8fec, #6e3cbc); /* Purple gradient border */
-  border-image-slice: 1; /* Ensures the gradient applies across the whole border */
-  
-  border-radius: 50%; /* Makes the shape a circle */
-  
   width: 80px;
   height: 80px;
+  
+  /* Make the shape a circle */
+  border-radius: 50%;
+  
+  /* Applying a background gradient to mimic the border */
+  background: linear-gradient(to right, #bb8fec, #6e3cbc); /* Gradient border effect */
   
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  
   color: #f0f0f0; /* Light text color */
   z-index: 1;
   
-  background-color: transparent; /* No fill color inside the circles */
+  /* Ensure there's no background fill inside the circle */
+  background-clip: content-box;
+  padding: 10px;
   
   cursor: pointer;
   text-align: center;
-  padding: 10px;
   font-size: 14px;
   max-width: 100px; /* Prevent text overflow */
   word-wrap: break-word; /* Wrap long text if necessary */
@@ -329,17 +331,15 @@ body {
 
 /* Output Layer Styling */
 .output-layer .circle {
-  border: 3px solid;
-  border-image: linear-gradient(to right, #ffd700, #ff8c00); /* Gold gradient border for output circle */
-  border-image-slice: 1;
-  
-  border-radius: 50%; /* Ensuring it's still a circle */
-  
   width: 120px;
   height: 120px;
   
+  /* Make the output layer circle distinct with a gold border */
+  background: linear-gradient(to right, #ffd700, #ff8c00); /* Gradient for output circle */
+  
+  border-radius: 50%;
+  
   font-weight: bold;
-  background-color: transparent; /* No fill color */
   font-size: 16px;
   
   max-width: 140px;
