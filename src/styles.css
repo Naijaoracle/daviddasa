@@ -127,6 +127,7 @@ body {
   
   /* Main Content Styles */
   main {
+    flex: 1;
     padding: 20px;
   }
   
@@ -408,10 +409,10 @@ body {
 /* Footer Styling */
 footer {
   text-align: center;
+  opacity: 0.9;
   padding: 20px;
-  background-color: #34495e;
+  background-image: linear-gradient(to right, #2ecc71, #092917); 
   color: #fff;
-  position: fixed;
   width: 100%;
   bottom: 0;
 }
