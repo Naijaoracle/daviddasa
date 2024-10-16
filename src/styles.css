@@ -265,6 +265,7 @@ body {
   align-items: center; /* Center items vertically in the container */
   position: relative;
   height: 80vh; /* Adjusted height to use viewport height */
+  flex-wrap: wrap; /* Ensure that items don't get squished in small containers */
 }
 
 /* Adjusting Layer Spacing */
@@ -272,8 +273,9 @@ body {
   display: flex;
   flex-direction: column; /* Vertical alignment of nodes */
   align-items: center; /* Center nodes horizontally */
-  justify-content: space-around; /* Evenly space nodes vertically */
+  justify-content: space-evenly; /* Evenly space nodes vertically */
   flex: 1;
+  min-height: 100px; /* Ensure there is enough space vertically for each layer */
   margin: 0 10px; /* Horizontal margin */
 }
 
@@ -282,6 +284,7 @@ body {
   width: 80px;
   height: 80px;
   border-radius: 50%; /* Ensure the circles are rendered as circles */
+  flex-shrink: 0; /* Prevent circles from shrinking or distorting */
 }
 
 /* Circle Styles */
