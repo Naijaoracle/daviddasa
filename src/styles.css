@@ -294,29 +294,23 @@ body {
   z-index: 1; /* Ensure circles appear above other elements */
   background-color: transparent; /* No fill color */
   cursor: pointer; /* Indicate interactivity */
-  transition: transform 0.3s, border-color 0.3s, background-color 0.5s, opacity 0.5s;
+  transition: opacity 1s ease-in-out, transform 0.3s, border-color 0.3s;
   text-align: center; /* Center text */
   padding: 10px; /* Add padding for multi-line text */
   font-size: 14px; /* Adjust font size for readability */
   max-width: 100px; /* Prevent text overflow */
   word-wrap: break-word; /* Break long words */
-  opacity: 0.7; /* Default opacity */
+  opacity: 0; /* Start fully transparent */
 }
 
 /* Active State for Animation */
 .circle.active {
-  border-color: #16a085; /* Active border color */
-  background-color: rgba(22, 160, 133, 0.2); /* Light green overlay */
-  transform: scale(1.1); /* Slightly scale up */
-  opacity: 1; /* Fully opaque */
+  opacity: 1; /* Fade in to fully opaque */
 }
 
 /* Hover Effect */
 .circle:hover {
   transform: scale(1.1);
-  border-color: #16a085;
-  background-color: rgba(22, 160, 133, 0.2); /* Light green overlay on hover */
-  opacity: 1;
 }
 
 /* Output Layer Styling */
@@ -330,7 +324,7 @@ body {
   background-color: transparent; /* No fill color */
   font-size: 16px; /* Slightly larger font */
   max-width: 140px; /* Adjusted max-width for longer text */
-  opacity: 0.9; /* Slightly higher opacity */
+  opacity: 0; /* Start fully transparent */
 }
 
 /* Layer Label Styling */
@@ -397,11 +391,6 @@ footer {
 @media (max-width: 1200px) {
   .animation-container {
     flex-direction: column;
-    height: auto;
-  }
-
-  /* Adjust height if necessary */
-  .animation-container {
     height: auto;
   }
 }

@@ -125,6 +125,7 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
 </div>
 
 <!-- ... Health Data Animation ... -->
+
 <section id="interactive-animation">
   <div class="animation-container">
     <!-- Input Layer -->
@@ -193,7 +194,7 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
     </div>
 
     <div class="fully-connected-layer">
-      <span class="layer-label">Clinician Review</span> <!-- Updated Layer Name -->
+      <span class="layer-label">Clinician Review</span>
       <div class="layer fully-connected">
         <div class="circle" data-label="Clinical Review" id="fc3-1" aria-label="Clinical Review" tabindex="0">
           Clinical Review
@@ -211,4 +212,96 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
     </div>
 
     <!-- Output Layer -->
-    <div class="layer out
+    <div class="layer output-layer">
+      <div class="circle" id="output-circle" aria-label="Improve Patient Outcomes" tabindex="0">
+        Improve Patient Outcomes
+        <span class="tooltip">Improve Patient Outcomes</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer Section -->
+<footer>
+  <p>&copy; 2023 David Dasa</p>
+</footer>
+
+<!-- Revised Script -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Define layers in order
+    const layers = [
+      document.querySelectorAll('.input-layer .circle'),
+      document.querySelectorAll('.fully-connected-layer:nth-of-type(1) .fully-connected .circle'),
+      document.querySelectorAll('.fully-connected-layer:nth-of-type(2) .fully-connected .circle'),
+      document.querySelectorAll('.fully-connected-layer:nth-of-type(3) .fully-connected .circle'),
+      [document.getElementById('output-circle')]
+    ];
+
+    // Define fully connected layers (excluding input and output)
+    const fullyConnectedLayers = layers.slice(1, layers.length - 1);
+
+    // Define animation timings (in milliseconds)
+    const forwardDelay = 1000; // 1 second per activation
+    const backwardDelay = 500; // Backward pass is half as fast
+
+    // Helper function to delay execution
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    // Function to activate a layer
+    const activateLayer = async (layer, delayTime) => {
+      // Activate all circles in the layer simultaneously
+      layer.forEach(circle => {
+        circle.classList.add('active');
+      });
+      // Wait for the specified delay
+      await delay(delayTime);
+      // Deactivate after delay to allow fade-out
+      layer.forEach(circle => {
+        circle.classList.remove('active');
+      });
+    };
+
+    // Function to deactivate all layers (initial state)
+    const deactivateAll = () => {
+      document.querySelectorAll('.circle').forEach(circle => {
+        circle.classList.remove('active');
+      });
+    };
+
+    // Function to perform forward pass
+    const forwardPass = async () => {
+      for (let layer of layers) {
+        await activateLayer(layer, forwardDelay);
+      }
+    };
+
+    // Function to perform backward pass
+    const backwardPass = async () => {
+      // Exclude input and output layers
+      for (let i = fullyConnectedLayers.length - 1; i >= 0; i--) {
+        await activateLayer(fullyConnectedLayers[i], backwardDelay);
+      }
+    };
+
+    // Function to perform final forward pass
+    const finalForwardPass = async () => {
+      for (let layer of fullyConnectedLayers) {
+        await activateLayer(layer, forwardDelay);
+      }
+      // Finally, activate the output layer
+      await activateLayer(layers[layers.length - 1], forwardDelay);
+    };
+
+    // Execute the animation sequence
+    const executeAnimation = async () => {
+      deactivateAll();
+      await forwardPass();
+      await backwardPass();
+      await finalForwardPass();
+    };
+
+    // Start the animation
+    executeAnimation();
+  });
+</script>
