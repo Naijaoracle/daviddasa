@@ -223,14 +223,15 @@ p {
   /* Footer Styles */
   footer {
     text-align: center;
-    opacity: 0.8;
+    opacity: 0.9;
     padding: 20px;
     background-image: linear-gradient(to right, #2ecc71, #092917);
     color: #fff;
     position: fixed;
     width: 100%;
     bottom: 0;
-  }
+    left: 0;
+  }  
   
   /* Links */
   a {
