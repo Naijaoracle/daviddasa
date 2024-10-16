@@ -233,16 +233,16 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
       document.querySelectorAll('.input-layer .circle'),
       document.querySelectorAll('.fully-connected-layer:nth-of-type(1) .fully-connected .circle'),
       document.querySelectorAll('.fully-connected-layer:nth-of-type(2) .fully-connected .circle'),
-      document.querySelectorAll('.fully-connected-layer:nth-of-type(3) .fully-connected .circle'),
+      document.querySelectorAll('.fully-connected-layer:nth-of-type(3) .fully-connected .circle'), // Clinician Review layer
       [document.getElementById('output-circle')]
     ];
 
     // Define fully connected layers (excluding input and output)
-    const fullyConnectedLayers = layers.slice(1, layers.length - 1);
+    const fullyConnectedLayers = layers.slice(1, layers.length - 1); // Excludes input and output layer
 
     // Define animation timings (in milliseconds)
-    const forwardDelay = 1000; // 1 second per activation
-    const backwardDelay = 500; // Backward pass is half as fast
+    const forwardDelay = 2000; // 2 seconds per activation
+    const backwardDelay = forwardDelay / 2; // Backward pass is half as fast
 
     // Helper function to delay execution
     const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -303,6 +303,7 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
     // Start the animation
     executeAnimation();
   });
+</script>
 </script>
 </body>
 </html>
