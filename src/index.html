@@ -129,32 +129,84 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
   <div class="animation-container">
     <!-- Input Layer -->
     <div class="layer input-layer">
-      <!-- Input circles -->
-      <!-- ... same as before ... -->
+      <div class="circle" data-label="Wearables" id="input-1" aria-label="Wearables" tabindex="0">
+        Wearables
+        <span class="tooltip">Wearables</span>
+      </div>
+      <div class="circle" data-label="Remote Monitoring" id="input-2" aria-label="Remote Monitoring" tabindex="0">
+        Remote Monitoring
+        <span class="tooltip">Remote Monitoring</span>
+      </div>
+      <div class="circle" data-label="Health Records" id="input-3" aria-label="Health Records" tabindex="0">
+        Health Records
+        <span class="tooltip">Health Records</span>
+      </div>
+      <div class="circle" data-label="Public Health Data" id="input-4" aria-label="Public Health Data" tabindex="0">
+        Public Health Data
+        <span class="tooltip">Public Health Data</span>
+      </div>
+      <div class="circle" data-label="Patient Feedback" id="input-5" aria-label="Patient Feedback" tabindex="0">
+        Patient Feedback
+        <span class="tooltip">Patient Feedback</span>
+      </div>
     </div>
 
     <!-- Fully Connected Layers with Labels -->
     <div class="fully-connected-layer">
       <span class="layer-label">Data Aggregation</span>
       <div class="layer fully-connected">
-        <!-- Data Aggregation circles -->
-        <!-- ... same as before ... -->
+        <div class="circle" data-label="Data Normalization" id="fc1-1" aria-label="Data Normalization" tabindex="0">
+          Data Normalization
+          <span class="tooltip">Data Normalization</span>
+        </div>
+        <div class="circle" data-label="Feature Selection" id="fc1-2" aria-label="Feature Selection" tabindex="0">
+          Feature Selection
+          <span class="tooltip">Feature Selection</span>
+        </div>
+        <div class="circle" data-label="Integration" id="fc1-3" aria-label="Integration" tabindex="0">
+          Integration
+          <span class="tooltip">Integration</span>
+        </div>
       </div>
     </div>
 
     <div class="fully-connected-layer">
       <span class="layer-label">Compute</span>
       <div class="layer fully-connected">
-        <!-- Compute circles -->
-        <!-- ... same as before ... -->
+        <div class="circle" data-label="Machine Learning Models" id="fc2-1" aria-label="Machine Learning Models" tabindex="0">
+          Machine Learning Models
+          <span class="tooltip">Machine Learning Models</span>
+        </div>
+        <div class="circle" data-label="Statistical Analysis" id="fc2-2" aria-label="Statistical Analysis" tabindex="0">
+          Statistical Analysis
+          <span class="tooltip">Statistical Analysis</span>
+        </div>
+        <div class="circle" data-label="Predictive Analytics" id="fc2-3" aria-label="Predictive Analytics" tabindex="0">
+          Predictive Analytics
+          <span class="tooltip">Predictive Analytics</span>
+        </div>
+        <div class="circle" data-label="Data Validation" id="fc2-4" aria-label="Data Validation" tabindex="0">
+          Data Validation
+          <span class="tooltip">Data Validation</span>
+        </div>
       </div>
     </div>
 
     <div class="fully-connected-layer">
       <span class="layer-label">Clinician Review</span>
       <div class="layer fully-connected">
-        <!-- Clinician Review circles -->
-        <!-- ... same as before ... -->
+        <div class="circle" data-label="Clinical Review" id="fc3-1" aria-label="Clinical Review" tabindex="0">
+          Clinical Review
+          <span class="tooltip">Clinical Review</span>
+        </div>
+        <div class="circle" data-label="User Feedback" id="fc3-2" aria-label="User Feedback" tabindex="0">
+          User Feedback
+          <span class="tooltip">User Feedback</span>
+        </div>
+        <div class="circle" data-label="Outcome Validation" id="fc3-3" aria-label="Outcome Validation" tabindex="0">
+          Outcome Validation
+          <span class="tooltip">Outcome Validation</span>
+        </div>
       </div>
     </div>
 
@@ -236,7 +288,7 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
       for (let layer of fullyConnectedLayers) {
         await activateLayer(layer, forwardDelay);
       }
-      // Activate the output layer
+      // Finally, activate the output layer
       await activateLayer(layers[layers.length - 1], forwardDelay);
     };
 
@@ -252,3 +304,5 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
     executeAnimation();
   });
 </script>
+</body>
+</html>
