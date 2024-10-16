@@ -126,7 +126,7 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
 <section id="interactive-animation">
   <div class="animation-container">
     <!-- SVG for Connections -->
-    <svg class="connections" width="100%" height="100%" viewBox="0 0 1000 400">
+    <svg class="connections" width="100%" height="100%" viewBox="0 0 1000 600">
       <!-- Connection lines will be dynamically added here -->
     </svg>
 
@@ -160,7 +160,7 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
     </div>
 
     <div class="fully-connected-layer">
-      <span class="layer-label">Human Feedback / Machine Prediction Concordance</span>
+      <span class="layer-label">Clinician Feedback / Concordance Assessment</span>
       <div class="layer fully-connected">
         <div class="circle" data-label="Clinical Review" id="fc3-1"></div>
         <div class="circle" data-label="User Feedback" id="fc3-2"></div>
@@ -180,48 +180,80 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
   <p>&copy; 2023 David Dasa</p>
 </footer>
 
+<!-- Revised Script -->
 <script>
-  const connections = document.querySelector('.connections');
+  document.addEventListener("DOMContentLoaded", () => {
+    const connections = document.querySelector('.connections');
+    const animationContainer = document.querySelector('.animation-container');
 
-  // Function to dynamically draw SVG lines between two elements
-  const drawLine = (startElem, endElem) => {
-    const start = startElem.getBoundingClientRect();
-    const end = endElem.getBoundingClientRect();
-    
-    // Calculate coordinates for the line (adjust based on the page layout)
-    const startX = start.left + (start.width / 2);
-    const startY = start.top + (start.height / 2);
-    const endX = end.left + (end.width / 2);
-    const endY = end.top + (end.height / 2);
-    
-    // Create the SVG line element
-    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    line.setAttribute('x1', startX);
-    line.setAttribute('y1', startY);
-    line.setAttribute('x2', endX);
-    line.setAttribute('y2', endY);
-    line.setAttribute('stroke', '#333');
-    line.setAttribute('stroke-width', '2');
+    // Function to dynamically draw SVG lines between two elements
+    const drawLine = (startElem, endElem) => {
+      const svgRect = connections.getBoundingClientRect();
+      const start = startElem.getBoundingClientRect();
+      const end = endElem.getBoundingClientRect();
 
-    connections.appendChild(line);
-  };
+      // Calculate coordinates relative to the SVG container
+      const startX = start.left + (start.width / 2) - svgRect.left;
+      const startY = start.top + (start.height / 2) - svgRect.top;
+      const endX = end.left + (end.width / 2) - svgRect.left;
+      const endY = end.top + (end.height / 2) - svgRect.top;
 
-  // Draw connections for all input to fully connected layers
-  const inputNodes = document.querySelectorAll('.input-layer .circle');
-  const fcNodes = document.querySelectorAll('.fully-connected .circle');
-  const outputNode = document.getElementById('output-circle');
+      // Create the SVG line element
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', startX);
+      line.setAttribute('y1', startY);
+      line.setAttribute('x2', endX);
+      line.setAttribute('y2', endY);
+      line.setAttribute('stroke', '#333');
+      line.setAttribute('stroke-width', '2');
 
-  // Draw lines from input layer to first fully connected layer
-  inputNodes.forEach(inputNode => {
-    fcNodes.forEach(fcNode => {
-      drawLine(inputNode, fcNode);
+      connections.appendChild(line);
+    };
+
+    // Select all relevant nodes
+    const inputNodes = document.querySelectorAll('.input-layer .circle');
+    const fcLayers = document.querySelectorAll('.fully-connected-layer .fully-connected');
+    const outputNode = document.getElementById('output-circle');
+
+    // Draw lines from each input node to every node in each fully connected layer
+    inputNodes.forEach(inputNode => {
+      fcLayers.forEach(fcLayer => {
+        const fcNodes = fcLayer.querySelectorAll('.circle');
+        fcNodes.forEach(fcNode => {
+          drawLine(inputNode, fcNode);
+        });
+      });
+    });
+
+    // Draw lines from every node in each fully connected layer to the output node
+    fcLayers.forEach(fcLayer => {
+      const fcNodes = fcLayer.querySelectorAll('.circle');
+      fcNodes.forEach(fcNode => {
+        drawLine(fcNode, outputNode);
+      });
+    });
+
+    // Optional: Redraw connections on window resize to maintain alignment
+    window.addEventListener('resize', () => {
+      // Clear existing connections
+      connections.innerHTML = '';
+
+      // Redraw all connections
+      inputNodes.forEach(inputNode => {
+        fcLayers.forEach(fcLayer => {
+          const fcNodes = fcLayer.querySelectorAll('.circle');
+          fcNodes.forEach(fcNode => {
+            drawLine(inputNode, fcNode);
+          });
+        });
+      });
+
+      fcLayers.forEach(fcLayer => {
+        const fcNodes = fcLayer.querySelectorAll('.circle');
+        fcNodes.forEach(fcNode => {
+          drawLine(fcNode, outputNode);
+        });
+      });
     });
   });
-
-  // Draw lines from the fully connected layers to output layer
-  fcNodes.forEach(fcNode => {
-    drawLine(fcNode, outputNode);
-  });
-
-  // Simulation logic for coloring nodes remains unchanged.
 </script>

@@ -246,14 +246,18 @@ p {
 .animation-container {
   display: flex;
   justify-content: space-around;
-  align-items: flex-start;
+  align-items: center; /* Changed from flex-start to center for vertical alignment */
   position: relative;
+  height: 600px; /* Increased height to accommodate connections */
 }
 
+/* Adjusted SVG viewBox to match the new height */
 .connections {
   position: absolute;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
   z-index: 0; /* Ensure connections are behind the circles */
 }
 
@@ -261,7 +265,8 @@ p {
 .layer {
   display: flex;
   flex-direction: column; /* Ensure vertical alignment of nodes */
-  justify-content: space-around;
+  justify-content: center; /* Center nodes vertically within the layer */
+  align-items: center; /* Center nodes horizontally */
   margin: 20px;
 }
 
@@ -276,6 +281,7 @@ p {
   position: relative;
   color: #fff;
   z-index: 1; /* Ensure circles appear above the SVG lines */
+  background-color: #3498db; /* Added background color for better visibility */
 }
 
 /* Hover Effect */
@@ -290,16 +296,34 @@ p {
   width: 100px;
   height: 100px;
   font-weight: bold;
+  background-color: #e67e22; /* Changed background color for distinction */
 }
 
+/* Fully Connected Layer Styling */
 .fully-connected-layer {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+/* Layer Label Styling */
 .layer-label {
   margin-bottom: 10px;
   font-weight: bold;
   color: #fff;
+  background-color: rgba(0, 0, 0, 0.5); /* Added background for readability */
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+/* Optional: Responsive Adjustments */
+@media (max-width: 1200px) {
+  .animation-container {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .connections {
+    height: 1000px; /* Adjust as needed */
+  }
 }
