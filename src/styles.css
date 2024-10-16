@@ -241,7 +241,6 @@ p {
   }
   
   /*Any other decorations*/
-  
 /* Reset default margins and paddings */
 * {
   margin: 0;
@@ -266,18 +265,10 @@ body {
   justify-content: space-around;
   align-items: center; /* Center vertically */
   position: relative;
-  height: 600px; /* Ensure enough height for connections */
+  height: 600px; /* Ensure enough height for animation */
 }
 
-/* Adjusted SVG viewBox to match the container's height */
-.connections {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0; /* Ensure connections are behind the circles */
-}
+/* Removed SVG connections */
 
 /* Layer Styles */
 .layer {
@@ -299,15 +290,22 @@ body {
   justify-content: center;
   position: relative;
   color: #333; /* Changed text color for better contrast */
-  z-index: 1; /* Ensure circles appear above the SVG lines */
+  z-index: 1; /* Ensure circles appear above other elements */
   background-color: transparent; /* Removed background color */
   cursor: pointer; /* Indicate interactivity */
-  transition: transform 0.2s, border-color 0.2s;
+  transition: transform 0.2s, border-color 0.2s, background-color 0.5s;
   text-align: center; /* Center text */
   padding: 5px; /* Add padding for multi-line text */
   font-size: 12px; /* Adjust font size for readability */
   max-width: 80px; /* Prevent text overflow */
   word-wrap: break-word; /* Break long words */
+}
+
+/* Active State for Animation */
+.circle.active {
+  border-color: #16a085;
+  background-color: rgba(22, 160, 133, 0.3); /* Light green overlay */
+  transform: scale(1.2);
 }
 
 /* Hover Effect */
@@ -401,8 +399,9 @@ footer {
     height: auto;
   }
 
-  .connections {
-    height: 1000px; /* Adjust as needed */
+  /* Adjust height if necessary */
+  .animation-container {
+    height: auto;
   }
 }
 

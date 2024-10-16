@@ -125,26 +125,28 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
 </div>
   <section id="interactive-animation">
     <div class="animation-container">
-      <!-- SVG for Connections -->
-      <svg class="connections" width="100%" height="100%" viewBox="0 0 1000 600">
-        <!-- Connection lines will be dynamically added here -->
-      </svg>
+      <!-- Removed SVG for Connections -->
 
       <!-- Input Layer -->
       <div class="layer input-layer">
-        <div class="circle" data-label="Wearables" id="input-1">Wearables
+        <div class="circle" data-label="Wearables" id="input-1">
+          Wearables
           <span class="tooltip">Wearables</span>
         </div>
-        <div class="circle" data-label="Remote Monitoring" id="input-2">Remote Monitoring
+        <div class="circle" data-label="Remote Monitoring" id="input-2">
+          Remote Monitoring
           <span class="tooltip">Remote Monitoring</span>
         </div>
-        <div class="circle" data-label="Health Records" id="input-3">Health Records
+        <div class="circle" data-label="Health Records" id="input-3">
+          Health Records
           <span class="tooltip">Health Records</span>
         </div>
-        <div class="circle" data-label="Public Health Data" id="input-4">Public Health Data
+        <div class="circle" data-label="Public Health Data" id="input-4">
+          Public Health Data
           <span class="tooltip">Public Health Data</span>
         </div>
-        <div class="circle" data-label="Patient Feedback" id="input-5">Patient Feedback
+        <div class="circle" data-label="Patient Feedback" id="input-5">
+          Patient Feedback
           <span class="tooltip">Patient Feedback</span>
         </div>
       </div>
@@ -153,13 +155,16 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
       <div class="fully-connected-layer">
         <span class="layer-label">Data Aggregation</span>
         <div class="layer fully-connected">
-          <div class="circle" data-label="Data Normalization" id="fc1-1">Data Normalization
+          <div class="circle" data-label="Data Normalization" id="fc1-1">
+            Data Normalization
             <span class="tooltip">Data Normalization</span>
           </div>
-          <div class="circle" data-label="Feature Selection" id="fc1-2">Feature Selection
+          <div class="circle" data-label="Feature Selection" id="fc1-2">
+            Feature Selection
             <span class="tooltip">Feature Selection</span>
           </div>
-          <div class="circle" data-label="Integration" id="fc1-3">Integration
+          <div class="circle" data-label="Integration" id="fc1-3">
+            Integration
             <span class="tooltip">Integration</span>
           </div>
         </div>
@@ -168,16 +173,20 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
       <div class="fully-connected-layer">
         <span class="layer-label">Compute</span>
         <div class="layer fully-connected">
-          <div class="circle" data-label="Machine Learning Models" id="fc2-1">Machine Learning Models
+          <div class="circle" data-label="Machine Learning Models" id="fc2-1">
+            Machine Learning Models
             <span class="tooltip">Machine Learning Models</span>
           </div>
-          <div class="circle" data-label="Statistical Analysis" id="fc2-2">Statistical Analysis
+          <div class="circle" data-label="Statistical Analysis" id="fc2-2">
+            Statistical Analysis
             <span class="tooltip">Statistical Analysis</span>
           </div>
-          <div class="circle" data-label="Predictive Analytics" id="fc2-3">Predictive Analytics
+          <div class="circle" data-label="Predictive Analytics" id="fc2-3">
+            Predictive Analytics
             <span class="tooltip">Predictive Analytics</span>
           </div>
-          <div class="circle" data-label="Data Validation" id="fc2-4">Data Validation
+          <div class="circle" data-label="Data Validation" id="fc2-4">
+            Data Validation
             <span class="tooltip">Data Validation</span>
           </div>
         </div>
@@ -186,13 +195,16 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
       <div class="fully-connected-layer">
         <span class="layer-label">Clinician Feedback / Concordance Assessment</span>
         <div class="layer fully-connected">
-          <div class="circle" data-label="Clinical Review" id="fc3-1">Clinical Review
+          <div class="circle" data-label="Clinical Review" id="fc3-1">
+            Clinical Review
             <span class="tooltip">Clinical Review</span>
           </div>
-          <div class="circle" data-label="User Feedback" id="fc3-2">User Feedback
+          <div class="circle" data-label="User Feedback" id="fc3-2">
+            User Feedback
             <span class="tooltip">User Feedback</span>
           </div>
-          <div class="circle" data-label="Outcome Validation" id="fc3-3">Outcome Validation
+          <div class="circle" data-label="Outcome Validation" id="fc3-3">
+            Outcome Validation
             <span class="tooltip">Outcome Validation</span>
           </div>
         </div>
@@ -200,7 +212,8 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
 
       <!-- Output Layer -->
       <div class="layer output-layer">
-        <div class="circle" id="output-circle">Improve Patient Outcomes
+        <div class="circle" id="output-circle">
+          Improve Patient Outcomes
           <span class="tooltip">Improve Patient Outcomes</span>
         </div>
       </div>
@@ -215,88 +228,74 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
   <!-- Revised Script -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const connections = document.querySelector('.connections');
-      const animationContainer = document.querySelector('.animation-container');
-
-      // Function to dynamically draw SVG lines between two elements
-      const drawLine = (startElem, endElem) => {
-        const svgRect = connections.getBoundingClientRect();
-        const start = startElem.getBoundingClientRect();
-        const end = endElem.getBoundingClientRect();
-
-        // Calculate coordinates relative to the SVG container
-        const startX = start.left + (start.width / 2) - svgRect.left;
-        const startY = start.top + (start.height / 2) - svgRect.top;
-        const endX = end.left + (end.width / 2) - svgRect.left;
-        const endY = end.top + (end.height / 2) - svgRect.top;
-
-        // Create the SVG line element
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', startX);
-        line.setAttribute('y1', startY);
-        line.setAttribute('x2', endX);
-        line.setAttribute('y2', endY);
-        line.setAttribute('stroke', '#333');
-        line.setAttribute('stroke-width', '2');
-        line.setAttribute('stroke-opacity', '0.5'); // Make lines semi-transparent
-
-        connections.appendChild(line);
-      };
-
-      // Select all relevant nodes
-      const inputNodes = document.querySelectorAll('.input-layer .circle');
-      const fcLayers = document.querySelectorAll('.fully-connected-layer .fully-connected');
-      const outputNode = document.getElementById('output-circle');
-
-      // Define specific connections to reduce the number of lines
-      const connectionsList = [
-        // Input to Data Aggregation
-        { from: 'input-1', to: 'fc1-1' },
-        { from: 'input-2', to: 'fc1-2' },
-        { from: 'input-3', to: 'fc1-3' },
-        { from: 'input-4', to: 'fc1-1' },
-        { from: 'input-5', to: 'fc1-2' },
-
-        // Data Aggregation to Compute
-        { from: 'fc1-1', to: 'fc2-1' },
-        { from: 'fc1-2', to: 'fc2-2' },
-        { from: 'fc1-3', to: 'fc2-3' },
-        { from: 'fc1-1', to: 'fc2-4' },
-
-        // Compute to Clinician Feedback
-        { from: 'fc2-1', to: 'fc3-1' },
-        { from: 'fc2-2', to: 'fc3-2' },
-        { from: 'fc2-3', to: 'fc3-3' },
-        { from: 'fc2-4', to: 'fc3-1' },
-
-        // Clinician Feedback to Output
-        { from: 'fc3-1', to: 'output-circle' },
-        { from: 'fc3-2', to: 'output-circle' },
-        { from: 'fc3-3', to: 'output-circle' },
+      // Define layers in order
+      const layers = [
+        document.querySelectorAll('.input-layer .circle'),
+        document.querySelectorAll('.fully-connected-layer:nth-child(1) .fully-connected .circle'),
+        document.querySelectorAll('.fully-connected-layer:nth-child(2) .fully-connected .circle'),
+        document.querySelectorAll('.fully-connected-layer:nth-child(3) .fully-connected .circle'),
+        [document.getElementById('output-circle')]
       ];
 
-      // Function to draw all connections
-      const drawAllConnections = () => {
-        // Clear existing connections
-        connections.innerHTML = '';
+      // Define fully connected layers (excluding input and output)
+      const fullyConnectedLayers = layers.slice(1, layers.length - 1);
 
-        // Draw the defined connections
-        connectionsList.forEach(conn => {
-          const fromElem = document.getElementById(conn.from);
-          const toElem = document.getElementById(conn.to);
-          if (fromElem && toElem) {
-            drawLine(fromElem, toElem);
-          }
+      // Define animation timings (in milliseconds)
+      const forwardDelay = 500; // 0.5 seconds per activation
+      const backwardDelay = forwardDelay * 2; // Backward pass is half as fast
+
+      // Helper function to delay execution
+      const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+      // Function to activate a layer
+      const activateLayer = async (layer, delayTime) => {
+        for (let circle of layer) {
+          circle.classList.add('active');
+          await delay(delayTime);
+        }
+      };
+
+      // Function to deactivate all layers
+      const deactivateAll = () => {
+        document.querySelectorAll('.circle').forEach(circle => {
+          circle.classList.remove('active');
         });
       };
 
-      // Initial drawing of connections
-      drawAllConnections();
+      // Function to perform forward pass
+      const forwardPass = async () => {
+        for (let layer of layers) {
+          await activateLayer(layer, forwardDelay);
+        }
+      };
 
-      // Redraw connections on window resize to maintain alignment
-      window.addEventListener('resize', () => {
-        drawAllConnections();
-      });
+      // Function to perform backward pass
+      const backwardPass = async () => {
+        // Exclude input and output layers
+        for (let i = fullyConnectedLayers.length - 1; i >= 0; i--) {
+          await activateLayer(fullyConnectedLayers[i], backwardDelay);
+        }
+      };
+
+      // Function to perform final forward pass
+      const finalForwardPass = async () => {
+        for (let layer of fullyConnectedLayers) {
+          await activateLayer(layer, forwardDelay);
+        }
+        // Finally, activate the output layer
+        await activateLayer(layers[layers.length - 1], forwardDelay);
+      };
+
+      // Execute the animation sequence
+      const executeAnimation = async () => {
+        deactivateAll();
+        await forwardPass();
+        await backwardPass();
+        await finalForwardPass();
+      };
+
+      // Start the animation
+      executeAnimation();
     });
   </script>
 </body>
