@@ -245,8 +245,8 @@ p {
 /* Animation Section Styles */
 .animation-container {
   display: flex;
-  flex-direction: row;
-  justify-content: center;
+  justify-content: space-around;
+  align-items: flex-start;
   position: relative;
 }
 
@@ -260,6 +260,7 @@ p {
 /* Layer Styles */
 .layer {
   display: flex;
+  flex-direction: column; /* Ensure vertical alignment of nodes */
   justify-content: space-around;
   margin: 20px;
 }
