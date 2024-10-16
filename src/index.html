@@ -123,14 +123,6 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
     </section>
   </main>
 </div>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Interactive Neural Network Animation</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
   <section id="interactive-animation">
     <div class="animation-container">
       <!-- SVG for Connections -->
@@ -140,45 +132,77 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
 
       <!-- Input Layer -->
       <div class="layer input-layer">
-        <div class="circle" data-label="Wearables" id="input-1">Wearables</div>
-        <div class="circle" data-label="Remote Monitoring" id="input-2">Remote Monitoring</div>
-        <div class="circle" data-label="Health Records" id="input-3">Health Records</div>
-        <div class="circle" data-label="Public Health Data" id="input-4">Public Health Data</div>
-        <div class="circle" data-label="Patient Feedback" id="input-5">Patient Feedback</div>
+        <div class="circle" data-label="Wearables" id="input-1">Wearables
+          <span class="tooltip">Wearables</span>
+        </div>
+        <div class="circle" data-label="Remote Monitoring" id="input-2">Remote Monitoring
+          <span class="tooltip">Remote Monitoring</span>
+        </div>
+        <div class="circle" data-label="Health Records" id="input-3">Health Records
+          <span class="tooltip">Health Records</span>
+        </div>
+        <div class="circle" data-label="Public Health Data" id="input-4">Public Health Data
+          <span class="tooltip">Public Health Data</span>
+        </div>
+        <div class="circle" data-label="Patient Feedback" id="input-5">Patient Feedback
+          <span class="tooltip">Patient Feedback</span>
+        </div>
       </div>
 
       <!-- Fully Connected Layers with Labels -->
       <div class="fully-connected-layer">
         <span class="layer-label">Data Aggregation</span>
         <div class="layer fully-connected">
-          <div class="circle" data-label="Data Normalization" id="fc1-1">Data Normalization</div>
-          <div class="circle" data-label="Feature Selection" id="fc1-2">Feature Selection</div>
-          <div class="circle" data-label="Integration" id="fc1-3">Integration</div>
+          <div class="circle" data-label="Data Normalization" id="fc1-1">Data Normalization
+            <span class="tooltip">Data Normalization</span>
+          </div>
+          <div class="circle" data-label="Feature Selection" id="fc1-2">Feature Selection
+            <span class="tooltip">Feature Selection</span>
+          </div>
+          <div class="circle" data-label="Integration" id="fc1-3">Integration
+            <span class="tooltip">Integration</span>
+          </div>
         </div>
       </div>
 
       <div class="fully-connected-layer">
         <span class="layer-label">Compute</span>
         <div class="layer fully-connected">
-          <div class="circle" data-label="Machine Learning Models" id="fc2-1">Machine Learning Models</div>
-          <div class="circle" data-label="Statistical Analysis" id="fc2-2">Statistical Analysis</div>
-          <div class="circle" data-label="Predictive Analytics" id="fc2-3">Predictive Analytics</div>
-          <div class="circle" data-label="Data Validation" id="fc2-4">Data Validation</div>
+          <div class="circle" data-label="Machine Learning Models" id="fc2-1">Machine Learning Models
+            <span class="tooltip">Machine Learning Models</span>
+          </div>
+          <div class="circle" data-label="Statistical Analysis" id="fc2-2">Statistical Analysis
+            <span class="tooltip">Statistical Analysis</span>
+          </div>
+          <div class="circle" data-label="Predictive Analytics" id="fc2-3">Predictive Analytics
+            <span class="tooltip">Predictive Analytics</span>
+          </div>
+          <div class="circle" data-label="Data Validation" id="fc2-4">Data Validation
+            <span class="tooltip">Data Validation</span>
+          </div>
         </div>
       </div>
 
       <div class="fully-connected-layer">
         <span class="layer-label">Clinician Feedback / Concordance Assessment</span>
         <div class="layer fully-connected">
-          <div class="circle" data-label="Clinical Review" id="fc3-1">Clinical Review</div>
-          <div class="circle" data-label="User Feedback" id="fc3-2">User Feedback</div>
-          <div class="circle" data-label="Outcome Validation" id="fc3-3">Outcome Validation</div>
+          <div class="circle" data-label="Clinical Review" id="fc3-1">Clinical Review
+            <span class="tooltip">Clinical Review</span>
+          </div>
+          <div class="circle" data-label="User Feedback" id="fc3-2">User Feedback
+            <span class="tooltip">User Feedback</span>
+          </div>
+          <div class="circle" data-label="Outcome Validation" id="fc3-3">Outcome Validation
+            <span class="tooltip">Outcome Validation</span>
+          </div>
         </div>
       </div>
 
       <!-- Output Layer -->
       <div class="layer output-layer">
-        <div class="circle" id="output-circle">Improve Patient Outcomes</div>
+        <div class="circle" id="output-circle">Improve Patient Outcomes
+          <span class="tooltip">Improve Patient Outcomes</span>
+        </div>
       </div>
     </div>
   </section>
@@ -251,21 +275,12 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
         { from: 'fc3-3', to: 'output-circle' },
       ];
 
-      // Draw the defined connections
-      connectionsList.forEach(conn => {
-        const fromElem = document.getElementById(conn.from);
-        const toElem = document.getElementById(conn.to);
-        if (fromElem && toElem) {
-          drawLine(fromElem, toElem);
-        }
-      });
-
-      // Optional: Redraw connections on window resize to maintain alignment
-      window.addEventListener('resize', () => {
+      // Function to draw all connections
+      const drawAllConnections = () => {
         // Clear existing connections
         connections.innerHTML = '';
 
-        // Redraw all connections
+        // Draw the defined connections
         connectionsList.forEach(conn => {
           const fromElem = document.getElementById(conn.from);
           const toElem = document.getElementById(conn.to);
@@ -273,19 +288,14 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
             drawLine(fromElem, toElem);
           }
         });
-      });
+      };
 
-      // Hover functionality to display labels (if not already visible)
-      // Since labels are inside the circles, no additional hover is needed unless you want tooltips
-      // Alternatively, use title attributes for native tooltips
+      // Initial drawing of connections
+      drawAllConnections();
 
-      const circles = document.querySelectorAll('.circle');
-
-      circles.forEach(circle => {
-        const label = circle.getAttribute('data-label');
-        if (label) {
-          circle.setAttribute('title', label); // Native tooltip on hover
-        }
+      // Redraw connections on window resize to maintain alignment
+      window.addEventListener('resize', () => {
+        drawAllConnections();
       });
     });
   </script>

@@ -242,7 +242,25 @@ p {
   
   /*Any other decorations*/
   
+/* Reset default margins and paddings */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #2c3e50;
+  color: #333;
+}
+
 /* Animation Section Styles */
+#interactive-animation {
+  padding: 50px 0;
+}
+
 .animation-container {
   display: flex;
   justify-content: space-around;
@@ -288,6 +306,8 @@ p {
   text-align: center; /* Center text */
   padding: 5px; /* Add padding for multi-line text */
   font-size: 12px; /* Adjust font size for readability */
+  max-width: 80px; /* Prevent text overflow */
+  word-wrap: break-word; /* Break long words */
 }
 
 /* Hover Effect */
@@ -304,6 +324,7 @@ p {
   font-weight: bold;
   background-color: transparent; /* Removed background color */
   font-size: 14px; /* Slightly larger font */
+  max-width: 120px; /* Adjusted max-width for longer text */
 }
 
 /* Fully Connected Layer Styling */
@@ -317,19 +338,57 @@ p {
 .layer-label {
   margin-bottom: 10px;
   font-weight: bold;
-  color: #333; /* Changed color for better contrast */
-  background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background for readability */
+  color: #fff; /* Changed color for better contrast */
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background for readability */
   padding: 5px 10px;
   border-radius: 5px;
   font-size: 14px;
+}
+
+/* Tooltip Styling */
+.tooltip {
+  visibility: hidden;
+  width: max-content;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+  padding: 5px 8px;
+  position: absolute;
+  z-index: 2;
+  bottom: 110%; /* Position above the circle */
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  font-size: 12px;
+}
+
+/* Tooltip Arrow */
+.tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%; /* At the bottom of the tooltip */
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.75) transparent transparent transparent;
+}
+
+/* Show Tooltip on Hover */
+.circle:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
 }
 
 /* Footer Styling */
 footer {
   text-align: center;
   padding: 20px;
-  background-color: #f4f4f4;
-  color: #333;
+  background-color: #34495e;
+  color: #fff;
   position: fixed;
   width: 100%;
   bottom: 0;
@@ -352,15 +411,21 @@ footer {
     width: 50px;
     height: 50px;
     font-size: 10px;
+    max-width: 70px;
   }
 
   .output-layer .circle {
     width: 80px;
     height: 80px;
     font-size: 12px;
+    max-width: 100px;
   }
 
   .layer-label {
     font-size: 12px;
+  }
+
+  .tooltip {
+    font-size: 10px;
   }
 }
