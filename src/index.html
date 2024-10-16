@@ -145,59 +145,79 @@
   <!-- Revised Script for Animation -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
+      // Define layers in order
       const layers = [
         document.querySelectorAll('.input-layer .circle'),
         document.querySelectorAll('#data-aggregation-layer .circle'),
         document.querySelectorAll('#compute-layer .circle'),
         document.querySelectorAll('#clinician-review-layer .circle'),
-        [document.getElementById('output-circle')]
+        [document.getElementById('output-circle')] // Output layer
       ];
-
-      const fullyConnectedLayers = layers.slice(1, layers.length - 1);
+  
+      // Define fully connected layers (excluding input and output)
+      const fullyConnectedLayers = layers.slice(1, layers.length - 1); // Excludes input and output layer
+  
+      // Define animation timings (in milliseconds)
       const forwardDelay = 2000; // 2 seconds per activation
       const backwardDelay = forwardDelay / 2; // Backward pass is half as fast
-
+  
+      // Helper function to delay execution
       const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
+  
+      // Function to activate a layer
       const activateLayer = async (layer, delayTime) => {
-        layer.forEach(circle => circle.classList.add('active'));
+        layer.forEach(circle => {
+          circle.classList.add('active');
+        });
         await delay(delayTime);
-        layer.forEach(circle => circle.classList.remove('active'));
+        layer.forEach(circle => {
+          circle.classList.remove('active');
+        });
       };
-
+  
+      // Function to deactivate all layers (initial state)
       const deactivateAll = () => {
-        document.querySelectorAll('.circle').forEach(circle => circle.classList.remove('active'));
+        document.querySelectorAll('.circle').forEach(circle => {
+          circle.classList.remove('active');
+        });
       };
-
+  
+      // Function to perform forward pass (stops before output layer)
       const forwardPass = async () => {
-        for (let layer of layers) {
-          await activateLayer(layer, forwardDelay);
+        for (let i = 0; i < layers.length - 1; i++) {
+          await activateLayer(layers[i], forwardDelay); // Skip the output layer
         }
       };
-
+  
+      // Function to perform backward pass
       const backwardPass = async () => {
+        // Exclude input and output layers
         for (let i = fullyConnectedLayers.length - 1; i >= 0; i--) {
           await activateLayer(fullyConnectedLayers[i], backwardDelay);
         }
       };
-
+  
+      // Function to perform final forward pass (including output layer)
       const finalForwardPass = async () => {
         for (let layer of fullyConnectedLayers) {
           await activateLayer(layer, forwardDelay);
         }
+        // Finally, activate the output layer
         await activateLayer(layers[layers.length - 1], forwardDelay);
       };
-
+  
+      // Execute the animation sequence
       const executeAnimation = async () => {
         deactivateAll();
-        await forwardPass();
-        await backwardPass();
-        await finalForwardPass();
+        await forwardPass(); // First forward pass does not include output layer
+        await backwardPass(); // Backward pass
+        await finalForwardPass(); // Final forward pass including output layer
       };
-
+  
+      // Start the animation
       executeAnimation();
     });
-  </script>
+  </script>  
 
 </body>
 </html>
