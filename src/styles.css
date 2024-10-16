@@ -297,17 +297,23 @@ body {
   z-index: 1; /* Ensure circles appear above other elements */
   background-color: transparent; /* No fill color */
   cursor: pointer; /* Indicate interactivity */
-  transition: opacity 2s ease-in-out, transform 0.3s;
   text-align: center; /* Center text */
   padding: 10px; /* Add padding for multi-line text */
   font-size: 14px; /* Adjust font size for readability */
   max-width: 100px; /* Prevent text overflow */
   word-wrap: break-word; /* Break long words */
-  opacity: 0.5; /* Default opacity */
+  opacity: 0.5; /* Default opacity for the circle */
+  transition: opacity 2s ease-in-out, transform 0.3s; /* 2s transition for opacity and 0.3s for scaling on hover */
 }
 
 .circle.active {
   opacity: 1; /* Fade to fully opaque when active */
+}
+
+/* To ensure the text fades with the circle, apply opacity to the entire .circle element */
+.circle span, .circle p {
+  opacity: inherit; /* Text will inherit the circle's opacity */
+  transition: opacity 2s ease-in-out; /* Text will fade in/out with the circle */
 }
 
 .circle:hover {
