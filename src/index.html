@@ -88,83 +88,139 @@
       </section>
     </main>
   </div>
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    // Define layers in order
-    const layers = [
-      document.querySelectorAll('.input-layer .circle'),
-      document.querySelectorAll('#data-aggregation-layer .circle'),
-      document.querySelectorAll('#compute-layer .circle'),
-      document.querySelectorAll('#clinician-review-layer .circle'),
-      [document.getElementById('output-circle')] // Output layer
-    ];
-  
-    // Define fully connected layers (excluding input and output)
-    const fullyConnectedLayers = layers.slice(1, layers.length - 1); // Excludes input and output layer
-  
-    // Define animation timings (in milliseconds)
-    const forwardDelay = 2000; // 2 seconds per activation
-    const backwardDelay = forwardDelay / 2; // Backward pass is half as fast
-    const waitAfterCompletion = 7000; // 7 seconds wait before restarting the sequence
-  
-    // Helper function to delay execution
-    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-  
-    // Function to activate a layer
-    const activateLayer = async (layer, delayTime) => {
-      layer.forEach(circle => {
-        circle.classList.add('active');
-      });
-      await delay(delayTime);
-      layer.forEach(circle => {
-        circle.classList.remove('active');
-      });
-    };
-  
-    // Function to deactivate all layers (initial state)
-    const deactivateAll = () => {
-      document.querySelectorAll('.circle').forEach(circle => {
-        circle.classList.remove('active');
-      });
-    };
-  
-    // Function to perform forward pass (stops before output layer)
-    const forwardPass = async () => {
-      for (let i = 0; i < layers.length - 1; i++) {
-        await activateLayer(layers[i], forwardDelay); // Skip the output layer
-      }
-    };
-  
-    // Function to perform backward pass
-    const backwardPass = async () => {
-      // Exclude input and output layers
-      for (let i = fullyConnectedLayers.length - 1; i >= 0; i--) {
-        await activateLayer(fullyConnectedLayers[i], backwardDelay);
-      }
-    };
-  
-    // Function to perform final forward pass (including output layer)
-    const finalForwardPass = async () => {
-      for (let layer of fullyConnectedLayers) {
-        await activateLayer(layer, forwardDelay);
-      }
-      // Finally, activate the output layer
-      await activateLayer(layers[layers.length - 1], forwardDelay);
-    };
-  
-    // Execute the animation sequence
-    const executeAnimation = async () => {
-      deactivateAll();
-      await forwardPass(); // First forward pass does not include output layer
-      await backwardPass(); // Backward pass
-      await finalForwardPass(); // Final forward pass including output layer
-    };
-  
-    // Set an interval to restart the animation cycle after 7 seconds of completing
-    setInterval(async () => {
-      await executeAnimation();
-    }, forwardDelay * (layers.length + fullyConnectedLayers.length + 1) + waitAfterCompletion);
-  });
-  </script>
+
+  <!-- Interactive Animation Section -->
+  <section id="interactive-animation">
+    <div class="animation-container">
+      <!-- Input Layer -->
+      <div class="layer input-layer">
+        <div class="circle" id="input-1">Wearables</div>
+        <div class="circle" id="input-2">Remote Monitoring</div>
+        <div class="circle" id="input-3">Health Records</div>
+        <div class="circle" id="input-4">Public Health Data</div>
+        <div class="circle" id="input-5">Patient Feedback</div>
+      </div>
+
+      <!-- Fully Connected Layers -->
+      <div class="fully-connected-layer" id="data-aggregation-layer">
+        <span class="layer-label">Data Aggregation</span>
+        <div class="layer fully-connected">
+          <div class="circle" id="fc1-1">Data Normalization</div>
+          <div class="circle" id="fc1-2">Feature Selection</div>
+          <div class="circle" id="fc1-3">Integration</div>
+        </div>
+      </div>
+
+      <div class="fully-connected-layer" id="compute-layer">
+        <span class="layer-label">Compute</span>
+        <div class="layer fully-connected">
+          <div class="circle" id="fc2-1">Machine Learning Models</div>
+          <div class="circle" id="fc2-2">Statistical Analysis</div>
+          <div class="circle" id="fc2-3">Predictive Analytics</div>
+          <div class="circle" id="fc2-4">Data Validation</div>
+        </div>
+      </div>
+
+      <div class="fully-connected-layer" id="clinician-review-layer">
+        <span class="layer-label">Clinician Review</span>
+        <div class="layer fully-connected">
+          <div class="circle" id="fc3-1">Clinical Review</div>
+          <div class="circle" id="fc3-2">User Feedback</div>
+          <div class="circle" id="fc3-3">Outcome Validation</div>
+        </div>
+      </div>
+
+      <!-- Output Layer -->
+      <div class="layer output-layer">
+        <div class="circle" id="output-circle">Improve Patient Outcomes</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer Section -->
+  <footer>
+    <p>&copy; 2023 David Dasa</p>
+  </footer>
+
+  <!-- Revised Script for Animation -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Define layers in order
+      const layers = [
+        document.querySelectorAll('.input-layer .circle'),
+        document.querySelectorAll('#data-aggregation-layer .circle'),
+        document.querySelectorAll('#compute-layer .circle'),
+        document.querySelectorAll('#clinician-review-layer .circle'),
+        [document.getElementById('output-circle')] // Output layer
+      ];
+    
+      // Define fully connected layers (excluding input and output)
+      const fullyConnectedLayers = layers.slice(1, layers.length - 1); // Excludes input and output layer
+    
+      // Define animation timings (in milliseconds)
+      const forwardDelay = 2000; // 2 seconds per activation
+      const backwardDelay = forwardDelay / 2; // Backward pass is half as fast
+      const waitAfterCompletion = 7000; // 7 seconds wait before restarting the sequence
+    
+      // Helper function to delay execution
+      const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    
+      // Function to activate a layer
+      const activateLayer = async (layer, delayTime) => {
+        layer.forEach(circle => {
+          circle.classList.add('active');
+        });
+        await delay(delayTime);
+        layer.forEach(circle => {
+          circle.classList.remove('active');
+        });
+      };
+    
+      // Function to deactivate all layers (initial state)
+      const deactivateAll = () => {
+        document.querySelectorAll('.circle').forEach(circle => {
+          circle.classList.remove('active');
+        });
+      };
+    
+      // Function to perform forward pass (stops before output layer)
+      const forwardPass = async () => {
+        for (let i = 0; i < layers.length - 1; i++) {
+          await activateLayer(layers[i], forwardDelay); // Skip the output layer
+        }
+      };
+    
+      // Function to perform backward pass
+      const backwardPass = async () => {
+        // Exclude input and output layers
+        for (let i = fullyConnectedLayers.length - 1; i >= 0; i--) {
+          await activateLayer(fullyConnectedLayers[i], backwardDelay);
+        }
+      };
+    
+      // Function to perform final forward pass (including output layer)
+      const finalForwardPass = async () => {
+        for (let layer of fullyConnectedLayers) {
+          await activateLayer(layer, forwardDelay);
+        }
+        // Finally, activate the output layer
+        await activateLayer(layers[layers.length - 1], forwardDelay);
+      };
+    
+      // Execute the animation sequence
+      const executeAnimation = async () => {
+        deactivateAll();
+        await forwardPass(); // First forward pass does not include output layer
+        await backwardPass(); // Backward pass
+        await finalForwardPass(); // Final forward pass including output layer
+      };
+    
+      // Set an interval to restart the animation cycle after 7 seconds of completing
+      setInterval(async () => {
+        await executeAnimation();
+      }, forwardDelay * (layers.length + fullyConnectedLayers.length + 1) + waitAfterCompletion);
+    });
+    </script>
+
 </body>
 </html>
