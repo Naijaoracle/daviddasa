@@ -246,12 +246,12 @@ p {
 .animation-container {
   display: flex;
   justify-content: space-around;
-  align-items: center; /* Changed from flex-start to center for vertical alignment */
+  align-items: center; /* Center vertically */
   position: relative;
-  height: 600px; /* Increased height to accommodate connections */
+  height: 600px; /* Ensure enough height for connections */
 }
 
-/* Adjusted SVG viewBox to match the new height */
+/* Adjusted SVG viewBox to match the container's height */
 .connections {
   position: absolute;
   top: 0;
@@ -264,12 +264,13 @@ p {
 /* Layer Styles */
 .layer {
   display: flex;
-  flex-direction: column; /* Ensure vertical alignment of nodes */
+  flex-direction: column; /* Vertical alignment of nodes */
   justify-content: center; /* Center nodes vertically within the layer */
   align-items: center; /* Center nodes horizontally */
   margin: 20px;
 }
 
+/* Circle Styles */
 .circle {
   border: 3px solid #6b6b6b;
   border-radius: 50%;
@@ -279,14 +280,19 @@ p {
   align-items: center;
   justify-content: center;
   position: relative;
-  color: #fff;
+  color: #333; /* Changed text color for better contrast */
   z-index: 1; /* Ensure circles appear above the SVG lines */
-  background-color: #3498db; /* Added background color for better visibility */
+  background-color: transparent; /* Removed background color */
+  cursor: pointer; /* Indicate interactivity */
+  transition: transform 0.2s, border-color 0.2s;
+  text-align: center; /* Center text */
+  padding: 5px; /* Add padding for multi-line text */
+  font-size: 12px; /* Adjust font size for readability */
 }
 
 /* Hover Effect */
 .circle:hover {
-  transform: scale(1.1);
+  transform: scale(1.2);
   border-color: #16a085;
 }
 
@@ -296,7 +302,8 @@ p {
   width: 100px;
   height: 100px;
   font-weight: bold;
-  background-color: #e67e22; /* Changed background color for distinction */
+  background-color: transparent; /* Removed background color */
+  font-size: 14px; /* Slightly larger font */
 }
 
 /* Fully Connected Layer Styling */
@@ -310,10 +317,22 @@ p {
 .layer-label {
   margin-bottom: 10px;
   font-weight: bold;
-  color: #fff;
-  background-color: rgba(0, 0, 0, 0.5); /* Added background for readability */
+  color: #333; /* Changed color for better contrast */
+  background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background for readability */
   padding: 5px 10px;
   border-radius: 5px;
+  font-size: 14px;
+}
+
+/* Footer Styling */
+footer {
+  text-align: center;
+  padding: 20px;
+  background-color: #f4f4f4;
+  color: #333;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
 }
 
 /* Optional: Responsive Adjustments */
@@ -325,5 +344,23 @@ p {
 
   .connections {
     height: 1000px; /* Adjust as needed */
+  }
+}
+
+@media (max-width: 768px) {
+  .circle {
+    width: 50px;
+    height: 50px;
+    font-size: 10px;
+  }
+
+  .output-layer .circle {
+    width: 80px;
+    height: 80px;
+    font-size: 12px;
+  }
+
+  .layer-label {
+    font-size: 12px;
   }
 }
