@@ -245,24 +245,27 @@ p {
 /* Animation Section Styles */
 .animation-container {
   display: flex;
-  flex-direction: row; /* Make it horizontal */
+  flex-direction: row;
   justify-content: center;
-  margin-top: 20px;
-  align-items: center;
   position: relative;
+}
+
+.connections {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0; /* Ensure connections are behind the circles */
 }
 
 /* Layer Styles */
 .layer {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: space-around;
   margin: 20px;
 }
 
-/* Circle Styles for Input Layer */
 .circle {
-  border: 3px solid #6b6b6b; /* Circle outline only */
+  border: 3px solid #6b6b6b;
   border-radius: 50%;
   width: 60px;
   height: 60px;
@@ -271,93 +274,31 @@ p {
   justify-content: center;
   position: relative;
   color: #fff;
-  transition: transform 0.3s, border-color 0.3s; /* Transition for hover effects */
+  z-index: 1; /* Ensure circles appear above the SVG lines */
 }
 
-/* Hover Effect for Circles */
+/* Hover Effect */
 .circle:hover {
   transform: scale(1.1);
-  border-color: #16a085; /* Change border color on hover */
+  border-color: #16a085;
 }
 
-/* Connecting Lines */
-.layer .circle::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  right: -50px;
-  height: 3px;
-  width: 50px;
-  background-color: #6b6b6b; /* Line between circles */
+/* Output Layer Styling */
+.output-layer .circle {
+  border: 3px solid #ffd700;
+  width: 100px;
+  height: 100px;
+  font-weight: bold;
 }
 
-.layer .circle:last-child::after {
-  content: none;
-}
-
-/* Labels for Fully Connected Layers */
 .fully-connected-layer {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-right: 40px;
 }
 
 .layer-label {
   margin-bottom: 10px;
   font-weight: bold;
   color: #fff;
-}
-
-/* Circle Styles for Output Layer */
-.output-layer .circle {
-  border: 3px solid #ffd700; /* Gold outline for the output circle */
-  width: 100px; /* Larger size for emphasis */
-  height: 100px; /* Larger size for emphasis */
-  color: #000; /* Black text for contrast */
-  font-weight: bold;
-  transition: transform 0.3s, border-color 0.3s; /* Transition for hover effects */
-}
-
-/* Flash Animation for Output Layer */
-@keyframes flash {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
-}
-
-.flash {
-  animation: flash 0.5s infinite; /* Flash effect */
-}
-
-/* Tooltip Styles for Layer Labels */
-.circle[data-label]:hover::after {
-  content: attr(data-label); /* Show the label */
-  position: absolute;
-  top: -25px; /* Adjust position as necessary */
-  background-color: rgba(0, 0, 0, 0.8);
-  color: #fff;
-  padding: 5px;
-  border-radius: 5px;
-  font-size: 12px;
-  white-space: nowrap;
-  z-index: 10; /* Ensure it appears above other elements */
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .circle {
-    width: 50px; /* Smaller size on mobile */
-    height: 50px; /* Smaller size on mobile */
-  }
-
-  .output-layer .circle {
-    width: 80px; /* Adjust output circle size on mobile */
-    height: 80px; /* Adjust output circle size on mobile */
-  }
-
-  .layer .circle::after {
-    right: -30px;
-    width: 30px;
-  }
 }

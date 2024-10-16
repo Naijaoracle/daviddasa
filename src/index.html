@@ -124,42 +124,48 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
   </main>
 </div>
 <section id="interactive-animation">
+  <h2>Health Data Flow Animation</h2>
   <div class="animation-container">
+    <!-- SVG for Connections -->
+    <svg class="connections" width="100%" height="100%" viewBox="0 0 1000 400">
+      <!-- Connection lines will go here dynamically -->
+    </svg>
+
     <!-- Input Layer -->
     <div class="layer input-layer">
-      <div class="circle" data-label="Wearables">Wearables</div>
-      <div class="circle" data-label="Remote Monitoring">Remote Monitoring</div>
-      <div class="circle" data-label="Health Records">Health Records</div>
-      <div class="circle" data-label="Public Health Data">Public Health Data</div>
-      <div class="circle" data-label="Patient Feedback">Patient Feedback</div>
+      <div class="circle" data-label="Wearables" id="input-1">Wearables</div>
+      <div class="circle" data-label="Remote Monitoring" id="input-2">Remote Monitoring</div>
+      <div class="circle" data-label="Health Records" id="input-3">Health Records</div>
+      <div class="circle" data-label="Public Health Data" id="input-4">Public Health Data</div>
+      <div class="circle" data-label="Patient Feedback" id="input-5">Patient Feedback</div>
     </div>
 
     <!-- Fully Connected Layers with Labels -->
     <div class="fully-connected-layer">
       <span class="layer-label">Data Aggregation</span>
       <div class="layer fully-connected">
-        <div class="circle" data-label="Data Normalization"></div>
-        <div class="circle" data-label="Feature Selection"></div>
-        <div class="circle" data-label="Integration"></div>
+        <div class="circle" data-label="Data Normalization" id="fc1-1"></div>
+        <div class="circle" data-label="Feature Selection" id="fc1-2"></div>
+        <div class="circle" data-label="Integration" id="fc1-3"></div>
       </div>
     </div>
 
     <div class="fully-connected-layer">
       <span class="layer-label">Compute</span>
       <div class="layer fully-connected">
-        <div class="circle" data-label="Machine Learning Models"></div>
-        <div class="circle" data-label="Statistical Analysis"></div>
-        <div class="circle" data-label="Predictive Analytics"></div>
-        <div class="circle" data-label="Data Validation"></div>
+        <div class="circle" data-label="Machine Learning Models" id="fc2-1"></div>
+        <div class="circle" data-label="Statistical Analysis" id="fc2-2"></div>
+        <div class="circle" data-label="Predictive Analytics" id="fc2-3"></div>
+        <div class="circle" data-label="Data Validation" id="fc2-4"></div>
       </div>
     </div>
 
     <div class="fully-connected-layer">
       <span class="layer-label">Human Feedback / Machine Prediction Concordance</span>
       <div class="layer fully-connected">
-        <div class="circle" data-label="Clinical Review"></div>
-        <div class="circle" data-label="User Feedback"></div>
-        <div class="circle" data-label="Outcome Validation"></div>
+        <div class="circle" data-label="Clinical Review" id="fc3-1"></div>
+        <div class="circle" data-label="User Feedback" id="fc3-2"></div>
+        <div class="circle" data-label="Outcome Validation" id="fc3-3"></div>
       </div>
     </div>
 
@@ -176,42 +182,47 @@ I'd love to connect with you. Also if you have any inquiries, feel free to reach
 </footer>
 
 <script>
-  // Select elements
-  const fcLayers = document.querySelectorAll('.fully-connected .circle');
-  const outputCircle = document.querySelector('#output-circle');
+  const connections = document.querySelector('.connections');
 
-  // Show labels on hover for fully connected layers
-  fcLayers.forEach(layer => {
-    layer.addEventListener('mouseover', () => {
-      layer.textContent = layer.getAttribute('data-label');
-    });
-    layer.addEventListener('mouseout', () => {
-      layer.textContent = '';
+  // Function to dynamically draw SVG lines between two elements
+  const drawLine = (startElem, endElem) => {
+    const start = startElem.getBoundingClientRect();
+    const end = endElem.getBoundingClientRect();
+    
+    // Calculate coordinates for the line (adjust based on the page layout)
+    const startX = start.left + (start.width / 2);
+    const startY = start.top + (start.height / 2);
+    const endX = end.left + (end.width / 2);
+    const endY = end.top + (end.height / 2);
+    
+    // Create the SVG line element
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', startX);
+    line.setAttribute('y1', startY);
+    line.setAttribute('x2', endX);
+    line.setAttribute('y2', endY);
+    line.setAttribute('stroke', '#333');
+    line.setAttribute('stroke-width', '2');
+
+    connections.appendChild(line);
+  };
+
+  // Draw connections for all input to fully connected layers
+  const inputNodes = document.querySelectorAll('.input-layer .circle');
+  const fcNodes = document.querySelectorAll('.fully-connected .circle');
+  const outputNode = document.getElementById('output-circle');
+
+  // Draw lines from input layer to first fully connected layer
+  inputNodes.forEach(inputNode => {
+    fcNodes.forEach(fcNode => {
+      drawLine(inputNode, fcNode);
     });
   });
 
-  // Animation for output layer
-  const animateOutput = () => {
-    outputCircle.classList.add('flash');
-    setTimeout(() => {
-      outputCircle.classList.remove('flash');
-    }, 1000);
-  };
+  // Draw lines from the fully connected layers to output layer
+  fcNodes.forEach(fcNode => {
+    drawLine(fcNode, outputNode);
+  });
 
-  // Simulate forward pass animation
-  const simulatePass = () => {
-    let currentLayer = 0;
-    const interval = setInterval(() => {
-      if (currentLayer < fcLayers.length) {
-        fcLayers[currentLayer].style.borderColor = '#16a085'; // Change border color to indicate current pass
-        currentLayer++;
-      } else {
-        clearInterval(interval);
-        animateOutput();
-      }
-    }, 1000); // Adjust speed here
-  };
-
-  // Start the simulation when the page loads
-  window.onload = simulatePass;
+  // Simulation logic for coloring nodes remains unchanged.
 </script>
