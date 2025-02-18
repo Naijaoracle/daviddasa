@@ -1,35 +1,36 @@
-{% extends "layout.html" %}
+<!--# set var="title" value="Blood Pressure Prediction - David Dasa" -->
+<!--# include virtual="/_includes/header.html" -->
 
-{% block title %}Blood Pressure Prediction - David Dasa{% endblock %}
-
-{% block content %}
 <!-- Introduction -->
-<section id="introduction">
+<section id="introduction" class="fade">
     <h1>Blood Pressure Prediction</h1>
     <p>Predicting blood pressure in healthcare can assist in the early detection and management of cardiovascular diseases. This project utilizes advanced machine learning models to forecast blood pressure based on patient features.</p>
     <p>In this phase, we train three models: a random forest model, support vector machine, and a gradient boosting machine to predict cardiovascular disease.</p>
-    <p><strong>Healthcare Relevance:</strong></p>
+    <p class="mt-3"><strong>Healthcare Relevance:</strong></p>
     <p>Accurate blood pressure prediction can play a key role in preventing life-threatening cardiovascular conditions. Timely predictions allow for personalized treatments to mitigate risks associated with these conditions.</p>
-    <p><strong>Benefits:</strong></p>
-    <ul>
+    <p class="mt-3"><strong>Benefits:</strong></p>
+    <ul class="feature-list">
         <li>Early Intervention: Prediction models can enable early identification of at-risk individuals.</li>
         <li>Personalized Treatment: Accurate forecasts can aid in tailoring treatments to individual needs.</li>
-        <li>Resource Optimization: Efficient predictions assist in effective resource allocation accross the healthcare system.</li>
+        <li>Resource Optimization: Efficient predictions assist in effective resource allocation across the healthcare system.</li>
     </ul>
 </section>
 
 <!-- Notebook Embed -->
-<iframe
-    src="https://naijaoracle.github.io/jupyterwork/notebooks/index.html?path=cardio_SVM.ipynb&kernel=python&toolbar=1&theme=JupyterLab%20Dark"
-    width="100%"
-    height="800px">
-</iframe>
+<section class="card fade mt-4">
+    <iframe
+        src="https://naijaoracle.github.io/jupyterwork/notebooks/index.html?path=cardio_SVM.ipynb&kernel=python&toolbar=1&theme=JupyterLab%20Dark"
+        width="100%"
+        height="800px">
+    </iframe>
+</section>
 
 <!-- Conclusion Section -->
-<section id="conclusion">
+<section id="conclusion" class="fade mt-4">
     <h1>Conclusion</h1>
     <p>The notebook above showcases the use of three models to predict cardiovascular disease. They show closely matched performance. In the next phase, we will explore neural network models and assess their performance at this task.</p>
     <p>Further iterations and fine-tuning are underway to enhance predictive precision and generalizability.</p>
-    <p>I would like to hear your thoughts. You can <a href="https://www.linkedin.com/in/daviddasa">get in touch</a> via LinkedIn.</p>
+    <p class="mt-3">I would like to hear your thoughts. You can <a href="https://www.linkedin.com/in/daviddasa" class="text-primary">get in touch</a> via LinkedIn.</p>
 </section>
-{% endblock %}
+
+<!--# include virtual="/_includes/footer.html" -->
