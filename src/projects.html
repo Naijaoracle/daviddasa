@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="David Dasa's Portfolio of Digital Health & AI Projects">
   <title>Projects - David Dasa</title>
-  <!-- CSS file goes here -->
+  <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
 
@@ -21,81 +24,159 @@
     </ul>
   </nav>
 
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
+  <!-- Main Content -->
   <div class="container">
-    <h2>Projects</h2>
+    <main>
+      <!-- Projects Introduction -->
+      <section id="about">
+        <div class="about-content">
+          <h1>Projects & Research</h1>
+          <h2>Innovating at the Intersection of Healthcare & Technology</h2>
+          <p>Explore my portfolio of projects that combine medical expertise with cutting-edge technology to address real healthcare challenges.</p>
+        </div>
+      </section>
 
-    <!-- Projects Section -->
-    <section id="projects">
-      <div class="project-card">
-        <b>Remote Patient Monitoring System</b>
-        <p>A project to build a remote patient monitoring system using Bluetooth low energy medical devices, blockchain verification, and distributed ledger.</p>
-        <a href="https://github.com/Naijaoracle/remote-patient-monitoring-system">Project GitHub page</a> and the 
-        <a href="https://www.researchgate.net/publication/377029947_A_proposal_for_improving_the_data_security_of_remote_patient_monitoring_systems_by_proximity_verification_using_blockchain">Academic paper</a> on ResearchGate.
-      </div>
+      <!-- Featured Projects -->
+      <section class="project-card">
+        <h2>Featured Projects</h2>
+        <div class="project-grid">
+          <div class="project-item">
+            <h3>Secure Remote Patient Monitoring</h3>
+            <p>An innovative system combining Bluetooth low energy medical devices with blockchain verification for secure, reliable patient monitoring.</p>
+            <ul class="skills-list">
+              <li>Blockchain Technology</li>
+              <li>IoT Integration</li>
+              <li>Healthcare Security</li>
+              <li>Remote Monitoring</li>
+            </ul>
+            <div class="project-links">
+              <a href="https://github.com/Naijaoracle/remote-patient-monitoring-system" class="project-link">View on GitHub</a>
+              <a href="https://www.researchgate.net/publication/377029947_A_proposal_for_improving_the_data_security_of_remote_patient_monitoring_systems_by_proximity_verification_using_blockchain" class="project-link">Read Research Paper</a>
+            </div>
+          </div>
+        </div>
+      </section>
 
-<!--       <div class="project-card">
-        <b>Blood Pressure Prediction</b>
-        <p>A neural network project aimed at predicting human arterial blood pressure with high accuracy.</p>
-        <a href="https://www.daviddasa.com/bloodpressureprediction">Project page and notebook.</a>
-      </div> -->
+      <!-- Healthcare AI Projects -->
+      <section class="project-card">
+        <h2>Healthcare AI Research</h2>
+        <div class="project-grid">
+          <div class="project-item">
+            <h3>NIH Chest X-ray Analysis</h3>
+            <p>Comprehensive analysis of the NIH chest x-ray dataset, laying groundwork for tuberculosis prediction and other diagnostic applications.</p>
+            <ul class="skills-list">
+              <li>Computer Vision</li>
+              <li>Medical Imaging</li>
+              <li>Data Analysis</li>
+              <li>Machine Learning</li>
+            </ul>
+            <div class="project-links">
+              <a href="https://www.daviddasa.com/tbxraydata-analysis" class="project-link">View Analysis</a>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      <div class="project-card">
-        <b>Azure Cloud APP</b>
-        <p>This website is being served from the Azure cloud. The code is hosted on it's own GitHub repository, the link to the repository is below. The site is built using HTML, CSS, JavaScript, DockerFile. </p>
-        <p>The site will be used to host my projects for display.</p>
-        <a href="https://github.com/Naijaoracle/daviddasa">Project GitHub page</a>
-      </div>
+      <!-- Digital Health Tools -->
+      <section class="project-card">
+        <h2>Digital Health Tools</h2>
+        <div class="project-grid">
+          <div class="project-item">
+            <h3>Healthcare Web Applications</h3>
+            <p>A collection of web-based tools designed to improve healthcare accessibility and patient engagement:</p>
+            <ul class="skills-list">
+              <li>BMI Calculator</li>
+              <li>Medication Reminder</li>
+              <li>Digital Health Quiz</li>
+              <li>Hearing Assessment Tools</li>
+            </ul>
+            <div class="project-links">
+              <a href="https://www.daviddasa.com/DHAIquiz" class="project-link">Digital Health Quiz</a>
+              <a href="https://www.daviddasa.com/medication-reminder" class="project-link">Medication Reminder</a>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      <div class="project-card">
-        <b>NIH chest x-ray dataset analysis</b>
-        <p>This analysis not only uncovers insights into the chest x-ray dataset but also lays the groundwork for future projects, including the TB prediction initiative, my project to develop a model to accurately predict the presence of tuberculosis in chest x-rays.</p>
-        <a href="https://www.daviddasa.com/tbxraydata-analysis">Project page and notebook</a>
-      </div>  
+      <!-- Cloud & Infrastructure -->
+      <section class="project-card">
+        <h2>Cloud Infrastructure</h2>
+        <div class="project-grid">
+          <div class="project-item">
+            <h3>Azure Cloud Deployment</h3>
+            <p>This portfolio website is deployed on Azure Cloud, showcasing modern web development and cloud infrastructure practices.</p>
+            <ul class="skills-list">
+              <li>Azure Cloud</li>
+              <li>Docker</li>
+              <li>CI/CD</li>
+              <li>Web Development</li>
+            </ul>
+            <div class="project-links">
+              <a href="https://github.com/Naijaoracle/daviddasa" class="project-link">View Source</a>
+            </div>
+          </div>
+        </div>
+      </section>
 
-<!--       <div class="project-card">
-        <b>Tuberculosis Identification (using chest x-rays)</b>
-        <p>The project aims to achieve an accurate and reliable classification model for TB detection in chest X-ray images.</p>
-        <a href="https://www.daviddasa.com/tuberculosis-chestxray">Project page and notebook</a>
-      </div>       -->
-     
-      <div class="project-card">
-        <b>BMI Calculator</b>
-        <p>A simple BMI calculator.</p>
-        <a href="https://www.daviddasa.com/bmi-calculator">Calculate your BMI here.</a>
-      </div>
-
-      <div class="project-card">
-        <b>Digital Health & AI education quiz</b>
-        <p>Questions on digital health and AI.</p>
-        <a href="https://www.daviddasa.com/DHAIquiz">Test your digital health & AI knowledge here.</a>
-      </div>
-
-      <div class="project-card">
-        <b>Medication Reminder</b>
-        <p>A simple tool to remind you when to take your medicine.</p>
-        <p>As a simple prototype, it uses browser notifications, but a proper built out reminder tool would collect data like an email or phone number to send proper notifications.</p>
-        <a href="https://www.daviddasa.com/medication-reminder">Set a reminder for your meds here.</a>
-      </div>
-
-      <div class="project-card">
-        <b>Ear & Hearing Inquiries</b>
-        <p>A collection of tools to provide a user with information on ear health and issues with hearing.</p>
-        <a href="https://www.daviddasa.com/ent-chat">Ear & Hearing information here.</a>
-      </div>      
-
-      <div class="project-card">
-        <b>Hearing Frequency Test</b>
-        <p>A tool that charts the frequency of sounds you can hear. Chart available to download - no sign up or email required to access.</p>
-        <a href="https://www.daviddasa.com/hearingfrequency-test">Ear & Hearing information here.</a>
-      </div> 
-      <!-- Add more projects as needed -->
-    </section>
+      <!-- Call to Action -->
+      <section class="project-card">
+        <div class="cta-section">
+          <h2>Interested in Collaboration?</h2>
+          <p>I'm always open to discussing new projects and ideas at the intersection of healthcare and technology.</p>
+          <p>Connect with me on <a href="https://www.linkedin.com/in/daviddasa" class="linkedin-link">LinkedIn</a></p>
+        </div>
+      </section>
+    </main>
   </div>
 
   <!-- Footer Section -->
   <footer>
     <p>&copy; 2025 David Dasa</p>
   </footer>
+
+  <!-- Particles.js Configuration -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+    });
+  </script>
+
 </body>
 </html>
 
