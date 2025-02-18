@@ -1,0 +1,94 @@
+/* Base Styles */
+:root {
+    --primary-color: #2ecc71;
+    --secondary-color: #092917;
+    --text-color: #333;
+    --light-text: #fff;
+    --container-bg: #ede9da;
+}
+
+/* Body and General Styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 10px;
+    background-color: var(--secondary-color);
+    color: var(--light-text);
+    background-image: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Container Styles */
+.container {
+    background-color: var(--container-bg);
+    margin: 0 auto;
+    padding: 20px;
+    width: 80%;
+    color: var(--text-color);
+    position: relative;
+    border-radius: 20px;
+    top: 90px;
+    margin-bottom: 90px;
+}
+
+/* Navigation Styles */
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-image: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    z-index: 1000;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+}
+
+nav li {
+    margin: 0 15px;
+}
+
+nav a {
+    color: var(--light-text);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav .logo img {
+    border-radius: 50%;
+}
+
+/* Footer Styles */
+footer {
+    text-align: center;
+    padding: 20px;
+    background-image: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    color: var(--light-text);
+    margin-top: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+        top: 90px;
+        margin-bottom: 70px;
+    }
+
+    nav ul {
+        flex-direction: column;
+        padding: 5px;
+    }
+
+    nav li {
+        margin: 5px 0;
+    }
+} 
