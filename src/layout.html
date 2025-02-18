@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}David Dasa{% endblock %}</title>
+    <link rel="stylesheet" href="styles.css">
+    {% block additional_head %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation Section -->
+    <nav>
+        <ul>
+            <li class="logo">
+                <a href="https://www.daviddasa.com">
+                    <img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50">
+                </a>
+            </li>
+            <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+            <li><a href="https://www.daviddasa.com/about">About</a></li>
+            <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
+            <li><a href="https://www.daviddasa.com/skills">Skills</a></li>
+            <li><a href="https://www.daviddasa.com/contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        {% block content %}
+        <!-- Content will be inserted here by child templates -->
+        {% endblock %}
+    </div>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>&copy; {% block year %}2025{% endblock %} David Dasa</p>
+    </footer>
+
+    {% block scripts %}
+    <!-- Additional scripts can be added here by child templates -->
+    {% endblock %}
+</body>
+</html> 
