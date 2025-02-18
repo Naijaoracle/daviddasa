@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>David Dasa - Digital Health & AI Portfolio</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
 
@@ -26,13 +28,40 @@
       <!-- About Section -->
       <section id="about">
         <img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/david%20dasa.jpeg?raw=true" alt="David Dasa Photo" width="100" height="100" class="about-image">
-        <h1>Welcome to My Digital Health & AI Portfolio</h1>
-        <p>Hello and welcome! I'm David Dasa, a Medical Doctor on a path to explore the intersection of healthcare and technology. Currently pursuing an MSc in Digital Health & Artificial Intelligence, I seek to leverage technology's potential to enhance healthcare solutions.</p>
-        <p>With years of clinical experience, I've navigated high-pressure medical situations, leading cardiac arrest responses and coordinating postoperative care. My journey is fueled by a vision to integrate innovative technology into healthcare practice, aiming to create impactful solutions to real-world challenges.</p>
-        <p>From conducting research on the use of blockchain technology in healthcare to organizing medical outreach missions, I am committed to innovation and patient-centric care.</p>
-        <p>Join me in exploring the dynamic realm where medicine meets technology, as we strive to shape the future of healthcare.</p>
-        <p>Please take a look around and feel free to <a href="https://www.linkedin.com/in/daviddasa">get in touch</a> on LinkedIn.</p>
-        <p>If you would like to test your knowledge on Digital Health & AI, <a href="https://www.daviddasa.com/DHAIquiz">take a short quiz.</a></p>
+        <div class="about-content">
+          <h1>Welcome to My Digital Health & AI Portfolio</h1>
+          <h2>Medical Doctor | MSc Digital Health & AI | PhD Researcher</h2>
+          <p>Hello! I'm David Dasa, a Medical Doctor with seven years of clinical experience across Nigeria and the UK. I'm passionate about addressing healthcare challenges through technology, working at the intersection of healthcare, AI, and Extended Reality (XR).</p>
+          
+          <h3>Current Research</h3>
+          <p>I'm currently pursuing a PhD at Bournemouth University, focusing on Advanced Non-Player Character (NPC) Systems for XR Healthcare Simulation. My research aims to develop AI-driven NPCs for XR training environments, enabling effective self-study and teamwork simulations in healthcare training.</p>
+          
+          <h3>Academic Achievement</h3>
+          <p>I hold an MSc in Digital Health & Artificial Intelligence from Bournemouth University (with distinction). My dissertation explored remote photoplethysmography (rPPG) technology for hypertension screening in individuals with darker skin tones, conducting valuable fieldwork in Nigeria.</p>
+          
+          <h3>Key Skills & Expertise</h3>
+          <ul class="skills-list">
+            <li>Clinical expertise in diverse healthcare settings</li>
+            <li>AI and machine learning applications in healthcare</li>
+            <li>XR (Extended Reality) in healthcare training</li>
+            <li>Remote patient monitoring and telehealth solutions</li>
+            <li>Cross-cultural communication and collaboration</li>
+            <li>Python Programming</li>
+            <li>Machine Learning</li>
+            <li>Good Clinical Practice (GCP)</li>
+            <li>Advanced Life Support (ALS)</li>
+            <li>Computer Vision</li>
+          </ul>
+
+          <h3>Vision & Goals</h3>
+          <p>My goal is to advance healthcare through innovative solutions in remote patient monitoring, telehealth, and clinical decision support, while enhancing the tools and experiences of healthcare professionals in training. Through my PhD research, I aim to improve the realism and educational value of XR healthcare simulations, providing learners with robust tools for skill development in dynamic, safe, and repeatable settings.</p>
+
+          <div class="cta-section">
+            <p>Let's connect if you're interested in discussing innovations at the intersection of AI, XR, and digital health, especially projects that aim to transform healthcare training and increase healthcare accessibility worldwide.</p>
+            <p>Connect with me on <a href="https://www.linkedin.com/in/daviddasa" class="linkedin-link">LinkedIn</a></p>
+            <p>Test your knowledge: <a href="https://www.daviddasa.com/DHAIquiz" class="quiz-link">Take the Digital Health & AI Quiz</a></p>
+          </div>
+        </div>
       </section>
 
       <!-- Projects Section -->
@@ -91,136 +120,209 @@
 
   <!-- Interactive Animation Section -->
   <section id="interactive-animation">
+    <div id="particles-js"></div>
     <div class="animation-container">
       <!-- Input Layer -->
       <div class="layer input-layer">
-        <div class="circle" id="input-1">Wearables</div>
-        <div class="circle" id="input-2">Remote Monitoring</div>
-        <div class="circle" id="input-3">Health Records</div>
-        <div class="circle" id="input-4">Public Health Data</div>
-        <div class="circle" id="input-5">Patient Feedback</div>
+        <div class="circle" data-info="Collecting data from wearable devices" id="input-1">Wearables</div>
+        <div class="circle" data-info="Real-time patient monitoring systems" id="input-2">Remote Monitoring</div>
+        <div class="circle" data-info="Electronic health record systems" id="input-3">Health Records</div>
+        <div class="circle" data-info="Population health statistics" id="input-4">Public Health Data</div>
+        <div class="circle" data-info="Patient experience and satisfaction data" id="input-5">Patient Feedback</div>
       </div>
 
       <!-- Fully Connected Layers -->
       <div class="fully-connected-layer" id="data-aggregation-layer">
         <span class="layer-label">Data Aggregation</span>
         <div class="layer fully-connected">
-          <div class="circle" id="fc1-1">Data Normalization</div>
-          <div class="circle" id="fc1-2">Feature Selection</div>
-          <div class="circle" id="fc1-3">Integration</div>
+          <div class="circle" data-info="Standardizing data formats and units" id="fc1-1">Data Normalization</div>
+          <div class="circle" data-info="Selecting relevant data points" id="fc1-2">Feature Selection</div>
+          <div class="circle" data-info="Combining data from multiple sources" id="fc1-3">Integration</div>
         </div>
       </div>
 
       <div class="fully-connected-layer" id="compute-layer">
         <span class="layer-label">Compute</span>
         <div class="layer fully-connected">
-          <div class="circle" id="fc2-1">Machine Learning Models</div>
-          <div class="circle" id="fc2-2">Statistical Analysis</div>
-          <div class="circle" id="fc2-3">Predictive Analytics</div>
-          <div class="circle" id="fc2-4">Data Validation</div>
+          <div class="circle" data-info="AI/ML model processing" id="fc2-1">Machine Learning Models</div>
+          <div class="circle" data-info="Statistical data analysis" id="fc2-2">Statistical Analysis</div>
+          <div class="circle" data-info="Future outcome predictions" id="fc2-3">Predictive Analytics</div>
+          <div class="circle" data-info="Data quality verification" id="fc2-4">Data Validation</div>
         </div>
       </div>
 
       <div class="fully-connected-layer" id="clinician-review-layer">
         <span class="layer-label">Clinician Review</span>
         <div class="layer fully-connected">
-          <div class="circle" id="fc3-1">Clinical Review</div>
-          <div class="circle" id="fc3-2">User Feedback</div>
-          <div class="circle" id="fc3-3">Outcome Validation</div>
+          <div class="circle" data-info="Medical expert verification" id="fc3-1">Clinical Review</div>
+          <div class="circle" data-info="System user feedback" id="fc3-2">User Feedback</div>
+          <div class="circle" data-info="Outcome verification" id="fc3-3">Outcome Validation</div>
         </div>
       </div>
 
       <!-- Output Layer -->
       <div class="layer output-layer">
-        <div class="circle" id="output-circle">Improved Patient Outcomes</div>
+        <div class="circle" data-info="Enhanced healthcare outcomes" id="output-circle">Improved Patient Outcomes</div>
       </div>
     </div>
   </section>
 
-  <!-- Footer Section -->
-  <footer>
-    <p>&copy; 2023 David Dasa</p>
-  </footer>
-
-  <!-- Revised Script for Animation -->
+  <!-- Updated Animation Script -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
+      // Initialize particles.js
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+
       // Define layers in order
       const layers = [
         document.querySelectorAll('.input-layer .circle'),
         document.querySelectorAll('#data-aggregation-layer .circle'),
         document.querySelectorAll('#compute-layer .circle'),
         document.querySelectorAll('#clinician-review-layer .circle'),
-        [document.getElementById('output-circle')] // Output layer
+        [document.getElementById('output-circle')]
       ];
-    
-      // Define fully connected layers (excluding input and output)
-      const fullyConnectedLayers = layers.slice(1, layers.length - 1); // Excludes input and output layer
-    
-      // Define animation timings (in milliseconds)
-      const forwardDelay = 2000; // 2 seconds per activation
-      const backwardDelay = forwardDelay / 2; // Backward pass is half as fast
-      const waitAfterCompletion = 5000; // 5 seconds wait before restarting the sequence
-    
-      // Helper function to delay execution
-      const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-    
-      // Function to activate a layer
-      const activateLayer = async (layer, delayTime) => {
+
+      // Create GSAP timeline
+      const timeline = gsap.timeline({ repeat: -1 });
+      
+      // Add hover effect and tooltip for circles
+      document.querySelectorAll('.circle').forEach(circle => {
+        // Create tooltip
+        const tooltip = document.createElement('div');
+        tooltip.className = 'tooltip';
+        tooltip.textContent = circle.getAttribute('data-info');
+        circle.appendChild(tooltip);
+
+        // Add hover animation
+        circle.addEventListener('mouseenter', () => {
+          gsap.to(circle, {
+            scale: 1.1,
+            duration: 0.3,
+            ease: 'power2.out'
+          });
+          tooltip.style.opacity = '1';
+        });
+
+        circle.addEventListener('mouseleave', () => {
+          gsap.to(circle, {
+            scale: 1,
+            duration: 0.3,
+            ease: 'power2.out'
+          });
+          tooltip.style.opacity = '0';
+        });
+      });
+
+      // Function to activate a layer with GSAP
+      const activateLayer = (layer) => {
         layer.forEach(circle => {
-          circle.classList.add('active');
+          timeline.to(circle, {
+            scale: 1.1,
+            backgroundColor: 'rgba(46, 204, 113, 0.2)',
+            borderColor: '#2ecc71',
+            boxShadow: '0 0 30px rgba(46, 204, 113, 0.3)',
+            duration: 0.5,
+            ease: 'power2.out'
+          })
+          .to(circle, {
+            scale: 1,
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            borderColor: 'rgba(46, 204, 113, 0.3)',
+            boxShadow: 'none',
+            duration: 0.5,
+            ease: 'power2.in'
+          }, '+=0.5');
         });
-        await delay(delayTime);
-        layer.forEach(circle => {
-          circle.classList.remove('active');
+      };
+
+      // Create connections between layers
+      const createConnections = () => {
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.style.position = 'absolute';
+        svg.style.top = '0';
+        svg.style.left = '0';
+        svg.style.width = '100%';
+        svg.style.height = '100%';
+        svg.style.pointerEvents = 'none';
+        document.querySelector('.animation-container').appendChild(svg);
+
+        // Draw connections between layers
+        layers.forEach((layer, i) => {
+          if (i < layers.length - 1) {
+            layer.forEach(circle1 => {
+              layers[i + 1].forEach(circle2 => {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                const rect1 = circle1.getBoundingClientRect();
+                const rect2 = circle2.getBoundingClientRect();
+                
+                line.setAttribute('x1', rect1.left + rect1.width / 2);
+                line.setAttribute('y1', rect1.top + rect1.height / 2);
+                line.setAttribute('x2', rect2.left + rect2.width / 2);
+                line.setAttribute('y2', rect2.top + rect2.height / 2);
+                line.setAttribute('stroke', '#2ecc71');
+                line.setAttribute('stroke-width', '1');
+                line.setAttribute('stroke-opacity', '0.2');
+                
+                svg.appendChild(line);
+              });
+            });
+          }
         });
       };
-    
-      // Function to deactivate all layers (initial state)
-      const deactivateAll = () => {
-        document.querySelectorAll('.circle').forEach(circle => {
-          circle.classList.remove('active');
+
+      // Initialize connections
+      createConnections();
+      window.addEventListener('resize', createConnections);
+
+      // Start the animation sequence
+      const startAnimation = () => {
+        layers.forEach(layer => {
+          activateLayer(layer);
         });
       };
-    
-      // Function to perform forward pass (stops before output layer)
-      const forwardPass = async () => {
-        for (let i = 0; i < layers.length - 1; i++) {
-          await activateLayer(layers[i], forwardDelay); // Skip the output layer
-        }
-      };
-    
-      // Function to perform backward pass
-      const backwardPass = async () => {
-        // Exclude input and output layers
-        for (let i = fullyConnectedLayers.length - 1; i >= 0; i--) {
-          await activateLayer(fullyConnectedLayers[i], backwardDelay);
-        }
-      };
-    
-      // Function to perform final forward pass (including output layer)
-      const finalForwardPass = async () => {
-        for (let layer of fullyConnectedLayers) {
-          await activateLayer(layer, forwardDelay);
-        }
-        // Finally, activate the output layer
-        await activateLayer(layers[layers.length - 1], forwardDelay);
-      };
-    
-      // Execute the animation sequence
-      const executeAnimation = async () => {
-        deactivateAll();
-        await forwardPass(); // First forward pass does not include output layer
-        await backwardPass(); // Backward pass
-        await finalForwardPass(); // Final forward pass including output layer
-      };
-    
-      // Set an interval to restart the animation cycle after 7 seconds of completing
-      setInterval(async () => {
-        await executeAnimation();
-      }, forwardDelay * (layers.length + fullyConnectedLayers.length + 1) + waitAfterCompletion);
+
+      // Start animation with a delay
+      setTimeout(startAnimation, 1000);
     });
-    </script>
+  </script>
+
+  <!-- Footer Section -->
+  <footer>
+    <p>&copy; 2023 David Dasa</p>
+  </footer>
 
 </body>
 </html>
