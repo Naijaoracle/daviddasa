@@ -3,11 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Q&A on Digital Health & AI</title>
+  <meta name="description" content="David Dasa - Medical Doctor, Digital Health Innovator, and AI Researcher">
+  <title>About David Dasa - Digital Health & AI Journey</title>
   <!-- Favicon link goes here -->
   <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
   <!-- CSS file goes here -->
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
 
@@ -23,99 +26,167 @@
     </ul>
   </nav>
 
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
   <!-- Main Content -->
   <div class="container">
+    <main>
       <!-- Introduction -->
-      <section id="introduction">
-        <h1>About me</h1>
-        <p>With a background in medicine and a deep-rooted interest in leveraging technology to solve patient problems, I'm passionate about solving real-world challenges using digital innovation and AI-driven solutions.</p>
+      <section id="about">
+        <img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/david%20dasa.jpeg?raw=true" alt="David Dasa Photo" class="about-image">
+        <div class="about-content">
+          <h1>About Me</h1>
+          <h2>Medical Doctor | MSc Digital Health & AI | PhD Researcher</h2>
+          <p>With a background in medicine and a deep-rooted interest in leveraging technology to solve patient problems, I'm passionate about creating innovative digital solutions that transform healthcare delivery and improve patient outcomes.</p>
+        </div>
       </section>
-      
-      <div class="project-card">
+
       <!-- Education Section -->
-      <section id="education">
-        <h2>Education</h2>
-        <h3>Bournemouth University, Bournemouth, England.</h3>
-        <p>MSc Digital Health & Artificial Intelligence</p>
-        <b>September 2023 - September 2024</b>
-        <p>Relevant modules:</p>
-        <ul>
-          <li>Computer Vision</li>
-          <li>Accessibility and Assistive Technologies</li>
-          <li>Artificial Intelligence</li>
-          <li>Foundations of Health informations systems</li>
-          <li>Blockchain and Digital Futures</li>
-        </ul>
-        <!-- Other education details -->
-        <h3>Usmanu Danfodiyo University Sokoto, Sokoto, Nigeria.</h3>
-        <p>MBBS (Doctor of Human Medicine)</p>
-        <b>March 2012 - March 2018</b>
-        <p>Select Modules:</p>
-        <ul>
-          <li>Pathology</li>
-          <li>Radiology</li>
-          <li>Bio-statistics</li>
-          <li>Paediatrics</li>
-          <li>Principles of Medical Ethics</li>
-        </ul>
-        <!-- Other education details -->
-        <h4>Achievements</h4>
-        <ul>
-          <li>Awarded several academic scholarships</li>
-          <li>Completed numerous voluntary work placements in hospitals and clinics</li>
-        </ul>
+      <section class="project-card">
+        <h2>Education Journey</h2>
+        <div class="timeline">
+          <div class="timeline-item">
+            <h3>PhD Researcher - Bournemouth University</h3>
+            <p class="timeline-date">2024 - Present</p>
+            <p>Focusing on Advanced Non-Player Character (NPC) Systems for XR Healthcare Simulation, developing AI-driven solutions for healthcare training.</p>
+          </div>
+
+          <div class="timeline-item">
+            <h3>MSc Digital Health & Artificial Intelligence - Bournemouth University</h3>
+            <p class="timeline-date">2023 - 2024</p>
+            <p>Graduated with Distinction</p>
+            <ul class="skills-list">
+              <li>Computer Vision & AI Applications</li>
+              <li>Accessibility and Assistive Technologies</li>
+              <li>Health Information Systems</li>
+              <li>Blockchain in Healthcare</li>
+            </ul>
+          </div>
+
+          <div class="timeline-item">
+            <h3>MBBS - Usmanu Danfodiyo University Sokoto</h3>
+            <p class="timeline-date">2012 - 2018</p>
+            <p>Doctor of Human Medicine</p>
+            <ul class="skills-list">
+              <li>Clinical Medicine & Surgery</li>
+              <li>Medical Ethics & Professional Practice</li>
+              <li>Research Methodology & Bio-statistics</li>
+              <li>Community Health & Preventive Medicine</li>
+            </ul>
+          </div>
+        </div>
       </section>
-      </div>
-    <!-- Work Section -->
-    <div class="project-card">
-    <h2>Work Experience</h2>
-    
-      <section id="Work Experience">
-        <h3>RMO International Healthcare LLP, Bromsgrove, England</h3>
-        <p>In this role I served as the Resident Medical Officer in various hospitals and wards accross England. I provided patient care in line with consultant instructions and clinical best practice. I also provided resuscitation cover for emergencies.</p>
-        <p>Some centres where I worked:</p>
-        <ul>
-          <li>Furness General Hospital - Surgical Departments</li>
-          <li>Nightingale Hospital London - General Adult Psychiatry</li>
-          <li>Stoke Mandeville Hospital - General Surgery</li>
-          <li>Braintree Community Hospital - Trauma and Orthopaedics</li>
-        </ul>
 
-        <h3>Kebbi State Ministry of Health, Birnin Kebbi, Nigeria</h3>
-        <p>In this role I served as a Medical Officer directly in patient care in facilities run by the ministry. I provided patient care in line with clinical best practice.</p>
-
-        <h3>National Youth Service Corp, Kaduna, Nigeria</h3>
-        <p>This was for my year of national service, which is a year long requirement for Nigerian graduates. I served in rural and urban medical facilities.</p>
-
-        <h3>Federal Medical Centre Katsina, Katsina, Nigeria</h3>
-        <p>This was a year long internship, which is required for all new medical graduates before independent clinical practice. It involved a rotation round several departments for broad clinical experience.</p>        
+      <!-- Professional Experience -->
+      <section class="project-card">
+        <h2>Professional Experience</h2>
         
-        <!-- Other work details -->
-      </section>
-      </div>
+        <div class="experience-item">
+          <h3>RMO International Healthcare LLP, England</h3>
+          <p class="timeline-date">2020 - 2023</p>
+          <p>Served as Resident Medical Officer across various specialties and hospitals in England:</p>
+          <ul class="skills-list">
+            <li>Furness General Hospital - Surgical Departments</li>
+            <li>Nightingale Hospital London - General Adult Psychiatry</li>
+            <li>Stoke Mandeville Hospital - General Surgery</li>
+            <li>Braintree Community Hospital - Trauma and Orthopaedics</li>
+          </ul>
+        </div>
 
-      <div class="project-card">
-      <h2>Volunteering Experience</h2>
-        <section id="Volunteering Experience">
-        <h3>Rural Medical/Surgical Outreach, 2016.</h3>
-        <p>In 2016, while serving as the Mission Secretary of my schools chapter of the Christian Medical and Dental Association Nigeria - Students, I played a leading role in organising a medical outreach to a rural community in another state.</p>
-        <p>The participants included surgeons, nurses, community physicians, medical students, and others. About 610 patients received free medical consultations and about 50 patients received free surgeries.</p>
-        <p>Prior to this I had participated in outreaches, but this one also gave me an opportunity to take a leadership role. Ultimately it was a great opportunity to make a real difference in the lives of those who needed it but were unable to find solutions. </p>
+        <div class="experience-item">
+          <h3>Kebbi State Ministry of Health, Nigeria</h3>
+          <p class="timeline-date">2019 - 2020</p>
+          <p>Medical Officer providing direct patient care and implementing public health initiatives.</p>
+        </div>
+
+        <div class="experience-item">
+          <h3>Federal Medical Centre Katsina, Nigeria</h3>
+          <p class="timeline-date">2018 - 2019</p>
+          <p>Completed comprehensive medical internship with rotations in key specialties.</p>
+        </div>
       </section>
-      </div>
-      
-    <section id="Mission Statement">
-        <h3>Mission Statement</h3>
-        <p>As I continue my journey into the realm of Digital Health & AI, I'm committed to harnessing my medical expertise, technological skills, and unwavering passion to drive meaningful advancements in healthcare.</p>
-        <p>Join me in this pursuit towards a future where innovative technologies redefine healthcare delivery.</p>
+
+      <!-- Volunteering & Community Impact -->
+      <section class="project-card">
+        <h2>Community Impact</h2>
+        <div class="impact-item">
+          <h3>Rural Medical/Surgical Outreach</h3>
+          <p class="timeline-date">2016</p>
+          <p>Led the organization of a major medical outreach program as Mission Secretary of CMDA:</p>
+          <ul class="skills-list">
+            <li>Coordinated a team of surgeons, nurses, and medical professionals</li>
+            <li>Facilitated free medical consultations for 610+ patients</li>
+            <li>Enabled 50+ free surgical procedures</li>
+            <li>Developed leadership and organizational skills in healthcare delivery</li>
+          </ul>
+        </div>
       </section>
-      <!-- Other sections as needed: Research, Languages, etc. -->
+
+      <!-- Vision & Mission -->
+      <section class="project-card">
+        <h2>Vision & Mission</h2>
+        <div class="vision-content">
+          <p>As I continue my journey in Digital Health & AI, I'm committed to:</p>
+          <ul class="skills-list">
+            <li>Developing innovative AI solutions for healthcare challenges</li>
+            <li>Improving healthcare accessibility through technology</li>
+            <li>Enhancing medical education with XR and AI</li>
+            <li>Building bridges between clinical practice and digital innovation</li>
+          </ul>
+          <div class="cta-section">
+            <p>Let's connect and explore how we can transform healthcare together.</p>
+            <p>Connect with me on <a href="https://www.linkedin.com/in/daviddasa" class="linkedin-link">LinkedIn</a></p>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
 
   <!-- Footer Section -->
   <footer>
     <p>&copy; 2025 David Dasa</p>
   </footer>
+
+  <!-- Particles.js Configuration -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+    });
+  </script>
 
 </body>
 </html>
