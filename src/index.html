@@ -252,24 +252,23 @@
 
       // Function to activate a layer with GSAP
       const activateLayer = (layer) => {
-        layer.forEach(circle => {
-          timeline.to(circle, {
-            scale: 1.1,
-            backgroundColor: 'rgba(46, 204, 113, 0.2)',
-            borderColor: '#2ecc71',
-            boxShadow: '0 0 30px rgba(46, 204, 113, 0.3)',
-            duration: 0.5,
-            ease: 'power2.out'
-          })
-          .to(circle, {
-            scale: 1,
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            borderColor: 'rgba(46, 204, 113, 0.3)',
-            boxShadow: 'none',
-            duration: 0.5,
-            ease: 'power2.in'
-          }, '+=0.5');
-        });
+        // Animate all circles in the layer simultaneously
+        timeline.to(layer, {
+          scale: 1.1,
+          backgroundColor: 'rgba(46, 204, 113, 0.2)',
+          borderColor: '#2ecc71',
+          boxShadow: '0 0 30px rgba(46, 204, 113, 0.3)',
+          duration: 0.5,
+          ease: 'power2.out'
+        })
+        .to(layer, {
+          scale: 1,
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          borderColor: 'rgba(46, 204, 113, 0.3)',
+          boxShadow: 'none',
+          duration: 0.5,
+          ease: 'power2.in'
+        }, '+=0.5');
       };
 
       // Create connections between layers
@@ -348,10 +347,12 @@
       // Recreate connections when the page is fully loaded
       window.addEventListener('load', createConnections);
 
-      // Start the animation sequence
+      // Start the animation sequence with delays between layers
       const startAnimation = () => {
-        layers.forEach(layer => {
-          activateLayer(layer);
+        let delay = 0;
+        layers.forEach((layer, index) => {
+          timeline.add(() => activateLayer(layer), delay);
+          delay += 2; // Add 2 second delay between layers
         });
       };
 
