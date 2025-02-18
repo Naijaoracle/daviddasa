@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Skills - David Dasa</title>
-  <!-- CSS file goes here -->
+  <meta name="description" content="David Dasa's Professional Skills in Digital Health, AI, and Healthcare">
+  <title>Skills & Expertise - David Dasa</title>
+  <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
 
@@ -16,49 +19,159 @@
       <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
       <li><a href="https://www.daviddasa.com/about">About</a></li>
       <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
-      <li><a href="#skills">Skills</a></li>
+      <li><a href="https://www.daviddasa.com/skills">Skills</a></li>
       <li><a href="https://www.daviddasa.com/contact">Contact</a></li>
     </ul>
   </nav>
 
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
+  <!-- Main Content -->
   <div class="container">
-    <h1>Skills</h1>
+    <main>
+      <!-- Skills Introduction -->
+      <section id="about">
+        <div class="about-content">
+          <h1>Skills & Expertise</h1>
+          <h2>Bridging Healthcare & Technology</h2>
+          <p>My unique combination of clinical experience and technical expertise allows me to develop innovative solutions that address real healthcare challenges.</p>
+        </div>
+      </section>
 
-    <!-- Skills Section -->
-    <section id="skills">
-      <div class="skill-card">
-        <h2>Artificial Intelligence</h2>
-        <p>Expertise in AI algorithms, machine learning, and neural networks.</p>
-      </div>
+      <!-- Clinical Skills -->
+      <section class="project-card">
+        <h2>Clinical Expertise</h2>
+        <div class="skills-grid">
+          <div class="skill-category">
+            <h3>Medical Practice</h3>
+            <ul class="skills-list">
+              <li>General Medicine & Surgery</li>
+              <li>Emergency Medicine</li>
+              <li>Advanced Life Support (ALS)</li>
+              <li>Clinical Assessment & Diagnosis</li>
+              <li>Patient Care Management</li>
+            </ul>
+          </div>
+        </div>
+      </section>
 
-      <div class="skill-card">
-        <h2>Blockchain</h2>
-        <p>Proficiency in blockchain technology, smart contracts, and decentralized applications.</p>
-      </div>
+      <!-- Technical Skills -->
+      <section class="project-card">
+        <h2>Technical Skills</h2>
+        <div class="skills-grid">
+          <div class="skill-category">
+            <h3>Programming & Development</h3>
+            <ul class="skills-list">
+              <li>Python Programming</li>
+              <li>Machine Learning & AI</li>
+              <li>Computer Vision</li>
+              <li>JavaScript Development</li>
+              <li>Blockchain Technology</li>
+            </ul>
+          </div>
+          <div class="skill-category">
+            <h3>Healthcare Technology</h3>
+            <ul class="skills-list">
+              <li>Digital Health Systems</li>
+              <li>XR in Healthcare Training</li>
+              <li>Remote Patient Monitoring</li>
+              <li>Health Information Systems</li>
+              <li>Medical Data Analytics</li>
+            </ul>
+          </div>
+        </div>
+      </section>
 
-      <div class="skill-card">
-        <h2>Data Analysis</h2>
-        <p>Skilled in analysis and presentation of data. I am familiar with a variety of tools, from Microsoft Excel and IBM SPSS to a wide range of python libraries including matplotlib and 
-seaborn.</p>
-      </div>
+      <!-- Research Skills -->
+      <section class="project-card">
+        <h2>Research & Innovation</h2>
+        <div class="skills-grid">
+          <div class="skill-category">
+            <h3>Research Methodology</h3>
+            <ul class="skills-list">
+              <li>Clinical Research Design</li>
+              <li>Data Analysis & Statistics</li>
+              <li>Scientific Writing</li>
+              <li>Ethics in Medical Research</li>
+              <li>Healthcare Innovation</li>
+            </ul>
+          </div>
+        </div>
+      </section>
 
-      <div class="skill-card">
-        <h2>Computer vision</h2>
-        <p>Well versed in training and fine tuning models for image recognition and classification tasks.</p>
-      </div>
+      <!-- Professional Skills -->
+      <section class="project-card">
+        <h2>Professional Skills</h2>
+        <div class="skills-grid">
+          <div class="skill-category">
+            <h3>Leadership & Communication</h3>
+            <ul class="skills-list">
+              <li>Project Management</li>
+              <li>Team Leadership</li>
+              <li>Cross-cultural Communication</li>
+              <li>Stakeholder Management</li>
+              <li>Medical Education</li>
+            </ul>
+          </div>
+        </div>
+      </section>
 
-      <div class="skill-card">
-        <h2>Certifications</h2>
-        <p>You can view a gallery of my certifications <a href="https://www.daviddasa.com/certifications">here</a>.</p> </li> <!-- Link to Certifications Gallery -->
-      </div>
-
-      <!-- Add more skill cards for each skill -->
-    </section>
+      <!-- Call to Action -->
+      <section class="project-card">
+        <div class="cta-section">
+          <h2>Let's Collaborate</h2>
+          <p>Interested in combining healthcare expertise with technological innovation? Let's connect and explore potential collaborations.</p>
+          <p>Connect with me on <a href="https://www.linkedin.com/in/daviddasa" class="linkedin-link">LinkedIn</a></p>
+        </div>
+      </section>
+    </main>
   </div>
 
   <!-- Footer Section -->
   <footer>
     <p>&copy; 2025 David Dasa</p>
   </footer>
+
+  <!-- Particles.js Configuration -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+    });
+  </script>
+
 </body>
 </html>

@@ -3,16 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="David Dasa's Professional Certifications and Achievements">
   <title>Certifications - David Dasa</title>
-  <!-- Unique CSS style sheet for this one -->
+  <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
 
   <!-- Navigation Section -->
   <nav>
     <ul>
-      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png" alt="Logo" width="50" height="50"></a></li>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
       <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
       <li><a href="https://www.daviddasa.com/about">About</a></li>
       <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
@@ -21,59 +24,132 @@
     </ul>
   </nav>
 
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
 
- <!-- Certification Section -->
- <h2>Certifications Gallery</h2>
+  <!-- Main Content -->
+  <div class="container">
+    <main>
+      <!-- Certifications Introduction -->
+      <section id="about">
+        <div class="about-content">
+          <h1>Professional Certifications</h1>
+          <h2>Continuous Learning & Development</h2>
+          <p>My commitment to professional growth is reflected in these certifications, spanning healthcare, technology, and innovation.</p>
+        </div>
+      </section>
 
- <!-- Image Gallery Grid -->
- <div class="responsive">
-  <div class="gallery">
-    <a target="_blank" href="https://github.com/Naijaoracle/daviddasa/blob/469fb2d37143f0d84981e2ee0688c9ac8df4d28e/src/img/kaggle%20Data%20Visualization.png?raw=true">
-      <img src="https://github.com/Naijaoracle/daviddasa/blob/469fb2d37143f0d84981e2ee0688c9ac8df4d28e/src/img/kaggle%20Data%20Visualization.png?raw=true" alt="Cinque Terre" width="600" height="400">
-    </a>
-    <div class="desc">Kaggle data visualisation certification </div>
+      <!-- Technical Certifications -->
+      <section class="project-card">
+        <h2>Technical Certifications</h2>
+        <div class="cert-grid">
+          <div class="cert-item">
+            <h3>Quantum Cloud Computing</h3>
+            <div class="gallery">
+              <a target="_blank" href="https://github.com/Naijaoracle/daviddasa/blob/469fb2d37143f0d84981e2ee0688c9ac8df4d28e/src/img/Quantum%20cloud%20computing%20certification.jpeg?raw=true">
+                <img src="https://github.com/Naijaoracle/daviddasa/blob/469fb2d37143f0d84981e2ee0688c9ac8df4d28e/src/img/Quantum%20cloud%20computing%20certification.jpeg?raw=true" alt="Quantum Cloud Computing Certificate">
+              </a>
+              <div class="cert-description">
+                <p>Advanced certification in quantum computing and cloud technologies</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Healthcare Certifications -->
+      <section class="project-card">
+        <h2>Healthcare Certifications</h2>
+        <div class="cert-grid">
+          <div class="cert-item">
+            <h3>Advanced Life Support (ALS)</h3>
+            <ul class="skills-list">
+              <li>Emergency Response and Management</li>
+              <li>Advanced Cardiac Life Support</li>
+              <li>Critical Care Protocols</li>
+            </ul>
+          </div>
+          <div class="cert-item">
+            <h3>Good Clinical Practice (GCP)</h3>
+            <ul class="skills-list">
+              <li>Clinical Research Standards</li>
+              <li>Ethical Research Conduct</li>
+              <li>Patient Safety Protocols</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Professional Development -->
+      <section class="project-card">
+        <h2>Professional Development</h2>
+        <div class="cert-grid">
+          <div class="cert-item">
+            <h3>Digital Health & AI</h3>
+            <ul class="skills-list">
+              <li>MSc Digital Health & AI (Distinction)</li>
+              <li>Healthcare Innovation</li>
+              <li>Medical Technology Integration</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Call to Action -->
+      <section class="project-card">
+        <div class="cta-section">
+          <h2>Let's Connect</h2>
+          <p>Interested in discussing how these certifications and skills can benefit your healthcare innovation projects?</p>
+          <p>Connect with me on <a href="https://www.linkedin.com/in/daviddasa" class="linkedin-link">LinkedIn</a></p>
+        </div>
+      </section>
+    </main>
   </div>
-</div>
-
- <!-- Image Gallery Grid -->
- <div class="responsive">
-  <div class="gallery">
-    <a target="_blank" href="https://github.com/Naijaoracle/daviddasa/blob/469fb2d37143f0d84981e2ee0688c9ac8df4d28e/src/img/Quantum%20cloud%20computing%20certification.jpeg?raw=true">
-      <img src="https://github.com/Naijaoracle/daviddasa/blob/469fb2d37143f0d84981e2ee0688c9ac8df4d28e/src/img/Quantum%20cloud%20computing%20certification.jpeg?raw=true" alt="Cinque Terre" width="600" height="400">
-    </a>
-    <div class="desc">Quantum cloud computing certification</div>
-  </div>
-</div>
-<script>
-  const galleryElements = document.querySelectorAll('.gallery');
-  for (const galleryElement of galleryElements) {
-  const image = galleryElement.querySelector('img');
-  const description = galleryElement.querySelector('.desc');
-
-  image.addEventListener('mouseover', () => {
-    image.style.transition = 'transform 0.3s ease-in-out';
-    image.style.transform = 'scale(1.1) translateY(-3px)';
-
-    description.style.opacity = 1;
-  });
-
-  image.addEventListener('mouseout', () => {
-    image.style.transition = 'transform 0.3s ease-in-out';
-    image.style.transform = 'scale(1)';
-
-    description.style.opacity = 0;
-  });
-}
-</script>
- <!-- Just add more image gallery elements here: -->
-
- <div class="clearfix"></div>
-
- <div style="padding: 6px;"></div>
 
   <!-- Footer Section -->
   <footer>
     <p>&copy; 2025 David Dasa</p>
   </footer>
+
+  <!-- Particles.js Configuration -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+    });
+  </script>
+
 </body>
 </html>

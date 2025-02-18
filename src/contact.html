@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Get in touch with David Dasa - Digital Health & AI Innovator">
   <title>Contact - David Dasa</title>
-  <!-- CSS file goes here -->
+  <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
 
@@ -17,23 +20,130 @@
       <li><a href="https://www.daviddasa.com/about">About</a></li>
       <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
       <li><a href="https://www.daviddasa.com/skills">Skills</a></li>
-      <li><a href="#contact">Contact</a></li>
+      <li><a href="https://www.daviddasa.com/contact">Contact</a></li>
     </ul>
   </nav>
 
-  <div class="container">
-    <h1>Contact Me</h1>
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
 
-    <!-- Contact Section -->
-    <section id="contact">
-      <p>The best way to get in touch with me is through my LinkedIn. I look forward to connecting with you!</p>
-      <p>LinkedIn: <a href="https://www.linkedin.com/in/daviddasa">LinkedIn | David Dasa</a></p>
-    </section>
+  <!-- Main Content -->
+  <div class="container">
+    <main>
+      <!-- Contact Introduction -->
+      <section id="about">
+        <div class="about-content">
+          <h1>Let's Connect</h1>
+          <h2>Innovating Healthcare Together</h2>
+          <p>I'm always interested in discussing innovative healthcare solutions, research collaborations, and opportunities to make a positive impact in digital health.</p>
+        </div>
+      </section>
+
+      <!-- Contact Options -->
+      <section class="project-card">
+        <h2>Get in Touch</h2>
+        <div class="contact-grid">
+          <!-- Professional Network -->
+          <div class="contact-item">
+            <h3>Professional Network</h3>
+            <p>Connect with me on LinkedIn for professional networking and collaboration opportunities:</p>
+            <a href="https://www.linkedin.com/in/daviddasa" class="linkedin-link">LinkedIn Profile</a>
+          </div>
+
+          <!-- Research Collaboration -->
+          <div class="contact-item">
+            <h3>Research Collaboration</h3>
+            <p>Interested in collaborating on research in:</p>
+            <ul class="skills-list">
+              <li>Digital Health Innovation</li>
+              <li>AI in Healthcare</li>
+              <li>XR Healthcare Training</li>
+              <li>Medical Education Technology</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Areas of Interest -->
+      <section class="project-card">
+        <h2>Let's Discuss</h2>
+        <div class="interest-grid">
+          <div class="interest-item">
+            <h3>Healthcare Innovation</h3>
+            <ul class="skills-list">
+              <li>Digital Health Solutions</li>
+              <li>AI-Driven Healthcare</li>
+              <li>Remote Patient Monitoring</li>
+              <li>Healthcare Accessibility</li>
+            </ul>
+          </div>
+          <div class="interest-item">
+            <h3>Technology Integration</h3>
+            <ul class="skills-list">
+              <li>XR in Medical Training</li>
+              <li>AI-Powered Diagnostics</li>
+              <li>Healthcare Data Analytics</li>
+              <li>Blockchain in Healthcare</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Call to Action -->
+      <section class="project-card">
+        <div class="cta-section">
+          <h2>Ready to Collaborate?</h2>
+          <p>Whether you're interested in research collaboration, professional networking, or discussing innovative healthcare solutions, I'd love to connect with you.</p>
+          <p>Connect with me on <a href="https://www.linkedin.com/in/daviddasa" class="linkedin-link">LinkedIn</a></p>
+        </div>
+      </section>
+    </main>
   </div>
 
   <!-- Footer Section -->
   <footer>
     <p>&copy; 2025 David Dasa</p>
   </footer>
+
+  <!-- Particles.js Configuration -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+    });
+  </script>
+
 </body>
 </html>
