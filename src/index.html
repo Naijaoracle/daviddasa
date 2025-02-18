@@ -270,6 +270,12 @@
 
       // Create connections between layers
       const createConnections = () => {
+        // Remove existing SVG if it exists
+        const existingSvg = document.querySelector('.animation-container svg');
+        if (existingSvg) {
+          existingSvg.remove();
+        }
+
         const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         svg.style.position = 'absolute';
         svg.style.top = '0';
@@ -282,16 +288,29 @@
         // Draw connections between layers
         layers.forEach((layer, i) => {
           if (i < layers.length - 1) {
+            const nextLayer = layers[i + 1];
             layer.forEach(circle1 => {
-              layers[i + 1].forEach(circle2 => {
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                const rect1 = circle1.getBoundingClientRect();
+              const rect1 = circle1.getBoundingClientRect();
+              const x1 = rect1.left + rect1.width / 2;
+              const y1 = rect1.top + rect1.height / 2;
+
+              nextLayer.forEach(circle2 => {
                 const rect2 = circle2.getBoundingClientRect();
-                
-                line.setAttribute('x1', rect1.left + rect1.width / 2);
-                line.setAttribute('y1', rect1.top + rect1.height / 2);
-                line.setAttribute('x2', rect2.left + rect2.width / 2);
-                line.setAttribute('y2', rect2.top + rect2.height / 2);
+                const x2 = rect2.left + rect2.width / 2;
+                const y2 = rect2.top + rect2.height / 2;
+
+                // Calculate container-relative coordinates
+                const container = document.querySelector('.animation-container').getBoundingClientRect();
+                const relativeX1 = x1 - container.left;
+                const relativeY1 = y1 - container.top;
+                const relativeX2 = x2 - container.left;
+                const relativeY2 = y2 - container.top;
+
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', relativeX1);
+                line.setAttribute('y1', relativeY1);
+                line.setAttribute('x2', relativeX2);
+                line.setAttribute('y2', relativeY2);
                 line.setAttribute('stroke', '#2ecc71');
                 line.setAttribute('stroke-width', '1');
                 line.setAttribute('stroke-opacity', '0.2');
@@ -305,7 +324,25 @@
 
       // Initialize connections
       createConnections();
-      window.addEventListener('resize', createConnections);
+      
+      // Debounce function to limit the rate at which createConnections is called
+      function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+          const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+          };
+          clearTimeout(timeout);
+          timeout = setTimeout(later, wait);
+        };
+      }
+
+      // Add debounced resize listener
+      window.addEventListener('resize', debounce(createConnections, 250));
+
+      // Recreate connections when the page is fully loaded
+      window.addEventListener('load', createConnections);
 
       // Start the animation sequence
       const startAnimation = () => {

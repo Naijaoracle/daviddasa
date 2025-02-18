@@ -26,14 +26,14 @@ body {
     margin-bottom: 90px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10px);
+    overflow: hidden;
   }
   
   /* Media query for smaller screens (max-width: 768px) */
   @media (max-width: 768px) {
     .container {
-      width: 90%; /* 90% width for smaller screens */
-      top: 90px;
-      margin-bottom: 70px;
+      width: 95%;
+      padding: 1rem;
     }
   }
   
@@ -97,6 +97,7 @@ body {
     background: rgba(9, 41, 23, 0.95);
     backdrop-filter: blur(10px);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 0.5rem 0;
   }
   
   nav ul {
@@ -105,9 +106,10 @@ body {
     margin: 0;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: 0 1rem;
   }
   
   nav ul li {
@@ -115,14 +117,25 @@ body {
     margin: 0 0.5rem;
   }
   
+  nav ul li.logo {
+    margin-right: auto;
+  }
+  
+  nav ul li.logo img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+  }
+  
   nav ul li a {
     color: #fff;
     text-decoration: none;
-    padding: 1.5rem 1rem;
+    padding: 0.75rem 1rem;
     display: inline-block;
     transition: all 0.3s ease;
     font-weight: 500;
     position: relative;
+    font-size: 1rem;
   }
   
   nav ul li a::after {
@@ -174,9 +187,10 @@ body {
     height: 200px;
     border-radius: 50%;
     object-fit: cover;
-    border: 4px solid #2ecc71;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    border: 4px solid #1a4731;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
     transition: transform 0.3s ease;
+    margin: 1rem 2rem 1rem 1rem;
   }
   
   .about-image:hover {
@@ -196,9 +210,9 @@ body {
   
   .about-content h2 {
     font-size: 1.5rem;
-    color: #2ecc71;
+    color: #1a4731;
     margin-bottom: 1.5rem;
-    font-weight: 500;
+    font-weight: 600;
   }
   
   .about-content h3 {
@@ -387,29 +401,51 @@ body {
 }
 
 .animation-container {
-  display: grid;
-  gap: 2rem;
-  place-items: center;
-  padding: 2rem;
-}
-
-/* Adjusting Layer Spacing */
-.layer {
+  position: relative;
+  z-index: 2;
+  background: rgba(9, 41, 23, 0.7);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 3rem;
+  margin: 2rem auto;
+  max-width: 1400px;
+  min-height: 800px;
   display: flex;
-  flex-direction: column; /* Vertical alignment of nodes */
-  align-items: center; /* Center nodes horizontally */
-  justify-content: space-evenly; /* Evenly space nodes vertically */
-  flex: 1;
-  min-height: 100px; /* Ensure there is enough space vertically for each layer */
-  margin: 0 10px; /* Horizontal margin */
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-.layer .circle {
-  margin: 10px 0;
-  width: 90px;
-  height: 90px;
-  border-radius: 50%; /* Ensure the circles are rendered as circles */
-  flex-shrink: 0; /* Prevent circles from shrinking or distorting */
+/* Layer Styles */
+.layer {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  padding: 1rem;
+  min-height: 120px;
+}
+
+.input-layer {
+  display: flex;
+  justify-content: space-evenly;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.fully-connected-layer {
+  position: relative;
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.layer-label {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #2ecc71;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin-bottom: 1rem;
+  text-align: center;
 }
 
 /* Circle Styles */
@@ -420,6 +456,7 @@ body {
   border-radius: 50%;
   width: 120px;
   height: 120px;
+  min-width: 120px; /* Added to prevent shrinking */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -429,18 +466,77 @@ body {
   color: white;
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+  position: relative;
 }
 
-.circle.active {
-  background: rgba(46, 204, 113, 0.2);
-  border-color: #2ecc71;
-  box-shadow: 0 0 30px rgba(46, 204, 113, 0.3);
-  transform: scale(1.1);
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .animation-container {
+    padding: 2rem;
+    min-height: 700px;
+  }
+
+  .circle {
+    width: 100px;
+    height: 100px;
+    min-width: 100px;
+    font-size: 0.8rem;
+  }
+
+  .layer {
+    gap: 1.5rem;
+    min-height: 100px;
+  }
 }
 
-.circle:hover {
-  background: rgba(46, 204, 113, 0.15);
-  transform: scale(1.05);
+@media (max-width: 768px) {
+  .animation-container {
+    padding: 1rem;
+    min-height: 600px;
+  }
+
+  .circle {
+    width: 80px;
+    height: 80px;
+    min-width: 80px;
+    font-size: 0.7rem;
+    padding: 0.5rem;
+  }
+
+  .layer {
+    gap: 1rem;
+    min-height: 80px;
+  }
+
+  .input-layer {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* SVG connection lines */
+svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+svg line {
+  stroke: #2ecc71;
+  stroke-width: 1;
+  stroke-dasharray: 4;
+  animation: dash 20s linear infinite;
+  opacity: 0.4;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 1000;
+  }
 }
 
 /* Output Layer Styling */
@@ -465,15 +561,6 @@ body {
 
 .output-layer .circle.active {
   opacity: 1;
-}
-
-/* Layer Label Styling */
-.layer-label {
-  font-size: 1.2rem;
-  font-weight: 500;
-  color: #2ecc71;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  margin: 1rem 0;
 }
 
 /* Tooltip Styling */
@@ -524,178 +611,6 @@ footer {
   bottom: 0;
 }
 
-/* Optional: Responsive Adjustments */
-@media (max-width: 1200px) {
-  .animation-container {
-    flex-direction: column;
-    align-items: center;
-    height: auto;
-  }
-
-  .layer {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .layer .circle {
-    margin: 10px;
-  }
-}
-
-@media (max-width: 768px) {
-  .circle {
-    width: 60px;
-    height: 60px;
-    font-size: 12px;
-    max-width: 90px;
-  }
-
-  .output-layer .circle {
-    width: 100px;
-    height: 100px;
-    font-size: 14px;
-    max-width: 120px;
-  }
-
-  .layer-label {
-    font-size: 14px;
-  }
-
-  .tooltip {
-    font-size: 10px;
-  }
-}
-
-/* Particles Background */
-#particles-js {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  pointer-events: none;
-}
-
-/* Animation Container */
-.animation-container {
-  position: relative;
-  z-index: 2;
-  background: rgba(9, 41, 23, 0.7);
-  backdrop-filter: blur(10px);
-  border-radius: 1rem;
-  padding: 3rem;
-  margin: 2rem auto;
-  max-width: 1400px;
-}
-
-/* Tooltip Styles */
-.tooltip {
-  position: absolute;
-  background: rgba(9, 41, 23, 0.95);
-  color: white;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  font-size: 0.85rem;
-  max-width: 200px;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: all 0.3s ease;
-  pointer-events: none;
-  z-index: 100;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(46, 204, 113, 0.2);
-  text-align: center;
-  white-space: normal;
-  word-wrap: break-word;
-}
-
-.tooltip::after {
-  content: '';
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  margin-left: -5px;
-  border-width: 5px;
-  border-style: solid;
-  border-color: transparent transparent rgba(9, 41, 23, 0.95) transparent;
-}
-
-.circle {
-  position: relative;
-}
-
-.circle:hover .tooltip {
-  opacity: 1;
-  transform: translateY(20px);
-}
-
-/* Layer Connections */
-svg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1;
-}
-
-svg line {
-  stroke: #2ecc71;
-  stroke-width: 1;
-  stroke-dasharray: 4;
-  animation: dash 20s linear infinite;
-}
-
-@keyframes dash {
-  to {
-    stroke-dashoffset: 1000;
-  }
-}
-
-/* Responsive Adjustments */
-@media (max-width: 1200px) {
-  .animation-container {
-    padding: 2rem;
-  }
-
-  .circle {
-    width: 100px;
-    height: 100px;
-    font-size: 0.8rem;
-  }
-
-  .tooltip {
-    max-width: 150px;
-    font-size: 0.75rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .animation-container {
-    padding: 1rem;
-  }
-
-  .circle {
-    width: 80px;
-    height: 80px;
-    font-size: 0.7rem;
-  }
-
-  .tooltip {
-    max-width: 120px;
-    font-size: 0.7rem;
-    padding: 0.5rem 0.75rem;
-  }
-
-  .layer-label {
-    font-size: 1rem;
-  }
-}
-
 /* Responsive styles for about section */
 @media (max-width: 1024px) {
   #about {
@@ -731,4 +646,51 @@ svg line {
   .about-content p {
     font-size: 1rem;
   }
+}
+
+/* Video and Certificate Sections */
+#video, #certification {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  margin: 2rem 0;
+}
+
+#video iframe {
+  max-width: 100%;
+  width: 100%;
+  height: 315px;
+  border-radius: 0.5rem;
+}
+
+.gallery img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  #video iframe {
+    height: 240px;
+  }
+}
+
+/* The floating web background effect */
+#particles-js {
+  position: fixed; /* Changed from absolute to fixed */
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, #2ecc71 0%, #092917 100%);
+}
+
+/* Ensure content stays above particles */
+.container, nav {
+  position: relative;
+  z-index: 1;
 }
