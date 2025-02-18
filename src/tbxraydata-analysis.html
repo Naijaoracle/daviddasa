@@ -3,9 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About David Dasa</title>
-  <!-- CSS file -->
+  <meta name="description" content="Analysis of NIH Chest X-ray Dataset for Medical AI Applications">
+  <title>Chest X-ray Data Analysis - David Dasa</title>
+  <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
 
@@ -21,59 +25,211 @@
     </ul>
   </nav>
 
-<!-- Main Content -->
-<div class="container">
-    <!-- Introduction -->
-    <section id="introduction">
-      <h1>Welcome to this Chest X-ray Data Analysis</h1>
-      <p>I am excited to share with you a fascinating exploration into the NIH chest x-ray dataset, delve into the wealth of information hidden within medical images. This analysis aims to uncover patterns, understand patient demographics, and shed light on the presence of various medical conditions.</p>
-      <p>This analysis is available to view on Kaggle. You can check it out <a href="https://www.kaggle.com/code/naijaoracle/nih-chest-x-ray-dataset-analysis" target="_blank">here</a>.</p>
-    </section>
-  
-    <!-- What We Explored Section -->
-    <section id="explored">
-      <h2>What Was Explored</h2>
-      <ol>
-        <li><strong>Data Insights:</strong> Started by understanding the basics of the dataset, examining patient ages, and getting an overview of the medical conditions present in the x-rays.</li>
-        <li><strong>Demographic Patterns:</strong> Through visualizations, explored how age groups and gender correlate with the occurrence of medical conditions.</li>
-        <li><strong>Follow-up Analysis:</strong> Understanding the number of follow-ups required for different conditions provides valuable insights into patient care and healthcare planning.</li>
-        <li><strong>Multi-Condition Analysis:</strong> Investigated the co-occurrence of multiple conditions and their distribution across age groups.</li>
-      </ol>
-    </section>
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
 
-    <iframe
-      src="https://naijaoracle.github.io/jupyterwork/notebooks/index.html?path=chest-x-ray-dataset-analysis.ipynb&kernel=python&toolbar=1&theme=JupyterLab%20Dark"
-      width="100%"
-      height="800px"
-      title="Chest X-ray Dataset Analysis"
-    ></iframe>
-  
-    <!-- Next Steps Section -->
-    <section id="next-steps">
-      <h2>Next Steps - TB Prediction Project</h2>
-      <p>Ready for more excitement? I am working on a project to predict the presence of Tuberculosis (TB) in chest x-rays. Join me on this journey to leverage machine learning for early detection and improved patient outcomes.</p>
-      <!-- <p>Checkout the TB Prediction Project <a href="https://www.daviddasa.com/tuberculosis-chestxray">here</a>.</p> -->
-    </section>
-  
-    <!-- Conclusion Section -->
-    <section id="conclusion">
-      <h2>Conclusion</h2>
-      <p>In conclusion, this analysis not only uncovers insights into the chest x-ray dataset but also lays the groundwork for future projects, including the TB prediction initiative. My project to develop a model to accurately predict the presence of tuberculosis in chest x-rays.</p>
-      <p>Thank you for reading, and we look forward to your continued interest!</p>
-    </section>
-  
-    <!-- Get in Touch Section -->
-    <section id="get-in-touch">
-      <h2>Get in Touch</h2>
-      <p>I would like to hear your thoughts. You can <a href="https://www.linkedin.com/in/daviddasa">get in touch</a> via LinkedIn.</p>
-    </section>
-  </div>  
+  <!-- Main Content -->
+  <div class="container">
+    <main>
+      <!-- Introduction Section -->
+      <section id="about">
+        <div class="about-content">
+          <h1>NIH Chest X-ray Dataset Analysis</h1>
+          <h2>Exploring Medical Imaging Data for AI Applications</h2>
+          <p>A comprehensive analysis of the NIH chest X-ray dataset, uncovering patterns and insights that inform the development of AI-powered diagnostic tools.</p>
+        </div>
+      </section>
 
+      <!-- Dataset Overview -->
+      <section class="project-card">
+        <h2>Dataset Overview</h2>
+        <div class="analysis-grid">
+          <div class="analysis-item">
+            <h3>About the Dataset</h3>
+            <p>The NIH Chest X-ray dataset is one of the largest publicly available collections of chest radiographs, containing:</p>
+            <ul class="stats-list">
+              <li>Over 100,000 chest X-ray images</li>
+              <li>14 different pathological conditions</li>
+              <li>Multiple findings per image</li>
+              <li>Detailed patient demographics</li>
+            </ul>
+          </div>
+          <div class="analysis-item">
+            <h3>Research Objectives</h3>
+            <ul class="skills-list">
+              <li>Analyze condition distribution</li>
+              <li>Identify demographic patterns</li>
+              <li>Study multi-condition correlations</li>
+              <li>Assess dataset quality for AI training</li>
+            </ul>
+          </div>
+        </div>
+      </section>
 
-  
+      <!-- Key Findings -->
+      <section class="project-card">
+        <h2>Key Findings</h2>
+        <div class="analysis-grid">
+          <div class="analysis-item">
+            <h3>Condition Distribution</h3>
+            <div id="conditionChart" class="chart-container"></div>
+            <p class="chart-description">Distribution of medical conditions in the dataset, showing relative frequencies and highlighting the most common pathologies.</p>
+          </div>
+          <div class="analysis-item">
+            <h3>Key Insights</h3>
+            <ul class="findings-list">
+              <li>No Finding is the most common label (53.8%)</li>
+              <li>Infiltration is the most frequent pathology (17.7%)</li>
+              <li>Significant class imbalance exists in the dataset</li>
+              <li>Multiple conditions frequently co-occur</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Methodology -->
+      <section class="project-card">
+        <h2>Analysis Methodology</h2>
+        <div class="analysis-grid">
+          <div class="analysis-item">
+            <h3>Data Processing Steps</h3>
+            <ul class="process-list">
+              <li>Data cleaning and validation</li>
+              <li>Statistical analysis of distributions</li>
+              <li>Demographic correlation studies</li>
+              <li>Multi-condition pattern analysis</li>
+            </ul>
+          </div>
+          <div class="analysis-item">
+            <h3>Tools & Technologies</h3>
+            <ul class="skills-list">
+              <li>Python Data Analysis</li>
+              <li>Pandas & NumPy</li>
+              <li>Matplotlib & Seaborn</li>
+              <li>Jupyter Notebooks</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Interactive Analysis -->
+      <section class="project-card">
+        <h2>Interactive Analysis</h2>
+        <div class="analysis-grid">
+          <div class="analysis-item full-width">
+            <h3>Explore the Analysis</h3>
+            <p>View the complete analysis and interact with the data:</p>
+            <div class="project-links">
+              <a href="https://www.kaggle.com/code/daviddasa/nih-chest-x-ray-analysis" class="project-link">View on Kaggle</a>
+              <a href="https://github.com/Naijaoracle/chest-xray-analysis" class="project-link">GitHub Repository</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Future Applications -->
+      <section class="project-card">
+        <h2>Future Applications</h2>
+        <div class="analysis-grid">
+          <div class="analysis-item">
+            <h3>Potential Impact</h3>
+            <ul class="impact-list">
+              <li>AI-powered diagnostic support</li>
+              <li>Automated screening systems</li>
+              <li>Clinical decision support tools</li>
+              <li>Medical education and training</li>
+            </ul>
+          </div>
+          <div class="analysis-item">
+            <h3>Next Steps</h3>
+            <ul class="skills-list">
+              <li>Model development for TB detection</li>
+              <li>Multi-condition classification</li>
+              <li>Integration with clinical workflows</li>
+              <li>Validation studies</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Call to Action -->
+      <section class="project-card">
+        <div class="cta-section">
+          <h2>Interested in Collaboration?</h2>
+          <p>If you're interested in medical imaging AI or would like to collaborate on similar projects, let's connect.</p>
+          <p>Connect with me on <a href="https://www.linkedin.com/in/daviddasa" class="linkedin-link">LinkedIn</a></p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Footer Section -->
   <footer>
     <p>&copy; 2025 David Dasa</p>
   </footer>
+
+  <!-- Particles.js Configuration -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Particles.js Configuration
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+
+      // Plotly Chart Configuration
+      const conditionData = {
+        values: [53.8, 17.7, 10.2, 5.8, 5.2, 4.8, 2.5],
+        labels: ['No Finding', 'Infiltration', 'Effusion', 'Atelectasis', 'Nodule', 'Mass', 'Other'],
+        type: 'pie',
+        hole: 0.4,
+        marker: {
+          colors: ['#2ecc71', '#27ae60', '#229954', '#1e8449', '#196f3d', '#145a32', '#0e3e24']
+        }
+      };
+
+      const layout = {
+        title: 'Distribution of Conditions',
+        height: 400,
+        margin: { t: 40, b: 0, l: 0, r: 0 },
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        font: { color: '#4a4a4a' }
+      };
+
+      Plotly.newPlot('conditionChart', [conditionData], layout);
+    });
+  </script>
 
 </body>
 </html>

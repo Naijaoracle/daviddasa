@@ -1053,3 +1053,112 @@ footer {
     text-align: center;
   }
 }
+
+/* Analysis Grid Styles */
+.analysis-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin: 1rem 0;
+}
+
+.analysis-item {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.analysis-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.analysis-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.analysis-item h3 {
+  color: #092917;
+  margin-bottom: 1rem;
+  font-size: 1.4rem;
+}
+
+.chart-container {
+  width: 100%;
+  min-height: 400px;
+  margin: 1rem 0;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.chart-description {
+  color: #4a4a4a;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  font-style: italic;
+}
+
+/* Analysis Lists */
+.stats-list,
+.findings-list,
+.process-list,
+.impact-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.stats-list li,
+.findings-list li,
+.process-list li,
+.impact-list li {
+  background: rgba(46, 204, 113, 0.1);
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  color: #092917;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.stats-list li::before,
+.findings-list li::before,
+.process-list li::before,
+.impact-list li::before {
+  content: '▹';
+  color: #2ecc71;
+  margin-right: 0.5rem;
+}
+
+.stats-list li:hover,
+.findings-list li:hover,
+.process-list li:hover,
+.impact-list li:hover {
+  background: rgba(46, 204, 113, 0.2);
+  transform: translateX(5px);
+}
+
+/* Responsive adjustments for analysis components */
+@media (max-width: 768px) {
+  .analysis-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .analysis-item {
+    padding: 1rem;
+  }
+
+  .analysis-item h3 {
+    font-size: 1.2rem;
+  }
+
+  .chart-container {
+    min-height: 300px;
+  }
+}
