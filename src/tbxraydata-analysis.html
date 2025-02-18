@@ -66,6 +66,19 @@
         </div>
       </section>
 
+      <!-- Jupyter Notebook Display -->
+      <section class="project-card">
+        <h2>Detailed Analysis</h2>
+        <div class="notebook-container">
+          <iframe
+            src="https://naijaoracle.github.io/jupyterwork/notebooks/index.html?path=tuberculosis.ipynb&kernel=python&toolbar=1&theme=JupyterLab%20Dark"
+            width="100%"
+            height="800px"
+            frameborder="0"
+          ></iframe>
+        </div>
+      </section>
+
       <!-- Key Findings -->
       <section class="project-card">
         <h2>Key Findings</h2>
@@ -87,42 +100,29 @@
         </div>
       </section>
 
-      <!-- Methodology -->
+      <!-- Additional Models -->
       <section class="project-card">
-        <h2>Analysis Methodology</h2>
-        <div class="analysis-grid">
-          <div class="analysis-item">
-            <h3>Data Processing Steps</h3>
-            <ul class="process-list">
-              <li>Data cleaning and validation</li>
-              <li>Statistical analysis of distributions</li>
-              <li>Demographic correlation studies</li>
-              <li>Multi-condition pattern analysis</li>
-            </ul>
+        <h2>Model Implementations</h2>
+        <div class="model-links">
+          <div class="model-item">
+            <h3>PyTorch Implementation</h3>
+            <p>Initial model using PyTorch achieving 81.48% accuracy</p>
+            <a href="https://www.daviddasa.com/tuberculosis-chestxray" class="project-link">View Analysis</a>
           </div>
-          <div class="analysis-item">
-            <h3>Tools & Technologies</h3>
-            <ul class="skills-list">
-              <li>Python Data Analysis</li>
-              <li>Pandas & NumPy</li>
-              <li>Matplotlib & Seaborn</li>
-              <li>Jupyter Notebooks</li>
-            </ul>
+          <div class="model-item">
+            <h3>Keras Implementation</h3>
+            <p>Alternative approach using Keras deep learning library</p>
+            <a href="https://www.daviddasa.com/kerastb" class="project-link">View Analysis</a>
           </div>
-        </div>
-      </section>
-
-      <!-- Interactive Analysis -->
-      <section class="project-card">
-        <h2>Interactive Analysis</h2>
-        <div class="analysis-grid">
-          <div class="analysis-item full-width">
-            <h3>Explore the Analysis</h3>
-            <p>View the complete analysis and interact with the data:</p>
-            <div class="project-links">
-              <a href="https://www.kaggle.com/code/daviddasa/nih-chest-x-ray-analysis" class="project-link">View on Kaggle</a>
-              <a href="https://github.com/Naijaoracle/chest-xray-analysis" class="project-link">GitHub Repository</a>
-            </div>
+          <div class="model-item">
+            <h3>TensorFlow Implementation</h3>
+            <p>Implementation using TensorFlow framework</p>
+            <a href="https://www.daviddasa.com/tensorflowtb" class="project-link">View Analysis</a>
+          </div>
+          <div class="model-item">
+            <h3>MobileNet Implementation</h3>
+            <p>Transfer learning approach using MobileNet architecture</p>
+            <a href="https://www.daviddasa.com/mobilenet-tb" class="project-link">View Analysis</a>
           </div>
         </div>
       </section>
@@ -168,7 +168,7 @@
     <p>&copy; 2025 David Dasa</p>
   </footer>
 
-  <!-- Particles.js Configuration -->
+  <!-- Scripts -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       // Particles.js Configuration
@@ -230,6 +230,60 @@
       Plotly.newPlot('conditionChart', [conditionData], layout);
     });
   </script>
+
+  <style>
+    /* Additional Styles */
+    .notebook-container {
+      background: white;
+      border-radius: 1rem;
+      padding: 1rem;
+      margin: 2rem 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .model-links {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .model-item {
+      background: rgba(255, 255, 255, 0.8);
+      padding: 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .model-item:hover {
+      transform: translateY(-5px);
+    }
+
+    .model-item h3 {
+      color: #092917;
+      margin-bottom: 1rem;
+    }
+
+    .model-item p {
+      margin-bottom: 1rem;
+      color: #4a4a4a;
+    }
+
+    @media (max-width: 768px) {
+      .notebook-container {
+        padding: 0.5rem;
+      }
+
+      .model-links {
+        gap: 1rem;
+      }
+
+      .model-item {
+        padding: 1rem;
+      }
+    }
+  </style>
 
 </body>
 </html>
