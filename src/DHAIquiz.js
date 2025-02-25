@@ -1,374 +1,474 @@
 // Array of all questions
 const allQuestions = [
     {
-        question: "What is Digital Health?",
+        question: "What is the most comprehensive definition of Digital Health?",
         options: [
-            "The use of digital technologies to improve health",
-            "The use of digital technologies to monitor health",
-            "The use of digital technologies to replace health"
+            "The use of digital technologies to improve health outcomes and healthcare delivery",
+            "The exclusive use of wearable devices to track health metrics",
+            "The replacement of traditional healthcare with online services"
         ],
-        correctAnswer: "The use of digital technologies to improve health"
+        correctAnswer: "The use of digital technologies to improve health outcomes and healthcare delivery"
     },
     {
-        question: "What is Artificial Intelligence (AI)?",
+        question: "Which statement best describes Artificial Intelligence (AI) in healthcare?",
         options: [
-            "The simulation of human intelligence in machines",
-            "The replacement of human intelligence with machines",
-            "The removal of human intelligence from machines"
+            "Technology that simulates human intelligence to assist with medical decisions and processes",
+            "Technology that exclusively replaces human clinicians with automated systems",
+            "A theoretical concept that has not yet been implemented in healthcare settings"
         ],
-        correctAnswer: "The simulation of human intelligence in machines"
+        correctAnswer: "Technology that simulates human intelligence to assist with medical decisions and processes"
     },
     {
-        question: "How can AI be used in healthcare?",
+        question: "What distinguishes machine learning from traditional computer programming in healthcare applications?",
         options: [
-            "To assist doctors in diagnosing diseases",
-            "To replace doctors",
-            "To make diseases"
+            "Machine learning systems can improve performance through experience without explicit reprogramming",
+            "Machine learning requires less computational power than traditional programming",
+            "Machine learning always provides more accurate results than traditional programming"
         ],
-        correctAnswer: "To assist doctors in diagnosing diseases"
+        correctAnswer: "Machine learning systems can improve performance through experience without explicit reprogramming"
     },
     {
-        question: "What is the role of blockchain technology in healthcare?",
+        question: "How does blockchain technology primarily benefit healthcare data management?",
         options: [
-            "To secure and decentralize patient data",
-            "To replace traditional health records",
-            "To block access to patient data"
+            "By creating immutable, transparent records while allowing selective and secure sharing of sensitive information",
+            "By completely replacing traditional electronic health record systems",
+            "By eliminating the need for data security measures in healthcare institutions"
         ],
-        correctAnswer: "To secure and decentralize patient data"
+        correctAnswer: "By creating immutable, transparent records while allowing selective and secure sharing of sensitive information"
     },
     {
-        question: "What is telemedicine?",
+        question: "What is the most accurate definition of telemedicine?",
         options: [
-            "The delivery of healthcare services through technology",
-            "The delivery of healthcare services in person",
-            "The delivery of healthcare services through mail"
+            "The remote delivery of clinical healthcare services using telecommunications technology",
+            "Any digital health service delivered outside a hospital setting",
+            "The use of social media platforms to discuss health concerns with physicians"
         ],
-        correctAnswer: "The delivery of healthcare services through technology"
+        correctAnswer: "The remote delivery of clinical healthcare services using telecommunications technology"
     },
     {
-        question: "What is a wearable device in digital health?",
+        question: "Which feature best characterizes wearable devices in digital health?",
         options: [
-            "A device that is worn on the body to track health data",
-            "A device that is worn on the body to change health data",
-            "A device that is worn on the body to hide health data"
+            "They continuously or periodically collect physiological data to monitor health status or activity",
+            "They are exclusively used in hospital settings for critical care monitoring",
+            "They primarily function to administer medications automatically"
         ],
-        correctAnswer: "A device that is worn on the body to track health data"
-    },
-
-    {
-        question: "What is machine learning in the context of AI?",
-        options: [
-            "The ability of a machine to learn from data",
-            "The ability of a machine to learn from humans",
-            "The ability of a machine to learn from machines"
-        ],
-        correctAnswer: "The ability of a machine to learn from data"
-    },
-
-    {
-        question: "What is the potential of AI in predicting disease outcomes?",
-        options: [
-            "AI can assist in predicting disease outcomes based on data",
-            "AI can predict disease outcomes with 100% accuracy",
-            "AI cannot predict disease outcomes"
-        ],
-        correctAnswer: "AI can assist in predicting disease outcomes based on data"
-    },
-
-    {
-        question: "What is the role of AI in medical imaging?",
-        options: [
-            "To assist in interpreting medical images",
-            "To replace radiologists",
-            "To create medical images"
-        ],
-        correctAnswer: "To assist in interpreting medical images"
-    },
-
-    {
-        question: "What is the role of digital health in managing chronic diseases?",
-        options: [
-            "To assist in monitoring and managing chronic diseases",
-            "To cure chronic diseases",
-            "To create chronic diseases"
-        ],
-        correctAnswer: "To assist in monitoring and managing chronic diseases"
+        correctAnswer: "They continuously or periodically collect physiological data to monitor health status or activity"
     },
     {
-        question: "What is the role of AI in drug discovery?",
+        question: "How does deep learning differ from basic machine learning in healthcare applications?",
         options: [
-            "To replace pharmacists",
-            "To assist in discovering new drugs",
-            "To stop the discovery of new drugs"
+            "Deep learning uses neural networks with multiple layers that can identify complex patterns in large datasets",
+            "Deep learning requires less data than basic machine learning to achieve accurate results",
+            "Deep learning is identical to basic machine learning but with a different marketing name"
         ],
-        correctAnswer: "To assist in discovering new drugs"
+        correctAnswer: "Deep learning uses neural networks with multiple layers that can identify complex patterns in large datasets"
     },
     {
-        question: "What is precision medicine?",
+        question: "What is the primary limitation of AI in predicting disease outcomes?",
         options: [
-            "A one-size-fits-all approach to medicine",
-            "A personalized approach to medicine based on individual characteristics",
-            "A randomized approach to medicine"
+            "AI predictions are limited by the quality, diversity, and representativeness of training data",
+            "AI cannot be used for predicting disease outcomes under any circumstances",
+            "AI can predict disease outcomes with 100% accuracy if programmed correctly"
         ],
-        correctAnswer: "A personalized approach to medicine based on individual characteristics"
+        correctAnswer: "AI predictions are limited by the quality, diversity, and representativeness of training data"
     },
     {
-        question: "What is the role of AI in precision medicine?",
+        question: "In medical imaging, how does AI most effectively complement radiologists' work?",
         options: [
-            "To replace doctors in precision medicine",
-            "To generalize medical treatments in precision medicine",
-            "To assist in personalizing medical treatments based on individual characteristics"
+            "By pre-screening images to flag potential abnormalities and providing quantitative analysis to support interpretation",
+            "By completely automating the diagnostic process without human verification",
+            "By generating medical images synthetically rather than requiring actual patient scans"
         ],
-        correctAnswer: "To assist in personalizing medical treatments based on individual characteristics"
+        correctAnswer: "By pre-screening images to flag potential abnormalities and providing quantitative analysis to support interpretation"
     },
     {
-        question: "What is the role of digital health in mental health?",
+        question: "Which approach best describes the role of digital health in chronic disease management?",
         options: [
-            "To replace therapists",
-            "To assist in providing mental health services remotely",
-            "To create mental health issues"
+            "Enabling continuous monitoring, personalized interventions, and improved adherence to treatment plans",
+            "Completely replacing in-person care with automated digital solutions",
+            "Restricting patients' access to their own health data to prevent anxiety"
         ],
-        correctAnswer: "To assist in providing mental health services remotely"
+        correctAnswer: "Enabling continuous monitoring, personalized interventions, and improved adherence to treatment plans"
     },
     {
-        question: "What is the role of AI in surgery?",
+        question: "How does AI primarily contribute to drug discovery?",
         options: [
-            "To assist surgeons in performing surgeries",
-            "To replace surgeons",
-            "To stop surgeries"
+            "By analyzing molecular structures and predicting potential drug candidates more efficiently than traditional methods",
+            "By synthesizing new chemical compounds without laboratory validation",
+            "By replacing pharmacological research entirely with computational models"
         ],
-        correctAnswer: "To assist surgeons in performing surgeries"
+        correctAnswer: "By analyzing molecular structures and predicting potential drug candidates more efficiently than traditional methods"
     },
     {
-        question: "What is a health information exchange (HIE)?",
+        question: "What is the core principle of precision medicine?",
         options: [
-            "The exchange of health information through phone calls",
-            "The exchange of health information through mail",
-            "The exchange of health information through digital platforms"
+            "Tailoring medical treatments to individual characteristics including genetics, environment, and lifestyle",
+            "Using the most expensive treatments available regardless of patient characteristics",
+            "Applying standardized protocols to all patients with similar diagnoses"
         ],
-        correctAnswer: "The exchange of health information through digital platforms"
+        correctAnswer: "Tailoring medical treatments to individual characteristics including genetics, environment, and lifestyle"
     },
     {
-        question: "What is the role of AI in health information exchanges?",
+        question: "How does AI specifically enable precision medicine?",
         options: [
-            "To stop health information exchanges",
-            "To replace health information exchanges",
-            "To assist in analyzing and interpreting health data"
+            "By analyzing complex multivariate data to identify patterns that can inform personalized treatment decisions",
+            "By removing the need for physicians to interpret genetic information",
+            "By standardizing treatments across all patients with similar conditions"
         ],
-        correctAnswer: "To assist in analyzing and interpreting health data"
+        correctAnswer: "By analyzing complex multivariate data to identify patterns that can inform personalized treatment decisions"
     },
     {
-        question: "What is the role of digital health in public health?",
+        question: "What is the most significant contribution of digital health to mental healthcare?",
         options: [
-            "To create public health issues",
-            "To replace public health officials",
-            "To assist in monitoring and managing public health issues"
+            "Improving accessibility through teletherapy and digital interventions while monitoring symptoms remotely",
+            "Replacing human therapists with fully automated AI counselors",
+            "Eliminating the stigma associated with mental health conditions"
         ],
-        correctAnswer: "To assist in monitoring and managing public health issues"
+        correctAnswer: "Improving accessibility through teletherapy and digital interventions while monitoring symptoms remotely"
     },
     {
-        question: "What is the role of AI in genomics?",
+        question: "How are surgical robots most commonly integrated into modern healthcare?",
         options: [
-            "To assist in analyzing and interpreting genomic data",
-            "To stop genomics research",
-            "To replace geneticists"
+            "As surgeon-controlled instruments that enhance precision, stability, and visualization during procedures",
+            "As autonomous systems that perform surgeries without human supervision",
+            "As training simulators that have no role in actual surgical procedures"
         ],
-        correctAnswer: "To assist in analyzing and interpreting genomic data"
+        correctAnswer: "As surgeon-controlled instruments that enhance precision, stability, and visualization during procedures"
     },
     {
-        question: "What is the role of digital health in patient engagement?",
+        question: "What is the primary purpose of Health Information Exchange (HIE) systems?",
         options: [
-            "To stop patient engagement",
-            "To replace patient engagement",
-            "To enhance patient engagement through technology"
+            "To enable secure, efficient sharing of clinical information across different healthcare organizations and IT systems",
+            "To centralize all healthcare data under government control",
+            "To replace traditional medical record systems with blockchain technology"
         ],
-        correctAnswer: "To enhance patient engagement through technology"
+        correctAnswer: "To enable secure, efficient sharing of clinical information across different healthcare organizations and IT systems"
     },
     {
-        question: "What is the role of AI in healthcare administration?",
+        question: "How does AI contribute to health information exchange systems?",
         options: [
-            "To stop healthcare administration",
-            "To replace healthcare administrators",
-            "To assist in managing healthcare operations"
+            "By identifying patterns across distributed datasets and facilitating interoperability between different data standards",
+            "By eliminating the need for data governance frameworks in healthcare",
+            "By restricting access to patient information to prevent privacy breaches"
         ],
-        correctAnswer: "To assist in managing healthcare operations"
+        correctAnswer: "By identifying patterns across distributed datasets and facilitating interoperability between different data standards"
     },
     {
-        question: "What is the role of digital health in health education?",
+        question: "How does digital health contribute to public health surveillance?",
         options: [
-            "To stop health education",
-            "To enhance health education through technology",
-            "To replace health education"            
+            "By enabling real-time data collection, early outbreak detection, and more efficient resource allocation",
+            "By tracking individual citizens without consent for public safety",
+            "By replacing traditional epidemiological methods entirely"
         ],
-        correctAnswer: "To enhance health education through technology"
-    },
-
-    {
-        question: "What is the role of AI in health research?",
-        options: [
-            "To stop health research",
-            "To replace health researchers",
-            "To assist in analyzing and interpreting health research data"
-        ],
-        correctAnswer: "To assist in analyzing and interpreting health research data"
-    },
-        
-    {
-        question: "What is the role of digital health in health promotion?",
-        options: [
-            "To enhance health promotion through technology",
-            "To stop health promotion",
-            "To replace health promotion"
-        ],
-        correctAnswer: "To enhance health promotion through technology"
-    },
-
-    {
-        question: "What is the role of AI in health policy?",
-        options: [
-            "To assist in analyzing and interpreting health policy data",
-            "To stop health policy",
-            "To replace health policy makers"
-        ],
-        correctAnswer: "To assist in analyzing and interpreting health policy data"
-    },
-
-    {
-        question: "What are the potential privacy concerns related to AI in healthcare?",
-        options: [
-            "There are no privacy concerns with AI in healthcare",
-            "AI may access and misuse sensitive patient data",
-            "Privacy concerns only apply to non-AI healthcare technologies"
-        ],
-        correctAnswer: "AI may access and misuse sensitive patient data"
+        correctAnswer: "By enabling real-time data collection, early outbreak detection, and more efficient resource allocation"
     },
     {
-        question: "In what ways can AI improve medication adherence for patients?",
+        question: "What is the primary application of AI in genomics?",
         options: [
-            "By removing the need for medication adherence",
-            "By increasing the complexity of medication regimens",
-            "By providing reminders and personalized interventions"    
+            "Analyzing and interpreting complex genomic data to identify disease markers and potential therapeutic targets",
+            "Creating artificial genetic sequences to replace human DNA",
+            "Determining which genetic data should be hidden from patients"
         ],
-        correctAnswer: "By providing reminders and personalized interventions"
-    },
-    {    
-        question: "How can AI-driven chatbots enhance the patient experience?",
-        options: [
-            "By replacing human interactions with chatbots",
-            "By providing instant and personalized responses to patient queries",
-            "By limiting communication channels to traditional methods"
-        ],
-        correctAnswer: "By providing instant and personalized responses to patient queries"
-    },
-    {    
-        question: "What role can AI play in predicting and preventing disease outbreaks?",
-        options: [
-            "AI has no role in predicting or preventing disease outbreaks",
-            "By intentionally spreading diseases for research purposes",
-            "By analyzing data patterns to anticipate and mitigate potential outbreaks"
-        ],
-        correctAnswer: "By analyzing data patterns to anticipate and mitigate potential outbreaks"
+        correctAnswer: "Analyzing and interpreting complex genomic data to identify disease markers and potential therapeutic targets"
     },
     {
-        question: "How does remote patient monitoring contribute to digital health?",
+        question: "How do patient portals enhance patient engagement in digital health?",
         options: [
-            "By enabling real-time monitoring of patients outside traditional healthcare settings",
-            "By replacing in-person consultations",
-            "By restricting patient monitoring to specific locations"
+            "By providing secure access to personal health information, test results, and communication with providers",
+            "By restricting information to prevent patients from becoming anxious about their health",
+            "By automating all patient-provider interactions to eliminate human communication"
         ],
-        correctAnswer: "By enabling real-time monitoring of patients outside traditional healthcare settings"
+        correctAnswer: "By providing secure access to personal health information, test results, and communication with providers"
     },
     {
-        question: "What are the potential privacy concerns related to AI in healthcare?",
+        question: "What is the primary benefit of AI in healthcare administration?",
         options: [
-            "There are no privacy concerns with AI in healthcare",
-            "AI may access and misuse sensitive patient data",
-            "Privacy concerns only apply to non-AI healthcare technologies"
+            "Automating routine tasks, optimizing resource allocation, and improving operational efficiency",
+            "Eliminating the need for human administrators entirely",
+            "Decreasing the importance of patient satisfaction metrics"
         ],
-        correctAnswer: "AI may access and misuse sensitive patient data"
+        correctAnswer: "Automating routine tasks, optimizing resource allocation, and improving operational efficiency"
     },
     {
-        question: "In what ways can AI improve medication adherence for patients?",
+        question: "How does digital health technology primarily enhance health education?",
         options: [
-            "By providing reminders and personalized interventions",
-            "By removing the need for medication adherence",
-            "By increasing the complexity of medication regimens"
+            "By providing interactive, personalized learning experiences and improved access to reliable information",
+            "By replacing traditional medical education with virtual reality simulations",
+            "By eliminating the need for evidence-based health information"
         ],
-        correctAnswer: "By providing reminders and personalized interventions"
+        correctAnswer: "By providing interactive, personalized learning experiences and improved access to reliable information"
     },
     {
-        question: "How can AI-driven chatbots enhance the patient experience?",
+        question: "What is the primary contribution of AI to health research?",
         options: [
-            "By replacing human interactions with chatbots",
-            "By limiting communication channels to traditional methods",
-            "By providing instant and personalized responses to patient queries"
+            "Accelerating data analysis, identifying novel patterns, and generating hypotheses from complex datasets",
+            "Eliminating the need for human researchers in designing studies",
+            "Fabricating research data to support predetermined conclusions"
         ],
-        correctAnswer: "By providing instant and personalized responses to patient queries"
+        correctAnswer: "Accelerating data analysis, identifying novel patterns, and generating hypotheses from complex datasets"
     },
     {
-        question: "What role can AI play in predicting and preventing disease outbreaks?",
+        question: "How does digital health technology promote preventive healthcare?",
         options: [
-            "AI has no role in predicting or preventing disease outbreaks",
-            "By analyzing data patterns to anticipate and mitigate potential outbreaks",
-            "By intentionally spreading diseases for research purposes"
+            "By enabling personalized risk assessments, habit tracking, and timely interventions before disease progression",
+            "By restricting unhealthy behaviors through digital surveillance",
+            "By making preventive services more expensive and exclusive"
         ],
-        correctAnswer: "By analyzing data patterns to anticipate and mitigate potential outbreaks"
+        correctAnswer: "By enabling personalized risk assessments, habit tracking, and timely interventions before disease progression"
     },
     {
-        question: "What is the role of Big Data in healthcare?",
+        question: "How can AI best inform health policy decisions?",
         options: [
-            "Big Data has no role in healthcare",
-            "Big Data helps in storing patient records",
-            "Big Data helps in predictive analysis, decision making, and improving patient care"
+            "By analyzing population-level data to predict outcomes of different policy approaches and identify disparities",
+            "By replacing human judgment in all policy decisions with algorithmic determination",
+            "By prioritizing cost-cutting measures over health outcomes"
         ],
-        correctAnswer: "Big Data helps in predictive analysis, decision making, and improving patient care"
+        correctAnswer: "By analyzing population-level data to predict outcomes of different policy approaches and identify disparities"
     },
     {
-        question: "What is the Internet of Medical Things (IoMT)?",
+        question: "What is the most significant privacy concern related to AI in healthcare?",
         options: [
-            "A network of medical devices connected to the internet",
-            "A network of medical professionals",
-            "A network of medical institutions"
+            "The potential for unauthorized access, re-identification of anonymized data, and algorithmic bias",
+            "Patient data privacy is not a significant concern when using AI",
+            "The possibility that AI might become sentient and intentionally leak patient information"
         ],
-        correctAnswer: "A network of medical devices connected to the internet"
+        correctAnswer: "The potential for unauthorized access, re-identification of anonymized data, and algorithmic bias"
     },
     {
-        question: "How does telehealth differ from telemedicine?",
+        question: "How can digital health technologies most effectively improve medication adherence?",
         options: [
-            "Telehealth involves a broader scope of remote healthcare services than telemedicine",
-            "Telemedicine involves a broader scope of remote healthcare services than telehealth",
-            "There is no difference between telehealth and telemedicine"
+            "Through smart pill dispensers, personalized reminders, and real-time monitoring with feedback loops",
+            "By restricting medication access until patients demonstrate compliance",
+            "By removing patient autonomy from medication decisions"
         ],
-        correctAnswer: "Telehealth involves a broader scope of remote healthcare services than telemedicine"
+        correctAnswer: "Through smart pill dispensers, personalized reminders, and real-time monitoring with feedback loops"
     },
     {
-        question: "What is the primary benefit of Electronic Health Records (EHRs)?",
+        question: "What is the most effective implementation of AI-driven healthcare chatbots?",
         options: [
-        "EHRs primarily benefit the insurance companies",
-        "EHRs are primarily used for billing purposes",
-        "EHRs enable better and faster decision making by providing accurate patient information"
-],
-        correctAnswer: "EHRs enable better and faster decision making by providing accurate patient information"
+            "As supplementary tools that provide information, triage, and support while clearly indicating their limitations",
+            "As complete replacements for human clinicians in all patient interactions",
+            "As systems that diagnose conditions without physician oversight"
+        ],
+        correctAnswer: "As supplementary tools that provide information, triage, and support while clearly indicating their limitations"
     },
     {
-        question: "How can blockchain technology benefit healthcare?",
+        question: "How does AI contribute to epidemic surveillance and management?",
         options: [
-                "Blockchain can ensure secure and tamper-proof storage of patient data",
-                "Blockchain can replace the need for doctors",
-                "Blockchain can automate patient diagnosis"
+            "By analyzing diverse data sources to detect anomalies, predict spread patterns, and optimize resource allocation",
+            "By implementing surveillance measures that override individual privacy rights",
+            "By making autonomous decisions about quarantine and isolation without human oversight"
         ],
-        correctAnswer: "Blockchain can ensure secure and tamper-proof storage of patient data"
-},
+        correctAnswer: "By analyzing diverse data sources to detect anomalies, predict spread patterns, and optimize resource allocation"
+    },
     {
-        question: "What is the role of robotics in healthcare?",
+        question: "What is the primary advantage of remote patient monitoring in healthcare delivery?",
         options: [
-                "Robotics has no role in healthcare",
-                "Robotics is used to replace doctors",
-                "Robotics assists in surgery, rehabilitation, and patient care"
+            "Enabling earlier interventions by continuously tracking health parameters outside clinical settings",
+            "Reducing the need for any in-person healthcare visits",
+            "Collecting data without patient awareness or consent"
         ],
-        correctAnswer: "Robotics assists in surgery, rehabilitation, and patient care"
-    },    
-    ];
+        correctAnswer: "Enabling earlier interventions by continuously tracking health parameters outside clinical settings"
+    },
+    {
+        question: "What constitutes big data in healthcare?",
+        options: [
+            "Extremely large, diverse datasets from multiple sources that require advanced analytics for meaningful interpretation",
+            "Any electronic health record system regardless of size or complexity",
+            "Government-mandated centralized databases of patient information"
+        ],
+        correctAnswer: "Extremely large, diverse datasets from multiple sources that require advanced analytics for meaningful interpretation"
+    },
+    {
+        question: "What defines the Internet of Medical Things (IoMT)?",
+        options: [
+            "An interconnected system of medical devices, software applications, and health systems that collect and exchange data",
+            "A theoretical concept with no current practical applications in healthcare",
+            "The use of internet searches to self-diagnose medical conditions"
+        ],
+        correctAnswer: "An interconnected system of medical devices, software applications, and health systems that collect and exchange data"
+    },
+    {
+        question: "What is the key distinction between telehealth and telemedicine?",
+        options: [
+            "Telehealth encompasses a broader range of remote services including education and administration, while telemedicine focuses specifically on clinical services",
+            "Telehealth is exclusively used for mental health services, while telemedicine is for physical health",
+            "Telehealth is only available in hospitals, while telemedicine is for home use"
+        ],
+        correctAnswer: "Telehealth encompasses a broader range of remote services including education and administration, while telemedicine focuses specifically on clinical services"
+    },
+    {
+        question: "What is the most significant advantage of Electronic Health Records (EHRs)?",
+        options: [
+            "Providing comprehensive, accessible patient information at the point of care while enabling data analysis and coordination across providers",
+            "Eliminating the need for patient-provider communication about medical history",
+            "Creating revenue through increased billing efficiency regardless of patient outcomes"
+        ],
+        correctAnswer: "Providing comprehensive, accessible patient information at the point of care while enabling data analysis and coordination across providers"
+    },
+    {
+        question: "How does natural language processing (NLP) contribute to healthcare?",
+        options: [
+            "By extracting meaningful information from unstructured clinical notes and enabling voice-based documentation",
+            "By eliminating the need for clinicians to document patient encounters",
+            "By translating medical terminology into simpler language regardless of accuracy"
+        ],
+        correctAnswer: "By extracting meaningful information from unstructured clinical notes and enabling voice-based documentation"
+    },
+    {
+        question: "What is the primary purpose of clinical decision support systems (CDSS)?",
+        options: [
+            "To provide clinicians with knowledge and patient-specific information to enhance decision-making at appropriate times",
+            "To replace clinical judgment entirely with automated decisions",
+            "To justify billing for more expensive procedures regardless of medical necessity"
+        ],
+        correctAnswer: "To provide clinicians with knowledge and patient-specific information to enhance decision-making at appropriate times"
+    },
+    {
+        question: "How does computer vision technology primarily benefit healthcare?",
+        options: [
+            "By analyzing medical images, monitoring patient activities, and enabling touchless interfaces in sterile environments",
+            "By replacing human vision entirely in all medical contexts",
+            "By surveilling patients without their knowledge or consent"
+        ],
+        correctAnswer: "By analyzing medical images, monitoring patient activities, and enabling touchless interfaces in sterile environments"
+    },
+    {
+        question: "What is the most accurate description of a digital therapeutic (DTx)?",
+        options: [
+            "Evidence-based software interventions that prevent, manage, or treat medical disorders or diseases",
+            "Any health-related mobile application regardless of clinical validation",
+            "Virtual reality games designed purely for entertainment in healthcare settings"
+        ],
+        correctAnswer: "Evidence-based software interventions that prevent, manage, or treat medical disorders or diseases"
+    },
+    {
+        question: "How do social determinants of health (SDOH) data enhance digital health initiatives?",
+        options: [
+            "By providing context about non-clinical factors that significantly influence health outcomes and treatment effectiveness",
+            "By enabling discrimination against patients from disadvantaged backgrounds",
+            "By eliminating the need for clinical data in healthcare decision-making"
+        ],
+        correctAnswer: "By providing context about non-clinical factors that significantly influence health outcomes and treatment effectiveness"
+    },
+    {
+        question: "What is the primary purpose of predictive analytics in healthcare?",
+        options: [
+            "To identify patients at risk for deterioration or readmission and enable proactive interventions",
+            "To predict which patients will be most profitable for healthcare systems",
+            "To eliminate the need for preventive care by accurately predicting all possible outcomes"
+        ],
+        correctAnswer: "To identify patients at risk for deterioration or readmission and enable proactive interventions"
+    },
+    {
+        question: "How does augmented reality (AR) primarily benefit healthcare?",
+        options: [
+            "By overlaying digital information onto the physical world to enhance surgical navigation and medical training",
+            "By creating entirely virtual environments that replace real-world medical settings",
+            "By providing entertainment for patients regardless of clinical benefit"
+        ],
+        correctAnswer: "By overlaying digital information onto the physical world to enhance surgical navigation and medical training"
+    },
+    {
+        question: "What is the primary challenge of implementing AI in rural or underserved healthcare settings?",
+        options: [
+            "Limited infrastructure, connectivity issues, and potential exacerbation of existing healthcare disparities",
+            "Rural patients' unwillingness to use technology under any circumstances",
+            "The inherent inability of AI to address health concerns outside urban settings"
+        ],
+        correctAnswer: "Limited infrastructure, connectivity issues, and potential exacerbation of existing healthcare disparities"
+    },
+    {
+        question: "How does federated learning address privacy concerns in healthcare AI?",
+        options: [
+            "By training algorithms across multiple decentralized devices without exchanging the underlying patient data",
+            "By centralizing all healthcare data in a single secure location",
+            "By eliminating the need for patient consent in AI development"
+        ],
+        correctAnswer: "By training algorithms across multiple decentralized devices without exchanging the underlying patient data"
+    },
+    {
+        question: "What is the primary ethical consideration when implementing AI in clinical care?",
+        options: [
+            "Ensuring transparency, explicability, and human oversight while mitigating algorithmic bias",
+            "Maximizing efficiency regardless of impact on patient-provider relationships",
+            "Implementing AI solutions without informing patients to avoid resistance"
+        ],
+        correctAnswer: "Ensuring transparency, explicability, and human oversight while mitigating algorithmic bias"
+    },
+    {
+        question: "How do digital twins contribute to healthcare advancement?",
+        options: [
+            "By creating virtual replicas of patients or organs to simulate treatment responses and optimize care",
+            "By cloning patients genetically to test treatments without consent",
+            "By replacing the need for clinical trials with completely virtual patients"
+        ],
+        correctAnswer: "By creating virtual replicas of patients or organs to simulate treatment responses and optimize care"
+    },
+    {
+        question: "What is the most accurate description of healthcare interoperability?",
+        options: [
+            "The ability of different information systems, devices, and applications to access, exchange, and cooperatively use data across organizational boundaries",
+            "The standardization of all healthcare systems under a single proprietary platform",
+            "The elimination of specialized health IT systems in favor of general-purpose solutions"
+        ],
+        correctAnswer: "The ability of different information systems, devices, and applications to access, exchange, and cooperatively use data across organizational boundaries"
+    },
+    {
+        question: "How does digital health technology impact health equity?",
+        options: [
+            "It can either reduce or exacerbate disparities depending on implementation, accessibility, and cultural appropriateness",
+            "Digital health inherently eliminates all healthcare disparities without additional effort",
+            "Digital health technologies are irrelevant to health equity considerations"
+        ],
+        correctAnswer: "It can either reduce or exacerbate disparities depending on implementation, accessibility, and cultural appropriateness"
+    },
+    {
+        question: "What is the primary function of a FHIR (Fast Healthcare Interoperability Resources) standard?",
+        options: [
+            "To provide a standardized framework for exchanging healthcare information electronically",
+            "To accelerate the physical delivery of medical supplies between facilities",
+            "To restrict access to patient information in emergency situations"
+        ],
+        correctAnswer: "To provide a standardized framework for exchanging healthcare information electronically"
+    },
+    {
+        question: "How do digital biomarkers differ from traditional biomarkers?",
+        options: [
+            "Digital biomarkers are collected through connected digital tools rather than conventional laboratory or imaging procedures",
+            "Digital biomarkers are always less accurate than traditional biomarkers",
+            "Digital biomarkers require surgical implantation of sensors to collect data"
+        ],
+        correctAnswer: "Digital biomarkers are collected through connected digital tools rather than conventional laboratory or imaging procedures"
+    },
+    {
+        question: "What is the most significant regulatory challenge for digital health innovations?",
+        options: [
+            "Balancing patient safety and innovation while addressing privacy, security, and efficacy requirements across rapidly evolving technologies",
+            "Ensuring that all digital health products are classified as medical devices regardless of function",
+            "Preventing any regulation of digital health products to maximize market growth"
+        ],
+        correctAnswer: "Balancing patient safety and innovation while addressing privacy, security, and efficacy requirements across rapidly evolving technologies"
+    },
+    {
+        question: "How does quantum computing potentially transform healthcare AI?",
+        options: [
+            "By enabling exponentially faster analysis of complex biological systems and drug interactions",
+            "By generating conscious AI systems that can replace all healthcare workers",
+            "By eliminating the need for clinical validation of AI systems"
+        ],
+        correctAnswer: "By enabling exponentially faster analysis of complex biological systems and drug interactions"
+    },
+    {
+        question: "What is the primary purpose of digital phenotyping in healthcare?",
+        options: [
+            "To collect and analyze data from smartphones and wearables to infer behavioral and cognitive states relevant to health",
+            "To permanently categorize patients based on their technology usage patterns",
+            "To restrict healthcare access based on digital literacy levels"
+        ],
+        correctAnswer: "To collect and analyze data from smartphones and wearables to infer behavioral and cognitive states relevant to health"
+    }
+];
 
 // Function to shuffle an array randomly
 function shuffleArray(array) {
@@ -381,8 +481,8 @@ function shuffleArray(array) {
 // Shuffle all questions randomly
 shuffleArray(allQuestions);
 
-// Select 10 random questions for the quiz session
-const selectedQuestions = allQuestions.slice(0, 10);
+// Select 5 random questions for the quiz session (instead of 10 - for a quicker quiz)
+const selectedQuestions = allQuestions.slice(0, 5);
 
 let currentQuestionIndex = 0;
 let score = 0;
@@ -397,6 +497,8 @@ startTimer(300); // Start the timer with a duration of 5 minutes
 
 function loadQuestion() {
     const currentQuestion = selectedQuestions[currentQuestionIndex];
+    const totalQuestions = selectedQuestions.length; // This will be 5 since we sliced 5 questions
+    
     document.getElementById('question').textContent = currentQuestion.question;
 
     const optionsContainer = document.getElementById('options');
@@ -414,7 +516,7 @@ function loadQuestion() {
         optionsContainer.appendChild(optionContainer);
     });
 
-    updateProgressBar(currentQuestionIndex, selectedQuestions.length);
+    updateProgressBar(currentQuestionIndex, totalQuestions);
 }
 
 function checkAnswer(selectedOption) {
@@ -500,7 +602,7 @@ function showResult() {
 
 function updateProgressBar(currentQuestionIndex, totalQuestions) {
     const progressBar = document.getElementById('progress-bar');
-    const progressPercentage = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+    const progressPercentage = (currentQuestionIndex / totalQuestions) * 100;
     progressBar.style.width = progressPercentage + '%';
 }
 
