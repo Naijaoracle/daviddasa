@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Test your knowledge of Digital Health and AI in Healthcare">
+  <meta name="description" content="Test your knowledge of Digital Health and AI with this interactive quiz">
   <title>Digital Health & AI Quiz - David Dasa</title>
   <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="DHAIquiz.js"></script>
 </head>
 <body>
 
@@ -42,54 +43,54 @@
       <!-- Quiz Section -->
       <section class="project-card">
         <div class="quiz-container">
-          <div id="start-screen" class="quiz-screen active">
-            <h2>Ready to Begin?</h2>
-            <p>This quiz contains questions about:</p>
-            <ul class="quiz-topics">
-              <li>Digital Health Technologies</li>
-              <li>AI in Healthcare</li>
-              <li>Medical Innovations</li>
-              <li>Healthcare Data</li>
-            </ul>
+          <!-- Welcome Screen -->
+          <div id="welcome-screen" class="quiz-screen active">
+            <h2>Ready to Start?</h2>
+            <p>You'll have 5 questions to answer. Take your time and good luck!</p>
             <button id="start-btn" class="quiz-btn">Start Quiz</button>
           </div>
 
-          <div id="question-screen" class="quiz-screen">
-            <div class="quiz-progress">
-              <div class="progress-bar">
-                <div class="progress-fill"></div>
-              </div>
-              <p>Question <span id="current-question">1</span> of <span id="total-questions">5</span></p>
+          <!-- Quiz Screen -->
+          <div id="quiz-screen" class="quiz-screen">
+            <!-- Progress Bar -->
+            <div class="progress-container">
+              <div class="progress-bar"></div>
+              <div class="progress-text">Question <span id="current-question">1</span>/5</div>
             </div>
 
-            <div class="question-container">
+            <!-- Timer -->
+            <div class="timer">Time: <span id="time">60</span>s</div>
+
+            <!-- Question -->
+            <div id="question-container">
               <h3 id="question-text"></h3>
               <div id="options-container" class="options-container"></div>
             </div>
 
-            <button id="next-btn" class="quiz-btn" disabled>Next Question</button>
+            <!-- Navigation -->
+            <div class="quiz-navigation">
+              <button id="next-btn" class="quiz-btn" disabled>Next Question</button>
+            </div>
           </div>
 
+          <!-- Results Screen -->
           <div id="results-screen" class="quiz-screen">
-            <h2>Quiz Complete!</h2>
-            <div class="results-container">
-              <div class="score-circle">
-                <span id="score-text">0%</span>
-              </div>
-              <p>Your Score: <span id="score-details">0 out of 5</span></p>
+            <div class="score-circle">
+              <span id="score-value">0</span>
+              <span class="score-label">Score</span>
             </div>
-            <div id="feedback-container"></div>
+            <div id="feedback-text"></div>
             <button id="retry-btn" class="quiz-btn">Try Again</button>
           </div>
         </div>
       </section>
 
-      <!-- Learning Resources -->
+      <!-- Additional Resources -->
       <section class="project-card">
-        <h2>Learning Resources</h2>
+        <h2>Learn More</h2>
         <div class="resources-grid">
           <div class="resource-item">
-            <h3>Digital Health Basics</h3>
+            <h3>Digital Health Resources</h3>
             <ul class="skills-list">
               <li>Electronic Health Records (EHR)</li>
               <li>Telemedicine Platforms</li>
@@ -116,7 +117,162 @@
     <p>&copy; 2025 David Dasa</p>
   </footer>
 
-  <!-- Quiz Script -->
+  <style>
+    .quiz-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .quiz-screen {
+      display: none;
+      text-align: center;
+    }
+
+    .quiz-screen.active {
+      display: block;
+    }
+
+    .progress-container {
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: #2ecc71;
+      width: 0%;
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      margin-top: 0.5rem;
+      color: #092917;
+    }
+
+    .timer {
+      font-size: 1.2rem;
+      color: #092917;
+      margin-bottom: 1rem;
+    }
+
+    .options-container {
+      display: grid;
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .option-btn {
+      background: white;
+      border: 2px solid rgba(46, 204, 113, 0.3);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+    }
+
+    .option-btn:hover {
+      background: rgba(46, 204, 113, 0.1);
+    }
+
+    .option-btn.selected {
+      background: #2ecc71;
+      color: white;
+      border-color: #2ecc71;
+    }
+
+    .option-btn.correct {
+      background: #27ae60;
+      color: white;
+      border-color: #27ae60;
+    }
+
+    .option-btn.incorrect {
+      background: #e74c3c;
+      color: white;
+      border-color: #e74c3c;
+    }
+
+    .quiz-btn {
+      background: #2ecc71;
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 0.5rem;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .quiz-btn:hover {
+      background: #27ae60;
+      transform: translateY(-2px);
+    }
+
+    .quiz-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .score-circle {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: #2ecc71;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 2rem;
+    }
+
+    .score-circle span {
+      display: block;
+    }
+
+    #score-value {
+      font-size: 3rem;
+      font-weight: bold;
+    }
+
+    .score-label {
+      font-size: 1.2rem;
+    }
+
+    #feedback-text {
+      margin: 2rem 0;
+      font-size: 1.2rem;
+      color: #092917;
+    }
+
+    @media (max-width: 768px) {
+      .quiz-container {
+        padding: 1rem;
+      }
+
+      .option-btn {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+      }
+
+      .score-circle {
+        width: 120px;
+        height: 120px;
+      }
+
+      .score-circle span {
+        font-size: 2rem;
+      }
+    }
+  </style>
+
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       // Particles.js Configuration
@@ -155,308 +311,156 @@
         retina_detect: true
       });
 
-      // Quiz Questions
-      const questions = [
-        {
-          question: "What is telemedicine?",
-          options: [
-            "Remote healthcare delivery using technology",
-            "Traditional in-person medical care",
-            "A type of medical equipment",
-            "A medical specialty"
-          ],
-          correct: 0
-        },
-        {
-          question: "Which technology is commonly used in remote patient monitoring?",
-          options: [
-            "Blockchain",
-            "Virtual Reality",
-            "Wearable devices",
-            "3D printing"
-          ],
-          correct: 2
-        },
-        {
-          question: "What is the primary benefit of Electronic Health Records (EHR)?",
-          options: [
-            "Reduced paper usage",
-            "Improved data accessibility and sharing",
-            "Lower healthcare costs",
-            "Faster patient registration"
-          ],
-          correct: 1
-        },
-        {
-          question: "How does AI assist in medical imaging?",
-          options: [
-            "By replacing radiologists",
-            "By taking X-rays automatically",
-            "By detecting patterns and anomalies",
-            "By storing images digitally"
-          ],
-          correct: 2
-        },
-        {
-          question: "What is the main purpose of clinical decision support systems?",
-          options: [
-            "To replace doctors",
-            "To assist healthcare providers in decision-making",
-            "To manage hospital schedules",
-            "To process insurance claims"
-          ],
-          correct: 1
-        }
-      ];
-
-      let currentQuestion = 0;
+      // Quiz Variables
+      let currentQuestions = [];
+      let currentQuestionIndex = 0;
       let score = 0;
-      let selectedAnswer = null;
+      let timer;
+      let timeLeft = 60;
 
-      const startScreen = document.getElementById('start-screen');
-      const questionScreen = document.getElementById('question-screen');
+      // DOM Elements
+      const welcomeScreen = document.getElementById('welcome-screen');
+      const quizScreen = document.getElementById('quiz-screen');
       const resultsScreen = document.getElementById('results-screen');
       const startBtn = document.getElementById('start-btn');
       const nextBtn = document.getElementById('next-btn');
       const retryBtn = document.getElementById('retry-btn');
       const questionText = document.getElementById('question-text');
       const optionsContainer = document.getElementById('options-container');
+      const progressBar = document.querySelector('.progress-bar');
       const currentQuestionSpan = document.getElementById('current-question');
-      const progressFill = document.querySelector('.progress-fill');
-      const scoreText = document.getElementById('score-text');
-      const scoreDetails = document.getElementById('score-details');
-      const feedbackContainer = document.getElementById('feedback-container');
+      const timeSpan = document.getElementById('time');
+      const scoreValue = document.getElementById('score-value');
+      const feedbackText = document.getElementById('feedback-text');
 
-      function showScreen(screen) {
-        [startScreen, questionScreen, resultsScreen].forEach(s => s.classList.remove('active'));
-        screen.classList.add('active');
+      // Shuffle and select 5 random questions
+      function initializeQuiz() {
+        currentQuestions = shuffleArray([...allQuestions]).slice(0, 5);
+        currentQuestionIndex = 0;
+        score = 0;
+        timeLeft = 60;
+        updateProgressBar();
       }
 
-      function displayQuestion() {
-        const question = questions[currentQuestion];
-        questionText.textContent = question.question;
-        currentQuestionSpan.textContent = currentQuestion + 1;
-        progressFill.style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
-        
-        optionsContainer.innerHTML = question.options.map((option, index) => `
-          <button class="option-btn" data-index="${index}">${option}</button>
-        `).join('');
+      // Shuffle array function
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      }
 
-        document.querySelectorAll('.option-btn').forEach(btn => {
-          btn.addEventListener('click', () => selectOption(btn));
+      // Display current question
+      function displayQuestion() {
+        const question = currentQuestions[currentQuestionIndex];
+        questionText.textContent = question.question;
+        optionsContainer.innerHTML = '';
+        
+        // Shuffle options
+        const shuffledOptions = shuffleArray([...question.options]);
+        
+        shuffledOptions.forEach(option => {
+          const button = document.createElement('button');
+          button.className = 'option-btn';
+          button.textContent = option;
+          button.addEventListener('click', () => selectOption(button, option));
+          optionsContainer.appendChild(button);
         });
 
         nextBtn.disabled = true;
-        selectedAnswer = null;
       }
 
-      function selectOption(button) {
-        document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
-        button.classList.add('selected');
-        selectedAnswer = parseInt(button.dataset.index);
+      // Handle option selection
+      function selectOption(button, selectedOption) {
+        const question = currentQuestions[currentQuestionIndex];
+        const options = document.querySelectorAll('.option-btn');
+        
+        options.forEach(opt => opt.disabled = true);
+        
+        if (selectedOption === question.correctAnswer) {
+          button.classList.add('correct');
+          score++;
+        } else {
+          button.classList.add('incorrect');
+          options.forEach(opt => {
+            if (opt.textContent === question.correctAnswer) {
+              opt.classList.add('correct');
+            }
+          });
+        }
+        
         nextBtn.disabled = false;
       }
 
-      function showResults() {
-        const percentage = (score / questions.length) * 100;
-        scoreText.textContent = `${Math.round(percentage)}%`;
-        scoreDetails.textContent = `${score} out of ${questions.length}`;
-
-        let feedback;
-        if (percentage >= 80) {
-          feedback = "Excellent! You have a strong understanding of digital health and AI.";
-        } else if (percentage >= 60) {
-          feedback = "Good job! You have a solid foundation in digital health concepts.";
-        } else {
-          feedback = "Keep learning! Review the resources below to improve your knowledge.";
-        }
-
-        feedbackContainer.textContent = feedback;
-        showScreen(resultsScreen);
+      // Update progress bar
+      function updateProgressBar() {
+        const progress = ((currentQuestionIndex + 1) / 5) * 100;
+        progressBar.style.width = `${progress}%`;
+        currentQuestionSpan.textContent = currentQuestionIndex + 1;
       }
 
+      // Start timer
+      function startTimer() {
+        timer = setInterval(() => {
+          timeLeft--;
+          timeSpan.textContent = timeLeft;
+          
+          if (timeLeft <= 0) {
+            clearInterval(timer);
+            showResults();
+          }
+        }, 1000);
+      }
+
+      // Show results
+      function showResults() {
+        clearInterval(timer);
+        quizScreen.classList.remove('active');
+        resultsScreen.classList.add('active');
+        
+        scoreValue.textContent = score;
+        const percentage = (score / 5) * 100;
+        
+        let feedback;
+        if (percentage === 100) {
+          feedback = "Perfect score! You're an expert in Digital Health & AI!";
+        } else if (percentage >= 80) {
+          feedback = "Excellent work! You have a strong understanding of Digital Health & AI.";
+        } else if (percentage >= 60) {
+          feedback = "Good job! You have a good grasp of the basics.";
+        } else {
+          feedback = "Keep learning! There's always room for improvement.";
+        }
+        
+        feedbackText.textContent = feedback;
+      }
+
+      // Event Listeners
       startBtn.addEventListener('click', () => {
-        showScreen(questionScreen);
+        welcomeScreen.classList.remove('active');
+        quizScreen.classList.add('active');
+        initializeQuiz();
         displayQuestion();
+        startTimer();
       });
 
       nextBtn.addEventListener('click', () => {
-        if (selectedAnswer === questions[currentQuestion].correct) {
-          score++;
-        }
-
-        if (currentQuestion < questions.length - 1) {
-          currentQuestion++;
+        currentQuestionIndex++;
+        if (currentQuestionIndex < 5) {
           displayQuestion();
+          updateProgressBar();
         } else {
           showResults();
         }
       });
 
       retryBtn.addEventListener('click', () => {
-        currentQuestion = 0;
-        score = 0;
-        showScreen(questionScreen);
-        displayQuestion();
+        resultsScreen.classList.remove('active');
+        welcomeScreen.classList.add('active');
       });
     });
   </script>
-
-  <style>
-    /* Quiz Specific Styles */
-    .quiz-container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-
-    .quiz-screen {
-      display: none;
-      text-align: center;
-    }
-
-    .quiz-screen.active {
-      display: block;
-    }
-
-    .quiz-topics {
-      list-style: none;
-      padding: 0;
-      margin: 2rem 0;
-    }
-
-    .quiz-topics li {
-      background: rgba(46, 204, 113, 0.1);
-      padding: 0.75rem 1rem;
-      border-radius: 0.5rem;
-      margin-bottom: 0.5rem;
-      color: #092917;
-    }
-
-    .quiz-btn {
-      background: #2ecc71;
-      color: white;
-      border: none;
-      padding: 1rem 2rem;
-      border-radius: 0.5rem;
-      font-size: 1.1rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .quiz-btn:hover:not(:disabled) {
-      background: #27ae60;
-      transform: translateY(-2px);
-    }
-
-    .quiz-btn:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-
-    .quiz-progress {
-      margin-bottom: 2rem;
-    }
-
-    .progress-bar {
-      width: 100%;
-      height: 10px;
-      background: rgba(46, 204, 113, 0.2);
-      border-radius: 5px;
-      margin-bottom: 1rem;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: #2ecc71;
-      width: 0;
-      transition: width 0.3s ease;
-    }
-
-    .question-container {
-      margin-bottom: 2rem;
-    }
-
-    .options-container {
-      display: grid;
-      gap: 1rem;
-      margin: 2rem 0;
-    }
-
-    .option-btn {
-      background: white;
-      border: 2px solid rgba(46, 204, 113, 0.3);
-      padding: 1rem;
-      border-radius: 0.5rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-align: left;
-    }
-
-    .option-btn:hover {
-      background: rgba(46, 204, 113, 0.1);
-    }
-
-    .option-btn.selected {
-      background: rgba(46, 204, 113, 0.2);
-      border-color: #2ecc71;
-    }
-
-    .results-container {
-      margin: 2rem 0;
-    }
-
-    .score-circle {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      background: rgba(46, 204, 113, 0.1);
-      border: 4px solid #2ecc71;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 2rem;
-    }
-
-    .score-circle span {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: #092917;
-    }
-
-    #feedback-container {
-      margin: 2rem 0;
-      padding: 1rem;
-      background: rgba(46, 204, 113, 0.1);
-      border-radius: 0.5rem;
-      color: #092917;
-    }
-
-    @media (max-width: 768px) {
-      .quiz-container {
-        padding: 1rem;
-      }
-
-      .options-container {
-        gap: 0.5rem;
-      }
-
-      .option-btn {
-        padding: 0.75rem;
-        font-size: 0.9rem;
-      }
-
-      .score-circle {
-        width: 120px;
-        height: 120px;
-      }
-
-      .score-circle span {
-        font-size: 2rem;
-      }
-    }
-  </style>
 
 </body>
 </html>
