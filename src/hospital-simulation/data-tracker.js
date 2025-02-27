@@ -81,7 +81,7 @@ class DataTracker {
     }
 
     initPatientSeverityChart() {
-        const ctx = document.getElementById('severity-chart').getContext('2d');
+        const ctx = document.getElementById('patient-severity-chart').getContext('2d');
         this.charts.severity = new Chart(ctx, {
             type: 'doughnut',
             data: {
