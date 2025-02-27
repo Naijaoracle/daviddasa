@@ -213,8 +213,19 @@ h2 {
 /* Make condition breakdown chart take full width but maintain proportions */
 .chart-container:last-child {
     grid-column: 1 / -1;
+    grid-row: 2;
     height: auto;
     padding: 0.5rem;
+}
+
+.chart-container:nth-child(1) {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.chart-container:nth-child(2) {
+    grid-column: 2;
+    grid-row: 1;
 }
 
 .chart-container:last-child canvas {
