@@ -186,14 +186,14 @@ h2 {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
     gap: 1rem;
-    height: 600px;
+    height: 800px;
     margin-bottom: 1rem;
 }
 
 .chart-container {
     position: relative;
     height: 100%;
-    padding: 0.75rem;
+    padding: 1rem;
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -508,12 +508,13 @@ h2 {
         grid-template-columns: repeat(2, 1fr);
         grid-template-rows: repeat(2, 1fr);
         gap: 1rem;
-        height: 400px;
+        height: 800px;
     }
 
     .chart-container {
         height: 100%;
-        padding: 0.8rem;
+        padding: 1rem;
+        min-height: 350px;
     }
 
     .chart-container:nth-child(1) {
@@ -570,7 +571,7 @@ h2 {
 
     .dashboard-layout {
         grid-template-columns: repeat(2, 1fr);
-        height: 500px;
+        height: 700px;
     }
 
     #hospital-map {
@@ -602,16 +603,16 @@ h2 {
     .dashboard-layout {
         height: auto;
         grid-template-columns: 1fr;
-        gap: 0.75rem;
+        gap: 1rem;
     }
 
     .chart-container {
-        height: 300px;
-        padding: 0.5rem;
+        height: 400px;
+        padding: 0.75rem;
     }
 
     .chart-container:last-child {
-        height: 350px;
+        height: 450px;
     }
 
     #hospital-map {
