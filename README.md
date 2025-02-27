@@ -1,4 +1,4 @@
-# David Dasa's Portfolio Website
+# Portfolio Website
 
 A modern, interactive portfolio website showcasing my journey in Digital Health, AI Research, and Medical Innovation. Visit the live site at [daviddasa.com](https://www.daviddasa.com).
 

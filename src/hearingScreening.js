@@ -43,9 +43,11 @@ function initializeChart() {
                 {
                     label: 'Not Heard',
                     data: [],
-                    backgroundColor: '#e74c3c',
+                    backgroundColor: '#ff0000',
                     pointStyle: 'crossRot',
-                    pointRadius: 8
+                    pointRadius: 10,
+                    borderColor: '#ff0000',
+                    borderWidth: 3
                 }
             ]
         },
@@ -53,9 +55,9 @@ function initializeChart() {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: {
+                y: {
                     type: 'logarithmic',
-                    position: 'bottom',
+                    position: 'left',
                     title: {
                         display: true,
                         text: 'Frequency (Hz)'
@@ -63,8 +65,10 @@ function initializeChart() {
                     min: 100,
                     max: 20000
                 },
-                y: {
-                    display: false
+                x: {
+                    display: false,
+                    min: -0.5,
+                    max: 1.5
                 }
             },
             plugins: {
@@ -110,9 +114,9 @@ function answer(response) {
     const frequency = testFrequencies[currentFrequencyIndex];
     
     if (response === 'Yes') {
-        responses.heard.push({ x: frequency, y: 1 });
+        responses.heard.push({ y: frequency, x: 1 });
     } else {
-        responses.notHeard.push({ x: frequency, y: 1 });
+        responses.notHeard.push({ y: frequency, x: 1 });
     }
     
     updateChart();
@@ -134,10 +138,39 @@ function updateChart() {
 }
 
 function downloadChart() {
-    const link = document.createElement('a');
-    link.download = 'hearing-test-results.png';
-    link.href = document.getElementById('responseChart').toDataURL();
-    link.click();
+    const canvas = document.getElementById('responseChart');
+    const context = canvas.getContext('2d');
+    
+    // Save the current state
+    context.save();
+    
+    // Store the current chart image
+    const chartImage = canvas.toDataURL();
+    
+    // Create a new canvas with white background
+    const downloadCanvas = document.createElement('canvas');
+    downloadCanvas.width = canvas.width;
+    downloadCanvas.height = canvas.height;
+    const downloadContext = downloadCanvas.getContext('2d');
+    
+    // Fill white background
+    downloadContext.fillStyle = 'white';
+    downloadContext.fillRect(0, 0, downloadCanvas.width, downloadCanvas.height);
+    
+    // Draw the chart on top
+    const img = new Image();
+    img.onload = function() {
+        downloadContext.drawImage(img, 0, 0);
+        // Create download link
+        const link = document.createElement('a');
+        link.download = 'hearing-test-results.png';
+        link.href = downloadCanvas.toDataURL('image/png');
+        link.click();
+    };
+    img.src = chartImage;
+    
+    // Restore the original state
+    context.restore();
 }
 
 // Initialize chart on page load
