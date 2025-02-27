@@ -185,15 +185,14 @@ h2 {
 .dashboard-layout {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
+    grid-template-rows: auto auto;
     gap: 0.75rem;
-    height: 350px;
     margin-bottom: 0.5rem;
 }
 
 .chart-container {
     position: relative;
-    height: 100%;
+    height: auto;
     padding: 0.5rem;
     background: #fff;
     border-radius: 8px;
@@ -206,23 +205,21 @@ h2 {
 }
 
 .chart-container canvas {
-    flex: 1;
-    width: 100% !important;
-    height: 100% !important;
-    max-width: 300px;
-    max-height: 200px;
+    width: 100%;
+    max-width: 250px;
+    max-height: 150px;
 }
 
 /* Make condition breakdown chart take full width but maintain proportions */
 .chart-container:last-child {
     grid-column: 1 / -1;
-    height: 100%;
+    height: auto;
     padding: 0.5rem;
 }
 
 .chart-container:last-child canvas {
-    max-width: 400px;
-    max-height: 250px;
+    max-width: 300px;
+    max-height: 180px;
 }
 
 .dialogue-box {
@@ -518,42 +515,16 @@ h2 {
 
     .dashboard-layout {
         grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(2, 1fr);
+        grid-template-rows: auto auto;
         gap: 1rem;
-        height: 350px;
     }
 
     .chart-container {
         padding: 0.5rem;
-        min-height: 260px;
-    }
-
-    .chart-container:nth-child(1) {
-        grid-column: 1;
-        grid-row: 1;
-    }
-
-    .chart-container:nth-child(2) {
-        grid-column: 2;
-        grid-row: 1;
-    }
-
-    .chart-container:nth-child(3) {
-        grid-column: 1;
-        grid-row: 2;
-    }
-
-    .chart-container:nth-child(4) {
-        grid-column: 2;
-        grid-row: 2;
-    }
-
-    .dialogue-box {
-        height: auto;
     }
 
     .dialogue-content {
-        height: 400px;
+        height: 600px;
     }
 
     .hospital-layout {
@@ -577,19 +548,20 @@ h2 {
 
     .dashboard-layout {
         grid-template-columns: repeat(2, 1fr);
-        height: 300px;
     }
 
     #hospital-map {
         height: 350px;
     }
 
-    .chart-container {
-        padding: 0.5rem;
+    .chart-container canvas {
+        max-width: 220px;
+        max-height: 140px;
     }
 
-    .dialogue-content {
-        height: 300px;
+    .chart-container:last-child canvas {
+        max-width: 280px;
+        max-height: 160px;
     }
 
     .data-dashboard {
@@ -615,18 +587,22 @@ h2 {
     }
 
     .dashboard-layout {
-        height: auto;
         grid-template-columns: 1fr;
         gap: 1rem;
     }
 
     .chart-container {
-        height: 175px;
         padding: 0.5rem;
     }
 
-    .chart-container:last-child {
-        height: 200px;
+    .chart-container canvas {
+        max-width: 200px;
+        max-height: 130px;
+    }
+
+    .chart-container:last-child canvas {
+        max-width: 250px;
+        max-height: 150px;
     }
 
     #hospital-map {
