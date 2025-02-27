@@ -103,6 +103,8 @@ h2 {
 }
 
 .staff-window {
+    display: flex;
+    flex-direction: column;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     overflow: hidden;
@@ -115,10 +117,10 @@ h2 {
 }
 
 .staff-header {
+    padding: 0.5rem 0.8rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.8rem;
     background: #f5f7fa;
     font-weight: bold;
 }
@@ -149,7 +151,7 @@ h2 {
 }
 
 .staff-activity {
-    height: 150px;
+    height: 50px;
     position: relative;
 }
 
@@ -188,6 +190,7 @@ h2 {
     padding: 1.5rem;
     margin-bottom: 2rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    min-width: 300px;
 }
 
 .dialogue-content {
@@ -419,7 +422,7 @@ h2 {
 @media (min-width: 1024px) {
     .main-content {
         display: grid;
-        grid-template-columns: 3fr 1fr;
+        grid-template-columns: 4fr 1fr;
         gap: 1.5rem;
         align-items: start;
     }
@@ -435,12 +438,37 @@ h2 {
         top: 1rem;
     }
 
+    .map-and-staff {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
     .hospital-map-container {
         margin-bottom: 0;
     }
 
     #hospital-map {
-        height: 500px;
+        height: 400px;
+    }
+
+    .staff-panel {
+        margin-bottom: 0;
+    }
+
+    .staff-windows {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+
+    .staff-window {
+        height: 90px;
+    }
+
+    .staff-activity {
+        height: 50px;
     }
 
     .dashboard-layout {
@@ -448,12 +476,12 @@ h2 {
     }
 
     .chart-container {
-        height: 300px;
+        height: 250px;
     }
 
     .chart-container:last-child {
         grid-column: span 3;
-        height: 350px;
+        height: 300px;
     }
 
     .dialogue-box {
