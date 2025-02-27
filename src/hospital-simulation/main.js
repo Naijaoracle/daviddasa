@@ -67,8 +67,6 @@ class HospitalSimulation {
     }
 
     bindEventListeners() {
-        document.getElementById('add-patient').addEventListener('click', () => this.generatePatient());
-        document.getElementById('add-emergency').addEventListener('click', () => this.generatePatient(true));
         document.getElementById('toggle-simulation').addEventListener('click', () => {
             const button = document.getElementById('toggle-simulation');
             if (this.running) {
