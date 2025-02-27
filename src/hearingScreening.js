@@ -1,22 +1,24 @@
 let audioContext;
 let oscillator;
 let chartData = {
-  labels: ['20', '50', '100', '200', '500', '1000', '2000', '5000', '7500', '10000', '15000', '20000'],
+  labels: [],
   datasets: [
     {
       label: 'Heard',
-      borderColor: 'blue',
-      backgroundColor: 'blue',
+      borderColor: '#2ecc71',
+      backgroundColor: '#2ecc71',
       pointRadius: 8,
       pointHoverRadius: 10,
+      pointStyle: 'circle',
       data: []
     },
     {
       label: 'Not Heard',
-      borderColor: 'red',
-      backgroundColor: 'red',
+      borderColor: '#e74c3c',
+      backgroundColor: '#e74c3c',
       pointRadius: 8,
       pointHoverRadius: 10,
+      pointStyle: 'crossRot',
       data: []
     }
   ]
@@ -63,58 +65,70 @@ function answer(response) {
   const frequencyInput = document.getElementById('frequencyInput');
   const frequency = parseFloat(frequencyInput.value);
 
-  chartData.labels.push(frequency.toString());
-  const middleX = 10010; // Middle of the x-axis range
+  if (isNaN(frequency) || frequency < 20 || frequency > 20000) {
+    alert('Please enter a valid frequency between 20 Hz and 20000 Hz.');
+    return;
+  }
 
+  // Add the frequency to the data
   if (response === 'Yes') {
-    chartData.datasets[0].data.push({ x: middleX, y: frequency });
+    chartData.datasets[0].data.push({ x: frequency, y: 1 });
   } else {
-    chartData.datasets[1].data.push({ x: middleX, y: frequency });
+    chartData.datasets[1].data.push({ x: frequency, y: 0 });
   }
   
   if (chart) {
-    chart.update(); // Update the chart immediately after the user responds
+    chart.update();
   } else {
-    chart = new Chart(document.getElementById('responseChart').getContext('2d'), {
+    const ctx = document.getElementById('responseChart').getContext('2d');
+    chart = new Chart(ctx, {
       type: 'scatter',
       data: chartData,
       options: {
         scales: {
           x: {
-            type: 'linear',
-            position: 'bottom',
-            ticks: {
-              display: false //To hide the x-axis ticks
-            }
-          },
-          y: {
             type: 'logarithmic',
-            position: 'left',
+            position: 'bottom',
             title: {
               display: true,
               text: 'Frequency (Hz)'
             },
+            min: 20,
+            max: 20000,
             ticks: {
-              userCallback: function (value, index, values) {
+              callback: function(value) {
                 return value.toString();
               }
             }
+          },
+          y: {
+            type: 'linear',
+            position: 'left',
+            min: -0.5,
+            max: 1.5,
+            ticks: {
+              display: false
+            },
+            grid: {
+              display: false
+            }
           }
         },
-        elements: {
-          point: {
-            hitRadius: 5,
-            hoverRadius: 5
-          }
-        },
-        responsive: false, // Keep the chart size fixed
-        maintainAspectRatio: false,
         plugins: {
+          title: {
+            display: true,
+            text: 'Hearing Test Results',
+            font: {
+              size: 16
+            }
+          },
           legend: {
             display: true,
             position: 'bottom'
           }
-        }
+        },
+        responsive: true,
+        maintainAspectRatio: false
       }
     });
   }
@@ -122,10 +136,24 @@ function answer(response) {
 
 function downloadChart() {
   const canvas = document.getElementById('responseChart');
+  
+  // Create a white background
+  const context = canvas.getContext('2d');
+  const backgroundColor = context.fillStyle;
+  context.fillStyle = 'white';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // Convert to image
   const dataUrl = canvas.toDataURL('image/png');
+  
+  // Restore original background
+  context.fillStyle = backgroundColor;
+  
+  // Create download link
   const link = document.createElement('a');
+  const date = new Date().toISOString().split('T')[0];
   link.href = dataUrl;
-  link.download = 'hearing_response_chart.png';
+  link.download = `hearing_test_results_${date}.png`;
   link.click();
 }
 

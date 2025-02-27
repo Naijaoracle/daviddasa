@@ -49,11 +49,13 @@
     <button onclick="answer('No')">No</button>
     </div>
 
-    <!-- Canvas for chart -->
-    <canvas id="responseChart" width="600" height="600"></canvas>
+    <!-- Chart container with proper dimensions -->
+    <div class="chart-container" style="position: relative; height:60vh; width:80vw; margin: auto;">
+      <canvas id="responseChart"></canvas>
+    </div>
     
     <div class="centered">
-    <button onclick="downloadChart()">Download Chart</button>
+    <button onclick="downloadChart()" class="download-btn">Download Results</button>
     </div>
     <section id="online-tools">
       <h3>Online Hearing Tools</h3>
