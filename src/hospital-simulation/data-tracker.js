@@ -204,24 +204,23 @@ class DataTracker {
                         max: 100,
                         title: {
                             display: true,
-                            text: 'Utilization %'
+                            text: 'Utilization %',
+                            font: {
+                                size: 10
+                            }
                         }
                     },
                     y: {
                         ticks: {
                             font: {
-                                size: 11
+                                size: 10
                             }
                         }
                     }
                 },
                 plugins: {
                     title: {
-                        display: true,
-                        text: 'Staff Utilization',
-                        font: {
-                            size: 14
-                        }
+                        display: false  // Removed title to save space
                     },
                     legend: {
                         display: false
@@ -229,10 +228,10 @@ class DataTracker {
                 },
                 layout: {
                     padding: {
-                        left: 5,
-                        right: 5,
-                        top: 5,
-                        bottom: 5
+                        left: 2,
+                        right: 2,
+                        top: 2,
+                        bottom: 2
                     }
                 }
             }
@@ -266,27 +265,31 @@ class DataTracker {
                         position: 'right',
                         align: 'start',
                         labels: {
-                            boxWidth: 12,
-                            padding: 10,
+                            boxWidth: 10,
+                            padding: 8,
                             font: {
-                                size: 10
+                                size: 9
                             }
                         }
                     },
                     title: {
                         display: true,
                         text: 'Conditions',
+                        position: 'bottom',  // Moved title to bottom
                         font: {
-                            size: 14
+                            size: 12
+                        },
+                        padding: {
+                            bottom: 0
                         }
                     }
                 },
                 layout: {
                     padding: {
-                        left: 5,
-                        right: 5,
-                        top: 5,
-                        bottom: 5
+                        left: 2,
+                        right: 2,
+                        top: 2,
+                        bottom: 10  // Added padding for bottom title
                     }
                 }
             }

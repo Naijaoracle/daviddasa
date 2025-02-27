@@ -124,8 +124,9 @@ h2 {
     align-items: center;
     background: #f5f7fa;
     font-weight: bold;
-    min-width: 160px;
+    min-width: 180px;
     border-right: 1px solid #eee;
+    flex-shrink: 0;
 }
 
 .staff-header.doctor {
@@ -161,6 +162,25 @@ h2 {
     gap: 0.8rem;
     padding: 0.35rem 0.8rem;
     height: 100%;
+    min-width: 300px;
+}
+
+.staff-activity .patient-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 200px;
+}
+
+.staff-activity .patient-name {
+    font-size: 0.85rem;
+    color: #666;
+    white-space: nowrap;
+}
+
+.staff-activity .patient-icon {
+    font-size: 1.2rem;
+    margin: 0;
 }
 
 .patient-icon {
@@ -679,4 +699,9 @@ h2 {
     opacity: 0.9;
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Hide the "Waiting for patient" text when staff is busy */
+.staff-window .status.busy + .staff-activity .patient-name:contains("Waiting for patient") {
+    display: none;
 }

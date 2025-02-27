@@ -241,6 +241,32 @@ class HospitalSimulation {
             this.assignPatientToStaff(this.waitingRoom[0]);
         }
     }
+
+    updateStaffStatus(staffId, status) {
+        const staffWindow = document.querySelector(`#${staffId}-canvas`);
+        const statusElement = staffWindow.parentElement.querySelector('.status');
+        const patientInfo = staffWindow.querySelector('.patient-info');
+        
+        if (status.patient) {
+            statusElement.textContent = 'Busy';
+            statusElement.classList.remove('available');
+            statusElement.classList.add('busy');
+            
+            patientInfo.innerHTML = `
+                <div class="patient-icon">🤒</div>
+                <div class="patient-name">${status.patient.name}</div>
+            `;
+        } else {
+            statusElement.textContent = 'Available';
+            statusElement.classList.remove('busy');
+            statusElement.classList.add('available');
+            
+            patientInfo.innerHTML = `
+                <div class="patient-icon">🤒</div>
+                <div class="patient-name">Waiting for patient</div>
+            `;
+        }
+    }
 }
 
 // Initialize and start the simulation when the page loads
