@@ -248,22 +248,24 @@ class HospitalSimulation {
         const patientInfo = staffWindow.querySelector('.patient-info');
         
         if (status.patient) {
+            // Staff is treating a patient
             statusElement.textContent = 'Busy';
             statusElement.classList.remove('available');
             statusElement.classList.add('busy');
             
             patientInfo.innerHTML = `
-                <div class="patient-icon">🤒</div>
+                <div class="patient-icon">🏥</div>
                 <div class="patient-name">Treating ${status.patient.name}</div>
                 <div class="treatment-timer">0:00</div>
             `;
         } else {
+            // Staff is available
             statusElement.textContent = 'Available';
             statusElement.classList.remove('busy');
             statusElement.classList.add('available');
             
             patientInfo.innerHTML = `
-                <div class="patient-icon">🤒</div>
+                <div class="patient-icon">⏳</div>
                 <div class="patient-name">Waiting for patient</div>
             `;
         }

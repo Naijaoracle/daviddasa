@@ -178,11 +178,27 @@ h2 {
     white-space: nowrap;
 }
 
-.staff-activity .treatment-timer {
+/* Hide "Waiting for patient" text when staff is busy */
+.status.busy ~ .staff-activity .patient-name:contains("Waiting for patient") {
+    display: none;
+}
+
+/* Show treatment info more prominently when staff is busy */
+.status.busy ~ .staff-activity .patient-name {
+    color: #4a90e2;
+    font-weight: 500;
+}
+
+.status.busy ~ .staff-activity .patient-icon {
+    color: #4a90e2;
+}
+
+.treatment-timer {
     font-size: 0.85rem;
     color: #4a90e2;
     font-family: monospace;
     margin-left: auto;
+    animation: pulse-text 2s infinite;
 }
 
 .staff-activity .staff-icon {
@@ -707,16 +723,7 @@ h2 {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Hide the "Waiting for patient" text when staff is busy */
-.staff-window .status.busy + .staff-activity .patient-name:contains("Waiting for patient") {
-    display: none;
-}
-
 /* Add a subtle animation for the treatment timer */
-.treatment-timer {
-    animation: pulse-text 2s infinite;
-}
-
 @keyframes pulse-text {
     0% { opacity: 1; }
     50% { opacity: 0.7; }
