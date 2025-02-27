@@ -12,9 +12,15 @@ body {
 }
 
 .container {
-    max-width: 1200px;
-    margin: 2rem auto;
+    max-width: 95%;
+    margin: 1rem auto;
     padding: 0 20px;
+}
+
+@media (min-width: 1600px) {
+    .container {
+        max-width: 1800px;
+    }
 }
 
 h1 {
@@ -34,8 +40,8 @@ h2 {
 .hospital-layout {
     display: grid;
     grid-template-columns: 1fr 2fr;
-    gap: 2rem;
-    margin-bottom: 2rem;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
 }
 
 .waiting-room, .emergency-room {
@@ -66,7 +72,7 @@ h2 {
     border-radius: 8px;
     padding: 1rem;
     text-align: center;
-    min-height: 120px;
+    min-height: 100px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -74,6 +80,7 @@ h2 {
     font-weight: bold;
     color: #495057;
     transition: all 0.3s ease;
+    gap: 0.5rem;
 }
 
 .treatment-bay:hover {
@@ -85,20 +92,26 @@ h2 {
     background: white;
     border-radius: 10px;
     padding: 1.5rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .staff-windows {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 .staff-window {
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     overflow: hidden;
+    background: #fff;
+    transition: transform 0.2s ease;
+}
+
+.staff-window:hover {
+    transform: translateY(-2px);
 }
 
 .staff-header {
@@ -403,17 +416,153 @@ h2 {
 }
 
 /* Responsive designs */
-@media (max-width: 768px) {
-    .hospital-layout, .staff-windows, .dashboard-layout {
+@media (min-width: 1024px) {
+    .main-content {
+        display: grid;
+        grid-template-columns: 3fr 1fr;
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    .left-column {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .right-column {
+        position: sticky;
+        top: 1rem;
+    }
+
+    .hospital-map-container {
+        margin-bottom: 0;
+    }
+
+    #hospital-map {
+        height: 500px;
+    }
+
+    .dashboard-layout {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .chart-container {
+        height: 300px;
+    }
+
+    .chart-container:last-child {
+        grid-column: span 3;
+        height: 350px;
+    }
+
+    .dialogue-box {
+        height: calc(100vh - 2rem);
+        margin-bottom: 0;
+    }
+
+    .dialogue-content {
+        height: calc(100% - 4rem);
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    .hospital-layout {
         grid-template-columns: 1fr;
     }
-    
-    .controls {
-        flex-direction: column;
+
+    .dashboard-layout {
+        grid-template-columns: repeat(2, 1fr);
     }
-    
+
+    #hospital-map {
+        height: 350px;
+    }
+
+    .chart-container {
+        height: 250px;
+    }
+}
+
+@media (max-width: 767px) {
+    .container {
+        padding: 0 10px;
+        margin: 0.5rem auto;
+    }
+
+    .hospital-layout {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .staff-windows {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .dashboard-layout {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .chart-container {
+        height: 200px;
+    }
+
+    #hospital-map {
+        height: 300px;
+    }
+
+    .dialogue-content {
+        height: 250px;
+    }
+
     .treatment-areas {
         grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+}
+
+/* Control Button Positioning */
+.controls {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 1000;
+}
+
+.controls button {
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    background: #4a90e2;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: auto;
+    min-width: 150px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.controls button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 767px) {
+    .controls {
+        bottom: 1rem;
+        right: 1rem;
+    }
+
+    .controls button {
+        padding: 0.6rem 1rem;
+        min-width: 120px;
+        font-size: 0.9rem;
     }
 }
 
