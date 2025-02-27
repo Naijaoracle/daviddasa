@@ -254,7 +254,8 @@ class HospitalSimulation {
             
             patientInfo.innerHTML = `
                 <div class="patient-icon">🤒</div>
-                <div class="patient-name">${status.patient.name}</div>
+                <div class="patient-name">Treating ${status.patient.name}</div>
+                <div class="treatment-timer">0:00</div>
             `;
         } else {
             statusElement.textContent = 'Available';

@@ -159,7 +159,7 @@ h2 {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 0.8rem;
+    justify-content: space-between;
     padding: 0.35rem 0.8rem;
     height: 100%;
     min-width: 300px;
@@ -168,7 +168,7 @@ h2 {
 .staff-activity .patient-info {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.8rem;
     min-width: 200px;
 }
 
@@ -178,9 +178,15 @@ h2 {
     white-space: nowrap;
 }
 
-.staff-activity .patient-icon {
-    font-size: 1.2rem;
-    margin: 0;
+.staff-activity .treatment-timer {
+    font-size: 0.85rem;
+    color: #4a90e2;
+    font-family: monospace;
+    margin-left: auto;
+}
+
+.staff-activity .staff-icon {
+    display: none;
 }
 
 .patient-icon {
@@ -704,4 +710,15 @@ h2 {
 /* Hide the "Waiting for patient" text when staff is busy */
 .staff-window .status.busy + .staff-activity .patient-name:contains("Waiting for patient") {
     display: none;
+}
+
+/* Add a subtle animation for the treatment timer */
+.treatment-timer {
+    animation: pulse-text 2s infinite;
+}
+
+@keyframes pulse-text {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
 }
