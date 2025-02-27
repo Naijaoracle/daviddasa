@@ -30,7 +30,7 @@
         <h3>How the Test Works</h3>
         <p>This test will play a series of tones at different frequencies (from 125 Hz to 16000 Hz):</p>
         <ul>
-          <li>Each tone will play for 2 seconds</li>
+          <li>Each tone will play for 2 seconds and end with a beep</li>
           <li>After each tone, click "Yes" if you heard it or "No" if you didn't</li>
           <li>The test will automatically progress through all frequencies</li>
           <li>Use the volume slider to set a comfortable listening level</li>
@@ -173,14 +173,20 @@
 
       .chart-container {
         max-width: 100%;
-        height: 400px;
+        height: 500px;
         margin: 2rem 0;
+        padding: 1rem 2rem;
       }
 
       @media (max-width: 768px) {
         .test-container {
           padding: 1rem;
           margin: 1rem;
+        }
+
+        .chart-container {
+          height: 400px;
+          padding: 0.5rem;
         }
 
         .button-group {

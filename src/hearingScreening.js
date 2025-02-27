@@ -60,10 +60,26 @@ function initializeChart() {
                     position: 'left',
                     title: {
                         display: true,
-                        text: 'Frequency (Hz)'
+                        text: 'Frequency (Hz)',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        }
                     },
                     min: 100,
-                    max: 20000
+                    max: 20000,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toString();
+                        },
+                        font: {
+                            size: 12
+                        },
+                        padding: 10
+                    },
+                    grid: {
+                        color: '#e0e0e0'
+                    }
                 },
                 x: {
                     display: false,
@@ -73,7 +89,21 @@ function initializeChart() {
             },
             plugins: {
                 legend: {
-                    position: 'bottom'
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        font: {
+                            size: 14
+                        }
+                    }
+                }
+            },
+            layout: {
+                padding: {
+                    left: 15,
+                    right: 15,
+                    top: 15,
+                    bottom: 15
                 }
             }
         }
