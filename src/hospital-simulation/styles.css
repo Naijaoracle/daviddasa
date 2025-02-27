@@ -185,7 +185,7 @@ h2 {
 .dashboard-layout {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: auto auto;
+    grid-template-rows: repeat(2, auto);
     gap: 0.75rem;
     margin-bottom: 0.5rem;
 }
@@ -210,27 +210,31 @@ h2 {
     max-height: 150px;
 }
 
-/* Make condition breakdown chart take full width but maintain proportions */
-.chart-container:last-child {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    height: auto;
-    padding: 0.5rem;
-}
-
-.chart-container:nth-child(1) {
+/* Position each chart explicitly */
+.chart-container:nth-child(1) { /* Staff Utilization */
     grid-column: 1;
     grid-row: 1;
 }
 
-.chart-container:nth-child(2) {
+.chart-container:nth-child(2) { /* Urgent/Stable */
     grid-column: 2;
     grid-row: 1;
 }
 
+.chart-container:nth-child(3) { /* Wait Times */
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.chart-container:nth-child(4) { /* Conditions */
+    grid-column: 2;
+    grid-row: 2;
+}
+
+/* Remove the special handling for last-child since we're explicitly positioning */
 .chart-container:last-child canvas {
-    max-width: 300px;
-    max-height: 180px;
+    max-width: 250px;
+    max-height: 150px;
 }
 
 .dialogue-box {
