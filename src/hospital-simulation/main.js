@@ -264,10 +264,7 @@ class HospitalSimulation {
             statusElement.classList.remove('busy');
             statusElement.classList.add('available');
             
-            patientInfo.innerHTML = `
-                <div class="patient-icon">⏳</div>
-                <div class="patient-name">Waiting for patient</div>
-            `;
+            patientInfo.innerHTML = ''; // Empty when available
         }
     }
 }
