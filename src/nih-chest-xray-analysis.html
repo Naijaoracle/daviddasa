@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Analysis of NIH Chest X-ray Dataset for Medical AI Applications">
+  <title>NIH Chest X-ray Analysis - David Dasa</title>
+  <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body>
+
+  <!-- Navigation Section -->
+  <nav>
+    <ul>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+      <li><a href="https://www.daviddasa.com/about">About</a></li>
+      <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
+      <li><a href="https://www.daviddasa.com/skills">Skills</a></li>
+      <li><a href="https://www.daviddasa.com/contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <main>
+      <!-- Introduction Section -->
+      <section id="about">
+        <div class="about-content">
+          <h1>NIH Chest X-ray Dataset Analysis</h1>
+          <h2>Medical Image Analysis using AI</h2>
+          <p>A comprehensive analysis of the NIH chest X-ray dataset using advanced machine learning techniques to identify patterns and insights for improving diagnostic capabilities.</p>
+        </div>
+      </section>
+
+      <!-- Analysis Section -->
+      <section class="project-card">
+        <h2>Interactive Analysis</h2>
+        <div class="notebook-container">
+          <iframe
+            src="https://naijaoracle.github.io/jupyterwork/lab?path=content%2Fnih-chest-x-ray-dataset-analysis.ipynb"
+            width="100%"
+            height="800px"
+            frameborder="0"
+            id="notebook-frame"
+          ></iframe>
+        </div>
+      </section>
+
+      <!-- Key Findings -->
+      <section class="project-card">
+        <h2>Key Findings</h2>
+        <div class="analysis-grid">
+          <div class="analysis-item">
+            <h3>Dataset Overview</h3>
+            <ul class="stats-list">
+              <li>112,120 X-ray images from 30,805 unique patients</li>
+              <li>14 disease labels identified by NLP</li>
+              <li>Comprehensive demographic information</li>
+              <li>High-quality medical imaging data</li>
+            </ul>
+          </div>
+          <div class="analysis-item">
+            <h3>Analysis Highlights</h3>
+            <ul class="skills-list">
+              <li>Distribution of pathological conditions</li>
+              <li>Demographic patterns and correlations</li>
+              <li>Multi-label classification challenges</li>
+              <li>Data quality assessment</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Call to Action -->
+      <section class="project-card">
+        <div class="cta-section">
+          <h2>Interested in Collaboration?</h2>
+          <p>If you're interested in medical imaging AI or would like to discuss similar projects, let's connect.</p>
+          <p>Connect with me on <a href="https://www.linkedin.com/in/daviddasa" class="linkedin-link">LinkedIn</a></p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Footer Section -->
+  <footer>
+    <p>&copy; 2025 David Dasa</p>
+  </footer>
+
+  <!-- Particles.js Configuration -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+
+      // Load the notebook content
+      const notebookFrame = document.getElementById('notebook-frame');
+      // You'll need to implement the logic to load your notebook content here
+    });
+  </script>
+
+  <style>
+    .notebook-container {
+      background: white;
+      border-radius: 1rem;
+      padding: 1rem;
+      margin: 2rem 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .analysis-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .analysis-item {
+      background: rgba(255, 255, 255, 0.8);
+      padding: 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .analysis-item:hover {
+      transform: translateY(-5px);
+    }
+
+    @media (max-width: 768px) {
+      .notebook-container {
+        padding: 0.5rem;
+      }
+
+      .analysis-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+    }
+  </style>
+
+</body>
+</html> 
