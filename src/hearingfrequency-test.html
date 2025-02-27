@@ -49,9 +49,9 @@
       <div class="test-requirements">
         <h3>Before You Begin</h3>
         <ul>
-          <li>Use headphones for accurate results</li>
+          <li>Use headphones for better results</li>
           <li>Find a quiet environment</li>
-          <li>Take breaks if needed</li>
+          <li>Set your device volume to 50%</li>
         </ul>
       </div>
 
@@ -69,6 +69,15 @@
     <div class="test-container">
       <h2>Frequency Hearing Test</h2>
       
+      <div class="test-explanation">
+        <h3>Before You Begin</h3>
+        <ul>
+          <li>Use headphones for better results</li>
+          <li>Find a quiet environment</li>
+          <li>Set your device volume to 50%</li>
+        </ul>
+      </div>
+
       <div class="volume-control">
         <label for="volumeSlider">Volume:</label>
         <input type="range" id="volumeSlider" min="0" max="100" value="50">
@@ -80,125 +89,103 @@
       </div>
 
       <div class="test-controls">
-        <button onclick="startTest()" class="start-btn">Start Test</button>
+        <button id="startButton" onclick="startTest()" class="primary-button">Start Test</button>
       </div>
 
-      <div class="response-buttons" style="display: none;">
+      <div id="responseButtons" class="response-buttons" style="display: none;">
         <p>Did you hear the sound?</p>
-        <button onclick="answer('Yes')" class="yes-btn">Yes</button>
-        <button onclick="answer('No')" class="no-btn">No</button>
+        <div class="button-group">
+          <button onclick="answer('Yes')" class="yes-button">Yes</button>
+          <button onclick="answer('No')" class="no-button">No</button>
+        </div>
       </div>
 
-      <div class="chart-container" style="position: relative; height:60vh; width:80vw; margin: auto;">
+      <div class="chart-container">
         <canvas id="responseChart"></canvas>
       </div>
-      
-      <div class="download-container">
-        <button onclick="downloadChart()" class="download-btn">Download Results</button>
-      </div>
+
+      <button onclick="downloadChart()" class="download-button">Download Results</button>
     </div>
 
     <style>
       .test-container {
-        background: rgba(255, 255, 255, 0.9);
+        background: white;
+        border-radius: 15px;
         padding: 2rem;
-        border-radius: 1rem;
-        margin: 2rem auto;
         max-width: 800px;
+        margin: 2rem auto;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       }
 
       .test-explanation {
-        background: rgba(46, 204, 113, 0.1);
-        padding: 1.5rem;
-        border-radius: 0.5rem;
-        margin: 1.5rem 0;
+        background: #f8f9fa;
         border-left: 4px solid #2ecc71;
-      }
-
-      .test-explanation h3 {
-        color: #2c3e50;
-        margin-bottom: 1rem;
-      }
-
-      .test-explanation ul {
-        list-style-type: none;
-        padding-left: 1rem;
-      }
-
-      .test-explanation li {
-        margin: 0.5rem 0;
-        position: relative;
-        padding-left: 1.5rem;
-      }
-
-      .test-explanation li:before {
-        content: "•";
-        color: #2ecc71;
-        font-weight: bold;
-        position: absolute;
-        left: 0;
-      }
-
-      .volume-control {
+        padding: 1rem;
         margin: 1rem 0;
+        border-radius: 4px;
+      }
+
+      .volume-control, .frequency-display {
+        margin: 1.5rem 0;
+      }
+
+      .button-group {
         display: flex;
-        align-items: center;
         gap: 1rem;
-      }
-
-      .frequency-display {
+        justify-content: center;
         margin: 1rem 0;
       }
 
-      .test-controls {
-        margin: 2rem 0;
-      }
-
-      .response-buttons {
-        margin: 2rem 0;
-        text-align: center;
-      }
-
-      .start-btn, .yes-btn, .no-btn, .download-btn {
-        padding: 0.5rem 2rem;
-        margin: 0.5rem;
+      .primary-button, .yes-button, .no-button, .download-button {
+        padding: 0.8rem 1.5rem;
         border: none;
-        border-radius: 0.5rem;
-        cursor: pointer;
+        border-radius: 8px;
         font-size: 1rem;
-        transition: all 0.3s ease;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
       }
 
-      .start-btn {
+      .primary-button {
         background: #2ecc71;
         color: white;
       }
 
-      .yes-btn {
+      .yes-button {
         background: #2ecc71;
         color: white;
       }
 
-      .no-btn {
+      .no-button {
         background: #e74c3c;
         color: white;
       }
 
-      .download-btn {
+      .download-button {
         background: #3498db;
         color: white;
+        margin-top: 1rem;
       }
 
-      button:hover {
+      .primary-button:hover, .yes-button:hover, .no-button:hover, .download-button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
       }
 
       .chart-container {
-        background: white;
-        padding: 1rem;
-        border-radius: 1rem;
+        max-width: 100%;
+        height: 400px;
         margin: 2rem 0;
+      }
+
+      @media (max-width: 768px) {
+        .test-container {
+          padding: 1rem;
+          margin: 1rem;
+        }
+
+        .button-group {
+          flex-direction: column;
+        }
       }
     </style>
 
