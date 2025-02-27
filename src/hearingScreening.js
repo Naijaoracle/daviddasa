@@ -1,7 +1,9 @@
 let audioContext;
 let oscillator;
+let gainNode;
+let currentFrequency = 0;
+const testFrequencies = [125, 250, 500, 1000, 2000, 4000, 8000, 12000, 16000];
 let chartData = {
-  labels: [],
   datasets: [
     {
       label: 'Heard',
@@ -25,29 +27,132 @@ let chartData = {
 };
 let chart;
 
+// Initialize the chart when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+  initChart();
+  setupVolumeControl();
+});
+
+function initChart() {
+  const ctx = document.getElementById('responseChart').getContext('2d');
+  chart = new Chart(ctx, {
+    type: 'scatter',
+    data: chartData,
+    options: {
+      scales: {
+        x: {
+          type: 'logarithmic',
+          position: 'bottom',
+          title: {
+            display: true,
+            text: 'Frequency (Hz)'
+          },
+          min: 20,
+          max: 20000,
+          ticks: {
+            callback: function(value) {
+              return value.toString();
+            }
+          }
+        },
+        y: {
+          type: 'linear',
+          position: 'left',
+          min: -0.5,
+          max: 1.5,
+          ticks: {
+            display: false
+          },
+          grid: {
+            display: false
+          }
+        }
+      },
+      plugins: {
+        title: {
+          display: true,
+          text: 'Hearing Test Results',
+          font: {
+            size: 16,
+            weight: 'bold'
+          }
+        },
+        legend: {
+          display: true,
+          position: 'bottom'
+        }
+      },
+      responsive: true,
+      maintainAspectRatio: false
+    }
+  });
+}
+
+function setupVolumeControl() {
+  const volumeSlider = document.getElementById('volumeSlider');
+  if (volumeSlider) {
+    volumeSlider.addEventListener('input', function() {
+      if (gainNode) {
+        gainNode.gain.value = this.value / 100;
+      }
+    });
+  }
+}
+
 function initAudioContext() {
   if (audioContext) {
     audioContext.close();
   }
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
   oscillator = audioContext.createOscillator();
-  oscillator.connect(audioContext.destination);
+  gainNode = audioContext.createGain();
+  
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+  
+  const volumeSlider = document.getElementById('volumeSlider');
+  if (volumeSlider) {
+    gainNode.gain.value = volumeSlider.value / 100;
+  }
+}
+
+function startTest() {
+  chartData.datasets[0].data = [];
+  chartData.datasets[1].data = [];
+  if (chart) {
+    chart.update();
+  }
+  currentFrequency = 0;
+  playNextFrequency();
+}
+
+function playNextFrequency() {
+  if (currentFrequency < testFrequencies.length) {
+    const frequency = testFrequencies[currentFrequency];
+    document.getElementById('frequencyInput').value = frequency;
+    playSound();
+    // Stop sound after 2 seconds
+    setTimeout(() => {
+      stopSound();
+    }, 2000);
+  } else {
+    alert('Test complete! You can now download your results.');
+  }
 }
 
 function playSound() {
-  stopSound(); // Stop the sound if already playing
+  stopSound();
 
   const frequencyInput = document.getElementById('frequencyInput');
   const frequency = parseFloat(frequencyInput.value);
 
-  if (isNaN(frequency)) {
-    alert('Please enter a valid frequency.');
+  if (isNaN(frequency) || frequency < 20 || frequency > 20000) {
+    alert('Please enter a valid frequency between 20 Hz and 20000 Hz.');
     return;
   }
 
   initAudioContext();
-
-  oscillator.type = 'sine'; // Change the waveform here if needed
+  oscillator.type = 'sine';
   oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
   oscillator.start();
 }
@@ -60,17 +165,10 @@ function stopSound() {
 }
 
 function answer(response) {
-  stopSound(); // Stop the sound when answering
+  stopSound();
 
-  const frequencyInput = document.getElementById('frequencyInput');
-  const frequency = parseFloat(frequencyInput.value);
-
-  if (isNaN(frequency) || frequency < 20 || frequency > 20000) {
-    alert('Please enter a valid frequency between 20 Hz and 20000 Hz.');
-    return;
-  }
-
-  // Add the frequency to the data
+  const frequency = testFrequencies[currentFrequency];
+  
   if (response === 'Yes') {
     chartData.datasets[0].data.push({ x: frequency, y: 1 });
   } else {
@@ -79,59 +177,10 @@ function answer(response) {
   
   if (chart) {
     chart.update();
-  } else {
-    const ctx = document.getElementById('responseChart').getContext('2d');
-    chart = new Chart(ctx, {
-      type: 'scatter',
-      data: chartData,
-      options: {
-        scales: {
-          x: {
-            type: 'logarithmic',
-            position: 'bottom',
-            title: {
-              display: true,
-              text: 'Frequency (Hz)'
-            },
-            min: 20,
-            max: 20000,
-            ticks: {
-              callback: function(value) {
-                return value.toString();
-              }
-            }
-          },
-          y: {
-            type: 'linear',
-            position: 'left',
-            min: -0.5,
-            max: 1.5,
-            ticks: {
-              display: false
-            },
-            grid: {
-              display: false
-            }
-          }
-        },
-        plugins: {
-          title: {
-            display: true,
-            text: 'Hearing Test Results',
-            font: {
-              size: 16
-            }
-          },
-          legend: {
-            display: true,
-            position: 'bottom'
-          }
-        },
-        responsive: true,
-        maintainAspectRatio: false
-      }
-    });
   }
+
+  currentFrequency++;
+  setTimeout(playNextFrequency, 1000); // Wait 1 second before playing next frequency
 }
 
 function downloadChart() {

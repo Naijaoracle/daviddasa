@@ -25,38 +25,183 @@
     <div class="hearing-info">
       <h2>Discover Your Hearing Frequency Range</h2>
       <p>Take this test to gain valuable insights into your auditory health. Identify the specific frequencies you can hear for a better understanding of your abilities to hear across the sound spectrum.</p>
-      <p>This information may help you recognize potential signs of a decline in your hearing. For the standard test done in hospital, the frequency ranges from <hard>125 Hz to 8000 Hz</hard> (low pitch to high pitch). The test also varies the volume for each frequency (from very quiet to very loud).</p>
-      <p>For example, difficulty in hearing sounds around 4000 Hz could indicate noise-induced hearing loss, while a more general difficulty in hearing sounds above 2000 Hz might suggest age-related hearing loss.</p>
-      <p>Being aware of these patterns allows you to monitor your hearing health and, if necessary, seek professional advice. This test empowers you with knowledge about your hearing capabilities, facilitating early awareness of potential issues and encouraging proactive steps towards maintaining optimal auditory well-being.</p>
-      <p>Remember, the test results are not a substitute for professional medical advice but serve as a useful tool to prompt further discussions with healthcare providers.</p>
-    </div>
-    <p>We recommend using a modern browser for optimal performance. If you encounter any issues, ensure that JavaScript is enabled, and consider updating your browser for the best experience.</p>
-    <h3>Please use headphones.</h3>
+      
+      <div class="test-explanation">
+        <h3>How the Test Works</h3>
+        <p>This test will play a series of tones at different frequencies (from 125 Hz to 16000 Hz):</p>
+        <ul>
+          <li>Each tone will play for 2 seconds</li>
+          <li>After each tone, click "Yes" if you heard it or "No" if you didn't</li>
+          <li>The test will automatically progress through all frequencies</li>
+          <li>Use the volume slider to set a comfortable listening level</li>
+        </ul>
+        
+        <h3>Understanding the Chart</h3>
+        <p>The results are displayed on a frequency chart:</p>
+        <ul>
+          <li>Green circles (●) show frequencies you could hear</li>
+          <li>Red X's (❌) show frequencies you couldn't hear</li>
+          <li>The horizontal axis shows frequency in Hz (logarithmic scale)</li>
+          <li>For reference: 125-250 Hz (bass), 250-2000 Hz (speech), 2000-16000 Hz (high pitch)</li>
+        </ul>
+      </div>
 
-    <div class="centered">
-    <label for="frequencyInput">Enter Frequency (Hz): </label>
-    <input type="number" id="frequencyInput" min="20" max="20000" step="10" placeholder="e.g., 1000">
+      <div class="test-requirements">
+        <h3>Before You Begin</h3>
+        <ul>
+          <li>Use headphones for accurate results</li>
+          <li>Find a quiet environment</li>
+          <li>Take breaks if needed</li>
+        </ul>
+      </div>
+
+      <div class="important-notes">
+        <h3>Important Notes</h3>
+        <ul>
+          <li>This is a screening tool, not a diagnosis</li>
+          <li>Results may vary based on equipment</li>
+          <li>Consult a professional for concerns</li>
+          <li>Regular testing is recommended</li>
+        </ul>
+      </div>
     </div>
 
-    <div class="audio-container">
-      <button class="play" onclick="playSound()">Play</button>
-      <button class="stop" onclick="stopSound()">Stop</button>
+    <div class="test-container">
+      <h2>Frequency Hearing Test</h2>
+      
+      <div class="volume-control">
+        <label for="volumeSlider">Volume:</label>
+        <input type="range" id="volumeSlider" min="0" max="100" value="50">
+      </div>
+
+      <div class="frequency-display">
+        <label for="frequencyInput">Current Frequency (Hz):</label>
+        <input type="number" id="frequencyInput" readonly>
+      </div>
+
+      <div class="test-controls">
+        <button onclick="startTest()" class="start-btn">Start Test</button>
+      </div>
+
+      <div class="response-buttons" style="display: none;">
+        <p>Did you hear the sound?</p>
+        <button onclick="answer('Yes')" class="yes-btn">Yes</button>
+        <button onclick="answer('No')" class="no-btn">No</button>
+      </div>
+
+      <div class="chart-container" style="position: relative; height:60vh; width:80vw; margin: auto;">
+        <canvas id="responseChart"></canvas>
+      </div>
+      
+      <div class="download-container">
+        <button onclick="downloadChart()" class="download-btn">Download Results</button>
+      </div>
     </div>
 
-    <div class="centered">
-    <p>Did you hear the sound for a few seconds?</p>
-    <button onclick="answer('Yes')">Yes</button>
-    <button onclick="answer('No')">No</button>
-    </div>
+    <style>
+      .test-container {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 2rem;
+        border-radius: 1rem;
+        margin: 2rem auto;
+        max-width: 800px;
+      }
 
-    <!-- Chart container with proper dimensions -->
-    <div class="chart-container" style="position: relative; height:60vh; width:80vw; margin: auto;">
-      <canvas id="responseChart"></canvas>
-    </div>
-    
-    <div class="centered">
-    <button onclick="downloadChart()" class="download-btn">Download Results</button>
-    </div>
+      .test-explanation {
+        background: rgba(46, 204, 113, 0.1);
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        margin: 1.5rem 0;
+        border-left: 4px solid #2ecc71;
+      }
+
+      .test-explanation h3 {
+        color: #2c3e50;
+        margin-bottom: 1rem;
+      }
+
+      .test-explanation ul {
+        list-style-type: none;
+        padding-left: 1rem;
+      }
+
+      .test-explanation li {
+        margin: 0.5rem 0;
+        position: relative;
+        padding-left: 1.5rem;
+      }
+
+      .test-explanation li:before {
+        content: "•";
+        color: #2ecc71;
+        font-weight: bold;
+        position: absolute;
+        left: 0;
+      }
+
+      .volume-control {
+        margin: 1rem 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .frequency-display {
+        margin: 1rem 0;
+      }
+
+      .test-controls {
+        margin: 2rem 0;
+      }
+
+      .response-buttons {
+        margin: 2rem 0;
+        text-align: center;
+      }
+
+      .start-btn, .yes-btn, .no-btn, .download-btn {
+        padding: 0.5rem 2rem;
+        margin: 0.5rem;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+      }
+
+      .start-btn {
+        background: #2ecc71;
+        color: white;
+      }
+
+      .yes-btn {
+        background: #2ecc71;
+        color: white;
+      }
+
+      .no-btn {
+        background: #e74c3c;
+        color: white;
+      }
+
+      .download-btn {
+        background: #3498db;
+        color: white;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      }
+
+      .chart-container {
+        background: white;
+        padding: 1rem;
+        border-radius: 1rem;
+        margin: 2rem 0;
+      }
+    </style>
+
     <section id="online-tools">
       <h3>Online Hearing Tools</h3>
       <p>Even if your hearing frequency range is normal there are othere hearing issues you may want to speak to your doctor about <a href="https://www.daviddasa.com/ent-chat">click here</a> for suggestions.</p>
