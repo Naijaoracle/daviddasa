@@ -8,7 +8,6 @@ class HospitalSimulation {
 
     start() {
         this.running = true;
-        this.dataTracker.initializeCharts();
         this.runSimulation();
     }
 

@@ -33,7 +33,22 @@ class DataTracker {
         this.initializeCharts();
     }
     
+    destroyCharts() {
+        // Destroy all existing charts
+        Object.values(this.charts).forEach(chart => {
+            if (chart) {
+                chart.destroy();
+            }
+        });
+        this.charts = {};
+        this.isInitialized = false;
+    }
+    
     initializeCharts() {
+        if (this.isInitialized) {
+            return; // Don't initialize if already initialized
+        }
+        
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.setupCharts());
         } else {
@@ -42,6 +57,13 @@ class DataTracker {
     }
 
     setupCharts() {
+        if (this.isInitialized) {
+            return; // Don't setup if already initialized
+        }
+        
+        // Destroy any existing charts first
+        this.destroyCharts();
+        
         this.initWaitingTimeChart();
         this.initPatientSeverityChart();
         this.initStaffUtilizationChart();
