@@ -182,15 +182,50 @@
         .test-container {
           padding: 1rem;
           margin: 1rem;
+          width: 95%;
         }
 
         .chart-container {
-          height: 400px;
-          padding: 0.5rem;
+          height: 350px;
+          padding: 0;
+          margin: 1rem 0;
+        }
+
+        .volume-control, .frequency-display {
+          margin: 1rem 0;
+        }
+
+        .frequency-display input {
+          width: 100%;
+          max-width: 150px;
         }
 
         .button-group {
           flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .primary-button, .yes-button, .no-button, .download-button {
+          width: 100%;
+          max-width: 200px;
+          margin: 0.25rem auto;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .test-container {
+          padding: 0.5rem;
+          margin: 0.5rem;
+        }
+
+        .chart-container {
+          height: 300px;
+          margin: 0.5rem 0;
+        }
+
+        .test-explanation {
+          padding: 0.5rem;
+          margin: 0.5rem 0;
         }
       }
     </style>
