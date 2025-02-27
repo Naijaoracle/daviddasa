@@ -81,15 +81,15 @@ class DataTracker {
     initWaitingTimeChart() {
         const ctx = document.getElementById('waiting-time-chart').getContext('2d');
         this.charts.waitingTime = new Chart(ctx, {
-            type: 'line',
+            type: 'bar',
             data: {
-                labels: Array(10).fill('').map((_, i) => `${i*5}m ago`),
+                labels: Array(10).fill('').map((_, i) => `${i*5}m`),
                 datasets: [{
                     label: 'Average Wait Time',
                     data: Array(10).fill(0),
-                    fill: false,
-                    borderColor: '#4a90e2',
-                    tension: 0.1
+                    backgroundColor: '#4a90e2',
+                    borderColor: '#2980b9',
+                    borderWidth: 1
                 }]
             },
             options: {
@@ -105,8 +105,11 @@ class DataTracker {
                     },
                     x: {
                         ticks: {
-                            maxRotation: 45,
-                            minRotation: 45
+                            maxRotation: 0,
+                            minRotation: 0,
+                            font: {
+                                size: 10
+                            }
                         }
                     }
                 },
@@ -114,18 +117,20 @@ class DataTracker {
                     title: {
                         display: true,
                         text: 'Average Waiting Time',
-                        padding: {
-                            top: 10,
-                            bottom: 10
+                        font: {
+                            size: 14
                         }
+                    },
+                    legend: {
+                        display: false
                     }
                 },
                 layout: {
                     padding: {
-                        left: 10,
-                        right: 10,
-                        top: 0,
-                        bottom: 20
+                        left: 5,
+                        right: 5,
+                        top: 5,
+                        bottom: 5
                     }
                 }
             }
@@ -174,25 +179,17 @@ class DataTracker {
         this.charts.staffUtilization = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Dr. Smith', 'Dr. Johnson', 'Dr. Williams', 'Nurse Davis', 'Nurse Wilson', 'Nurse Thompson'],
+                labels: ['Dr. Smith', 'Dr. Johnson', 'Dr. Williams', 'N. Davis', 'N. Wilson', 'N. Thompson'],
                 datasets: [{
-                    label: 'Staff Utilization Rate',
+                    label: 'Utilization %',
                     data: [0, 0, 0, 0, 0, 0],
                     backgroundColor: [
-                        'rgba(255, 99, 132, 0.5)',
-                        'rgba(54, 162, 235, 0.5)',
-                        'rgba(255, 206, 86, 0.5)',
-                        'rgba(75, 192, 192, 0.5)',
-                        'rgba(153, 102, 255, 0.5)',
-                        'rgba(255, 159, 64, 0.5)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(153, 102, 255, 0.7)',
+                        'rgba(255, 159, 64, 0.7)'
                     ],
                     borderWidth: 1
                 }]
@@ -200,29 +197,30 @@ class DataTracker {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                indexAxis: 'y',
                 scales: {
-                    y: {
+                    x: {
                         beginAtZero: true,
                         max: 100,
                         title: {
                             display: true,
-                            text: 'Utilization Rate (%)'
+                            text: 'Utilization %'
                         }
                     },
-                    x: {
+                    y: {
                         ticks: {
-                            maxRotation: 45,
-                            minRotation: 45
+                            font: {
+                                size: 11
+                            }
                         }
                     }
                 },
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Staff Utilization Rates',
-                        padding: {
-                            top: 10,
-                            bottom: 10
+                        text: 'Staff Utilization',
+                        font: {
+                            size: 14
                         }
                     },
                     legend: {
@@ -231,10 +229,10 @@ class DataTracker {
                 },
                 layout: {
                     padding: {
-                        left: 10,
-                        right: 10,
-                        top: 0,
-                        bottom: 10
+                        left: 5,
+                        right: 5,
+                        top: 5,
+                        bottom: 5
                     }
                 }
             }
@@ -266,21 +264,29 @@ class DataTracker {
                 plugins: {
                     legend: {
                         position: 'right',
+                        align: 'start',
                         labels: {
-                            boxWidth: 15,
-                            padding: 15,
+                            boxWidth: 12,
+                            padding: 10,
                             font: {
-                                size: 11
+                                size: 10
                             }
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Conditions',
+                        font: {
+                            size: 14
                         }
                     }
                 },
                 layout: {
                     padding: {
-                        left: 10,
-                        right: 10,
-                        top: 10,
-                        bottom: 10
+                        left: 5,
+                        right: 5,
+                        top: 5,
+                        bottom: 5
                     }
                 }
             }
