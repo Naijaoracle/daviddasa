@@ -216,7 +216,7 @@ h2 {
     grid-row: 1;
 }
 
-.chart-container:nth-child(2) { /* Urgent/Stable */
+.chart-container:nth-child(2) { /* Patient Severity */
     grid-column: 2;
     grid-row: 1;
 }
@@ -231,7 +231,7 @@ h2 {
     grid-row: 2;
 }
 
-/* Remove the special handling for last-child since we're explicitly positioning */
+/* Remove special handling for last chart */
 .chart-container:last-child canvas {
     max-width: 250px;
     max-height: 150px;

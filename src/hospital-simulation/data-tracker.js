@@ -68,10 +68,12 @@ class DataTracker {
         // Destroy any existing charts first
         this.destroyCharts();
         
-        this.initWaitingTimeChart();
-        this.initPatientSeverityChart();
-        this.initStaffUtilizationChart();
-        this.initConditionBreakdownChart();
+        // Initialize charts in the correct order
+        this.initStaffUtilizationChart();    // Top left
+        this.initPatientSeverityChart();     // Top right
+        this.initWaitingTimeChart();         // Bottom left
+        this.initConditionBreakdownChart();  // Bottom right
+        
         this.isInitialized = true;
         this.startAutoUpdate();
     }
