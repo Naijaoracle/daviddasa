@@ -30,7 +30,11 @@ class DataTracker {
         };
         
         this.isInitialized = false;
+        this.lastUpdate = Date.now();
         this.initializeCharts();
+        
+        // Start tracking time
+        setInterval(() => this.updateUtilizationTime(), 1000); // Update every second
     }
     
     destroyCharts() {

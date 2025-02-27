@@ -175,6 +175,9 @@ class HospitalSimulation {
                     patient: patient
                 });
 
+                // Update staff utilization
+                this.dataTracker.updateStaffUtilization(availableStaff.id, true);
+
                 // Move staff to patient in waiting room first
                 this.hospitalMap.moveStaffToLocation(availableStaff.id, 'waitingRoom');
                 
@@ -228,6 +231,9 @@ class HospitalSimulation {
         this.staffVisualizer.updateStaffStatus(staff.id, {
             status: 'available'
         });
+
+        // Update staff utilization
+        this.dataTracker.updateStaffUtilization(staff.id, false);
 
         // Move staff back to their station
         this.hospitalMap.moveStaffToLocation(staff.id, staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation');
