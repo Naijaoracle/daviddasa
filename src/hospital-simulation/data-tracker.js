@@ -29,18 +29,25 @@ class DataTracker {
             patientConditions: []
         };
         
+        this.isInitialized = false;
         this.initializeCharts();
-        this.startAutoUpdate();
     }
     
     initializeCharts() {
-        // Wait for DOM to be ready
-        document.addEventListener('DOMContentLoaded', () => {
-            this.initWaitingTimeChart();
-            this.initPatientSeverityChart();
-            this.initStaffUtilizationChart();
-            this.initConditionBreakdownChart();
-        });
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.setupCharts());
+        } else {
+            this.setupCharts();
+        }
+    }
+
+    setupCharts() {
+        this.initWaitingTimeChart();
+        this.initPatientSeverityChart();
+        this.initStaffUtilizationChart();
+        this.initConditionBreakdownChart();
+        this.isInitialized = true;
+        this.startAutoUpdate();
     }
     
     initWaitingTimeChart() {
@@ -181,6 +188,8 @@ class DataTracker {
     }
 
     updateCharts() {
+        if (!this.isInitialized) return;  // Skip updates if charts aren't ready
+
         // Update waiting time chart
         this.charts.waitingTime.data.datasets[0].data.shift();
         this.charts.waitingTime.data.datasets[0].data.push(this.stats.averageWaitTime);
