@@ -189,7 +189,7 @@ h2 {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
     gap: 1rem;
-    height: 600px;
+    height: 450px;
     margin-bottom: 1rem;
 }
 
@@ -211,8 +211,8 @@ h2 {
     flex: 1;
     width: 100% !important;
     height: 100% !important;
-    max-width: 450px;
-    max-height: 300px;
+    max-width: 337px;
+    max-height: 225px;
 }
 
 /* Make condition breakdown chart take full width but maintain proportions */
@@ -222,8 +222,8 @@ h2 {
 }
 
 .chart-container:last-child canvas {
-    max-width: 600px;
-    max-height: 375px;
+    max-width: 450px;
+    max-height: 281px;
 }
 
 .dialogue-box {
@@ -583,7 +583,7 @@ h2 {
 
     .dashboard-layout {
         grid-template-columns: repeat(2, 1fr);
-        height: 525px;
+        height: 394px;
     }
 
     #hospital-map {
@@ -623,12 +623,12 @@ h2 {
     }
 
     .chart-container {
-        height: 300px;
+        height: 225px;
         padding: 1rem;
     }
 
     .chart-container:last-child {
-        height: 340px;
+        height: 255px;
     }
 
     #hospital-map {
