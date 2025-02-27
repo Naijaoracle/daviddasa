@@ -100,12 +100,30 @@ class DataTracker {
                             display: true,
                             text: 'Minutes'
                         }
+                    },
+                    x: {
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
                     }
                 },
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Average Waiting Time'
+                        text: 'Average Waiting Time',
+                        padding: {
+                            top: 10,
+                            bottom: 10
+                        }
+                    }
+                },
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 10,
+                        top: 0,
+                        bottom: 20
                     }
                 }
             }
@@ -128,7 +146,21 @@ class DataTracker {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        position: 'bottom'
+                        position: 'bottom',
+                        labels: {
+                            padding: 10,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                },
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 10,
+                        top: 10,
+                        bottom: 10
                     }
                 }
             }
@@ -174,15 +206,33 @@ class DataTracker {
                             display: true,
                             text: 'Utilization Rate (%)'
                         }
+                    },
+                    x: {
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
                     }
                 },
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Staff Utilization Rates'
+                        text: 'Staff Utilization Rates',
+                        padding: {
+                            top: 10,
+                            bottom: 10
+                        }
                     },
                     legend: {
                         display: false
+                    }
+                },
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 10,
+                        top: 0,
+                        bottom: 10
                     }
                 }
             }
@@ -213,7 +263,22 @@ class DataTracker {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        position: 'right'
+                        position: 'right',
+                        labels: {
+                            boxWidth: 15,
+                            padding: 15,
+                            font: {
+                                size: 11
+                            }
+                        }
+                    }
+                },
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 10,
+                        top: 10,
+                        bottom: 10
                     }
                 }
             }

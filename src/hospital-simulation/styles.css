@@ -198,6 +198,14 @@ h2 {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-container canvas {
+    flex: 1;
+    width: 100% !important;
+    height: 100% !important;
 }
 
 /* Make condition breakdown chart take full width */
@@ -592,14 +600,18 @@ h2 {
     }
 
     .dashboard-layout {
-        height: 300px;
+        height: auto;
         grid-template-columns: 1fr;
         gap: 0.75rem;
     }
 
     .chart-container {
-        height: 200px;
+        height: 250px;
         padding: 0.5rem;
+    }
+
+    .chart-container:last-child {
+        height: 300px;
     }
 
     #hospital-map {
