@@ -13,11 +13,14 @@ class HospitalSimulation {
             nurse2: new Staff('nurse2', 'Nurse Wilson', 'nurse')
         };
         
+        // Initialize hospital resources
+        this.resources = new HospitalResources();
+        
         // Initialize staff visualizer
         this.staffVisualizer = new StaffVisualizer(Object.values(this.staff));
         
-        // Initialize hospital resources
-        this.resources = new HospitalResources();
+        // Initialize hospital map
+        this.hospitalMap = new HospitalMap(Object.values(this.staff), this.resources);
         
         // Initialize waiting room and treatment areas
         this.waitingRoom = [];
@@ -111,6 +114,14 @@ class HospitalSimulation {
                     status: 'treating',
                     patient: patient
                 });
+
+                // Move staff to patient in waiting room first
+                this.hospitalMap.moveStaffToLocation(availableStaff.id, 'waitingRoom');
+                
+                // Then after a delay, move to treatment bay
+                setTimeout(() => {
+                    this.hospitalMap.moveStaffToLocation(availableStaff.id, bayId);
+                }, 1500);
                 
                 // Update treatment bay display
                 document.getElementById(bayId).innerHTML = `
@@ -141,6 +152,9 @@ class HospitalSimulation {
         this.staffVisualizer.updateStaffStatus(staff.id, {
             status: 'available'
         });
+
+        // Move staff back to their station
+        this.hospitalMap.moveStaffToLocation(staff.id, staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation');
         
         // Try to assign new patient if any waiting
         if (this.waitingRoom.length > 0) {
