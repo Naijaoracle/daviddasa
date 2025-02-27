@@ -6,10 +6,10 @@ class DataTracker {
             emergencyCases: 0,
             averageWaitTime: 0,
             staffUtilization: {
-                'doctor1': 0,
-                'doctor2': 0,
-                'nurse1': 0,
-                'nurse2': 0
+                'doctor1': { busyTime: 0, totalTime: 0, lastBusyStart: null, currentStatus: false },
+                'doctor2': { busyTime: 0, totalTime: 0, lastBusyStart: null, currentStatus: false },
+                'nurse1': { busyTime: 0, totalTime: 0, lastBusyStart: null, currentStatus: false },
+                'nurse2': { busyTime: 0, totalTime: 0, lastBusyStart: null, currentStatus: false }
             },
             conditionBreakdown: {},
             severityBreakdown: {
@@ -127,7 +127,7 @@ class DataTracker {
             data: {
                 labels: ['Dr. Smith', 'Dr. Johnson', 'Nurse Davis', 'Nurse Wilson'],
                 datasets: [{
-                    label: 'Utilization %',
+                    label: 'Staff Utilization',
                     data: [0, 0, 0, 0],
                     backgroundColor: ['#3498db', '#3498db', '#2ecc71', '#2ecc71']
                 }]
@@ -141,14 +141,25 @@ class DataTracker {
                         max: 100,
                         title: {
                             display: true,
-                            text: 'Utilization %'
+                            text: 'Time Spent Treating Patients (%)'
                         }
                     }
                 },
                 plugins: {
                     legend: {
                         display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const value = Math.round(context.raw);
+                                return `Utilization: ${value}% of total time`;
+                            }
+                        }
                     }
+                },
+                animation: {
+                    duration: 500
                 }
             }
         });
@@ -210,21 +221,62 @@ class DataTracker {
             this.stats.waitingTimes.reduce((a, b) => a + b, 0) / this.stats.waitingTimes.length;
     }
 
+    updateUtilizationTime() {
+        const now = Date.now();
+        const timeDiff = (now - this.lastUpdate) / 1000; // Convert to seconds
+
+        // Update total time and busy time for all staff
+        Object.entries(this.stats.staffUtilization).forEach(([staffId, staff]) => {
+            staff.totalTime += timeDiff;
+            if (staff.currentStatus && staff.lastBusyStart) {
+                staff.busyTime += timeDiff;
+            }
+        });
+
+        this.lastUpdate = now;
+        this.updateCharts();
+    }
+
     updateStaffUtilization(staffId, busy) {
-        // Update the staff utilization stats
-        this.stats.staffUtilization[staffId] = busy ? 100 : 0;
-        
-        // Calculate rolling average if needed
+        const staff = this.stats.staffUtilization[staffId];
+        if (!staff) return;
+
+        const now = Date.now();
+
+        // If status is changing, update the metrics
+        if (busy !== staff.currentStatus) {
+            if (busy) {
+                staff.lastBusyStart = now;
+            } else if (staff.lastBusyStart) {
+                // Add the time spent busy to total busy time
+                const busyDuration = (now - staff.lastBusyStart) / 1000;
+                staff.busyTime += busyDuration;
+                staff.lastBusyStart = null;
+            }
+            staff.currentStatus = busy;
+        }
+
+        // Calculate and update utilization percentage
         const staffIndex = {
             'doctor1': 0,
             'doctor2': 1,
             'nurse1': 2,
             'nurse2': 3
         }[staffId];
-        
+
         if (this.charts.staffUtilization && staffIndex !== undefined) {
-            this.charts.staffUtilization.data.datasets[0].data[staffIndex] = this.stats.staffUtilization[staffId];
-            this.charts.staffUtilization.update('none'); // Use 'none' for smoother updates
+            // Calculate current utilization including ongoing busy time
+            let currentBusyTime = staff.busyTime;
+            if (staff.currentStatus && staff.lastBusyStart) {
+                currentBusyTime += (now - staff.lastBusyStart) / 1000;
+            }
+
+            const utilizationPercentage = staff.totalTime > 0 
+                ? (currentBusyTime / staff.totalTime) * 100 
+                : 0;
+            
+            this.charts.staffUtilization.data.datasets[0].data[staffIndex] = Math.round(utilizationPercentage);
+            this.charts.staffUtilization.update('none');
         }
     }
 
@@ -244,12 +296,15 @@ class DataTracker {
         this.charts.severity.update();
 
         // Update staff utilization chart
-        this.charts.staffUtilization.data.datasets[0].data = [
-            this.stats.staffUtilization.doctor1,
-            this.stats.staffUtilization.doctor2,
-            this.stats.staffUtilization.nurse1,
-            this.stats.staffUtilization.nurse2
-        ];
+        const utilizationData = Object.values(this.stats.staffUtilization).map(staff => {
+            let currentBusyTime = staff.busyTime;
+            if (staff.currentStatus && staff.lastBusyStart) {
+                currentBusyTime += (Date.now() - staff.lastBusyStart) / 1000;
+            }
+            return staff.totalTime > 0 ? (currentBusyTime / staff.totalTime) * 100 : 0;
+        });
+        
+        this.charts.staffUtilization.data.datasets[0].data = utilizationData.map(Math.round);
         this.charts.staffUtilization.update();
 
         // Update condition breakdown chart
