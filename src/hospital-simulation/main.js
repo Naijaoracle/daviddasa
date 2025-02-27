@@ -31,33 +31,81 @@ class HospitalSimulation {
             bay4: null
         };
         
+        // Initialize activity log
+        this.activityLog = [];
+        
         // Bind event listeners
         this.bindEventListeners();
+    }
+
+    logActivity(message, type = 'info') {
+        const timestamp = new Date().toLocaleTimeString();
+        const logEntry = {
+            timestamp,
+            message,
+            type
+        };
+        this.activityLog.unshift(logEntry); // Add to beginning of array
+        this.updateActivityLog();
+    }
+
+    updateActivityLog() {
+        const logContainer = document.querySelector('.dialogue-content');
+        if (!logContainer) return;
+
+        // Only keep the 10 most recent entries
+        this.activityLog = this.activityLog.slice(0, 10);
+
+        logContainer.innerHTML = this.activityLog
+            .map(entry => `
+                <div class="log-entry ${entry.type}">
+                    <span class="timestamp">${entry.timestamp}</span>
+                    ${entry.message}
+                </div>
+            `)
+            .join('');
     }
 
     bindEventListeners() {
         document.getElementById('add-patient').addEventListener('click', () => this.generatePatient());
         document.getElementById('add-emergency').addEventListener('click', () => this.generatePatient(true));
+        document.getElementById('toggle-simulation').addEventListener('click', () => {
+            const button = document.getElementById('toggle-simulation');
+            if (this.running) {
+                this.stop();
+                button.textContent = 'Start Simulation';
+                button.style.background = '#27ae60';
+            } else {
+                this.start();
+                button.textContent = 'Stop Simulation';
+                button.style.background = '#e74c3c';
+            }
+        });
     }
 
     start() {
+        if (this.running) return; // Don't start if already running
         this.running = true;
-        this.runSimulation();
-    }
-
-    stop() {
-        this.running = false;
-    }
-
-    runSimulation() {
-        if (!this.running) return;
-
-        // Simulate patient arrival every few seconds
-        setInterval(() => {
+        this.logActivity('Simulation started', 'info');
+        this.simulationInterval = setInterval(() => {
             if (this.running) {
                 this.generatePatient();
             }
         }, 3000);
+    }
+
+    stop() {
+        if (!this.running) return; // Don't stop if already stopped
+        this.running = false;
+        this.logActivity('Simulation stopped', 'warning');
+        if (this.simulationInterval) {
+            clearInterval(this.simulationInterval);
+        }
+    }
+
+    runSimulation() {
+        // This method is now handled by start()
+        this.start();
     }
 
     generatePatient(isEmergency = false) {
@@ -70,6 +118,12 @@ class HospitalSimulation {
         // Add to waiting room
         this.waitingRoom.push(patient);
         this.updateWaitingRoomDisplay();
+
+        // Log patient arrival
+        this.logActivity(
+            `${patient.name} arrived with ${patient.condition} (${patient.severity})`,
+            isEmergency ? 'emergency' : 'info'
+        );
 
         // Track patient arrival
         this.dataTracker.updateStats(patient, 'arrival');
@@ -108,6 +162,12 @@ class HospitalSimulation {
                 // Assign to treatment bay
                 this.treatmentAreas[bayId] = patient;
                 
+                // Log assignment
+                this.logActivity(
+                    `${patient.name} assigned to ${availableStaff.name} in ${bayId}`,
+                    'transfer'
+                );
+                
                 // Update staff status
                 availableStaff.assignPatient(patient);
                 this.staffVisualizer.updateStaffStatus(availableStaff.id, {
@@ -133,7 +193,17 @@ class HospitalSimulation {
                 setTimeout(() => {
                     this.completePatientTreatment(patient, availableStaff, bayId);
                 }, (Math.random() * 10000) + 5000);
+            } else {
+                this.logActivity(
+                    `No treatment bays available for ${patient.name}`,
+                    'warning'
+                );
             }
+        } else {
+            this.logActivity(
+                `No staff available to treat ${patient.name}`,
+                'warning'
+            );
         }
     }
 
@@ -142,6 +212,12 @@ class HospitalSimulation {
         patient.treatmentEndTime = Date.now();
         patient.treatmentTime = (patient.treatmentEndTime - patient.treatmentStartTime) / 1000 / 60;
         this.dataTracker.updateStats(patient, 'treatment-end');
+        
+        // Log treatment completion
+        this.logActivity(
+            `${patient.name} treatment completed by ${staff.name}`,
+            'treatment'
+        );
         
         // Clear treatment bay
         this.treatmentAreas[bayId] = null;

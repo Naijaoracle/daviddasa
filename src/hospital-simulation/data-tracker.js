@@ -144,6 +144,11 @@ class DataTracker {
                             text: 'Utilization %'
                         }
                     }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
                 }
             }
         });
@@ -206,7 +211,21 @@ class DataTracker {
     }
 
     updateStaffUtilization(staffId, busy) {
+        // Update the staff utilization stats
         this.stats.staffUtilization[staffId] = busy ? 100 : 0;
+        
+        // Calculate rolling average if needed
+        const staffIndex = {
+            'doctor1': 0,
+            'doctor2': 1,
+            'nurse1': 2,
+            'nurse2': 3
+        }[staffId];
+        
+        if (this.charts.staffUtilization && staffIndex !== undefined) {
+            this.charts.staffUtilization.data.datasets[0].data[staffIndex] = this.stats.staffUtilization[staffId];
+            this.charts.staffUtilization.update('none'); // Use 'none' for smoother updates
+        }
     }
 
     updateCharts() {
