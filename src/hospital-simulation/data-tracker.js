@@ -83,7 +83,7 @@ class DataTracker {
             data: {
                 labels: Array(10).fill('').map((_, i) => `${i*5}m ago`),
                 datasets: [{
-                    label: 'Average Waiting Time (minutes)',
+                    label: 'Average Wait Time',
                     data: Array(10).fill(0),
                     fill: false,
                     borderColor: '#4a90e2',
@@ -100,6 +100,12 @@ class DataTracker {
                             display: true,
                             text: 'Minutes'
                         }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Average Waiting Time'
                     }
                 }
             }
@@ -119,7 +125,12 @@ class DataTracker {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
             }
         });
     }
@@ -145,7 +156,7 @@ class DataTracker {
                         max: 100,
                         title: {
                             display: true,
-                            text: 'Time Spent Treating Patients (%)'
+                            text: 'Utilization Rate (%)'
                         }
                     }
                 },
@@ -153,17 +164,10 @@ class DataTracker {
                     legend: {
                         display: false
                     },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const value = Math.round(context.raw);
-                                return `Utilization: ${value}% of total time`;
-                            }
-                        }
+                    title: {
+                        display: true,
+                        text: 'Staff Utilization Rate'
                     }
-                },
-                animation: {
-                    duration: 500
                 }
             }
         });
@@ -174,18 +178,28 @@ class DataTracker {
         this.charts.conditions = new Chart(ctx, {
             type: 'pie',
             data: {
-                labels: [],
+                labels: ['Stomach Pain', 'Dizziness', 'Chest Pain', 'Joint Pain', 'Breathing Difficulty', 'High Fever', 'Severe Headache'],
                 datasets: [{
                     data: [],
                     backgroundColor: [
-                        '#e74c3c', '#3498db', '#f1c40f', '#2ecc71',
-                        '#9b59b6', '#e67e22', '#1abc9c', '#34495e'
+                        '#e74c3c',  // Red
+                        '#f1c40f',  // Yellow
+                        '#2ecc71',  // Green
+                        '#9b59b6',  // Purple
+                        '#34495e',  // Dark Blue
+                        '#e67e22',  // Orange
+                        '#3498db'   // Light Blue
                     ]
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
             }
         });
     }

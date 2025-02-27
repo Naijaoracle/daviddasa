@@ -103,13 +103,14 @@ h2 {
 }
 
 .staff-window {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: auto 1fr;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     overflow: hidden;
     background: #fff;
     transition: transform 0.2s ease;
+    aspect-ratio: 1;
 }
 
 .staff-window:hover {
@@ -151,8 +152,24 @@ h2 {
 }
 
 .staff-activity {
-    height: 35px;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    height: auto;
+}
+
+.patient-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.3rem;
+}
+
+.patient-name {
+    font-size: 0.8rem;
+    color: #666;
+    text-align: center;
 }
 
 .data-dashboard {
@@ -166,13 +183,15 @@ h2 {
 .dashboard-layout {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
+    grid-template-rows: repeat(2, 1fr);
+    gap: 1rem;
+    height: 500px;
     margin-bottom: 1rem;
 }
 
 .chart-container {
     position: relative;
-    height: 220px;
+    height: 100%;
     padding: 0.8rem;
     background: #fff;
     border-radius: 8px;
@@ -472,18 +491,35 @@ h2 {
     }
 
     .dashboard-layout {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 1fr);
         gap: 1rem;
+        height: 500px;
     }
 
     .chart-container {
-        height: 220px;
+        height: 100%;
         padding: 0.8rem;
     }
 
-    .chart-container:last-child {
-        grid-column: span 3;
-        height: 250px;
+    .chart-container:nth-child(1) {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .chart-container:nth-child(2) {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .chart-container:nth-child(3) {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    .chart-container:nth-child(4) {
+        grid-column: 2;
+        grid-row: 2;
     }
 
     .dialogue-box {
