@@ -154,6 +154,11 @@ h2 {
     color: #155724;
 }
 
+.status:not(.busy):not(.available) {
+    background: #e9ecef;
+    color: #6c757d;
+}
+
 .staff-activity {
     position: relative;
     display: flex;

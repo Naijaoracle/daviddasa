@@ -82,16 +82,33 @@ class StaffVisualizer {
     updateStaffStatus(staffId, status) {
         const headerElement = document.querySelector(`#${staffId}-canvas`).previousElementSibling;
         const statusElement = headerElement.querySelector('.status');
+        const patientInfo = document.querySelector(`#${staffId}-canvas .patient-info`);
         
-        if (status === 'available') {
-            statusElement.textContent = 'Available';
-            statusElement.className = 'status available';
-        } else if (status === 'busy' || status === 'assisting') {
-            statusElement.textContent = 'Busy';
-            statusElement.className = 'status busy';
-        } else if (status === 'on break') {
+        if (status.status === 'on break') {
             statusElement.textContent = 'On Break';
             statusElement.className = 'status';
+            if (patientInfo) {
+                patientInfo.innerHTML = `
+                    <div class="patient-icon">☕</div>
+                    <div class="patient-name">Taking a break</div>
+                `;
+            }
+        } else if (status.status === 'available') {
+            statusElement.textContent = 'Available';
+            statusElement.className = 'status available';
+            if (patientInfo) {
+                patientInfo.innerHTML = '';
+            }
+        } else if (status.patient) {
+            statusElement.textContent = 'Busy';
+            statusElement.className = 'status busy';
+            if (patientInfo) {
+                patientInfo.innerHTML = `
+                    <div class="patient-icon">🏥</div>
+                    <div class="patient-name">Treating ${status.patient.name}</div>
+                    <div class="treatment-timer">0:00</div>
+                `;
+            }
         }
     }
 }

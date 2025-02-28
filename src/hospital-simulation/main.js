@@ -9,8 +9,19 @@ class HospitalSimulation {
         this.staff = {
             doctor1: new Staff('doctor1', 'Dr. Smith', 'doctor'),
             doctor2: new Staff('doctor2', 'Dr. Johnson', 'doctor'),
+            doctor3: new Staff('doctor3', 'Dr. Williams', 'doctor'),
             nurse1: new Staff('nurse1', 'Nurse Davis', 'nurse'),
-            nurse2: new Staff('nurse2', 'Nurse Wilson', 'nurse')
+            nurse2: new Staff('nurse2', 'Nurse Wilson', 'nurse'),
+            nurse3: new Staff('nurse3', 'Nurse Thompson', 'nurse')
+        };
+        
+        // Initialize break schedule
+        this.breakSchedule = {
+            doctors: ['doctor1', 'doctor2', 'doctor3'],
+            nurses: ['nurse1', 'nurse2', 'nurse3'],
+            currentIndex: { doctors: 0, nurses: 0 },
+            breakDuration: 5 * 60 * 1000, // 5 minutes in milliseconds
+            workDuration: 15 * 60 * 1000  // 15 minutes in milliseconds
         };
         
         // Initialize hospital resources
@@ -82,9 +93,14 @@ class HospitalSimulation {
     }
 
     start() {
-        if (this.running) return; // Don't start if already running
+        if (this.running) return;
         this.running = true;
         this.logActivity('Simulation started', 'info');
+        
+        // Start break rotation
+        this.startBreakRotation();
+        
+        // Start patient generation
         this.simulationInterval = setInterval(() => {
             if (this.running) {
                 this.generatePatient();
@@ -93,12 +109,60 @@ class HospitalSimulation {
     }
 
     stop() {
-        if (!this.running) return; // Don't stop if already stopped
+        if (!this.running) return;
         this.running = false;
         this.logActivity('Simulation stopped', 'warning');
+        
+        // Clear all intervals
         if (this.simulationInterval) {
             clearInterval(this.simulationInterval);
         }
+        if (this.breakRotationInterval) {
+            clearInterval(this.breakRotationInterval);
+        }
+    }
+
+    startBreakRotation() {
+        // Initially send first staff members on break
+        this.sendStaffOnBreak('doctors');
+        this.sendStaffOnBreak('nurses');
+        
+        // Set up break rotation interval
+        this.breakRotationInterval = setInterval(() => {
+            this.rotateBreaks('doctors');
+            this.rotateBreaks('nurses');
+        }, this.breakSchedule.workDuration);
+    }
+
+    sendStaffOnBreak(staffType) {
+        const currentId = this.breakSchedule[staffType][this.breakSchedule.currentIndex[staffType]];
+        const staff = this.staff[currentId];
+        
+        if (staff && !staff.currentPatient) {
+            staff.status = 'on break';
+            this.staffVisualizer.updateStaffStatus(staff.id, { status: 'on break' });
+            this.hospitalMap.moveStaffToLocation(staff.id, 'restArea');
+            this.logActivity(`${staff.name} is taking a break`, 'info');
+            
+            // Schedule end of break
+            setTimeout(() => {
+                if (staff.status === 'on break') {
+                    staff.status = 'available';
+                    this.staffVisualizer.updateStaffStatus(staff.id, { status: 'available' });
+                    const location = staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
+                    this.hospitalMap.moveStaffToLocation(staff.id, location);
+                    this.logActivity(`${staff.name} has returned from break`, 'info');
+                }
+            }, this.breakSchedule.breakDuration);
+        }
+    }
+
+    rotateBreaks(staffType) {
+        // Move to next staff member in rotation
+        this.breakSchedule.currentIndex[staffType] = 
+            (this.breakSchedule.currentIndex[staffType] + 1) % this.breakSchedule[staffType].length;
+        
+        this.sendStaffOnBreak(staffType);
     }
 
     runSimulation() {
@@ -143,8 +207,10 @@ class HospitalSimulation {
     }
 
     assignPatientToStaff(patient) {
-        // Find available staff member
-        const availableStaff = Object.values(this.staff).find(staff => !staff.currentPatient);
+        // Find available staff member (excluding those on break)
+        const availableStaff = Object.values(this.staff).find(staff => 
+            !staff.currentPatient && staff.status !== 'on break'
+        );
         
         if (availableStaff) {
             // Find available treatment bay
@@ -178,7 +244,7 @@ class HospitalSimulation {
                 // Update staff utilization
                 this.dataTracker.updateStaffUtilization(availableStaff.id, true);
 
-                // Move directly to treatment bay - removed waiting room step
+                // Move directly to treatment bay
                 this.hospitalMap.moveStaffToLocation(availableStaff.id, bayId);
                 
                 // Update treatment bay display
