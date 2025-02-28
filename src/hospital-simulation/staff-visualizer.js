@@ -90,7 +90,7 @@ class StaffVisualizer {
             if (patientInfo) {
                 patientInfo.innerHTML = `
                     <div class="patient-icon">☕</div>
-                    <div class="patient-name">Taking a break - Returning in 5 minutes</div>
+                    <div class="patient-name">Taking a break</div>
                     <div class="treatment-timer">5:00</div>
                 `;
             }
@@ -100,7 +100,7 @@ class StaffVisualizer {
             if (patientInfo) {
                 patientInfo.innerHTML = `
                     <div class="patient-icon">✓</div>
-                    <div class="patient-name">Available for new patients</div>
+                    <div class="patient-name">Waiting for next patient</div>
                 `;
             }
         } else if (status.patient) {

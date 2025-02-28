@@ -228,6 +228,23 @@ h2 {
     margin-left: auto;
     animation: pulse-text 2s infinite;
     white-space: nowrap;
+    display: none; /* Hide by default */
+}
+
+/* Only show timer for busy staff or staff on break */
+.status.busy ~ .staff-activity .treatment-timer,
+.status:not(.busy):not(.available) ~ .staff-activity .treatment-timer {
+    display: block;
+}
+
+/* Hide timer for available staff */
+.status.available ~ .staff-activity .treatment-timer {
+    display: none;
+}
+
+/* Ensure patient info takes full width when no timer */
+.status.available ~ .staff-activity .patient-info {
+    flex: 1;
 }
 
 .staff-activity .staff-icon {
