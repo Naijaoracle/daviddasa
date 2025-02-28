@@ -79,6 +79,10 @@ class HospitalSimulation {
         this.dataTracker = new DataTracker();
         this.running = false;
         
+        // Simulation time settings
+        this.simulationTimeScale = 10; // 1 real second = 10 simulation seconds
+        this.simulationStartTime = null;
+        
         // Initialize staff members
         this.staff = {
             doctor1: new Staff('doctor1', 'Dr. Smith', 'doctor'),
@@ -89,13 +93,13 @@ class HospitalSimulation {
             nurse3: new Staff('nurse3', 'Nurse Thompson', 'nurse')
         };
         
-        // Initialize break schedule
+        // Initialize break schedule (in simulation minutes)
         this.breakSchedule = {
             doctors: ['doctor1', 'doctor2', 'doctor3'],
             nurses: ['nurse1', 'nurse2', 'nurse3'],
             currentIndex: { doctors: 0, nurses: 0 },
-            breakDuration: 5 * 60 * 1000, // 5 minutes in milliseconds
-            workDuration: 15 * 60 * 1000  // 15 minutes in milliseconds
+            breakDuration: 30,     // 30 simulation minutes
+            workDuration: 240      // 4 simulation hours
         };
         
         // Initialize hospital resources
@@ -166,9 +170,16 @@ class HospitalSimulation {
         });
     }
 
+    getSimulationTime() {
+        if (!this.simulationStartTime) return 0;
+        const realElapsed = Date.now() - this.simulationStartTime;
+        return realElapsed * (this.simulationTimeScale / 1000); // Convert to simulation seconds
+    }
+
     start() {
         if (this.running) return;
         this.running = true;
+        this.simulationStartTime = Date.now();
         this.logActivity('Simulation started', 'info');
         
         // Start break rotation
@@ -201,11 +212,13 @@ class HospitalSimulation {
         this.sendStaffOnBreak('doctors');
         this.sendStaffOnBreak('nurses');
         
-        // Set up break rotation interval
+        // Set up break rotation interval using simulation time
+        const workDurationReal = (this.breakSchedule.workDuration * 60 * 1000) / this.simulationTimeScale;
+        
         this.breakRotationInterval = setInterval(() => {
             this.rotateBreaks('doctors');
             this.rotateBreaks('nurses');
-        }, this.breakSchedule.workDuration);
+        }, workDurationReal);
     }
 
     sendStaffOnBreak(staffType) {
@@ -215,25 +228,33 @@ class HospitalSimulation {
         if (staff && !staff.currentPatient) {
             staff.status = 'on break';
             this.staffVisualizer.updateStaffStatus(staff.id, { status: 'on break' });
+            
+            // Move staff to rest area in the hospital map
             this.hospitalMap.moveStaffToLocation(staff.id, 'restArea');
+            
             this.logActivity(`${staff.name} is taking a break`, 'info');
             
-            // Schedule end of break
+            // Schedule end of break using simulation time
+            const breakDurationReal = (this.breakSchedule.breakDuration * 60 * 1000) / this.simulationTimeScale;
+            
             setTimeout(() => {
                 if (staff.status === 'on break') {
                     staff.status = 'available';
                     this.staffVisualizer.updateStaffStatus(staff.id, { status: 'available' });
+                    
+                    // Move staff back to their office/station
                     const location = staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
                     this.hospitalMap.moveStaffToLocation(staff.id, location);
+                    
                     this.logActivity(`${staff.name} has returned from break`, 'info');
                 }
-            }, this.breakSchedule.breakDuration);
+            }, breakDurationReal);
 
             // Prevent staff from being assigned during break
             staff.onBreak = true;
             setTimeout(() => {
                 staff.onBreak = false;
-            }, this.breakSchedule.breakDuration);
+            }, breakDurationReal);
         }
     }
 
@@ -281,26 +302,57 @@ class HospitalSimulation {
     }
 
     updateWaitingRoomDisplay() {
+        // Update the waiting room display in the metrics panel
         const waitingRoomElement = document.querySelector('.waiting-patients');
         waitingRoomElement.innerHTML = '';
         
         const waitingRoomGrid = document.createElement('div');
         waitingRoomGrid.className = 'waiting-room-grid';
         
-        this.waitingRoom.getAllPatients().forEach(patient => {
-            const patientCell = document.createElement('div');
-            patientCell.className = `patient-cell ${patient.severity}`;
-            const waitTime = Math.floor((Date.now() - patient.addedTime) / 1000 / 60); // minutes
-            
-            patientCell.innerHTML = `
-                <div class="patient-icon">${patient.severity === 'urgent' ? '🚨' : '🤒'}</div>
-                <div class="patient-info">
-                    <div class="patient-name">${patient.name}</div>
-                    <div class="patient-condition">${patient.condition}</div>
-                    <div class="wait-time">${waitTime}m waiting</div>
-                </div>
-            `;
-            waitingRoomGrid.appendChild(patientCell);
+        // Update the hospital map waiting room grid
+        const mapWaitingRoom = document.querySelector('.waiting-room-grid-map');
+        if (!mapWaitingRoom) {
+            // Create the grid container if it doesn't exist
+            const newMapGrid = document.createElement('div');
+            newMapGrid.className = 'waiting-room-grid-map';
+            document.querySelector('.waiting-room').appendChild(newMapGrid);
+        }
+        
+        // Clear existing patients from map
+        document.querySelector('.waiting-room-grid-map').innerHTML = '';
+        
+        // Create a 3x4 grid for waiting room (max 12 patients)
+        const gridSize = 12;
+        for (let i = 0; i < gridSize; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'waiting-room-cell';
+            document.querySelector('.waiting-room-grid-map').appendChild(cell);
+        }
+        
+        // Fill grid with patients
+        this.waitingRoom.getAllPatients().forEach((patient, index) => {
+            if (index < gridSize) {
+                // Update map grid
+                const mapCell = document.querySelectorAll('.waiting-room-cell')[index];
+                mapCell.innerHTML = `<span class="patient-icon-map ${patient.severity}">${patient.severity === 'urgent' ? '🚨' : '🤒'}</span>`;
+                mapCell.classList.add('occupied');
+                mapCell.classList.add(patient.severity);
+                
+                // Update metrics panel grid
+                const patientCell = document.createElement('div');
+                patientCell.className = `patient-cell ${patient.severity}`;
+                const waitTime = Math.floor((Date.now() - patient.addedTime) / 1000 / 60); // minutes
+                
+                patientCell.innerHTML = `
+                    <div class="patient-icon">${patient.severity === 'urgent' ? '🚨' : '🤒'}</div>
+                    <div class="patient-info">
+                        <div class="patient-name">${patient.name}</div>
+                        <div class="patient-condition">${patient.condition}</div>
+                        <div class="wait-time">${waitTime}m waiting</div>
+                    </div>
+                `;
+                waitingRoomGrid.appendChild(patientCell);
+            }
         });
         
         waitingRoomElement.appendChild(waitingRoomGrid);
