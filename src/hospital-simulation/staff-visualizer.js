@@ -161,13 +161,7 @@ class ActivityScene {
         const w = s.width;
         const h = s.height;
         
-        // Draw staff icon
-        s.push();
-        s.textSize(24);
-        s.text(this.staff.icon, 40, h/2);
-        s.pop();
-        
-        // Draw main activity area
+        // Draw main activity area (removed staff icon drawing)
         s.push();
         s.fill(255);
         s.stroke(200);
