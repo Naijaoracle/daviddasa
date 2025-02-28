@@ -93,17 +93,25 @@ class HospitalMap {
             graphics.strokeRect(x, y, 150, 100);
         }
         
-        // Draw nurse station (made larger)
+        // Staff area dimensions
+        const officeWidth = 100;
+        const officeHeight = 80;
+        const staffAreaStartX = 570;
+        const staffAreaStartY = 50;
+        
+        // Draw nurse office (left)
         graphics.fillStyle(colors.nurseStation, 1);
-        graphics.fillRect(570, 50, 210, 80);
+        graphics.fillRect(staffAreaStartX, staffAreaStartY, officeWidth, officeHeight);
         
-        // Draw doctor offices (made larger)
+        // Draw doctor office (right)
         graphics.fillStyle(colors.doctorOffice, 1);
-        graphics.fillRect(570, 140, 100, 110);
+        graphics.fillRect(staffAreaStartX + officeWidth + 10, staffAreaStartY, officeWidth, officeHeight);
         
-        // Draw rest area (made larger)
+        // Draw large rest area below offices
         graphics.fillStyle(colors.restArea, 1);
-        graphics.fillRect(680, 140, 100, 110);
+        graphics.fillRect(staffAreaStartX, staffAreaStartY + officeHeight + 10, 
+                         officeWidth * 2 + 10, // Width of both offices plus gap
+                         120); // Taller than offices
         
         // Add room labels
         this.addRoomLabel(scene, 110, 40, 'Waiting Room');
@@ -111,9 +119,9 @@ class HospitalMap {
         this.addRoomLabel(scene, 485, 40, 'Treatment Bay 2');
         this.addRoomLabel(scene, 325, 150, 'Treatment Bay 3');
         this.addRoomLabel(scene, 485, 150, 'Treatment Bay 4');
-        this.addRoomLabel(scene, 675, 40, 'Nurse Station');
-        this.addRoomLabel(scene, 620, 130, 'Doctor Offices');
-        this.addRoomLabel(scene, 730, 130, 'Rest Area');
+        this.addRoomLabel(scene, staffAreaStartX + officeWidth/2, staffAreaStartY - 10, 'Nurse Office');
+        this.addRoomLabel(scene, staffAreaStartX + officeWidth*1.5 + 10, staffAreaStartY - 10, 'Doctor Office');
+        this.addRoomLabel(scene, staffAreaStartX + officeWidth + 5, staffAreaStartY + officeHeight + 60, 'Rest Area');
         
         // Add corridors
         graphics.fillStyle(0xf8f9fa, 1);

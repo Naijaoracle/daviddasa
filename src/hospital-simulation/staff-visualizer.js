@@ -222,25 +222,29 @@ class ActivityScene {
         
         if (!this.patientDetails) return;
         
+        // Center everything in the activity area
+        const centerX = w/2;
+        const centerY = h/2;
+        
         // Draw patient info
         s.push();
         s.fill(70);
         s.textSize(12);
         s.textAlign(s.CENTER, s.TOP);
-        s.text(`Treating: ${this.patientDetails.name}`, w/2 + 40, 35);
+        s.text(`Treating: ${this.patientDetails.name}`, centerX, 35);
         s.textSize(10);
         s.fill(100);
-        s.text(`Condition: ${this.patientDetails.condition}`, w/2 + 40, 55);
+        s.text(`Condition: ${this.patientDetails.condition}`, centerX, 55);
         
-        // Draw patient icon
+        // Draw patient icon centered
         s.textSize(20);
-        s.text(this.patientDetails.avatar, w/2 + 40, h/2 - 10);
+        s.text(this.patientDetails.avatar, centerX, centerY);
         
-        // Draw vitals
+        // Draw vitals below the icon
         s.textSize(8);
-        s.textAlign(s.LEFT, s.CENTER);
-        s.text(`HR: ${this.patientDetails.vitals.heartRate} BP: ${this.patientDetails.vitals.bloodPressure}`, w/2 - 30, h/2 + 20);
-        s.text(`Temp: ${this.patientDetails.vitals.temperature}°C`, w/2 - 30, h/2 + 30);
+        s.textAlign(s.CENTER, s.CENTER);
+        s.text(`HR: ${this.patientDetails.vitals.heartRate} BP: ${this.patientDetails.vitals.bloodPressure}`, centerX, centerY + 30);
+        s.text(`Temp: ${this.patientDetails.vitals.temperature}°C`, centerX, centerY + 40);
         s.pop();
         
         // Draw treatment animation with particles
