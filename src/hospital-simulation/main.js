@@ -185,10 +185,21 @@ class HospitalSimulation {
         // Start break rotation
         this.startBreakRotation();
         
+        // Generate initial batch of patients (4-8 patients)
+        const initialPatients = Math.floor(Math.random() * 5) + 4;
+        for (let i = 0; i < initialPatients; i++) {
+            this.generatePatient();
+        }
+        
         // Start patient generation
         this.simulationInterval = setInterval(() => {
             if (this.running) {
-                this.generatePatient();
+                // 15% chance of emergency patient
+                if (Math.random() < 0.15) {
+                    this.generatePatient(true);
+                } else {
+                    this.generatePatient();
+                }
             }
         }, 3000);
     }
@@ -273,7 +284,11 @@ class HospitalSimulation {
 
     generatePatient(isEmergency = false) {
         const patient = new Patient(Math.random().toString(36).substr(2, 9));
-        if (isEmergency) {
+        
+        // Determine severity - 30% chance of urgent if not emergency
+        if (!isEmergency) {
+            patient.severity = Math.random() < 0.3 ? 'urgent' : 'stable';
+        } else {
             patient.severity = 'urgent';
             patient.isEmergency = true;
         }
@@ -310,37 +325,108 @@ class HospitalSimulation {
         waitingRoomGrid.className = 'waiting-room-grid';
         
         // Get all waiting room cells in the hospital map
-        const mapCells = document.querySelectorAll('.waiting-room .waiting-room-cell');
+        const mapCells = [];
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 4; j++) {
+                const cellId = `waiting_${i}_${j}`;
+                const cell = document.querySelector(`[name="${cellId}"]`);
+                if (cell) {
+                    mapCells.push(cell);
+                }
+            }
+        }
+        console.log('Found waiting room cells:', mapCells.length); // Debug log
         
         // Clear all existing cells
         mapCells.forEach(cell => {
-            cell.innerHTML = '';
-            cell.className = 'waiting-room-cell';
+            const cellGraphics = cell.graphics;
+            if (cellGraphics) {
+                cellGraphics.destroy();
+            }
+            cell.removeAllListeners('pointerover');
+            cell.removeAllListeners('pointerout');
+            
+            // Create new graphics for the cell
+            const scene = this.hospitalMap.game.scene.scenes[0];
+            const initialCellGraphics = scene.add.graphics();
+            const bounds = cell.getBounds();
+            
+            // Draw the cell background
+            initialCellGraphics.fillStyle(0xf0f0f0);
+            initialCellGraphics.fillRect(bounds.x - bounds.width/2, bounds.y - bounds.height/2, bounds.width, bounds.height);
+            
+            cell.graphics = initialCellGraphics;
         });
         
         // Fill grid with patients
-        this.waitingRoom.getAllPatients().forEach((patient, index) => {
+        const patients = this.waitingRoom.getAllPatients();
+        console.log('Patients to display:', patients.length); // Debug log
+        
+        patients.forEach((patient, index) => {
             if (index < mapCells.length) {
-                // Update map grid cell
-                const mapCell = mapCells[index];
-                mapCell.innerHTML = `<span class="patient-icon-map ${patient.severity}">${patient.severity === 'urgent' ? '🚨' : '🤒'}</span>`;
-                mapCell.classList.add('occupied');
-                mapCell.classList.add(patient.severity);
+                const cell = mapCells[index];
+                const scene = this.hospitalMap.game.scene.scenes[0];
+                const bounds = cell.getBounds();
+                
+                // Create patient icon
+                const icon = patient.severity === 'urgent' ? '🚨' : '🤒';
+                const patientIcon = scene.add.text(
+                    bounds.centerX,
+                    bounds.centerY,
+                    icon,
+                    { fontSize: '16px' }
+                );
+                patientIcon.setOrigin(0.5, 0.5);
+                
+                // Update cell graphics
+                const patientCellGraphics = cell.graphics;
+                if (patientCellGraphics) {
+                    patientCellGraphics.clear();
+                    patientCellGraphics.fillStyle(0xffffff);
+                    patientCellGraphics.fillRect(bounds.x - bounds.width/2, bounds.y - bounds.height/2, bounds.width, bounds.height);
+                    patientCellGraphics.lineStyle(2, patient.severity === 'urgent' ? 0xe74c3c : 0x27ae60);
+                    patientCellGraphics.strokeRect(bounds.x - bounds.width/2, bounds.y - bounds.height/2, bounds.width, bounds.height);
+                }
+                
+                // Store the icon reference in the cell
+                cell.patientIcon = patientIcon;
                 
                 // Update metrics panel grid
                 const patientCell = document.createElement('div');
                 patientCell.className = `patient-cell ${patient.severity}`;
-                const waitTime = Math.floor((Date.now() - patient.addedTime) / 1000 / 60); // minutes
+                
+                // Calculate wait time using simulation time
+                const realWaitTime = Date.now() - patient.addedTime;
+                const simulationWaitTime = Math.floor((realWaitTime * this.simulationTimeScale) / (1000 * 60)); // simulation minutes
                 
                 patientCell.innerHTML = `
-                    <div class="patient-icon">${patient.severity === 'urgent' ? '🚨' : '🤒'}</div>
+                    <div class="patient-icon">${icon}</div>
                     <div class="patient-info">
                         <div class="patient-name">${patient.name}</div>
                         <div class="patient-condition">${patient.condition}</div>
-                        <div class="wait-time">${waitTime}m waiting</div>
+                        <div class="wait-time">${simulationWaitTime}m waiting</div>
                     </div>
                 `;
                 waitingRoomGrid.appendChild(patientCell);
+            }
+        });
+        
+        // Clean up any remaining patient icons from empty cells
+        mapCells.slice(patients.length).forEach(cell => {
+            if (cell.patientIcon) {
+                cell.patientIcon.destroy();
+                cell.patientIcon = null;
+            }
+            
+            // Reset cell graphics to empty state
+            const emptyGraphics = cell.graphics;
+            if (emptyGraphics) {
+                emptyGraphics.clear();
+                emptyGraphics.fillStyle(0xf0f0f0);
+                const bounds = cell.getBounds();
+                emptyGraphics.fillRect(bounds.x - bounds.width/2, bounds.y - bounds.height/2, bounds.width, bounds.height);
+                emptyGraphics.lineStyle(1, 0xdddddd);
+                emptyGraphics.strokeRect(bounds.x - bounds.width/2, bounds.y - bounds.height/2, bounds.width, bounds.height);
             }
         });
         
@@ -415,10 +501,11 @@ class HospitalSimulation {
                     </div>
                 `;
                 
-                // Simulate treatment
+                // Simulate treatment (5-15 minutes in simulation time)
+                const treatmentDuration = ((Math.random() * 10 + 5) * 60 * 1000) / this.simulationTimeScale;
                 setTimeout(() => {
                     this.completePatientTreatment(patient, availableStaff, bayId);
-                }, (Math.random() * 10000) + 5000);
+                }, treatmentDuration);
             } else {
                 this.logActivity(
                     `No treatment bays available for ${patient.name}`,
