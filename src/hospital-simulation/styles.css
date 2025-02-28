@@ -206,11 +206,6 @@ h2 {
     flex: 1;
 }
 
-/* Hide "Waiting for patient" text when staff is busy */
-.status.busy ~ .staff-activity .patient-name:contains("Waiting for patient") {
-    display: none;
-}
-
 /* Show treatment info more prominently when staff is busy */
 .status.busy ~ .staff-activity .patient-name {
     color: #4a90e2;
@@ -219,36 +214,6 @@ h2 {
 
 .status.busy ~ .staff-activity .patient-icon {
     color: #4a90e2;
-}
-
-.treatment-timer {
-    font-size: 0.85rem;
-    color: #4a90e2;
-    font-family: monospace;
-    margin-left: auto;
-    animation: pulse-text 2s infinite;
-    white-space: nowrap;
-    display: none; /* Hide by default */
-}
-
-/* Only show timer for busy staff or staff on break */
-.status.busy ~ .staff-activity .treatment-timer,
-.status:not(.busy):not(.available) ~ .staff-activity .treatment-timer {
-    display: block;
-}
-
-/* Hide timer for available staff */
-.status.available ~ .staff-activity .treatment-timer {
-    display: none;
-}
-
-/* Ensure patient info takes full width when no timer */
-.status.available ~ .staff-activity .patient-info {
-    flex: 1;
-}
-
-.staff-activity .staff-icon {
-    display: none;
 }
 
 .patient-icon {
@@ -768,11 +733,4 @@ h2 {
     opacity: 0.9;
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Add a subtle animation for the treatment timer */
-@keyframes pulse-text {
-    0% { opacity: 1; }
-    50% { opacity: 0.7; }
-    100% { opacity: 1; }
 }
