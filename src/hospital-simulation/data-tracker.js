@@ -4,19 +4,27 @@ class DataTracker {
         this.stats = {
             patientsServed: 0,
             emergencyCases: 0,
-            averageWaitTime: 0,
+            averageWaitTime: {
+                urgent: 0,
+                stable: 0
+            },
             staffUtilization: {
                 'doctor1': { busyTime: 0, totalTime: 0, lastBusyStart: null, currentStatus: false },
                 'doctor2': { busyTime: 0, totalTime: 0, lastBusyStart: null, currentStatus: false },
+                'doctor3': { busyTime: 0, totalTime: 0, lastBusyStart: null, currentStatus: false },
                 'nurse1': { busyTime: 0, totalTime: 0, lastBusyStart: null, currentStatus: false },
-                'nurse2': { busyTime: 0, totalTime: 0, lastBusyStart: null, currentStatus: false }
+                'nurse2': { busyTime: 0, totalTime: 0, lastBusyStart: null, currentStatus: false },
+                'nurse3': { busyTime: 0, totalTime: 0, lastBusyStart: null, currentStatus: false }
             },
             conditionBreakdown: {},
             severityBreakdown: {
                 urgent: 0,
                 stable: 0
             },
-            waitingTimes: [],
+            waitingTimes: {
+                urgent: [],
+                stable: []
+            },
             hourlyPatients: Array(24).fill(0),
             treatmentTimes: []
         };
@@ -81,42 +89,35 @@ class DataTracker {
     initWaitingTimeChart() {
         const ctx = document.getElementById('waiting-time-chart').getContext('2d');
         this.charts.waitingTime = new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: {
-                labels: Array(10).fill('').map((_, i) => `${i*5}m`),
-                datasets: [{
-                    label: 'Average Wait Time',
-                    data: Array(10).fill(0),
-                    backgroundColor: '#4a90e2',
-                    borderColor: '#2980b9',
-                    borderWidth: 1
-                }]
+                labels: Array(20).fill('').map((_, i) => `${i}m`),
+                datasets: [
+                    {
+                        label: 'Urgent',
+                        data: Array(20).fill(0),
+                        borderColor: '#ff4444',
+                        backgroundColor: 'rgba(255, 68, 68, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Stable',
+                        data: Array(20).fill(0),
+                        borderColor: '#4CAF50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Minutes'
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            maxRotation: 0,
-                            minRotation: 0,
-                            font: {
-                                size: 10
-                            }
-                        }
-                    }
-                },
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Average Waiting Time',
+                        text: 'Average Waiting Times',
                         font: {
                             size: 14
                         }
@@ -125,12 +126,13 @@ class DataTracker {
                         display: false
                     }
                 },
-                layout: {
-                    padding: {
-                        left: 5,
-                        right: 5,
-                        top: 5,
-                        bottom: 5
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Minutes'
+                        }
                     }
                 }
             }
@@ -309,7 +311,7 @@ class DataTracker {
                 if (patient.severity === 'urgent') {
                     this.stats.emergencyCases++;
                 }
-                this.updateWaitingTime(patient.waitingTime);
+                this.updateWaitingTime(patient);
                 break;
                 
             case 'treatment-end':
@@ -325,10 +327,14 @@ class DataTracker {
             (this.stats.conditionBreakdown[condition] || 0) + 1;
     }
 
-    updateWaitingTime(time) {
-        this.stats.waitingTimes.push(time);
-        this.stats.averageWaitTime = 
-            this.stats.waitingTimes.reduce((a, b) => a + b, 0) / this.stats.waitingTimes.length;
+    updateWaitingTime(patient) {
+        const waitTime = (Date.now() - patient.addedTime) / 1000 / 60; // Convert to minutes
+        this.stats.waitingTimes[patient.severity].push(waitTime);
+        
+        // Update average wait time for this severity
+        const times = this.stats.waitingTimes[patient.severity];
+        this.stats.averageWaitTime[patient.severity] = 
+            times.reduce((a, b) => a + b, 0) / times.length;
     }
 
     updateUtilizationTime() {
@@ -370,8 +376,10 @@ class DataTracker {
         const staffIndex = {
             'doctor1': 0,
             'doctor2': 1,
-            'nurse1': 2,
-            'nurse2': 3
+            'doctor3': 2,
+            'nurse1': 3,
+            'nurse2': 4,
+            'nurse3': 5
         }[staffId];
 
         if (this.charts.staffUtilization && staffIndex !== undefined) {
@@ -394,9 +402,19 @@ class DataTracker {
         if (!this.isInitialized) return;  // Skip updates if charts aren't ready
 
         // Update waiting time chart
-        this.charts.waitingTime.data.datasets[0].data.shift();
-        this.charts.waitingTime.data.datasets[0].data.push(this.stats.averageWaitTime);
-        this.charts.waitingTime.update();
+        if (this.charts.waitingTime) {
+            this.charts.waitingTime.data.datasets[0].data.shift();
+            this.charts.waitingTime.data.datasets[1].data.shift();
+            
+            this.charts.waitingTime.data.datasets[0].data.push(
+                this.stats.averageWaitTime.urgent.toFixed(1)
+            );
+            this.charts.waitingTime.data.datasets[1].data.push(
+                this.stats.averageWaitTime.stable.toFixed(1)
+            );
+            
+            this.charts.waitingTime.update('none');
+        }
 
         // Update severity chart
         this.charts.severity.data.datasets[0].data = [

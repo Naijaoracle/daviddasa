@@ -1,5 +1,79 @@
 // Main Hospital Simulation Controller
 
+class WaitingRoom {
+    constructor(maxCapacity = 12) {
+        this.maxCapacity = maxCapacity;
+        this.patients = {
+            urgent: [],
+            stable: []
+        };
+        this.lastUrgentTreated = false;
+    }
+
+    isFull() {
+        return this.getTotalCount() >= this.maxCapacity;
+    }
+
+    getTotalCount() {
+        return this.patients.urgent.length + this.patients.stable.length;
+    }
+
+    addPatient(patient) {
+        if (this.isFull()) {
+            return false;
+        }
+
+        patient.addedTime = Date.now();
+        this.patients[patient.severity].push(patient);
+        
+        // Sort by waiting time within each category
+        this.patients[patient.severity].sort((a, b) => a.addedTime - b.addedTime);
+        return true;
+    }
+
+    getNextPatient() {
+        if (this.getTotalCount() === 0) return null;
+
+        // If only one type of patients, return the longest waiting one
+        if (this.patients.urgent.length === 0) return this.patients.stable[0];
+        if (this.patients.stable.length === 0) return this.patients.urgent[0];
+
+        const oldestUrgent = this.patients.urgent[0];
+        const oldestStable = this.patients.stable[0];
+        const urgentWaitTime = Date.now() - oldestUrgent.addedTime;
+        const stableWaitTime = Date.now() - oldestStable.addedTime;
+
+        // Prioritize stable patients if they've waited too long (over 10 minutes)
+        if (stableWaitTime > 10 * 60 * 1000) {
+            return oldestStable;
+        }
+
+        // Alternate between urgent and stable to prevent starvation
+        if (this.lastUrgentTreated && stableWaitTime > urgentWaitTime * 0.5) {
+            return oldestStable;
+        }
+
+        return oldestUrgent;
+    }
+
+    removePatient(patientId) {
+        let removed = null;
+        ['urgent', 'stable'].forEach(severity => {
+            const index = this.patients[severity].findIndex(p => p.id === patientId);
+            if (index !== -1) {
+                removed = this.patients[severity].splice(index, 1)[0];
+                this.lastUrgentTreated = (severity === 'urgent');
+            }
+        });
+        return removed;
+    }
+
+    getAllPatients() {
+        return [...this.patients.urgent, ...this.patients.stable]
+            .sort((a, b) => a.addedTime - b.addedTime);
+    }
+}
+
 class HospitalSimulation {
     constructor() {
         this.dataTracker = new DataTracker();
@@ -34,7 +108,7 @@ class HospitalSimulation {
         this.hospitalMap = new HospitalMap(Object.values(this.staff), this.resources);
         
         // Initialize waiting room and treatment areas
-        this.waitingRoom = [];
+        this.waitingRoom = new WaitingRoom(12);
         this.treatmentAreas = {
             bay1: null,
             bay2: null,
@@ -183,36 +257,58 @@ class HospitalSimulation {
             patient.isEmergency = true;
         }
 
-        // Add to waiting room
-        this.waitingRoom.push(patient);
-        this.updateWaitingRoomDisplay();
+        // Try to add to waiting room
+        if (this.waitingRoom.addPatient(patient)) {
+            this.updateWaitingRoomDisplay();
+            
+            // Log patient arrival
+            this.logActivity(
+                `${patient.name} arrived with ${patient.condition} (${patient.severity})`,
+                isEmergency ? 'emergency' : 'info'
+            );
 
-        // Log patient arrival
-        this.logActivity(
-            `${patient.name} arrived with ${patient.condition} (${patient.severity})`,
-            isEmergency ? 'emergency' : 'info'
-        );
+            // Track patient arrival
+            this.dataTracker.updateStats(patient, 'arrival');
 
-        // Track patient arrival
-        this.dataTracker.updateStats(patient, 'arrival');
-
-        // Try to assign patient to available staff
-        this.assignPatientToStaff(patient);
+            // Try to assign patient to available staff
+            this.assignPatientToStaff();
+        } else {
+            this.logActivity(
+                `${patient.name} turned away - waiting room full`,
+                'warning'
+            );
+        }
     }
 
     updateWaitingRoomDisplay() {
         const waitingRoomElement = document.querySelector('.waiting-patients');
         waitingRoomElement.innerHTML = '';
         
-        this.waitingRoom.forEach(patient => {
-            const patientElement = document.createElement('div');
-            patientElement.className = `patient-avatar ${patient.severity}`;
-            patientElement.innerHTML = `🤒 ${patient.name}<br>${patient.condition}`;
-            waitingRoomElement.appendChild(patientElement);
+        const waitingRoomGrid = document.createElement('div');
+        waitingRoomGrid.className = 'waiting-room-grid';
+        
+        this.waitingRoom.getAllPatients().forEach(patient => {
+            const patientCell = document.createElement('div');
+            patientCell.className = `patient-cell ${patient.severity}`;
+            const waitTime = Math.floor((Date.now() - patient.addedTime) / 1000 / 60); // minutes
+            
+            patientCell.innerHTML = `
+                <div class="patient-icon">${patient.severity === 'urgent' ? '🚨' : '🤒'}</div>
+                <div class="patient-info">
+                    <div class="patient-name">${patient.name}</div>
+                    <div class="patient-condition">${patient.condition}</div>
+                    <div class="wait-time">${waitTime}m waiting</div>
+                </div>
+            `;
+            waitingRoomGrid.appendChild(patientCell);
         });
+        
+        waitingRoomElement.appendChild(waitingRoomGrid);
     }
 
-    assignPatientToStaff(patient) {
+    assignPatientToStaff() {
+        if (this.waitingRoom.getTotalCount() === 0) return;
+
         // Find available staff member (excluding those on break)
         const availableStaff = Object.values(this.staff).find(staff => 
             !staff.currentPatient && !staff.onBreak && staff.status !== 'on break'
@@ -224,10 +320,16 @@ class HospitalSimulation {
             
             if (availableBay) {
                 const [bayId, _] = availableBay;
+                const patient = this.waitingRoom.getNextPatient();
                 
+                if (!patient) return;
+
                 // Remove from waiting room
-                this.waitingRoom = this.waitingRoom.filter(p => p.id !== patient.id);
+                this.waitingRoom.removePatient(patient.id);
                 this.updateWaitingRoomDisplay();
+                
+                // Calculate waiting time
+                const waitingTime = Math.floor((Date.now() - patient.addedTime) / 1000 / 60); // minutes
                 
                 // Assign to treatment bay
                 this.treatmentAreas[bayId] = patient;
@@ -236,7 +338,7 @@ class HospitalSimulation {
                 
                 // Log assignment
                 this.logActivity(
-                    `${patient.name} assigned to ${availableStaff.name} in ${bayId}`,
+                    `${patient.name} assigned to ${availableStaff.name} in ${bayId} after ${waitingTime}m wait`,
                     'transfer'
                 );
                 
@@ -320,9 +422,9 @@ class HospitalSimulation {
         this.hospitalMap.moveStaffToLocation(staff.id, staffLocation);
         
         // Try to assign new patient if any waiting
-        if (this.waitingRoom.length > 0) {
+        if (this.waitingRoom.getTotalCount() > 0) {
             setTimeout(() => {
-                this.assignPatientToStaff(this.waitingRoom[0]);
+                this.assignPatientToStaff();
             }, 1000); // Add a small delay before next assignment
         }
     }
