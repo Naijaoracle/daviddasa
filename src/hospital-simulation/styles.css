@@ -121,7 +121,7 @@ h2 {
 
 .staff-window {
     display: grid;
-    grid-template-columns: minmax(180px, auto) 1fr;
+    grid-template-columns: auto 1fr;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     overflow: hidden;
@@ -141,8 +141,8 @@ h2 {
     align-items: center;
     background: #f5f7fa;
     font-weight: bold;
-    border-right: 1px solid #eee;
-    flex-shrink: 0;
+    border-right: none;
+    white-space: nowrap;
 }
 
 .staff-header.doctor {
@@ -186,6 +186,7 @@ h2 {
     min-width: 0;
     flex: 1;
     gap: 0.8rem;
+    background: #fff;
 }
 
 .staff-activity .patient-info {

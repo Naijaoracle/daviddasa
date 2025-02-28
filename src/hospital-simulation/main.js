@@ -154,6 +154,12 @@ class HospitalSimulation {
                     this.logActivity(`${staff.name} has returned from break`, 'info');
                 }
             }, this.breakSchedule.breakDuration);
+
+            // Prevent staff from being assigned during break
+            staff.onBreak = true;
+            setTimeout(() => {
+                staff.onBreak = false;
+            }, this.breakSchedule.breakDuration);
         }
     }
 
@@ -209,7 +215,7 @@ class HospitalSimulation {
     assignPatientToStaff(patient) {
         // Find available staff member (excluding those on break)
         const availableStaff = Object.values(this.staff).find(staff => 
-            !staff.currentPatient && staff.status !== 'on break'
+            !staff.currentPatient && !staff.onBreak && staff.status !== 'on break'
         );
         
         if (availableStaff) {
@@ -247,16 +253,21 @@ class HospitalSimulation {
                 // Move directly to treatment bay
                 this.hospitalMap.moveStaffToLocation(availableStaff.id, bayId);
                 
-                // Update treatment bay display
+                // Update treatment bay display with side-by-side layout
                 document.getElementById(bayId).innerHTML = `
-                    <div style="display: flex; justify-content: center; align-items: center; gap: 1rem;">
-                        <div style="display: flex; flex-direction: column; align-items: center;">
-                            ${availableStaff.role === 'doctor' ? '👨‍⚕️' : '👩‍⚕️'}
-                            <span style="font-size: 0.8rem;">${availableStaff.name}</span>
+                    <div class="treatment-bay-content">
+                        <div class="treatment-bay-row">
+                            <div class="treatment-bay-person">
+                                <span>${availableStaff.role === 'doctor' ? '👨‍⚕️' : '👩‍⚕️'}</span>
+                                <span>${availableStaff.name}</span>
+                            </div>
+                            <div class="treatment-bay-person">
+                                <span>${patient.severity === 'urgent' ? '🚨' : '🤒'}</span>
+                                <span>${patient.name}</span>
+                            </div>
                         </div>
-                        <div style="display: flex; flex-direction: column; align-items: center;">
-                            🤒
-                            <span style="font-size: 0.8rem;">${patient.name}</span>
+                        <div class="treatment-bay-info">
+                            <span class="condition">${patient.condition}</span>
                         </div>
                     </div>
                 `;
@@ -293,7 +304,7 @@ class HospitalSimulation {
         
         // Clear treatment bay
         this.treatmentAreas[bayId] = null;
-        document.getElementById(bayId).innerHTML = `Bay ${bayId.slice(-1)}`;
+        document.getElementById(bayId).innerHTML = '';
         
         // Update staff status
         staff.releasePatient();
