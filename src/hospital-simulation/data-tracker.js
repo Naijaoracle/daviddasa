@@ -298,28 +298,41 @@ class DataTracker {
         });
     }
 
-    updateStats(patient, action) {
-        switch(action) {
+    updateStats(patient, event) {
+        switch(event) {
             case 'arrival':
-                this.stats.hourlyPatients[new Date().getHours()]++;
-                this.stats.severityBreakdown[patient.severity]++;
-                this.updateConditionBreakdown(patient.condition);
+                // Track patient arrival
+                this.stats.totalPatients++;
+                this.stats.currentPatients++;
+                this.stats.patientsByType[patient.severity]++;
+                this.stats.waitingPatients++;
                 break;
                 
             case 'treatment-start':
-                this.stats.patientsServed++;
-                if (patient.severity === 'urgent') {
-                    this.stats.emergencyCases++;
-                }
+                // Track treatment start
+                this.stats.waitingPatients--;
                 this.updateWaitingTime(patient);
                 break;
                 
             case 'treatment-end':
-                this.stats.treatmentTimes.push(patient.treatmentTime);
+                // Track treatment completion
+                this.stats.currentPatients--;
+                this.stats.treatedPatients++;
+                this.stats.patientsByType[patient.severity]--;
+                
+                // Calculate and store treatment time
+                const treatmentTime = (patient.treatmentEndTime - patient.treatmentStartTime) / 1000 / 60;
+                this.stats.treatmentTimes[patient.severity].push(treatmentTime);
+                
+                // Update average treatment time
+                const times = this.stats.treatmentTimes[patient.severity];
+                this.stats.averageTreatmentTime[patient.severity] = 
+                    times.reduce((a, b) => a + b, 0) / times.length;
                 break;
         }
         
-        this.updateCharts();
+        // Update metrics display
+        this.updateMetricsDisplay();
     }
 
     updateConditionBreakdown(condition) {
