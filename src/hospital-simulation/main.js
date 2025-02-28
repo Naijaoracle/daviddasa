@@ -159,6 +159,8 @@ class HospitalSimulation {
                 
                 // Assign to treatment bay
                 this.treatmentAreas[bayId] = patient;
+                patient.treatingBay = bayId;
+                patient.treatmentStartTime = Date.now();
                 
                 // Log assignment
                 this.logActivity(
@@ -176,13 +178,8 @@ class HospitalSimulation {
                 // Update staff utilization
                 this.dataTracker.updateStaffUtilization(availableStaff.id, true);
 
-                // Move staff to patient in waiting room first
-                this.hospitalMap.moveStaffToLocation(availableStaff.id, 'waitingRoom');
-                
-                // Then after a delay, move to treatment bay
-                setTimeout(() => {
-                    this.hospitalMap.moveStaffToLocation(availableStaff.id, bayId);
-                }, 1500);
+                // Move directly to treatment bay - removed waiting room step
+                this.hospitalMap.moveStaffToLocation(availableStaff.id, bayId);
                 
                 // Update treatment bay display
                 document.getElementById(bayId).innerHTML = `
@@ -234,11 +231,14 @@ class HospitalSimulation {
         this.dataTracker.updateStaffUtilization(staff.id, false);
 
         // Move staff back to their station
-        this.hospitalMap.moveStaffToLocation(staff.id, staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation');
+        const staffLocation = staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
+        this.hospitalMap.moveStaffToLocation(staff.id, staffLocation);
         
         // Try to assign new patient if any waiting
         if (this.waitingRoom.length > 0) {
-            this.assignPatientToStaff(this.waitingRoom[0]);
+            setTimeout(() => {
+                this.assignPatientToStaff(this.waitingRoom[0]);
+            }, 1000); // Add a small delay before next assignment
         }
     }
 

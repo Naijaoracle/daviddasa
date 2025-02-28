@@ -202,15 +202,15 @@ class HospitalMap {
         // Different initial positions based on staff role and ID
         if (staff.role === 'doctor') {
             if (staff.id === 'doctor1') {
-                return { x: 600, y: 180 };
+                return { x: 590 + Math.random() * 60, y: 180 + Math.random() * 30 };
             } else {
-                return { x: 640, y: 180 };
+                return { x: 590 + Math.random() * 60, y: 180 + Math.random() * 30 };
             }
         } else { // nurse
             if (staff.id === 'nurse1') {
-                return { x: 600, y: 80 };
+                return { x: 620 + Math.random() * 60, y: 70 + Math.random() * 30 };
             } else {
-                return { x: 640, y: 80 };
+                return { x: 620 + Math.random() * 60, y: 70 + Math.random() * 30 };
             }
         }
     }
@@ -324,11 +324,13 @@ class HospitalMap {
                 
                 // Animate staff movement if needed
                 if (staff.currentPatient && !this.paths[staff.id].active) {
-                    const bayNumber = parseInt(staff.currentPatient.treatingBay?.replace('bay', '') || '1');
-                    const targetX = 250 + ((bayNumber - 1) % 2) * 160 + 75;
-                    const targetY = 50 + Math.floor((bayNumber - 1) / 2) * 110 + 50;
-                    
-                    this.moveStaffTo(scene, staff.id, targetX, targetY);
+                    if (staff.currentPatient.treatingBay) {
+                        const bayNumber = parseInt(staff.currentPatient.treatingBay.replace('bay', ''));
+                        const targetX = 250 + ((bayNumber - 1) % 2) * 160 + 75;
+                        const targetY = 50 + Math.floor((bayNumber - 1) / 2) * 110 + 50;
+                        
+                        this.moveStaffTo(scene, staff.id, targetX, targetY);
+                    }
                 }
                 
                 // Update label position to follow sprite
@@ -375,10 +377,6 @@ class HospitalMap {
         let targetX, targetY;
         
         switch(location) {
-            case 'waitingRoom':
-                targetX = 110;
-                targetY = 150;
-                break;
             case 'bay1':
                 targetX = 325;
                 targetY = 100;
@@ -396,16 +394,16 @@ class HospitalMap {
                 targetY = 210;
                 break;
             case 'nurseStation':
-                targetX = 620 + Math.random() * 100;
-                targetY = 90;
+                targetX = 620 + Math.random() * 60;
+                targetY = 70 + Math.random() * 30;
                 break;
             case 'doctorOffice':
                 targetX = 590 + Math.random() * 60;
-                targetY = 180 + Math.random() * 50;
+                targetY = 180 + Math.random() * 30;
                 break;
             case 'restArea':
                 targetX = 700 + Math.random() * 60;
-                targetY = 180 + Math.random() * 50;
+                targetY = 180 + Math.random() * 30;
                 break;
             default:
                 return;
