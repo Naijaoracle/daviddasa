@@ -309,31 +309,20 @@ class HospitalSimulation {
         const waitingRoomGrid = document.createElement('div');
         waitingRoomGrid.className = 'waiting-room-grid';
         
-        // Update the hospital map waiting room grid
-        const mapWaitingRoom = document.querySelector('.waiting-room-grid-map');
-        if (!mapWaitingRoom) {
-            // Create the grid container if it doesn't exist
-            const newMapGrid = document.createElement('div');
-            newMapGrid.className = 'waiting-room-grid-map';
-            document.querySelector('.waiting-room').appendChild(newMapGrid);
-        }
+        // Get all waiting room cells in the hospital map
+        const mapCells = document.querySelectorAll('.waiting-room .waiting-room-cell');
         
-        // Clear existing patients from map
-        document.querySelector('.waiting-room-grid-map').innerHTML = '';
-        
-        // Create a 3x4 grid for waiting room (max 12 patients)
-        const gridSize = 12;
-        for (let i = 0; i < gridSize; i++) {
-            const cell = document.createElement('div');
+        // Clear all existing cells
+        mapCells.forEach(cell => {
+            cell.innerHTML = '';
             cell.className = 'waiting-room-cell';
-            document.querySelector('.waiting-room-grid-map').appendChild(cell);
-        }
+        });
         
         // Fill grid with patients
         this.waitingRoom.getAllPatients().forEach((patient, index) => {
-            if (index < gridSize) {
-                // Update map grid
-                const mapCell = document.querySelectorAll('.waiting-room-cell')[index];
+            if (index < mapCells.length) {
+                // Update map grid cell
+                const mapCell = mapCells[index];
                 mapCell.innerHTML = `<span class="patient-icon-map ${patient.severity}">${patient.severity === 'urgent' ? '🚨' : '🤒'}</span>`;
                 mapCell.classList.add('occupied');
                 mapCell.classList.add(patient.severity);
