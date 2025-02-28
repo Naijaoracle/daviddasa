@@ -66,13 +66,20 @@ class HospitalMap {
             treatmentBay: 0xe8f4fd,
             nurseStation: 0xfff3cd,
             doctorOffice: 0xd1ecf1,
-            lab: 0xf8d7da,
             restArea: 0xf5f5f5
         };
         
-        // Draw waiting room
+        // Draw waiting room with grid
         graphics.fillStyle(colors.waitingRoom, 1);
         graphics.fillRect(20, 50, 180, 200);
+        
+        // Draw waiting room grid
+        graphics.lineStyle(1, 0xaaaaaa, 0.5);
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 4; j++) {
+                graphics.strokeRect(35 + i * 50, 65 + j * 45, 45, 40);
+            }
+        }
         
         // Draw treatment bays
         for (let i = 0; i < 4; i++) {
@@ -86,19 +93,15 @@ class HospitalMap {
             graphics.strokeRect(x, y, 150, 100);
         }
         
-        // Draw nurse station
+        // Draw nurse station (made larger)
         graphics.fillStyle(colors.nurseStation, 1);
-        graphics.fillRect(570, 50, 100, 80);
+        graphics.fillRect(570, 50, 210, 80);
         
-        // Draw doctor offices
+        // Draw doctor offices (made larger)
         graphics.fillStyle(colors.doctorOffice, 1);
         graphics.fillRect(570, 140, 100, 110);
         
-        // Draw lab
-        graphics.fillStyle(colors.lab, 1);
-        graphics.fillRect(680, 50, 100, 80);
-        
-        // Draw rest area
+        // Draw rest area (made larger)
         graphics.fillStyle(colors.restArea, 1);
         graphics.fillRect(680, 140, 100, 110);
         
@@ -108,9 +111,8 @@ class HospitalMap {
         this.addRoomLabel(scene, 485, 40, 'Treatment Bay 2');
         this.addRoomLabel(scene, 325, 150, 'Treatment Bay 3');
         this.addRoomLabel(scene, 485, 150, 'Treatment Bay 4');
-        this.addRoomLabel(scene, 620, 40, 'Nurse Station');
+        this.addRoomLabel(scene, 675, 40, 'Nurse Station');
         this.addRoomLabel(scene, 620, 130, 'Doctor Offices');
-        this.addRoomLabel(scene, 730, 40, 'Laboratory');
         this.addRoomLabel(scene, 730, 130, 'Rest Area');
         
         // Add corridors
@@ -126,10 +128,6 @@ class HospitalMap {
         graphics.beginPath();
         graphics.moveTo(570, 100);
         graphics.lineTo(570, 250);
-        graphics.stroke();
-        graphics.beginPath();
-        graphics.moveTo(680, 100);
-        graphics.lineTo(680, 250);
         graphics.stroke();
     }
     
@@ -211,14 +209,23 @@ class HospitalMap {
     
     createInteractionAreas(scene) {
         // Create interactive zones for treatment bays, waiting room, etc.
-        this.createInteractionZone(scene, 20, 50, 180, 200, 'waitingRoom');
+        
+        // Waiting room grid zones
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 4; j++) {
+                this.createInteractionZone(scene, 35 + i * 50, 65 + j * 45, 45, 40, `waiting_${i}_${j}`);
+            }
+        }
+        
+        // Treatment bays
         this.createInteractionZone(scene, 250, 50, 150, 100, 'bay1');
         this.createInteractionZone(scene, 410, 50, 150, 100, 'bay2');
         this.createInteractionZone(scene, 250, 160, 150, 100, 'bay3');
         this.createInteractionZone(scene, 410, 160, 150, 100, 'bay4');
-        this.createInteractionZone(scene, 570, 50, 100, 80, 'nurseStation');
+        
+        // Staff areas
+        this.createInteractionZone(scene, 570, 50, 210, 80, 'nurseStation');
         this.createInteractionZone(scene, 570, 140, 100, 110, 'doctorOffice');
-        this.createInteractionZone(scene, 680, 50, 100, 80, 'lab');
         this.createInteractionZone(scene, 680, 140, 100, 110, 'restArea');
     }
     
@@ -351,49 +358,51 @@ class HospitalMap {
     }
     
     moveStaffToLocation(staffId, location) {
-        // Get target coordinates for the location
+        const scene = this.game.scene.scenes[0];
+        const sprite = this.sprites[staffId];
+        const label = this.labels[staffId];
+        
+        if (!sprite || !label) return;
+        
         let targetX, targetY;
         
-        switch (location) {
+        switch(location) {
+            case 'waitingRoom':
+                targetX = 110;
+                targetY = 150;
+                break;
             case 'bay1':
-                targetX = 325; targetY = 100;
+                targetX = 325;
+                targetY = 100;
                 break;
             case 'bay2':
-                targetX = 485; targetY = 100;
+                targetX = 485;
+                targetY = 100;
                 break;
             case 'bay3':
-                targetX = 325; targetY = 210;
+                targetX = 325;
+                targetY = 210;
                 break;
             case 'bay4':
-                targetX = 485; targetY = 210;
-                break;
-            case 'waitingRoom':
-                targetX = 110; targetY = 150;
+                targetX = 485;
+                targetY = 210;
                 break;
             case 'nurseStation':
-                targetX = 620; targetY = 80;
+                targetX = 620 + Math.random() * 100;
+                targetY = 90;
                 break;
             case 'doctorOffice':
-                targetX = 620; targetY = 190;
-                break;
-            case 'lab':
-                targetX = 730; targetY = 80;
+                targetX = 590 + Math.random() * 60;
+                targetY = 180 + Math.random() * 50;
                 break;
             case 'restArea':
-                targetX = 730; targetY = 190;
+                targetX = 700 + Math.random() * 60;
+                targetY = 180 + Math.random() * 50;
                 break;
             default:
                 return;
         }
         
-        // Move the staff sprite
-        const scene = this.game.scene.scenes[0];
         this.moveStaffTo(scene, staffId, targetX, targetY);
-        
-        // Update staff location
-        const staff = this.staffMembers.find(s => s.id === staffId);
-        if (staff) {
-            staff.location = location;
-        }
     }
 }
