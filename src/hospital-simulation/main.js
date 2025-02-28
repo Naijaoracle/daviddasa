@@ -249,8 +249,16 @@ class HospitalSimulation {
                 
                 // Update treatment bay display
                 document.getElementById(bayId).innerHTML = `
-                    ${availableStaff.role === 'doctor' ? '👨‍⚕️' : '👩‍⚕️'} ${availableStaff.name}<br>
-                    🤒 ${patient.name}
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 1rem;">
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            ${availableStaff.role === 'doctor' ? '👨‍⚕️' : '👩‍⚕️'}
+                            <span style="font-size: 0.8rem;">${availableStaff.name}</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            🤒
+                            <span style="font-size: 0.8rem;">${patient.name}</span>
+                        </div>
+                    </div>
                 `;
                 
                 // Simulate treatment

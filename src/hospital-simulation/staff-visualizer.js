@@ -90,22 +90,28 @@ class StaffVisualizer {
             if (patientInfo) {
                 patientInfo.innerHTML = `
                     <div class="patient-icon">☕</div>
-                    <div class="patient-name">Taking a break</div>
+                    <div class="patient-name">Taking a break - Returning in 5 minutes</div>
+                    <div class="treatment-timer">5:00</div>
                 `;
             }
         } else if (status.status === 'available') {
             statusElement.textContent = 'Available';
             statusElement.className = 'status available';
             if (patientInfo) {
-                patientInfo.innerHTML = '';
+                patientInfo.innerHTML = `
+                    <div class="patient-icon">✓</div>
+                    <div class="patient-name">Available for new patients</div>
+                `;
             }
         } else if (status.patient) {
             statusElement.textContent = 'Busy';
             statusElement.className = 'status busy';
             if (patientInfo) {
+                const severity = status.patient.severity || 'stable';
+                const severityIcon = severity === 'urgent' ? '🚨' : '🏥';
                 patientInfo.innerHTML = `
-                    <div class="patient-icon">🏥</div>
-                    <div class="patient-name">Treating ${status.patient.name}</div>
+                    <div class="patient-icon">${severityIcon}</div>
+                    <div class="patient-name">Treating ${status.patient.name} - ${status.patient.condition} (${severity})</div>
                     <div class="treatment-timer">0:00</div>
                 `;
             }

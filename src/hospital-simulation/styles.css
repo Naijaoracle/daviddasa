@@ -83,6 +83,23 @@ h2 {
     gap: 0.5rem;
 }
 
+.treatment-bay:empty {
+    justify-content: center;
+}
+
+.treatment-bay > div {
+    width: 100%;
+}
+
+.treatment-bay span {
+    display: block;
+    margin-top: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
 .treatment-bay:hover {
     border-color: #4a90e2;
     background: #f1f7fe;
@@ -104,7 +121,7 @@ h2 {
 
 .staff-window {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: minmax(180px, auto) 1fr;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     overflow: hidden;
@@ -124,7 +141,6 @@ h2 {
     align-items: center;
     background: #f5f7fa;
     font-weight: bold;
-    min-width: 180px;
     border-right: 1px solid #eee;
     flex-shrink: 0;
 }
@@ -169,6 +185,7 @@ h2 {
     height: 100%;
     min-width: 0;
     flex: 1;
+    gap: 0.8rem;
 }
 
 .staff-activity .patient-info {
@@ -183,6 +200,9 @@ h2 {
     font-size: 0.85rem;
     color: #666;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
 }
 
 /* Hide "Waiting for patient" text when staff is busy */
@@ -206,6 +226,7 @@ h2 {
     font-family: monospace;
     margin-left: auto;
     animation: pulse-text 2s infinite;
+    white-space: nowrap;
 }
 
 .staff-activity .staff-icon {
@@ -215,6 +236,7 @@ h2 {
 .patient-icon {
     font-size: 1.2rem;
     margin: 0;
+    flex-shrink: 0;
 }
 
 .patient-name {
