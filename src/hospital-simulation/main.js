@@ -80,7 +80,7 @@ class HospitalSimulation {
         this.running = false;
         
         // Simulation time settings
-        this.simulationTimeScale = 60; // 1 real second = 1 simulation minute (changed from 10)
+        this.simulationTimeScale = 60; // 1 real second = 1 simulation minute
         this.simulationStartTime = null;
         
         // Initialize staff members
@@ -123,8 +123,8 @@ class HospitalSimulation {
         // Initialize activity log
         this.activityLog = [];
         
-        // Bind event listeners
-        this.bindEventListeners();
+        // Auto-start the simulation after a short delay to ensure everything is initialized
+        setTimeout(() => this.start(), 1000);
     }
 
     logActivity(message, type = 'info') {
@@ -153,21 +153,6 @@ class HospitalSimulation {
                 </div>
             `)
             .join('');
-    }
-
-    bindEventListeners() {
-        document.getElementById('toggle-simulation').addEventListener('click', () => {
-            const button = document.getElementById('toggle-simulation');
-            if (this.running) {
-                this.stop();
-                button.textContent = 'Start Simulation';
-                button.style.background = '#27ae60';
-            } else {
-                this.start();
-                button.textContent = 'Stop Simulation';
-                button.style.background = '#e74c3c';
-            }
-        });
     }
 
     getSimulationTime() {
@@ -199,42 +184,14 @@ class HospitalSimulation {
         this.simulationInterval = setInterval(() => {
             if (this.running) {
                 console.log('Generating new patient...');
-                // 25% chance of emergency patient (increased from 15%)
+                // 25% chance of emergency patient
                 if (Math.random() < 0.25) {
                     this.generatePatient(true);
                 } else {
                     this.generatePatient();
                 }
             }
-        }, 1000); // Changed from 3000ms to 1000ms for faster patient generation
-    }
-
-    stop() {
-        if (!this.running) return;
-        console.log('Stopping simulation...');
-        this.running = false;
-        this.logActivity('Simulation stopped', 'warning');
-        
-        // Clear all intervals
-        if (this.simulationInterval) {
-            clearInterval(this.simulationInterval);
-            this.simulationInterval = null;
-        }
-        if (this.breakRotationInterval) {
-            clearInterval(this.breakRotationInterval);
-            this.breakRotationInterval = null;
-        }
-        
-        // Reset all staff to available status
-        Object.values(this.staff).forEach(staff => {
-            if (staff.status === 'on break') {
-                staff.status = 'available';
-                staff.onBreak = false;
-                this.staffVisualizer.updateStaffStatus(staff.id, { status: 'available' });
-                const location = staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
-                this.hospitalMap.moveStaffToLocation(staff.id, location);
-            }
-        });
+        }, 1000);
     }
 
     startBreakRotation() {
@@ -621,10 +578,7 @@ class HospitalSimulation {
     }
 }
 
-// Initialize and start the simulation when the page loads
+// Initialize the simulation when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    const simulation = new HospitalSimulation();
-    const button = document.getElementById('toggle-simulation');
-    button.textContent = 'Start Simulation';
-    button.style.background = '#27ae60';
+    new HospitalSimulation();
 });
