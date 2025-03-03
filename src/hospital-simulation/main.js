@@ -217,12 +217,14 @@ class HospitalSimulation {
     }
 
     startBreakRotation() {
+        // Force check for any stuck breaks before starting rotation
+        this.checkAndClearStuckBreaks();
+        
         // Initially send first staff members on break
         this.sendStaffOnBreak('doctors');
         this.sendStaffOnBreak('nurses');
         
         // Set up break rotation interval using simulation time
-        // 240 simulation minutes = 4 hours, convert to real milliseconds
         const workDurationReal = Math.floor((this.breakSchedule.workDuration * 60 * 1000) / this.simulationTimeScale);
         
         // Clear any existing interval
@@ -230,18 +232,26 @@ class HospitalSimulation {
             clearInterval(this.breakRotationInterval);
         }
         
+        // Set up periodic check for stuck breaks
+        setInterval(() => {
+            if (this.running) {
+                this.checkAndClearStuckBreaks();
+            }
+        }, 30000); // Check every 30 seconds
+        
         this.breakRotationInterval = setInterval(() => {
             if (this.running) {
                 console.log('Rotating breaks...');
-                // Force check and clear any stuck breaks before rotating
-                this.checkAndClearStuckBreaks();
-                this.rotateBreaks('doctors');
-                this.rotateBreaks('nurses');
+                if (!this.checkAndClearStuckBreaks()) {
+                    this.rotateBreaks('doctors');
+                    this.rotateBreaks('nurses');
+                }
             }
         }, workDurationReal);
     }
 
     checkAndClearStuckBreaks() {
+        let clearedAny = false;
         Object.values(this.staff).forEach(staff => {
             if (staff.status === 'on break' && Date.now() > staff.busyUntil) {
                 console.log(`Forcing ${staff.name} to return from break`);
@@ -249,8 +259,10 @@ class HospitalSimulation {
                 this.updateStaffStatus(staff.id, { status: 'available' });
                 const returnLocation = staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
                 this.hospitalMap.moveStaffToLocation(staff.id, returnLocation);
+                clearedAny = true;
             }
         });
+        return clearedAny;
     }
 
     sendStaffOnBreak(staffType) {
@@ -258,19 +270,16 @@ class HospitalSimulation {
         this.checkAndClearStuckBreaks();
 
         const availableStaff = Object.values(this.staff)
-            .filter(s => s.role === staffType && s.status === 'available' && !s.currentPatient)
+            .filter(s => s.role === staffType.slice(0, -1) && s.status === 'available' && !s.currentPatient)
             .sort((a, b) => (b.totalWorkTime || 0) - (a.totalWorkTime || 0));
 
         if (availableStaff.length > 0) {
             const staff = availableStaff[0];
             
-            // Calculate break duration in real milliseconds
+            // Calculate break duration in real milliseconds based on simulation time scale
             const breakDurationReal = Math.floor((this.breakSchedule.breakDuration * 60 * 1000) / this.simulationTimeScale);
             
-            staff.status = 'on break';
-            staff.onBreak = true;
-            staff.busyUntil = Date.now() + breakDurationReal;
-            
+            staff.takeBreak(this.breakSchedule.breakDuration);
             this.hospitalMap.moveStaffToLocation(staff.id, 'restArea');
             this.updateStaffStatus(staff.id, { status: 'on break' });
             this.logActivity(`${staff.name} is taking a break`, 'break');

@@ -175,6 +175,7 @@ class Staff {
         this.status = 'on break';
         this.onBreak = true;
         this.location = 'rest';
+        // Convert simulation minutes to real milliseconds using simulation time scale
         const realDurationMs = (duration * 60 * 1000) / 60; // Convert simulation minutes to real milliseconds
         this.busyUntil = Date.now() + realDurationMs;
         this.addActivity(`Taking a ${duration} minute break`);
@@ -184,6 +185,7 @@ class Staff {
         this.status = 'available';
         this.onBreak = false;
         this.busyUntil = 0;
+        this.location = this.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
         this.addActivity('Returned from break');
     }
 
