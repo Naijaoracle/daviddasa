@@ -809,3 +809,18 @@ h2 {
     background: #e9ecef;
     border-color: #dee2e6;
 }
+
+.time-counters {
+    background-color: #f8f9fa;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #dee2e6;
+}
+
+.sim-time, .real-time {
+    font-family: monospace;
+    font-size: 14px;
+    color: #495057;
+    margin: 5px 0;
+}

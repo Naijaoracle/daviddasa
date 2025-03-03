@@ -96,10 +96,11 @@ class Staff {
         this.id = id;
         this.name = name;
         this.role = role; // 'doctor' or 'nurse'
-        this.status = 'available'; // 'available', 'busy', 'assisting'
+        this.status = 'available'; // 'available', 'busy', 'assisting', 'on break'
         this.currentPatient = null;
         this.location = 'station'; // 'station', 'bay1', 'bay2', 'bay3', 'bay4', 'lab', 'rest'
         this.busyUntil = 0;
+        this.onBreak = false;
         this.totalPatientsServed = 0;
         this.totalWorkTime = 0;
         this.specializationSkills = this.generateSpecializationSkills();
@@ -172,11 +173,18 @@ class Staff {
 
     takeBreak(duration = 30) { // Default to 30 simulation minutes
         this.status = 'on break';
+        this.onBreak = true;
         this.location = 'rest';
-        // Calculate busyUntil in real time based on simulation time
         const realDurationMs = (duration * 60 * 1000) / 60; // Convert simulation minutes to real milliseconds
         this.busyUntil = Date.now() + realDurationMs;
         this.addActivity(`Taking a ${duration} minute break`);
+    }
+
+    endBreak() {
+        this.status = 'available';
+        this.onBreak = false;
+        this.busyUntil = 0;
+        this.addActivity('Returned from break');
     }
 
     addActivity(description) {
