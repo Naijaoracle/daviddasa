@@ -593,5 +593,7 @@ class HospitalSimulation {
 // Initialize and start the simulation when the page loads
 document.addEventListener('DOMContentLoaded', () => {
     const simulation = new HospitalSimulation();
-    simulation.start();
+    const button = document.getElementById('toggle-simulation');
+    button.textContent = 'Start Simulation';
+    button.style.background = '#27ae60';
 });
