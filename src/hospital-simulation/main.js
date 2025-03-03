@@ -302,13 +302,12 @@ class HospitalSimulation {
             const patientElement = document.createElement('div');
             patientElement.className = 'waiting-patient';
             
-            // Calculate current waiting time
-            const currentTime = Date.now();
-            const elapsedMs = currentTime - patient.addedTime;
-            const waitingTime = Math.floor(elapsedMs / (1000 * 60)); // Convert to minutes
+            // Calculate current waiting time in simulation minutes
+            const realElapsedMs = Date.now() - patient.addedTime;
+            const simElapsedMinutes = Math.floor((realElapsedMs * this.simulationTimeScale) / (1000 * 60));
             
             // Update patient's waiting time property
-            patient.waitingTime = waitingTime;
+            patient.waitingTime = simElapsedMinutes;
             
             const icon = patient.severity === 'urgent' ? '🚨' : '🤒';
             
@@ -316,7 +315,7 @@ class HospitalSimulation {
                 <div class="patient-icon">${icon}</div>
                 <div class="patient-name">${patient.name}</div>
                 <div class="patient-condition">${patient.condition}</div>
-                <div class="waiting-time">${waitingTime}m waiting</div>
+                <div class="waiting-time">${simElapsedMinutes}m waiting</div>
             `;
             
             waitingRoomElement.appendChild(patientElement);
@@ -390,8 +389,9 @@ class HospitalSimulation {
         this.waitingRoom.removePatient(patient.id);
         this.updateWaitingRoomDisplay();
         
-        // Calculate waiting time
-        const waitingTime = Math.floor((Date.now() - patient.addedTime) / 1000 / 60); // minutes
+        // Calculate waiting time in simulation minutes
+        const realWaitMs = Date.now() - patient.addedTime;
+        const waitingTime = Math.floor((realWaitMs * this.simulationTimeScale) / (1000 * 60));
         
         // Update waiting time statistics
         this.dataTracker.updateStats(patient, 'treatment-start');

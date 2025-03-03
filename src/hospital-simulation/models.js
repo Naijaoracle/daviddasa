@@ -84,7 +84,8 @@ class Patient {
 
     updateWaitingTime() {
         if (!this.treatmentStartTime) {
-            this.waitingTime = Math.floor((Date.now() - this.addedTime) / 1000);
+            const realElapsedSeconds = (Date.now() - this.addedTime) / 1000;
+            this.waitingTime = Math.floor(realElapsedSeconds * 60); // Convert to simulation minutes
         }
     }
 }
