@@ -1,6 +1,7 @@
 // Staff Activity Visualizer using p5.js
 class StaffVisualizer {
     constructor(staffMembers) {
+        console.log('Initializing StaffVisualizer with members:', staffMembers);
         this.staffMembers = staffMembers;
         this.sketches = {};
         this.iconImages = {
@@ -80,39 +81,52 @@ class StaffVisualizer {
     }
 
     updateStaffStatus(staffId, status) {
-        const headerElement = document.querySelector(`#${staffId}-canvas`).previousElementSibling;
-        const statusElement = headerElement.querySelector('.status');
-        const patientInfo = document.querySelector(`#${staffId}-canvas .patient-info`);
+        console.log(`Updating status for ${staffId}:`, status);
+        const staffWindow = document.querySelector(`#${staffId}-canvas`);
+        if (!staffWindow) {
+            console.error(`Staff window not found for ${staffId}`);
+            return;
+        }
+
+        const statusElement = staffWindow.parentElement.querySelector('.status');
+        const patientInfo = staffWindow.querySelector('.patient-info');
         
-        if (status.status === 'on break') {
-            statusElement.textContent = 'On Break';
-            statusElement.className = 'status';
-            if (patientInfo) {
-                patientInfo.innerHTML = `
-                    <div class="patient-icon">☕</div>
-                    <div class="patient-name">Taking a break</div>
-                `;
-            }
-        } else if (status.status === 'available') {
-            statusElement.textContent = 'Available';
-            statusElement.className = 'status available';
-            if (patientInfo) {
-                patientInfo.innerHTML = `
-                    <div class="patient-icon">✓</div>
-                    <div class="patient-name">Waiting for next patient</div>
-                `;
-            }
-        } else if (status.patient) {
+        if (!statusElement || !patientInfo) {
+            console.error(`Required elements not found for ${staffId}`);
+            return;
+        }
+
+        if (status.patient) {
+            console.log(`${staffId} is now treating patient:`, status.patient.name);
+            // Staff is treating a patient
             statusElement.textContent = 'Busy';
-            statusElement.className = 'status busy';
-            if (patientInfo) {
-                const severity = status.patient.severity || 'stable';
-                const severityIcon = severity === 'urgent' ? '🚨' : '🏥';
-                patientInfo.innerHTML = `
-                    <div class="patient-icon">${severityIcon}</div>
-                    <div class="patient-name">Treating ${status.patient.name} - ${status.patient.condition} (${severity})</div>
-                `;
-            }
+            statusElement.classList.remove('available');
+            statusElement.classList.add('busy');
+            
+            patientInfo.innerHTML = `
+                <div class="patient-icon">🏥</div>
+                <div class="patient-name">Treating ${status.patient.name}</div>
+                <div class="treatment-timer">0:00</div>
+            `;
+        } else if (status.status === 'on break') {
+            console.log(`${staffId} is now on break`);
+            // Staff is on break
+            statusElement.textContent = 'On Break';
+            statusElement.classList.remove('available', 'busy');
+            statusElement.classList.add('on-break');
+            
+            patientInfo.innerHTML = `
+                <div class="patient-icon">☕</div>
+                <div class="break-info">Taking a break</div>
+            `;
+        } else {
+            console.log(`${staffId} is now available`);
+            // Staff is available
+            statusElement.textContent = 'Available';
+            statusElement.classList.remove('busy', 'on-break');
+            statusElement.classList.add('available');
+            
+            patientInfo.innerHTML = ''; // Empty when available
         }
     }
 }

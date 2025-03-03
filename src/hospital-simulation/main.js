@@ -178,22 +178,27 @@ class HospitalSimulation {
 
     start() {
         if (this.running) return;
+        console.log('Starting simulation...');
         this.running = true;
         this.simulationStartTime = Date.now();
         this.logActivity('Simulation started', 'info');
         
         // Start break rotation
+        console.log('Starting break rotation...');
         this.startBreakRotation();
         
         // Generate initial batch of patients (4-8 patients)
         const initialPatients = Math.floor(Math.random() * 5) + 4;
+        console.log(`Generating ${initialPatients} initial patients...`);
         for (let i = 0; i < initialPatients; i++) {
             this.generatePatient();
         }
         
         // Start patient generation
+        console.log('Setting up patient generation interval...');
         this.simulationInterval = setInterval(() => {
             if (this.running) {
+                console.log('Generating new patient...');
                 // 25% chance of emergency patient (increased from 15%)
                 if (Math.random() < 0.25) {
                     this.generatePatient(true);
@@ -283,6 +288,7 @@ class HospitalSimulation {
     }
 
     generatePatient(isEmergency = false) {
+        console.log('Generating patient:', isEmergency ? 'emergency' : 'regular');
         const patient = new Patient(Math.random().toString(36).substr(2, 9));
         
         // Determine severity - 30% chance of urgent if not emergency
@@ -293,8 +299,11 @@ class HospitalSimulation {
             patient.isEmergency = true;
         }
 
+        console.log('Patient created:', patient.name, patient.severity);
+
         // Try to add to waiting room
         if (this.waitingRoom.addPatient(patient)) {
+            console.log('Patient added to waiting room');
             this.updateWaitingRoomDisplay();
             
             // Log patient arrival
@@ -308,9 +317,11 @@ class HospitalSimulation {
 
             // Try to assign patient to staff after a short delay
             setTimeout(() => {
+                console.log('Attempting to assign patient to staff:', patient.name);
                 this.assignPatientToStaff();
             }, 2000); // 2 second delay
         } else {
+            console.log('Waiting room full, patient turned away');
             this.logActivity(
                 `${patient.name} turned away - waiting room full`,
                 'warning'
@@ -440,16 +451,23 @@ class HospitalSimulation {
     }
 
     assignPatientToStaff() {
-        if (this.waitingRoom.getTotalCount() === 0) return;
+        console.log('Checking for patients to assign...');
+        if (this.waitingRoom.getTotalCount() === 0) {
+            console.log('No patients in waiting room');
+            return;
+        }
 
         // Find available staff member (excluding those on break)
         const availableStaff = Object.values(this.staff).find(staff => 
             !staff.currentPatient && !staff.onBreak && staff.status !== 'on break'
         );
         
+        console.log('Available staff:', availableStaff ? availableStaff.name : 'none');
+        
         if (availableStaff) {
             // Find available treatment bay
             const availableBay = Object.entries(this.treatmentAreas).find(([_, p]) => !p);
+            console.log('Available bay:', availableBay ? availableBay[0] : 'none');
             
             if (availableBay) {
                 const [bayId, _] = availableBay;

@@ -4,13 +4,13 @@ class Patient {
         this.id = id;
         this.name = this.generateName();
         this.condition = this.generateCondition();
-        this.severity = this.generateSeverity();
+        this.isEmergency = Math.random() < 0.1; // 10% chance for emergency
+        this.severity = this.generateSeverity(); // Move after isEmergency
         this.waitingTime = 0;
         this.arrivalTime = Date.now();
         this.treatmentStartTime = null;
         this.treatmentEndTime = null;
         this.treatedBy = null;
-        this.isEmergency = Math.random() < 0.1; // 10% chance for emergency
         this.avatar = this.generateAvatar();
         this.vitals = this.generateVitals();
         this.age = Math.floor(Math.random() * 70) + 18;
