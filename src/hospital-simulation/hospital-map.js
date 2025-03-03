@@ -206,19 +206,23 @@ class HospitalMap {
     
     getStaffInitialPosition(staff) {
         // Different initial positions based on staff role and ID
-        if (staff.role === 'doctor') {
-            if (staff.id === 'doctor1') {
-                return { x: 590 + Math.random() * 60, y: 180 + Math.random() * 30 };
-            } else {
-                return { x: 590 + Math.random() * 60, y: 180 + Math.random() * 30 };
-            }
-        } else { // nurse
-            if (staff.id === 'nurse1') {
-                return { x: 620 + Math.random() * 60, y: 70 + Math.random() * 30 };
-            } else {
-                return { x: 620 + Math.random() * 60, y: 70 + Math.random() * 30 };
-            }
-        }
+        const positions = {
+            'doctor1': { x: 680, y: 70 },  // Dr. Smith
+            'doctor2': { x: 720, y: 70 },  // Dr. Johnson
+            'doctor3': { x: 700, y: 100 }, // Dr. Williams
+            'nurse1': { x: 580, y: 70 },   // Nurse Davis
+            'nurse2': { x: 620, y: 70 },   // Nurse Wilson
+            'nurse3': { x: 600, y: 100 }   // Nurse Thompson
+        };
+
+        // Add some randomization to prevent overlap
+        const basePosition = positions[staff.id] || 
+            (staff.role === 'doctor' ? { x: 680, y: 70 } : { x: 580, y: 70 });
+            
+        return {
+            x: basePosition.x + Math.random() * 20 - 10,
+            y: basePosition.y + Math.random() * 20 - 10
+        };
     }
     
     createInteractionAreas(scene) {
@@ -400,16 +404,19 @@ class HospitalMap {
                 targetY = 210;
                 break;
             case 'nurseStation':
-                targetX = 620 + Math.random() * 60;
-                targetY = 70 + Math.random() * 30;
+                // Spread nurses across the nurse station
+                targetX = 570 + Math.random() * 90;
+                targetY = 50 + Math.random() * 70;
                 break;
             case 'doctorOffice':
-                targetX = 590 + Math.random() * 60;
-                targetY = 180 + Math.random() * 30;
+                // Spread doctors across their office
+                targetX = 680 + Math.random() * 90;
+                targetY = 50 + Math.random() * 70;
                 break;
             case 'restArea':
-                targetX = 700 + Math.random() * 60;
-                targetY = 180 + Math.random() * 30;
+                // Spread staff across the rest area, using the full space
+                targetX = 570 + Math.random() * 200;
+                targetY = 180 + Math.random() * 80;
                 break;
             default:
                 return;
