@@ -28,6 +28,9 @@ class HospitalMap {
                 arcade: {
                     debug: false
                 }
+            },
+            canvas: {
+                willReadFrequently: true
             }
         };
 

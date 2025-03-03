@@ -2,11 +2,27 @@
 class DataTracker {
     constructor() {
         this.stats = {
+            totalPatients: 0,
+            currentPatients: 0,
+            waitingPatients: 0,
+            treatedPatients: 0,
+            patientsByType: {
+                urgent: 0,
+                stable: 0
+            },
             patientsServed: 0,
             emergencyCases: 0,
             averageWaitTime: {
                 urgent: 0,
                 stable: 0
+            },
+            averageTreatmentTime: {
+                urgent: 0,
+                stable: 0
+            },
+            treatmentTimes: {
+                urgent: [],
+                stable: []
             },
             staffUtilization: {
                 'doctor1': { busyTime: 0, totalTime: 0, lastBusyStart: null, currentStatus: false },
@@ -25,8 +41,7 @@ class DataTracker {
                 urgent: [],
                 stable: []
             },
-            hourlyPatients: Array(24).fill(0),
-            treatmentTimes: []
+            hourlyPatients: Array(24).fill(0)
         };
         
         this.charts = {};
