@@ -138,7 +138,15 @@ class DataTracker {
                         }
                     },
                     legend: {
-                        display: false
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 15,
+                            font: {
+                                size: 11
+                            }
+                        }
                     }
                 },
                 scales: {
@@ -147,7 +155,38 @@ class DataTracker {
                         title: {
                             display: true,
                             text: 'Minutes'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value + 'm';
+                            }
+                        },
+                        grace: '10%',
+                        adapters: {
+                            date: false
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 10
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            maxRotation: 0
                         }
+                    }
+                },
+                animation: {
+                    duration: 750,
+                    easing: 'easeInOutQuart'
+                },
+                elements: {
+                    point: {
+                        radius: 0
+                    },
+                    line: {
+                        borderWidth: 2
                     }
                 }
             }
@@ -437,15 +476,28 @@ class DataTracker {
 
         // Update waiting time chart
         if (this.charts.waitingTime) {
-            this.charts.waitingTime.data.datasets[0].data.shift();
-            this.charts.waitingTime.data.datasets[1].data.shift();
+            const urgentData = this.charts.waitingTime.data.datasets[0].data;
+            const stableData = this.charts.waitingTime.data.datasets[1].data;
             
-            this.charts.waitingTime.data.datasets[0].data.push(
-                this.stats.averageWaitTime.urgent.toFixed(1)
+            // Shift data points
+            urgentData.shift();
+            stableData.shift();
+            
+            // Add new data points
+            urgentData.push(this.stats.averageWaitTime.urgent || 0);
+            stableData.push(this.stats.averageWaitTime.stable || 0);
+            
+            // Calculate the maximum wait time for y-axis scaling
+            const maxWaitTime = Math.max(
+                ...urgentData.filter(v => v !== null && !isNaN(v)),
+                ...stableData.filter(v => v !== null && !isNaN(v))
             );
-            this.charts.waitingTime.data.datasets[1].data.push(
-                this.stats.averageWaitTime.stable.toFixed(1)
-            );
+            
+            // Update y-axis max value with some headroom
+            if (maxWaitTime > 0) {
+                const suggestedMax = Math.ceil(maxWaitTime * 1.2); // Add 20% headroom
+                this.charts.waitingTime.options.scales.y.suggestedMax = Math.max(10, suggestedMax);
+            }
             
             this.charts.waitingTime.update('none');
         }
