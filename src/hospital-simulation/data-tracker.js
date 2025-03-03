@@ -114,7 +114,8 @@ class DataTracker {
                         borderColor: '#ff4444',
                         backgroundColor: 'rgba(255, 68, 68, 0.1)',
                         tension: 0.4,
-                        fill: true
+                        fill: true,
+                        borderWidth: 2
                     },
                     {
                         label: 'Stable',
@@ -122,27 +123,39 @@ class DataTracker {
                         borderColor: '#4CAF50',
                         backgroundColor: 'rgba(76, 175, 80, 0.1)',
                         tension: 0.4,
-                        fill: true
+                        fill: true,
+                        borderWidth: 2
                     }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        right: 50  // Add padding for legend
+                    }
+                },
                 plugins: {
                     title: {
                         display: true,
                         text: 'Average Waiting Times',
+                        position: 'left',
                         font: {
                             size: 14
+                        },
+                        padding: {
+                            bottom: 10
                         }
                     },
                     legend: {
                         display: true,
-                        position: 'top',
+                        position: 'right',
+                        align: 'start',
                         labels: {
                             usePointStyle: true,
                             padding: 15,
+                            boxWidth: 8,
                             font: {
                                 size: 11
                             }
@@ -161,11 +174,7 @@ class DataTracker {
                                 return value + 'm';
                             }
                         },
-                        grace: '10%',
-                        adapters: {
-                            date: false
-                        },
-                        suggestedMin: 0,
+                        min: 0,
                         suggestedMax: 10
                     },
                     x: {
@@ -173,7 +182,8 @@ class DataTracker {
                             display: false
                         },
                         ticks: {
-                            maxRotation: 0
+                            maxRotation: 0,
+                            maxTicksLimit: 10
                         }
                     }
                 },
@@ -484,8 +494,11 @@ class DataTracker {
             stableData.shift();
             
             // Add new data points
-            urgentData.push(this.stats.averageWaitTime.urgent || 0);
-            stableData.push(this.stats.averageWaitTime.stable || 0);
+            const urgentWaitTime = this.stats.averageWaitTime.urgent || 0;
+            const stableWaitTime = this.stats.averageWaitTime.stable || 0;
+            
+            urgentData.push(urgentWaitTime);
+            stableData.push(stableWaitTime);
             
             // Calculate the maximum wait time for y-axis scaling
             const maxWaitTime = Math.max(
@@ -499,7 +512,7 @@ class DataTracker {
                 this.charts.waitingTime.options.scales.y.suggestedMax = Math.max(10, suggestedMax);
             }
             
-            this.charts.waitingTime.update('none');
+            this.charts.waitingTime.update();
         }
 
         // Update severity chart

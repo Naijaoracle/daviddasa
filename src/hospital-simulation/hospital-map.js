@@ -404,23 +404,34 @@ class HospitalMap {
                 targetY = 210;
                 break;
             case 'nurseStation':
-                // Spread nurses across the nurse station
                 targetX = 570 + Math.random() * 90;
                 targetY = 50 + Math.random() * 70;
                 break;
             case 'doctorOffice':
-                // Spread doctors across their office
                 targetX = 680 + Math.random() * 90;
                 targetY = 50 + Math.random() * 70;
                 break;
             case 'restArea':
-                // Spread staff across the rest area, using the full space
+                // Position in the rest area below offices
+                targetX = 570 + Math.random() * 200; // Full width of rest area
+                targetY = 180 + Math.random() * 50;  // Adjusted height range
+                break;
+            case 'rest': // Add alias for rest area
                 targetX = 570 + Math.random() * 200;
-                targetY = 180 + Math.random() * 80;
+                targetY = 180 + Math.random() * 50;
                 break;
             default:
+                // If location not found, keep current position
                 return;
         }
+        
+        // Add slight randomization to prevent exact overlaps
+        targetX += Math.random() * 10 - 5;
+        targetY += Math.random() * 10 - 5;
+        
+        // Ensure staff stays within bounds
+        targetX = Math.max(30, Math.min(targetX, 770));
+        targetY = Math.max(30, Math.min(targetY, 270));
         
         this.moveStaffTo(scene, staffId, targetX, targetY);
     }
