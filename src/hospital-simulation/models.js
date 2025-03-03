@@ -171,12 +171,12 @@ class Staff {
         }
     }
 
-    takeBreak(duration = 30) { // Default to 30 simulation minutes
+    takeBreak(duration = 30, simulationTimeScale = 60) { // Default to 30 simulation minutes
         this.status = 'on break';
         this.onBreak = true;
         this.location = 'rest';
         // Convert simulation minutes to real milliseconds using simulation time scale
-        const realDurationMs = (duration * 60 * 1000) / 60; // Convert simulation minutes to real milliseconds
+        const realDurationMs = Math.floor((duration * 60 * 1000) / simulationTimeScale);
         this.busyUntil = Date.now() + realDurationMs;
         this.addActivity(`Taking a ${duration} minute break`);
     }
@@ -187,6 +187,10 @@ class Staff {
         this.busyUntil = 0;
         this.location = this.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
         this.addActivity('Returned from break');
+    }
+
+    isOnBreak() {
+        return this.status === 'on break' && this.onBreak && Date.now() < this.busyUntil;
     }
 
     addActivity(description) {

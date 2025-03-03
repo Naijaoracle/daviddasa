@@ -233,7 +233,11 @@ class HospitalSimulation {
         }
         
         // Set up periodic check for stuck breaks
-        setInterval(() => {
+        if (this.stuckBreakCheckInterval) {
+            clearInterval(this.stuckBreakCheckInterval);
+        }
+        
+        this.stuckBreakCheckInterval = setInterval(() => {
             if (this.running) {
                 this.checkAndClearStuckBreaks();
             }
@@ -279,9 +283,11 @@ class HospitalSimulation {
             // Calculate break duration in real milliseconds based on simulation time scale
             const breakDurationReal = Math.floor((this.breakSchedule.breakDuration * 60 * 1000) / this.simulationTimeScale);
             
-            staff.takeBreak(this.breakSchedule.breakDuration);
-            this.hospitalMap.moveStaffToLocation(staff.id, 'restArea');
+            // Update staff status first
             this.updateStaffStatus(staff.id, { status: 'on break' });
+            
+            // Then take break with simulation time scale
+            staff.takeBreak(this.breakSchedule.breakDuration, this.simulationTimeScale);
             this.logActivity(`${staff.name} is taking a break`, 'break');
             
             // Schedule return from break
@@ -290,10 +296,6 @@ class HospitalSimulation {
                     staff.endBreak();
                     this.updateStaffStatus(staff.id, { status: 'available' });
                     this.logActivity(`${staff.name} has returned from break`, 'break');
-                    
-                    // Move back to their station
-                    const returnLocation = staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
-                    this.hospitalMap.moveStaffToLocation(staff.id, returnLocation);
                 }
             }, breakDurationReal);
         }
@@ -553,7 +555,7 @@ class HospitalSimulation {
         if (status.patient) {
             // Staff is treating a patient
             statusElement.textContent = 'Busy';
-            statusElement.classList.remove('available');
+            statusElement.classList.remove('available', 'on-break');
             statusElement.classList.add('busy');
             
             patientInfo.innerHTML = `
@@ -561,10 +563,23 @@ class HospitalSimulation {
                 <div class="patient-name">Treating ${status.patient.name}</div>
                 <div class="treatment-timer">0:00</div>
             `;
+        } else if (status.status === 'on break') {
+            // Staff is on break
+            statusElement.textContent = 'On Break';
+            statusElement.classList.remove('available', 'busy');
+            statusElement.classList.add('on-break');
+            
+            patientInfo.innerHTML = `
+                <div class="patient-icon">☕</div>
+                <div class="break-info">Taking a break</div>
+            `;
+
+            // Ensure staff is moved to rest area
+            this.hospitalMap.moveStaffToLocation(staffId, 'restArea');
         } else {
             // Staff is available
             statusElement.textContent = 'Available';
-            statusElement.classList.remove('busy');
+            statusElement.classList.remove('busy', 'on-break');
             statusElement.classList.add('available');
             
             patientInfo.innerHTML = ''; // Empty when available
