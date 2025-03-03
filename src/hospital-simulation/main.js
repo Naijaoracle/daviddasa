@@ -222,47 +222,63 @@ class HospitalSimulation {
         this.sendStaffOnBreak('nurses');
         
         // Set up break rotation interval using simulation time
-        const workDurationReal = (this.breakSchedule.workDuration * 60 * 1000) / this.simulationTimeScale;
+        // 240 simulation minutes = 4 hours, convert to real milliseconds
+        const workDurationReal = Math.floor((this.breakSchedule.workDuration * 60 * 1000) / this.simulationTimeScale);
+        
+        // Clear any existing interval
+        if (this.breakRotationInterval) {
+            clearInterval(this.breakRotationInterval);
+        }
         
         this.breakRotationInterval = setInterval(() => {
-            if (this.running) {  // Only rotate breaks if simulation is running
+            if (this.running) {
+                console.log('Rotating breaks...');
+                // Force check and clear any stuck breaks before rotating
+                this.checkAndClearStuckBreaks();
                 this.rotateBreaks('doctors');
                 this.rotateBreaks('nurses');
             }
         }, workDurationReal);
     }
 
+    checkAndClearStuckBreaks() {
+        Object.values(this.staff).forEach(staff => {
+            if (staff.status === 'on break' && Date.now() > staff.busyUntil) {
+                console.log(`Forcing ${staff.name} to return from break`);
+                staff.endBreak();
+                this.updateStaffStatus(staff.id, { status: 'available' });
+                const returnLocation = staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
+                this.hospitalMap.moveStaffToLocation(staff.id, returnLocation);
+            }
+        });
+    }
+
     sendStaffOnBreak(staffType) {
         // First, ensure no staff of this type are stuck on break
-        Object.values(this.staff)
-            .filter(s => s.role === staffType && s.status === 'on break' && Date.now() > s.busyUntil)
-            .forEach(s => {
-                s.status = 'available';
-                this.updateStaffStatus(s.id, { status: 'available' });
-                const returnLocation = s.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
-                this.hospitalMap.moveStaffToLocation(s.id, returnLocation);
-            });
+        this.checkAndClearStuckBreaks();
 
         const availableStaff = Object.values(this.staff)
-            .filter(s => s.role === staffType && s.status === 'available')
+            .filter(s => s.role === staffType && s.status === 'available' && !s.currentPatient)
             .sort((a, b) => (b.totalWorkTime || 0) - (a.totalWorkTime || 0));
 
         if (availableStaff.length > 0) {
             const staff = availableStaff[0];
+            
+            // Calculate break duration in real milliseconds
+            const breakDurationReal = Math.floor((this.breakSchedule.breakDuration * 60 * 1000) / this.simulationTimeScale);
+            
             staff.status = 'on break';
             staff.onBreak = true;
+            staff.busyUntil = Date.now() + breakDurationReal;
+            
             this.hospitalMap.moveStaffToLocation(staff.id, 'restArea');
             this.updateStaffStatus(staff.id, { status: 'on break' });
             this.logActivity(`${staff.name} is taking a break`, 'break');
-
-            // Schedule return from break using simulation time
-            const breakDurationReal = (this.breakSchedule.breakDuration * 60 * 1000) / this.simulationTimeScale;
-            staff.busyUntil = Date.now() + breakDurationReal;
             
+            // Schedule return from break
             setTimeout(() => {
                 if (staff.status === 'on break') {
-                    staff.status = 'available';
-                    staff.onBreak = false;
+                    staff.endBreak();
                     this.updateStaffStatus(staff.id, { status: 'available' });
                     this.logActivity(`${staff.name} has returned from break`, 'break');
                     
@@ -276,15 +292,7 @@ class HospitalSimulation {
 
     rotateBreaks(staffType) {
         // First ensure no staff are stuck on break
-        Object.values(this.staff)
-            .filter(s => s.role === staffType && s.status === 'on break' && Date.now() > s.busyUntil)
-            .forEach(s => {
-                s.status = 'available';
-                s.onBreak = false;
-                this.updateStaffStatus(s.id, { status: 'available' });
-                const returnLocation = s.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
-                this.hospitalMap.moveStaffToLocation(s.id, returnLocation);
-            });
+        this.checkAndClearStuckBreaks();
 
         // Move to next staff member in rotation
         this.breakSchedule.currentIndex[staffType] = 
