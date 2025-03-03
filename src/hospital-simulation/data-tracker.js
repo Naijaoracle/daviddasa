@@ -381,7 +381,15 @@ class DataTracker {
             case 'treatment-start':
                 // Track treatment start
                 this.stats.waitingPatients--;
-                this.updateWaitingTime(patient);
+                
+                // Calculate and store waiting time
+                const waitTime = (Date.now() - patient.arrivalTime) / 1000 / 60; // Convert to minutes
+                this.stats.waitingTimes[patient.severity].push(waitTime);
+                
+                // Update average wait time for this severity
+                const waitTimes = this.stats.waitingTimes[patient.severity];
+                this.stats.averageWaitTime[patient.severity] = 
+                    waitTimes.reduce((a, b) => a + b, 0) / waitTimes.length;
                 break;
                 
             case 'treatment-end':

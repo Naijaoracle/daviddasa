@@ -211,41 +211,29 @@ class HospitalSimulation {
     }
 
     sendStaffOnBreak(staffType) {
-        const currentId = this.breakSchedule[staffType][this.breakSchedule.currentIndex[staffType]];
-        const staff = this.staff[currentId];
-        
-        if (staff && !staff.currentPatient) {
-            staff.status = 'on break';
-            this.staffVisualizer.updateStaffStatus(staff.id, { status: 'on break' });
-            
-            // Move staff to rest area in the hospital map
-            this.hospitalMap.moveStaffToLocation(staff.id, 'restArea');
-            
-            this.logActivity(`${staff.name} is taking a break`, 'info');
-            
-            // Schedule end of break using simulation time
-            const breakDurationReal = (this.breakSchedule.breakDuration * 60 * 1000) / this.simulationTimeScale;
-            
-            setTimeout(() => {
-                if (this.running && staff.status === 'on break') {  // Only end break if simulation is still running
-                    staff.status = 'available';
-                    this.staffVisualizer.updateStaffStatus(staff.id, { status: 'available' });
-                    
-                    // Move staff back to their office/station
-                    const location = staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
-                    this.hospitalMap.moveStaffToLocation(staff.id, location);
-                    
-                    this.logActivity(`${staff.name} has returned from break`, 'info');
-                }
-            }, breakDurationReal);
+        const availableStaff = Object.values(this.staff)
+            .filter(s => s.role === staffType && s.status === 'available')
+            .sort((a, b) => (b.totalWorkTime || 0) - (a.totalWorkTime || 0));
 
-            // Prevent staff from being assigned during break
-            staff.onBreak = true;
+        if (availableStaff.length > 0) {
+            const staff = availableStaff[0];
+            staff.takeBreak();
+            this.hospitalMap.moveStaffToLocation(staff.id, 'restArea');
+            this.updateStaffStatus(staff.id, { status: 'on break' });
+            this.logActivity(`${staff.name} is taking a break`, 'break');
+
+            // Schedule return from break
             setTimeout(() => {
-                if (this.running) {  // Only update if simulation is still running
-                    staff.onBreak = false;
+                if (staff.status === 'on break') {
+                    staff.status = 'available';
+                    this.updateStaffStatus(staff.id, { status: 'available' });
+                    this.logActivity(`${staff.name} has returned from break`, 'break');
+                    
+                    // Move back to their station
+                    const returnLocation = staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
+                    this.hospitalMap.moveStaffToLocation(staff.id, returnLocation);
                 }
-            }, breakDurationReal);
+            }, 5 * 60 * 1000); // 5 minutes
         }
     }
 
@@ -300,145 +288,51 @@ class HospitalSimulation {
     }
 
     updateWaitingRoomDisplay() {
-        // Update the waiting room display in the metrics panel
+        const waitingPatients = this.waitingRoom.getAllPatients();
         const waitingRoomElement = document.querySelector('.waiting-patients');
         waitingRoomElement.innerHTML = '';
-        
-        const waitingRoomGrid = document.createElement('div');
-        waitingRoomGrid.className = 'waiting-room-grid';
-        
-        // Get all waiting room cells from the Phaser scene
+
+        // Update waiting room grid in the UI
+        waitingPatients.forEach(patient => {
+            const patientElement = document.createElement('div');
+            patientElement.className = 'waiting-patient';
+            
+            const icon = patient.severity === 'urgent' ? '🚨' : '🤒';
+            const waitingTime = Math.floor((Date.now() - patient.addedTime) / 1000 / 60);
+            
+            patientElement.innerHTML = `
+                <div class="patient-icon">${icon}</div>
+                <div class="patient-name">${patient.name}</div>
+                <div class="patient-condition">${patient.condition}</div>
+                <div class="waiting-time">${waitingTime}m waiting</div>
+            `;
+            
+            waitingRoomElement.appendChild(patientElement);
+        });
+
+        // Update hospital map display
         const scene = this.hospitalMap.game.scene.scenes[0];
-        const mapCells = [];
-        for (let i = 0; i < 3; i++) {
-            for (let j = 0; j < 4; j++) {
-                const cellId = `waiting_${i}_${j}`;
-                const cell = scene.children.list.find(child => child.name === cellId);
-                if (cell) {
-                    mapCells.push(cell);
-                }
+        if (scene) {
+            // Clear existing patient sprites
+            if (scene.patientSprites) {
+                scene.patientSprites.forEach(sprite => sprite.destroy());
             }
+            scene.patientSprites = [];
+
+            // Add new patient sprites to the waiting room grid
+            waitingPatients.forEach((patient, index) => {
+                const row = Math.floor(index / 3);
+                const col = index % 3;
+                const x = 35 + col * 50 + 22;
+                const y = 65 + row * 45 + 20;
+
+                const sprite = scene.add.text(x, y, patient.severity === 'urgent' ? '🚨' : '🤒', {
+                    fontSize: '20px'
+                });
+                sprite.setOrigin(0.5, 0.5);
+                scene.patientSprites.push(sprite);
+            });
         }
-        
-        // Clear all existing cells
-        mapCells.forEach(cell => {
-            if (cell.patientIcon) {
-                cell.patientIcon.destroy();
-                cell.patientIcon = null;
-            }
-            
-            // Reset cell graphics
-            if (cell.graphics) {
-                cell.graphics.destroy();
-            }
-            
-            // Create new graphics for the cell
-            const cellGraphics = scene.add.graphics();
-            const bounds = cell.getBounds();
-            
-            // Draw the cell background with a lighter color
-            cellGraphics.fillStyle(0xffffff);
-            cellGraphics.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
-            cellGraphics.lineStyle(1, 0xdddddd);
-            cellGraphics.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
-            
-            cell.graphics = cellGraphics;
-        });
-        
-        // Fill grid with patients
-        const patients = this.waitingRoom.getAllPatients();
-        
-        patients.forEach((patient, index) => {
-            if (index < mapCells.length) {
-                const cell = mapCells[index];
-                const bounds = cell.getBounds();
-                
-                // Create patient icon
-                const icon = patient.severity === 'urgent' ? '🚨' : '🤒';
-                const patientIcon = scene.add.text(
-                    bounds.x + bounds.width/2,
-                    bounds.y + bounds.height/2,
-                    icon,
-                    { 
-                        fontSize: '20px',
-                        fontFamily: 'Arial'
-                    }
-                );
-                patientIcon.setOrigin(0.5, 0.5);
-                
-                // Add patient name below icon
-                const nameText = scene.add.text(
-                    bounds.x + bounds.width/2,
-                    bounds.y + bounds.height - 10,
-                    patient.name.split(' ')[0],
-                    {
-                        fontSize: '8px',
-                        fontFamily: 'Arial',
-                        color: '#333333'
-                    }
-                );
-                nameText.setOrigin(0.5, 0.5);
-                
-                // Update cell graphics with patient severity color
-                const patientCellGraphics = scene.add.graphics();
-                patientCellGraphics.clear();
-                patientCellGraphics.fillStyle(0xffffff);
-                patientCellGraphics.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
-                patientCellGraphics.lineStyle(2, patient.severity === 'urgent' ? 0xe74c3c : 0x27ae60);
-                patientCellGraphics.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
-                
-                if (cell.graphics) {
-                    cell.graphics.destroy();
-                }
-                cell.graphics = patientCellGraphics;
-                cell.patientIcon = patientIcon;
-                cell.nameText = nameText;
-                
-                // Update metrics panel grid
-                const patientCell = document.createElement('div');
-                patientCell.className = `patient-cell ${patient.severity}`;
-                
-                // Calculate wait time using simulation time
-                const realWaitTime = Date.now() - patient.addedTime;
-                const simulationWaitTime = Math.floor((realWaitTime * this.simulationTimeScale) / (1000 * 60));
-                
-                patientCell.innerHTML = `
-                    <div class="patient-icon">${icon}</div>
-                    <div class="patient-info">
-                        <div class="patient-name">${patient.name}</div>
-                        <div class="patient-condition">${patient.condition}</div>
-                        <div class="wait-time">${simulationWaitTime}m waiting</div>
-                    </div>
-                `;
-                waitingRoomGrid.appendChild(patientCell);
-            }
-        });
-        
-        // Clean up any remaining patient icons and names from empty cells
-        mapCells.slice(patients.length).forEach(cell => {
-            if (cell.patientIcon) {
-                cell.patientIcon.destroy();
-                cell.patientIcon = null;
-            }
-            if (cell.nameText) {
-                cell.nameText.destroy();
-                cell.nameText = null;
-            }
-            
-            // Reset cell graphics to empty state
-            if (cell.graphics) {
-                cell.graphics.destroy();
-            }
-            const emptyGraphics = scene.add.graphics();
-            const bounds = cell.getBounds();
-            emptyGraphics.fillStyle(0xffffff);
-            emptyGraphics.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
-            emptyGraphics.lineStyle(1, 0xdddddd);
-            emptyGraphics.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
-            cell.graphics = emptyGraphics;
-        });
-        
-        waitingRoomElement.appendChild(waitingRoomGrid);
     }
 
     assignPatientToStaff() {
