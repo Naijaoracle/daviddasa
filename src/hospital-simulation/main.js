@@ -80,7 +80,7 @@ class HospitalSimulation {
         this.running = false;
         
         // Simulation time settings
-        this.simulationTimeScale = 10; // 1 real second = 10 simulation seconds
+        this.simulationTimeScale = 60; // 1 real second = 1 simulation minute (changed from 10)
         this.simulationStartTime = null;
         
         // Initialize staff members
@@ -194,14 +194,14 @@ class HospitalSimulation {
         // Start patient generation
         this.simulationInterval = setInterval(() => {
             if (this.running) {
-                // 15% chance of emergency patient
-                if (Math.random() < 0.15) {
+                // 25% chance of emergency patient (increased from 15%)
+                if (Math.random() < 0.25) {
                     this.generatePatient(true);
                 } else {
                     this.generatePatient();
                 }
             }
-        }, 3000);
+        }, 1000); // Changed from 3000ms to 1000ms for faster patient generation
     }
 
     stop() {
@@ -507,8 +507,8 @@ class HospitalSimulation {
                     </div>
                 `;
                 
-                // Simulate treatment (5-15 minutes in simulation time)
-                const treatmentDuration = ((Math.random() * 10 + 5) * 60 * 1000) / this.simulationTimeScale;
+                // Simulate treatment (2-5 minutes in simulation time)
+                const treatmentDuration = ((Math.random() * 3 + 2) * 60 * 1000) / this.simulationTimeScale;
                 setTimeout(() => {
                     this.completePatientTreatment(patient, availableStaff, bayId);
                 }, treatmentDuration);
