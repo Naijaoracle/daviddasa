@@ -211,16 +211,30 @@ class HospitalSimulation {
 
     stop() {
         if (!this.running) return;
+        console.log('Stopping simulation...');
         this.running = false;
         this.logActivity('Simulation stopped', 'warning');
         
         // Clear all intervals
         if (this.simulationInterval) {
             clearInterval(this.simulationInterval);
+            this.simulationInterval = null;
         }
         if (this.breakRotationInterval) {
             clearInterval(this.breakRotationInterval);
+            this.breakRotationInterval = null;
         }
+        
+        // Reset all staff to available status
+        Object.values(this.staff).forEach(staff => {
+            if (staff.status === 'on break') {
+                staff.status = 'available';
+                staff.onBreak = false;
+                this.staffVisualizer.updateStaffStatus(staff.id, { status: 'available' });
+                const location = staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
+                this.hospitalMap.moveStaffToLocation(staff.id, location);
+            }
+        });
     }
 
     startBreakRotation() {
@@ -232,8 +246,10 @@ class HospitalSimulation {
         const workDurationReal = (this.breakSchedule.workDuration * 60 * 1000) / this.simulationTimeScale;
         
         this.breakRotationInterval = setInterval(() => {
-            this.rotateBreaks('doctors');
-            this.rotateBreaks('nurses');
+            if (this.running) {  // Only rotate breaks if simulation is running
+                this.rotateBreaks('doctors');
+                this.rotateBreaks('nurses');
+            }
         }, workDurationReal);
     }
 
@@ -254,7 +270,7 @@ class HospitalSimulation {
             const breakDurationReal = (this.breakSchedule.breakDuration * 60 * 1000) / this.simulationTimeScale;
             
             setTimeout(() => {
-                if (staff.status === 'on break') {
+                if (this.running && staff.status === 'on break') {  // Only end break if simulation is still running
                     staff.status = 'available';
                     this.staffVisualizer.updateStaffStatus(staff.id, { status: 'available' });
                     
@@ -269,7 +285,9 @@ class HospitalSimulation {
             // Prevent staff from being assigned during break
             staff.onBreak = true;
             setTimeout(() => {
-                staff.onBreak = false;
+                if (this.running) {  // Only update if simulation is still running
+                    staff.onBreak = false;
+                }
             }, breakDurationReal);
         }
     }
@@ -280,11 +298,6 @@ class HospitalSimulation {
             (this.breakSchedule.currentIndex[staffType] + 1) % this.breakSchedule[staffType].length;
         
         this.sendStaffOnBreak(staffType);
-    }
-
-    runSimulation() {
-        // This method is now handled by start()
-        this.start();
     }
 
     generatePatient(isEmergency = false) {
