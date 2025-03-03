@@ -225,7 +225,8 @@ class HospitalSimulation {
             this.updateStaffStatus(staff.id, { status: 'on break' });
             this.logActivity(`${staff.name} is taking a break`, 'break');
 
-            // Schedule return from break
+            // Schedule return from break using simulation time
+            const breakDurationReal = (this.breakSchedule.breakDuration * 60 * 1000) / this.simulationTimeScale;
             setTimeout(() => {
                 if (staff.status === 'on break') {
                     staff.status = 'available';
@@ -236,7 +237,7 @@ class HospitalSimulation {
                     const returnLocation = staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
                     this.hospitalMap.moveStaffToLocation(staff.id, returnLocation);
                 }
-            }, 5 * 60 * 1000); // 5 minutes
+            }, breakDurationReal); // Convert 30 simulation minutes to real time
         }
     }
 

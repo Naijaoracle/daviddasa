@@ -170,10 +170,12 @@ class Staff {
         }
     }
 
-    takeBreak(duration = 5) {
+    takeBreak(duration = 30) { // Default to 30 simulation minutes
         this.status = 'on break';
         this.location = 'rest';
-        this.busyUntil = Date.now() + (duration * 60 * 1000); // duration in minutes
+        // Calculate busyUntil in real time based on simulation time
+        const realDurationMs = (duration * 60 * 1000) / 60; // Convert simulation minutes to real milliseconds
+        this.busyUntil = Date.now() + realDurationMs;
         this.addActivity(`Taking a ${duration} minute break`);
     }
 
