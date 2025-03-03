@@ -321,6 +321,12 @@ class DataTracker {
                 this.stats.currentPatients++;
                 this.stats.patientsByType[patient.severity]++;
                 this.stats.waitingPatients++;
+                
+                // Update severity breakdown
+                this.stats.severityBreakdown[patient.severity]++;
+                
+                // Update condition breakdown
+                this.updateConditionBreakdown(patient.condition);
                 break;
                 
             case 'treatment-start':
@@ -346,8 +352,8 @@ class DataTracker {
                 break;
         }
         
-        // Update metrics display
-        this.updateMetricsDisplay();
+        // Update charts with new data
+        this.updateCharts();
     }
 
     updateConditionBreakdown(condition) {
