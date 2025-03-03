@@ -336,8 +336,8 @@ class HospitalSimulation {
             const cellGraphics = scene.add.graphics();
             const bounds = cell.getBounds();
             
-            // Draw the cell background
-            cellGraphics.fillStyle(0xf0f0f0);
+            // Draw the cell background with a lighter color
+            cellGraphics.fillStyle(0xffffff);
             cellGraphics.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
             cellGraphics.lineStyle(1, 0xdddddd);
             cellGraphics.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
@@ -359,11 +359,27 @@ class HospitalSimulation {
                     bounds.x + bounds.width/2,
                     bounds.y + bounds.height/2,
                     icon,
-                    { fontSize: '16px' }
+                    { 
+                        fontSize: '20px',
+                        fontFamily: 'Arial'
+                    }
                 );
                 patientIcon.setOrigin(0.5, 0.5);
                 
-                // Update cell graphics
+                // Add patient name below icon
+                const nameText = scene.add.text(
+                    bounds.x + bounds.width/2,
+                    bounds.y + bounds.height - 10,
+                    patient.name.split(' ')[0],
+                    {
+                        fontSize: '8px',
+                        fontFamily: 'Arial',
+                        color: '#333333'
+                    }
+                );
+                nameText.setOrigin(0.5, 0.5);
+                
+                // Update cell graphics with patient severity color
                 const patientCellGraphics = scene.add.graphics();
                 patientCellGraphics.clear();
                 patientCellGraphics.fillStyle(0xffffff);
@@ -376,6 +392,7 @@ class HospitalSimulation {
                 }
                 cell.graphics = patientCellGraphics;
                 cell.patientIcon = patientIcon;
+                cell.nameText = nameText;
                 
                 // Update metrics panel grid
                 const patientCell = document.createElement('div');
@@ -397,11 +414,15 @@ class HospitalSimulation {
             }
         });
         
-        // Clean up any remaining patient icons from empty cells
+        // Clean up any remaining patient icons and names from empty cells
         mapCells.slice(patients.length).forEach(cell => {
             if (cell.patientIcon) {
                 cell.patientIcon.destroy();
                 cell.patientIcon = null;
+            }
+            if (cell.nameText) {
+                cell.nameText.destroy();
+                cell.nameText = null;
             }
             
             // Reset cell graphics to empty state
@@ -410,7 +431,7 @@ class HospitalSimulation {
             }
             const emptyGraphics = scene.add.graphics();
             const bounds = cell.getBounds();
-            emptyGraphics.fillStyle(0xf0f0f0);
+            emptyGraphics.fillStyle(0xffffff);
             emptyGraphics.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
             emptyGraphics.lineStyle(1, 0xdddddd);
             emptyGraphics.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
@@ -434,84 +455,86 @@ class HospitalSimulation {
         
         console.log('Available staff:', availableStaff ? availableStaff.name : 'none');
         
-        if (availableStaff) {
-            // Find available treatment bay
-            const availableBay = Object.entries(this.treatmentAreas).find(([_, p]) => !p);
-            console.log('Available bay:', availableBay ? availableBay[0] : 'none');
-            
-            if (availableBay) {
-                const [bayId, _] = availableBay;
-                const patient = this.waitingRoom.getNextPatient();
-                
-                if (!patient) return;
-
-                // Remove from waiting room
-                this.waitingRoom.removePatient(patient.id);
-                this.updateWaitingRoomDisplay();
-                
-                // Calculate waiting time
-                const waitingTime = Math.floor((Date.now() - patient.addedTime) / 1000 / 60); // minutes
-                
-                // Assign to treatment bay
-                this.treatmentAreas[bayId] = patient;
-                patient.treatingBay = bayId;
-                patient.treatmentStartTime = Date.now();
-                
-                // Log assignment
-                this.logActivity(
-                    `${patient.name} assigned to ${availableStaff.name} in ${bayId} after ${waitingTime}m wait`,
-                    'transfer'
-                );
-                
-                // Update staff status
-                availableStaff.assignPatient(patient);
-                this.staffVisualizer.updateStaffStatus(availableStaff.id, {
-                    status: 'treating',
-                    patient: patient
-                });
-
-                // Update staff utilization
-                this.dataTracker.updateStaffUtilization(availableStaff.id, true);
-
-                // Move directly to treatment bay
-                this.hospitalMap.moveStaffToLocation(availableStaff.id, bayId);
-                
-                // Update treatment bay display with side-by-side layout
-                document.getElementById(bayId).innerHTML = `
-                    <div class="treatment-bay-content">
-                        <div class="treatment-bay-row">
-                            <div class="treatment-bay-person">
-                                <span>${availableStaff.role === 'doctor' ? '👨‍⚕️' : '👩‍⚕️'}</span>
-                                <span>${availableStaff.name}</span>
-                            </div>
-                            <div class="treatment-bay-person">
-                                <span>${patient.severity === 'urgent' ? '🚨' : '🤒'}</span>
-                                <span>${patient.name}</span>
-                            </div>
-                        </div>
-                        <div class="treatment-bay-info">
-                            <span class="condition">${patient.condition}</span>
-                        </div>
-                    </div>
-                `;
-                
-                // Simulate treatment (2-5 minutes in simulation time)
-                const treatmentDuration = ((Math.random() * 3 + 2) * 60 * 1000) / this.simulationTimeScale;
-                setTimeout(() => {
-                    this.completePatientTreatment(patient, availableStaff, bayId);
-                }, treatmentDuration);
-            } else {
-                this.logActivity(
-                    `No treatment bays available for ${patient.name}`,
-                    'warning'
-                );
-            }
-        } else {
-            this.logActivity(
-                `No staff available to treat ${patient.name}`,
-                'warning'
-            );
+        if (!availableStaff) {
+            this.logActivity('No staff available for treatment', 'warning');
+            return;
         }
+
+        // Find available treatment bay
+        const availableBay = Object.entries(this.treatmentAreas).find(([_, p]) => !p);
+        console.log('Available bay:', availableBay ? availableBay[0] : 'none');
+        
+        if (!availableBay) {
+            this.logActivity('No treatment bays available', 'warning');
+            return;
+        }
+
+        const [bayId, _] = availableBay;
+        const patient = this.waitingRoom.getNextPatient();
+        
+        if (!patient) {
+            console.log('No patient available to assign');
+            return;
+        }
+
+        // Remove from waiting room
+        this.waitingRoom.removePatient(patient.id);
+        this.updateWaitingRoomDisplay();
+        
+        // Calculate waiting time
+        const waitingTime = Math.floor((Date.now() - patient.addedTime) / 1000 / 60); // minutes
+        
+        // Update waiting time statistics
+        this.dataTracker.updateStats(patient, 'treatment-start');
+        
+        // Assign to treatment bay
+        this.treatmentAreas[bayId] = patient;
+        patient.treatingBay = bayId;
+        patient.treatmentStartTime = Date.now();
+        
+        // Log assignment
+        this.logActivity(
+            `${patient.name} assigned to ${availableStaff.name} in ${bayId} after ${waitingTime}m wait`,
+            'transfer'
+        );
+        
+        // Update staff status
+        availableStaff.assignPatient(patient);
+        this.staffVisualizer.updateStaffStatus(availableStaff.id, {
+            status: 'treating',
+            patient: patient
+        });
+
+        // Update staff utilization
+        this.dataTracker.updateStaffUtilization(availableStaff.id, true);
+
+        // Move directly to treatment bay
+        this.hospitalMap.moveStaffToLocation(availableStaff.id, bayId);
+        
+        // Update treatment bay display with side-by-side layout
+        document.getElementById(bayId).innerHTML = `
+            <div class="treatment-bay-content">
+                <div class="treatment-bay-row">
+                    <div class="treatment-bay-person">
+                        <span>${availableStaff.role === 'doctor' ? '👨‍⚕️' : '👩‍⚕️'}</span>
+                        <span>${availableStaff.name}</span>
+                    </div>
+                    <div class="treatment-bay-person">
+                        <span>${patient.severity === 'urgent' ? '🚨' : '🤒'}</span>
+                        <span>${patient.name}</span>
+                    </div>
+                </div>
+                <div class="treatment-bay-info">
+                    <span class="condition">${patient.condition}</span>
+                </div>
+            </div>
+        `;
+        
+        // Simulate treatment (2-5 minutes in simulation time)
+        const treatmentDuration = ((Math.random() * 3 + 2) * 60 * 1000) / this.simulationTimeScale;
+        setTimeout(() => {
+            this.completePatientTreatment(patient, availableStaff, bayId);
+        }, treatmentDuration);
     }
 
     completePatientTreatment(patient, staff, bayId) {
