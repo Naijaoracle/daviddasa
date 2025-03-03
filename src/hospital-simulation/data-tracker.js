@@ -376,6 +376,11 @@ class DataTracker {
                 
                 // Update condition breakdown
                 this.updateConditionBreakdown(patient.condition);
+                
+                // Initialize waiting time tracking
+                if (!this.stats.waitingTimes[patient.severity]) {
+                    this.stats.waitingTimes[patient.severity] = [];
+                }
                 break;
                 
             case 'treatment-start':
@@ -383,13 +388,16 @@ class DataTracker {
                 this.stats.waitingPatients--;
                 
                 // Calculate and store waiting time
-                const waitTime = (Date.now() - patient.arrivalTime) / 1000 / 60; // Convert to minutes
+                const waitTime = (Date.now() - patient.addedTime) / 1000 / 60; // Convert to minutes
                 this.stats.waitingTimes[patient.severity].push(waitTime);
                 
                 // Update average wait time for this severity
                 const waitTimes = this.stats.waitingTimes[patient.severity];
-                this.stats.averageWaitTime[patient.severity] = 
-                    waitTimes.reduce((a, b) => a + b, 0) / waitTimes.length;
+                if (waitTimes && waitTimes.length > 0) {
+                    this.stats.averageWaitTime[patient.severity] = 
+                        waitTimes.reduce((a, b) => a + b, 0) / waitTimes.length;
+                    console.log(`Updated ${patient.severity} average wait time to: ${this.stats.averageWaitTime[patient.severity]}`);
+                }
                 break;
                 
             case 'treatment-end':
@@ -501,12 +509,12 @@ class DataTracker {
             urgentData.shift();
             stableData.shift();
             
-            // Add new data points
+            // Add new data points with proper fallback to 0
             const urgentWaitTime = this.stats.averageWaitTime.urgent || 0;
             const stableWaitTime = this.stats.averageWaitTime.stable || 0;
             
-            urgentData.push(urgentWaitTime);
-            stableData.push(stableWaitTime);
+            urgentData.push(Number(urgentWaitTime.toFixed(1)));
+            stableData.push(Number(stableWaitTime.toFixed(1)));
             
             // Calculate the maximum wait time for y-axis scaling
             const maxWaitTime = Math.max(
@@ -520,7 +528,8 @@ class DataTracker {
                 this.charts.waitingTime.options.scales.y.suggestedMax = Math.max(10, suggestedMax);
             }
             
-            this.charts.waitingTime.update();
+            // Force a full update of the chart
+            this.charts.waitingTime.update('active');
         }
 
         // Update severity chart
