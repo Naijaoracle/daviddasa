@@ -123,6 +123,9 @@ class HospitalSimulation {
         // Initialize activity log
         this.activityLog = [];
         
+        // Set up regular waiting time updates
+        setInterval(() => this.updateWaitingRoomDisplay(), 1000);
+        
         // Auto-start the simulation after a short delay to ensure everything is initialized
         setTimeout(() => this.start(), 1000);
     }
@@ -290,6 +293,8 @@ class HospitalSimulation {
     updateWaitingRoomDisplay() {
         const waitingPatients = this.waitingRoom.getAllPatients();
         const waitingRoomElement = document.querySelector('.waiting-patients');
+        if (!waitingRoomElement) return;  // Guard against missing element
+        
         waitingRoomElement.innerHTML = '';
 
         // Update waiting room grid in the UI
@@ -297,8 +302,9 @@ class HospitalSimulation {
             const patientElement = document.createElement('div');
             patientElement.className = 'waiting-patient';
             
-            const icon = patient.severity === 'urgent' ? '🚨' : '🤒';
+            // Calculate current waiting time
             const waitingTime = Math.floor((Date.now() - patient.addedTime) / 1000 / 60);
+            const icon = patient.severity === 'urgent' ? '🚨' : '🤒';
             
             patientElement.innerHTML = `
                 <div class="patient-icon">${icon}</div>
@@ -308,6 +314,10 @@ class HospitalSimulation {
             `;
             
             waitingRoomElement.appendChild(patientElement);
+            
+            // Update patient's waiting time in the data tracker
+            patient.waitingTime = waitingTime;
+            this.dataTracker.updateStats(patient, 'waiting');
         });
 
         // Update hospital map display

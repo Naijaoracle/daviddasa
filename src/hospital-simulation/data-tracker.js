@@ -388,6 +388,20 @@ class DataTracker {
                 }
                 break;
                 
+            case 'waiting':
+                // Update current waiting time for real-time display
+                if (!this.stats.waitingTimes[patient.severity]) {
+                    this.stats.waitingTimes[patient.severity] = [];
+                }
+                
+                // Update the current average wait time for this severity
+                const currentWaitTime = patient.waitingTime;
+                this.stats.averageWaitTime[patient.severity] = currentWaitTime;
+                
+                // Update charts more frequently for waiting time updates
+                this.updateCharts();
+                break;
+                
             case 'treatment-start':
                 // Track treatment start
                 this.stats.waitingPatients--;
