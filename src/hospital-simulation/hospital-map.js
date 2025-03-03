@@ -13,7 +13,7 @@ class HospitalMap {
     initializeMap() {
         // Configure Phaser game
         const config = {
-            type: Phaser.AUTO,
+            type: Phaser.CANVAS, // Explicitly use Canvas renderer instead of AUTO
             parent: 'hospital-map',
             width: 800,
             height: 300,
@@ -29,8 +29,11 @@ class HospitalMap {
                     debug: false
                 }
             },
-            canvas: {
-                willReadFrequently: true
+            canvasStyle: 'width: 100%; height: 100%;',
+            render: {
+                pixelArt: false,
+                antialias: true,
+                roundPixels: false
             }
         };
 
