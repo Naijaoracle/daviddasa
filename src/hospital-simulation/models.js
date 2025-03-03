@@ -7,7 +7,6 @@ class Patient {
         this.isEmergency = Math.random() < 0.1; // 10% chance for emergency
         this.severity = this.generateSeverity(); // Move after isEmergency
         this.waitingTime = 0;
-        this.addedTime = Date.now();
         this.treatmentStartTime = null;
         this.treatmentEndTime = null;
         this.treatedBy = null;

@@ -303,7 +303,13 @@ class HospitalSimulation {
             patientElement.className = 'waiting-patient';
             
             // Calculate current waiting time
-            const waitingTime = Math.floor((Date.now() - patient.addedTime) / 1000 / 60);
+            const currentTime = Date.now();
+            const elapsedMs = currentTime - patient.addedTime;
+            const waitingTime = Math.floor(elapsedMs / (1000 * 60)); // Convert to minutes
+            
+            // Update patient's waiting time property
+            patient.waitingTime = waitingTime;
+            
             const icon = patient.severity === 'urgent' ? '🚨' : '🤒';
             
             patientElement.innerHTML = `
@@ -316,7 +322,6 @@ class HospitalSimulation {
             waitingRoomElement.appendChild(patientElement);
             
             // Update patient's waiting time in the data tracker
-            patient.waitingTime = waitingTime;
             this.dataTracker.updateStats(patient, 'waiting');
         });
 
