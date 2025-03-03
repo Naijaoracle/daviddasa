@@ -381,6 +381,11 @@ class DataTracker {
                 if (!this.stats.waitingTimes[patient.severity]) {
                     this.stats.waitingTimes[patient.severity] = [];
                 }
+                
+                // Initialize average wait time if not set
+                if (!this.stats.averageWaitTime[patient.severity]) {
+                    this.stats.averageWaitTime[patient.severity] = 0;
+                }
                 break;
                 
             case 'treatment-start':
@@ -394,9 +399,9 @@ class DataTracker {
                 // Update average wait time for this severity
                 const waitTimes = this.stats.waitingTimes[patient.severity];
                 if (waitTimes && waitTimes.length > 0) {
-                    this.stats.averageWaitTime[patient.severity] = 
-                        waitTimes.reduce((a, b) => a + b, 0) / waitTimes.length;
-                    console.log(`Updated ${patient.severity} average wait time to: ${this.stats.averageWaitTime[patient.severity]}`);
+                    const totalWaitTime = waitTimes.reduce((a, b) => a + b, 0);
+                    this.stats.averageWaitTime[patient.severity] = totalWaitTime / waitTimes.length;
+                    console.log(`Updated ${patient.severity} average wait time to: ${this.stats.averageWaitTime[patient.severity].toFixed(1)} minutes`);
                 }
                 break;
                 
@@ -505,14 +510,15 @@ class DataTracker {
             const urgentData = this.charts.waitingTime.data.datasets[0].data;
             const stableData = this.charts.waitingTime.data.datasets[1].data;
             
-            // Shift data points
-            urgentData.shift();
-            stableData.shift();
-            
-            // Add new data points with proper fallback to 0
+            // Get current average wait times
             const urgentWaitTime = this.stats.averageWaitTime.urgent || 0;
             const stableWaitTime = this.stats.averageWaitTime.stable || 0;
             
+            // Shift old data points
+            urgentData.shift();
+            stableData.shift();
+            
+            // Add new data points
             urgentData.push(Number(urgentWaitTime.toFixed(1)));
             stableData.push(Number(stableWaitTime.toFixed(1)));
             
@@ -528,7 +534,7 @@ class DataTracker {
                 this.charts.waitingTime.options.scales.y.suggestedMax = Math.max(10, suggestedMax);
             }
             
-            // Force a full update of the chart
+            // Force an immediate update of the chart
             this.charts.waitingTime.update('active');
         }
 
