@@ -257,26 +257,47 @@ class HospitalSimulation {
     checkAndClearStuckBreaks() {
         let clearedAny = false;
         Object.values(this.staff).forEach(staff => {
-            // Check if staff is in rest area but not on break
+            // Case 1: Staff is in rest area but not on break
             if (staff.location === 'rest' && staff.status !== 'on break') {
                 console.log(`${staff.name} is in rest area but not on break, moving back to station`);
                 const returnLocation = staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
                 this.hospitalMap.moveStaffToLocation(staff.id, returnLocation);
+                this.updateStaffStatus(staff.id, { status: 'available' });
                 clearedAny = true;
             }
-            // Check if staff is on break but time has expired
+            
+            // Case 2: Staff is on break but time has expired
             if (staff.status === 'on break' && Date.now() > staff.busyUntil) {
-                console.log(`Forcing ${staff.name} to return from break`);
+                console.log(`Forcing ${staff.name} to return from break (time expired)`);
                 staff.endBreak();
                 this.updateStaffStatus(staff.id, { status: 'available' });
                 const returnLocation = staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
                 this.hospitalMap.moveStaffToLocation(staff.id, returnLocation);
                 clearedAny = true;
             }
-            // Check if staff is marked as on break but not in rest area
+            
+            // Case 3: Staff is marked as on break but not in rest area
             if (staff.status === 'on break' && staff.location !== 'rest') {
                 console.log(`${staff.name} is on break but not in rest area, moving to rest area`);
                 this.hospitalMap.moveStaffToLocation(staff.id, 'rest');
+                clearedAny = true;
+            }
+            
+            // Case 4: Staff has onBreak flag but incorrect status
+            if (staff.onBreak && staff.status !== 'on break') {
+                console.log(`${staff.name} has inconsistent break state, fixing`);
+                staff.endBreak();
+                this.updateStaffStatus(staff.id, { status: 'available' });
+                const returnLocation = staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
+                this.hospitalMap.moveStaffToLocation(staff.id, returnLocation);
+                clearedAny = true;
+            }
+            
+            // Case 5: Staff is treating a patient but marked as on break
+            if (staff.currentPatient && (staff.status === 'on break' || staff.onBreak)) {
+                console.log(`${staff.name} is treating patient but marked as on break, fixing`);
+                staff.endBreak();
+                this.updateStaffStatus(staff.id, { status: 'busy', patient: staff.currentPatient });
                 clearedAny = true;
             }
         });
@@ -289,7 +310,8 @@ class HospitalSimulation {
 
         // Count how many staff of this type are currently on break
         const currentlyOnBreak = Object.values(this.staff)
-            .filter(s => s.role === staffType.slice(0, -1) && s.status === 'on break').length;
+            .filter(s => s.role === staffType.slice(0, -1) && 
+                        (s.status === 'on break' || s.location === 'rest')).length;
 
         // If we already have the maximum number on break, don't send more
         if (currentlyOnBreak >= 1) {
@@ -298,7 +320,10 @@ class HospitalSimulation {
         }
 
         const availableStaff = Object.values(this.staff)
-            .filter(s => s.role === staffType.slice(0, -1) && s.status === 'available' && !s.currentPatient)
+            .filter(s => s.role === staffType.slice(0, -1) && 
+                        s.status === 'available' && 
+                        !s.currentPatient &&
+                        s.location !== 'rest')
             .sort((a, b) => (b.totalWorkTime || 0) - (a.totalWorkTime || 0));
 
         if (availableStaff.length > 0) {
@@ -307,18 +332,25 @@ class HospitalSimulation {
             // Calculate break duration in real milliseconds based on simulation time scale
             const breakDurationReal = Math.floor((this.breakSchedule.breakDuration * 60 * 1000) / this.simulationTimeScale);
             
-            // Update staff status first
-            this.updateStaffStatus(staff.id, { status: 'on break' });
+            // First move to rest area
+            this.hospitalMap.moveStaffToLocation(staff.id, 'rest');
             
-            // Then take break with simulation time scale
+            // Then update status and start break
+            this.updateStaffStatus(staff.id, { status: 'on break' });
             staff.takeBreak(this.breakSchedule.breakDuration, this.simulationTimeScale);
             this.logActivity(`${staff.name} is taking a break`, 'break');
             
             // Schedule return from break
             setTimeout(() => {
                 if (staff.status === 'on break') {
+                    // First update status
                     staff.endBreak();
                     this.updateStaffStatus(staff.id, { status: 'available' });
+                    
+                    // Then move back to station
+                    const returnLocation = staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
+                    this.hospitalMap.moveStaffToLocation(staff.id, returnLocation);
+                    
                     this.logActivity(`${staff.name} has returned from break`, 'break');
                     
                     // When staff returns, try to send another staff member on break
