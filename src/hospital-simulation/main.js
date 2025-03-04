@@ -319,46 +319,72 @@ class HospitalSimulation {
             return;
         }
 
-        const availableStaff = Object.values(this.staff)
+        // Get all staff of this type who could potentially go on break
+        const eligibleStaff = Object.values(this.staff)
             .filter(s => s.role === staffType.slice(0, -1) && 
-                        s.status === 'available' && 
-                        !s.currentPatient &&
+                        !s.onBreak && 
                         s.location !== 'rest')
             .sort((a, b) => (b.totalWorkTime || 0) - (a.totalWorkTime || 0));
 
-        if (availableStaff.length > 0) {
-            const staff = availableStaff[0];
-            
-            // Calculate break duration in real milliseconds based on simulation time scale
-            const breakDurationReal = Math.floor((this.breakSchedule.breakDuration * 60 * 1000) / this.simulationTimeScale);
-            
-            // First move to rest area
-            this.hospitalMap.moveStaffToLocation(staff.id, 'rest');
-            
-            // Then update status and start break
-            this.updateStaffStatus(staff.id, { status: 'on break' });
-            staff.takeBreak(this.breakSchedule.breakDuration, this.simulationTimeScale);
-            this.logActivity(`${staff.name} is taking a break`, 'break');
-            
-            // Schedule return from break
-            setTimeout(() => {
-                if (staff.status === 'on break') {
-                    // First update status
-                    staff.endBreak();
-                    this.updateStaffStatus(staff.id, { status: 'available' });
-                    
-                    // Then move back to station
-                    const returnLocation = staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
-                    this.hospitalMap.moveStaffToLocation(staff.id, returnLocation);
-                    
-                    this.logActivity(`${staff.name} has returned from break`, 'break');
-                    
-                    // When staff returns, try to send another staff member on break
-                    setTimeout(() => {
-                        this.rotateBreaks(staffType);
-                    }, 1000); // Small delay to ensure status updates are complete
-                }
-            }, breakDurationReal);
+        // First try to find available staff
+        let staffToBreak = eligibleStaff.find(s => s.status === 'available' && !s.currentPatient);
+
+        // If no available staff, find one that will finish soon (within 30 seconds)
+        if (!staffToBreak) {
+            staffToBreak = eligibleStaff.find(s => 
+                s.status === 'busy' && 
+                s.currentPatient && 
+                s.busyUntil && 
+                (s.busyUntil - Date.now() < 30000)
+            );
+        }
+
+        if (staffToBreak) {
+            // If staff is currently busy, wait until they finish
+            const sendOnBreak = () => {
+                // Calculate break duration in real milliseconds based on simulation time scale
+                const breakDurationReal = Math.floor((this.breakSchedule.breakDuration * 60 * 1000) / this.simulationTimeScale);
+                
+                // First move to rest area
+                this.hospitalMap.moveStaffToLocation(staffToBreak.id, 'rest');
+                
+                // Then update status and start break
+                this.updateStaffStatus(staffToBreak.id, { status: 'on break' });
+                staffToBreak.takeBreak(this.breakSchedule.breakDuration, this.simulationTimeScale);
+                this.logActivity(`${staffToBreak.name} is taking a break`, 'break');
+                
+                // Schedule return from break
+                setTimeout(() => {
+                    if (staffToBreak.status === 'on break') {
+                        // First update status
+                        staffToBreak.endBreak();
+                        this.updateStaffStatus(staffToBreak.id, { status: 'available' });
+                        
+                        // Then move back to station
+                        const returnLocation = staffToBreak.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
+                        this.hospitalMap.moveStaffToLocation(staffToBreak.id, returnLocation);
+                        
+                        this.logActivity(`${staffToBreak.name} has returned from break`, 'break');
+                        
+                        // When staff returns, try to send another staff member on break
+                        setTimeout(() => {
+                            this.rotateBreaks(staffType);
+                        }, 1000); // Small delay to ensure status updates are complete
+                    }
+                }, breakDurationReal);
+            };
+
+            if (staffToBreak.status === 'busy') {
+                // Wait for current task to complete
+                const checkInterval = setInterval(() => {
+                    if (staffToBreak.status === 'available') {
+                        clearInterval(checkInterval);
+                        sendOnBreak();
+                    }
+                }, 1000);
+            } else {
+                sendOnBreak();
+            }
         }
     }
 
@@ -502,8 +528,19 @@ class HospitalSimulation {
             return;
         }
 
-        // Find available treatment bay
-        const availableBay = Object.entries(this.treatmentAreas).find(([_, p]) => !p);
+        // Find available treatment bay that has no staff in it
+        const availableBay = Object.entries(this.treatmentAreas).find(([bayId, patient]) => {
+            // Check if bay is empty
+            if (patient) return false;
+            
+            // Check if any staff member is currently in this bay
+            const staffInBay = Object.values(this.staff).some(staff => 
+                staff.location === bayId && staff.id !== availableStaff.id
+            );
+            
+            return !staffInBay;
+        });
+
         console.log('Available bay:', availableBay ? availableBay[0] : 'none');
         
         if (!availableBay) {
