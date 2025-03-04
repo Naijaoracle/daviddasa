@@ -273,6 +273,16 @@ class HospitalSimulation {
         // First, ensure no staff of this type are stuck on break
         this.checkAndClearStuckBreaks();
 
+        // Count how many staff of this type are currently on break
+        const currentlyOnBreak = Object.values(this.staff)
+            .filter(s => s.role === staffType.slice(0, -1) && s.status === 'on break').length;
+
+        // If we already have the maximum number on break, don't send more
+        if (currentlyOnBreak >= 1) {
+            console.log(`Already have ${currentlyOnBreak} ${staffType} on break, skipping...`);
+            return;
+        }
+
         const availableStaff = Object.values(this.staff)
             .filter(s => s.role === staffType.slice(0, -1) && s.status === 'available' && !s.currentPatient)
             .sort((a, b) => (b.totalWorkTime || 0) - (a.totalWorkTime || 0));
@@ -296,6 +306,11 @@ class HospitalSimulation {
                     staff.endBreak();
                     this.updateStaffStatus(staff.id, { status: 'available' });
                     this.logActivity(`${staff.name} has returned from break`, 'break');
+                    
+                    // When staff returns, try to send another staff member on break
+                    setTimeout(() => {
+                        this.rotateBreaks(staffType);
+                    }, 1000); // Small delay to ensure status updates are complete
                 }
             }, breakDurationReal);
         }
@@ -303,13 +318,22 @@ class HospitalSimulation {
 
     rotateBreaks(staffType) {
         // First ensure no staff are stuck on break
-        this.checkAndClearStuckBreaks();
+        if (this.checkAndClearStuckBreaks()) {
+            return; // If we cleared any stuck breaks, skip rotation this time
+        }
 
-        // Move to next staff member in rotation
-        this.breakSchedule.currentIndex[staffType] = 
-            (this.breakSchedule.currentIndex[staffType] + 1) % this.breakSchedule[staffType].length;
-        
-        this.sendStaffOnBreak(staffType);
+        // Count current staff on break
+        const currentlyOnBreak = Object.values(this.staff)
+            .filter(s => s.role === staffType.slice(0, -1) && s.status === 'on break').length;
+
+        // Only rotate if we don't have anyone on break
+        if (currentlyOnBreak === 0) {
+            // Move to next staff member in rotation
+            this.breakSchedule.currentIndex[staffType] = 
+                (this.breakSchedule.currentIndex[staffType] + 1) % this.breakSchedule[staffType].length;
+            
+            this.sendStaffOnBreak(staffType);
+        }
     }
 
     generatePatient(isEmergency = false) {
