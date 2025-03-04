@@ -257,12 +257,26 @@ class HospitalSimulation {
     checkAndClearStuckBreaks() {
         let clearedAny = false;
         Object.values(this.staff).forEach(staff => {
+            // Check if staff is in rest area but not on break
+            if (staff.location === 'rest' && staff.status !== 'on break') {
+                console.log(`${staff.name} is in rest area but not on break, moving back to station`);
+                const returnLocation = staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
+                this.hospitalMap.moveStaffToLocation(staff.id, returnLocation);
+                clearedAny = true;
+            }
+            // Check if staff is on break but time has expired
             if (staff.status === 'on break' && Date.now() > staff.busyUntil) {
                 console.log(`Forcing ${staff.name} to return from break`);
                 staff.endBreak();
                 this.updateStaffStatus(staff.id, { status: 'available' });
                 const returnLocation = staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
                 this.hospitalMap.moveStaffToLocation(staff.id, returnLocation);
+                clearedAny = true;
+            }
+            // Check if staff is marked as on break but not in rest area
+            if (staff.status === 'on break' && staff.location !== 'rest') {
+                console.log(`${staff.name} is on break but not in rest area, moving to rest area`);
+                this.hospitalMap.moveStaffToLocation(staff.id, 'rest');
                 clearedAny = true;
             }
         });
@@ -572,12 +586,16 @@ class HospitalSimulation {
     }
 
     updateStaffStatus(staffId, status) {
+        const staff = this.staff[staffId];
+        if (!staff) return;
+
         const staffWindow = document.querySelector(`#${staffId}-canvas`);
         const statusElement = staffWindow.parentElement.querySelector('.status');
         const patientInfo = staffWindow.querySelector('.patient-info');
         
         if (status.patient) {
             // Staff is treating a patient
+            staff.status = 'busy';
             statusElement.textContent = 'Busy';
             statusElement.classList.remove('available', 'on-break');
             statusElement.classList.add('busy');
@@ -589,6 +607,7 @@ class HospitalSimulation {
             `;
         } else if (status.status === 'on break') {
             // Staff is on break
+            staff.status = 'on break';
             statusElement.textContent = 'On Break';
             statusElement.classList.remove('available', 'busy');
             statusElement.classList.add('on-break');
@@ -599,14 +618,21 @@ class HospitalSimulation {
             `;
 
             // Ensure staff is moved to rest area
-            this.hospitalMap.moveStaffToLocation(staffId, 'restArea');
+            this.hospitalMap.moveStaffToLocation(staffId, 'rest');
         } else {
             // Staff is available
+            staff.status = 'available';
             statusElement.textContent = 'Available';
             statusElement.classList.remove('busy', 'on-break');
             statusElement.classList.add('available');
             
             patientInfo.innerHTML = ''; // Empty when available
+            
+            // Move back to appropriate station if they were on break
+            if (staff.location === 'rest') {
+                const returnLocation = staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
+                this.hospitalMap.moveStaffToLocation(staffId, returnLocation);
+            }
         }
     }
 }
