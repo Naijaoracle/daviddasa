@@ -643,67 +643,122 @@ h2 {
         padding: 10px;
         width: 100%;
         box-sizing: border-box;
+        overflow-x: hidden; /* Prevent body scroll */
     }
 
     .hospital-layout {
         width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
     }
 
     .map-and-staff {
         width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+        display: flex;
+        flex-direction: column;
     }
 
     .hospital-map-container {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
         margin: 0;
-        padding: 10px;
+        padding: 0;
+        /* Remove any max-width constraints */
+        max-width: none;
+        /* Ensure content doesn't get squished */
+        min-height: 320px;
+        background: #fff;
+        /* Fix webkit rendering */
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
     }
 
     #hospital-map {
-        margin: 0 auto;
+        width: 800px !important; /* Force width */
+        min-width: 800px; /* Ensure minimum width */
+        height: 300px !important;
+        margin: 0;
+        /* Prevent canvas scaling */
+        transform: none !important;
+    }
+
+    /* Remove any interfering styles */
+    .hospital-map-container canvas {
+        width: 800px !important;
+        height: 300px !important;
+        transform: none !important;
+    }
+
+    /* Ensure parent containers don't restrict scrolling */
+    .left-column, 
+    .main-content {
+        overflow: visible;
+        width: 100%;
     }
 
     .staff-panel {
         width: 100%;
-        overflow-x: auto;
+        overflow-x: visible;
+        padding: 10px;
     }
 
     .staff-windows {
-        min-width: 800px; /* Ensure staff windows don't get too squeezed */
         display: flex;
-        flex-wrap: nowrap;
+        flex-direction: column;
+        gap: 10px;
+        min-width: unset;
     }
 
     .staff-window {
         flex: 0 0 auto;
-        width: 250px;
-        margin-right: 10px;
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     .dashboard-layout {
-        grid-template-columns: 1fr;
-        gap: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 10px;
     }
 
     .chart-container {
-        padding: 0.5rem;
+        width: 100%;
+        height: 250px;
+        margin-bottom: 20px;
     }
 
     .chart-container canvas {
-        max-width: 200px;
-        max-height: 130px;
+        width: 100% !important;
+        height: 100% !important;
     }
 
-    .chart-container:last-child canvas {
-        max-width: 250px;
-        max-height: 150px;
+    .data-dashboard {
+        margin-top: 20px;
+        padding: 10px;
     }
 
-    .dialogue-content {
-        height: 175px;
+    .data-dashboard h2 {
+        margin-bottom: 15px;
+    }
+
+    /* Ensure staff activity panels are properly sized */
+    .staff-activity {
+        height: 120px;
+        width: 100%;
+    }
+
+    /* Improve staff header readability */
+    .staff-header {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+
+    /* Make status indicators more visible */
+    .status {
+        padding: 4px 8px;
+        font-size: 12px;
     }
 
     .treatment-areas {
@@ -849,15 +904,15 @@ h2 {
     margin: 5px 0;
 }
 
+/* Base styles for the map container */
 .hospital-map-container {
     width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    position: relative;
     margin-bottom: 20px;
 }
 
 #hospital-map {
-    min-width: 800px; /* Maintain minimum width to prevent squishing */
+    width: 800px; /* Fixed width */
     height: 300px;
     position: relative;
 }
