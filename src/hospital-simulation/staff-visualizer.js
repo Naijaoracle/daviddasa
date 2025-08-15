@@ -33,11 +33,14 @@ class StaffVisualizer {
                 sketch.setup = () => {
                     const canvas = sketch.createCanvas(300, 150);
                     canvas.parent(`${sketchId}-canvas`);
-                    sketch.frameRate(30);
+                    // Lower frame rate to reduce CPU usage
+                    sketch.frameRate(20);
                     sketch.textAlign(sketch.CENTER, sketch.CENTER);
                     
                     // Create the activity scene for this staff member
                     activityScene = new ActivityScene(sketch, staff);
+                    // Reduce particle effects load
+                    activityScene.maxParticles = 10;
                 };
                 
                 sketch.draw = () => {

@@ -54,6 +54,10 @@ class DataTracker {
         
         this.isInitialized = false;
         this.lastUpdate = Date.now();
+        // Throttling controls for chart updates
+        this._lastChartsUpdate = 0;
+        this._updateScheduled = false;
+        this._minUpdateIntervalMs = 500;
         this.initializeCharts();
         
         // Start tracking time
@@ -188,8 +192,8 @@ class DataTracker {
                     }
                 },
                 animation: {
-                    duration: 750,
-                    easing: 'easeInOutQuart'
+                    duration: 200,
+                    easing: 'easeOutQuad'
                 },
                 elements: {
                     point: {
@@ -235,7 +239,9 @@ class DataTracker {
                         top: 10,
                         bottom: 10
                     }
-                }
+                },
+                animation: { duration: 200 },
+                responsiveAnimationDuration: 0
             }
         });
     }
@@ -299,7 +305,9 @@ class DataTracker {
                         top: 2,
                         bottom: 2
                     }
-                }
+                },
+                animation: { duration: 200 },
+                responsiveAnimationDuration: 0
             }
         });
     }
@@ -357,7 +365,9 @@ class DataTracker {
                         top: 2,
                         bottom: 10  // Added padding for bottom title
                     }
-                }
+                },
+                animation: { duration: 200 },
+                responsiveAnimationDuration: 0
             }
         });
     }
@@ -389,17 +399,10 @@ class DataTracker {
                 break;
                 
             case 'waiting':
-                // Update current waiting time for real-time display
-                if (!this.stats.waitingTimes[patient.severity]) {
-                    this.stats.waitingTimes[patient.severity] = [];
-                }
-                
                 // Update the current average wait time for this severity
                 const currentWaitTime = patient.waitingTime;
                 this.stats.averageWaitTime[patient.severity] = currentWaitTime;
-                
-                // Update charts more frequently for waiting time updates
-                this.updateCharts();
+                this.scheduleUpdate();
                 break;
                 
             case 'treatment-start':
@@ -436,8 +439,8 @@ class DataTracker {
                 break;
         }
         
-        // Update charts with new data
-        this.updateCharts();
+        // Schedule chart update with throttling
+        this.scheduleUpdate();
     }
 
     updateConditionBreakdown(condition) {
@@ -468,7 +471,7 @@ class DataTracker {
         });
 
         this.lastUpdate = now;
-        this.updateCharts();
+        this.scheduleUpdate();
     }
 
     updateStaffUtilization(staffId, busy) {
@@ -490,7 +493,7 @@ class DataTracker {
             staff.currentStatus = busy;
         }
 
-        // Calculate and update utilization percentage
+        // Calculate and update utilization percentage dataset (chart update is throttled)
         const staffIndex = {
             'doctor1': 0,
             'doctor2': 1,
@@ -501,24 +504,22 @@ class DataTracker {
         }[staffId];
 
         if (this.charts.staffUtilization && staffIndex !== undefined) {
-            // Calculate current utilization including ongoing busy time
             let currentBusyTime = staff.busyTime;
             if (staff.currentStatus && staff.lastBusyStart) {
                 currentBusyTime += (now - staff.lastBusyStart) / 1000;
             }
-
             const utilizationPercentage = staff.totalTime > 0 
                 ? (currentBusyTime / staff.totalTime) * 100 
                 : 0;
-            
             this.charts.staffUtilization.data.datasets[0].data[staffIndex] = Math.round(utilizationPercentage);
-            this.charts.staffUtilization.update('none');
         }
+        
+        this.scheduleUpdate();
     }
 
     updateCharts() {
         if (!this.isInitialized) return;  // Skip updates if charts aren't ready
-
+        
         // Update waiting time chart
         if (this.charts.waitingTime) {
             const urgentData = this.charts.waitingTime.data.datasets[0].data;
@@ -549,16 +550,16 @@ class DataTracker {
             }
             
             // Force an immediate update of the chart
-            this.charts.waitingTime.update('active');
+            this.charts.waitingTime.update('none');
         }
-
+        
         // Update severity chart
         this.charts.severity.data.datasets[0].data = [
             this.stats.severityBreakdown.urgent,
             this.stats.severityBreakdown.stable
         ];
-        this.charts.severity.update();
-
+        this.charts.severity.update('none');
+        
         // Update staff utilization chart
         const utilizationData = Object.values(this.stats.staffUtilization).map(staff => {
             let currentBusyTime = staff.busyTime;
@@ -569,17 +570,40 @@ class DataTracker {
         });
         
         this.charts.staffUtilization.data.datasets[0].data = utilizationData.map(Math.round);
-        this.charts.staffUtilization.update();
-
+        this.charts.staffUtilization.update('none');
+        
         // Update condition breakdown chart
         const conditions = Object.keys(this.stats.conditionBreakdown);
         const conditionCounts = conditions.map(c => this.stats.conditionBreakdown[c]);
         this.charts.conditions.data.labels = conditions;
         this.charts.conditions.data.datasets[0].data = conditionCounts;
-        this.charts.conditions.update();
+        this.charts.conditions.update('none');
+        
+        this._lastChartsUpdate = Date.now();
+        this._updateScheduled = false;
     }
 
     startAutoUpdate() {
-        setInterval(() => this.updateCharts(), 5000); // Update every 5 seconds
+        setInterval(() => this.scheduleUpdate(), 5000); // Update every 5 seconds
+    }
+
+    // Schedule chart updates with throttling to avoid excessive redraws
+    scheduleUpdate(force = false) {
+        const now = Date.now();
+        if (force || now - this._lastChartsUpdate >= this._minUpdateIntervalMs) {
+            this.updateCharts();
+            return;
+        }
+        if (this._updateScheduled) return;
+        this._updateScheduled = true;
+        const delay = this._minUpdateIntervalMs - (now - this._lastChartsUpdate);
+        setTimeout(() => this.updateCharts(), Math.max(0, delay));
+    }
+
+    // Batch setter to update average waiting times and schedule one chart refresh
+    setAverageWaitTimes(urgentAvg, stableAvg) {
+        if (typeof urgentAvg === 'number') this.stats.averageWaitTime.urgent = urgentAvg;
+        if (typeof stableAvg === 'number') this.stats.averageWaitTime.stable = stableAvg;
+        this.scheduleUpdate();
     }
 }
