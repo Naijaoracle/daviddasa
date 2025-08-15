@@ -80,7 +80,7 @@ class HospitalSimulation {
         this.running = false;
         
         // Debug logging flag
-        this.debug = false;
+        this.debug = true;
         
         // Simulation time settings
         this.simulationTimeScale = 60; // 1 real second = 1 simulation minute

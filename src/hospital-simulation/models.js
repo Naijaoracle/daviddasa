@@ -5,7 +5,7 @@ class Patient {
         this.name = this.generateName();
         this.condition = this.generateCondition();
         this.isEmergency = Math.random() < 0.1; // 10% chance for emergency
-        this.severity = this.generateSeverity(); // Move after isEmergency
+        this.severity = this.generateSeverity(); // Now this.condition exists
         this.waitingTime = 0;
         this.treatmentStartTime = null;
         this.treatmentEndTime = null;
