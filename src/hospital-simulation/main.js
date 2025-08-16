@@ -306,6 +306,43 @@ class HospitalSimulation {
         return clearedAny;
     }
 
+    // Start a break for a specific staff member if group capacity allows
+    startBreakForStaff(staff) {
+        if (!staff) return;
+        const staffType = staff.role === 'doctor' ? 'doctors' : 'nurses';
+
+        // Count how many of this group are currently on break
+        const currentlyOnBreak = Object.values(this.staff)
+            .filter(s => s.role === staff.role && (s.status === 'on break' || s.onBreak || s.location === 'rest')).length;
+        if (currentlyOnBreak >= 1) {
+            // Try again shortly to avoid overlapping breaks
+            setTimeout(() => this.startBreakForStaff(staff), 3000);
+            return;
+        }
+
+        const breakDurationReal = Math.floor((this.breakSchedule.breakDuration * 60 * 1000) / this.simulationTimeScale);
+        // Move to rest area first
+        this.hospitalMap.moveStaffToLocation(staff.id, 'rest');
+        // Ensure utilization not marked busy
+        this.dataTracker.updateStaffUtilization(staff.id, false);
+        // Update status and start break
+        staff.takeBreak(this.breakSchedule.breakDuration, this.simulationTimeScale);
+        staff.breakPending = false;
+        this.updateStaffStatus(staff.id, { status: 'on break' });
+        this.logActivity(`${staff.name} is taking a break`, 'break');
+        // Schedule return
+        setTimeout(() => {
+            if (staff.status === 'on break') {
+                staff.endBreak();
+                this.updateStaffStatus(staff.id, { status: 'available' });
+                const returnLocation = staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
+                this.hospitalMap.moveStaffToLocation(staff.id, returnLocation);
+                this.logActivity(`${staff.name} has returned from break`, 'break');
+                setTimeout(() => this.rotateBreaks(staffType), 1000);
+            }
+        }, breakDurationReal);
+    }
+
     sendStaffOnBreak(staffType) {
         // First, ensure no staff of this type are stuck on break
         this.checkAndClearStuckBreaks();
@@ -313,7 +350,7 @@ class HospitalSimulation {
         // Count how many staff of this type are currently on break
         const currentlyOnBreak = Object.values(this.staff)
             .filter(s => s.role === staffType.slice(0, -1) && 
-                        (s.status === 'on break' || s.location === 'rest')).length;
+                        (s.status === 'on break' || s.onBreak || s.location === 'rest')).length;
 
         // If we already have the maximum number on break, don't send more
         if (currentlyOnBreak >= 1) {
@@ -344,56 +381,11 @@ class HospitalSimulation {
                 staffToBreak.breakPending = true; // ensure they go on break when free
                 console.log(`${staffToBreak.name} marked breakPending; will go on break after current patient`);
             }
+            return; // wait for completion to trigger break
         }
 
-        if (staffToBreak) {
-            const sendOnBreak = () => {
-                // Calculate break duration in real milliseconds based on simulation time scale
-                const breakDurationReal = Math.floor((this.breakSchedule.breakDuration * 60 * 1000) / this.simulationTimeScale);
-                
-                // First move to rest area
-                this.hospitalMap.moveStaffToLocation(staffToBreak.id, 'rest');
-                
-                // Ensure utilization is not counted as busy while on break
-                this.dataTracker.updateStaffUtilization(staffToBreak.id, false);
-                
-                // Then update status and start break
-                staffToBreak.takeBreak(this.breakSchedule.breakDuration, this.simulationTimeScale);
-                staffToBreak.breakPending = false;
-                this.updateStaffStatus(staffToBreak.id, { status: 'on break' });
-                this.logActivity(`${staffToBreak.name} is taking a break`, 'break');
-                
-                // Schedule return from break
-                setTimeout(() => {
-                    if (staffToBreak.status === 'on break') {
-                        staffToBreak.endBreak();
-                        this.updateStaffStatus(staffToBreak.id, { status: 'available' });
-                        
-                        const returnLocation = staffToBreak.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
-                        this.hospitalMap.moveStaffToLocation(staffToBreak.id, returnLocation);
-                        
-                        this.logActivity(`${staffToBreak.name} has returned from break`, 'break');
-                        
-                        // When staff returns, try to send another staff member on break
-                        setTimeout(() => {
-                            this.rotateBreaks(staffType);
-                        }, 1000);
-                    }
-                }, breakDurationReal);
-            };
-
-            if (staffToBreak.status === 'busy') {
-                // Wait for current task to complete
-                const checkInterval = setInterval(() => {
-                    if (staffToBreak.status === 'available') {
-                        clearInterval(checkInterval);
-                        sendOnBreak();
-                    }
-                }, 1000);
-            } else {
-                sendOnBreak();
-            }
-        }
+        // Staff is available now, start break immediately
+        this.startBreakForStaff(staffToBreak);
     }
 
     rotateBreaks(staffType) {
@@ -618,18 +610,17 @@ class HospitalSimulation {
         patient.treatingBay = bayId;
         patient.treatmentStartTime = Date.now();
         
-        // Log assignment
-        this.logActivity(
-            `${patient.name} assigned to ${availableStaff.name} in ${bayId} after ${waitingTime}m wait`,
-            'transfer'
-        );
-        
         // Update staff status
         availableStaff.assignPatient(patient);
         this.staffVisualizer.updateStaffStatus(availableStaff.id, {
             status: 'treating',
             patient: patient
         });
+
+        // Simulate treatment (2-5 minutes in simulation time)
+        const treatmentDuration = ((Math.random() * 3 + 2) * 60 * 1000) / this.simulationTimeScale;
+        // Record when this treatment is expected to end to aid break planning
+        availableStaff.busyUntil = Date.now() + treatmentDuration;
 
         // Update staff utilization
         this.dataTracker.updateStaffUtilization(availableStaff.id, true);
@@ -656,8 +647,6 @@ class HospitalSimulation {
             </div>
         `;
         
-        // Simulate treatment (2-5 minutes in simulation time)
-        const treatmentDuration = ((Math.random() * 3 + 2) * 60 * 1000) / this.simulationTimeScale;
         setTimeout(() => {
             this.completePatientTreatment(patient, availableStaff, bayId);
         }, treatmentDuration);
@@ -681,15 +670,15 @@ class HospitalSimulation {
         
         // Update staff status
         staff.releasePatient();
+        staff.busyUntil = 0;
         this.staffVisualizer.updateStaffStatus(staff.id, {
             status: 'available'
         });
 
-        // If they were marked to go on break next, do it now
+        // If they were marked to go on break next, do it now using the targeted helper
         if (staff.breakPending && !staff.onBreak) {
-            const group = staff.role === 'doctor' ? 'doctors' : 'nurses';
             console.log(`${staff.name} had breakPending; sending on break now`);
-            this.sendStaffOnBreak(group);
+            this.startBreakForStaff(staff);
         }
 
         // Update staff utilization
