@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="rPPG Fairness Visualizer - Interactive demonstration of how skin tone affects remote photoplethysmography signal quality">
+  <title>rPPG Visualizer - David Dasa</title>
+  <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  
+  <!-- rPPG Visualizer specific styles -->
+  <style>
+    :root{
+      --bg:#0b0c10;            /* dark canvas so beams pop */
+      --panel:#101217;
+      --muted:#7b8496;
+      --text:#e6e8ee;
+      --accent:#7aa2ff;
+      --radius:18px;
+    }
+    
+    .rppg-container {
+      background: linear-gradient(180deg, #0b0c1099, #0b0c10), radial-gradient(1200px 600px at 80% -20%, #15203a, transparent 60%);
+      color: var(--text);
+      border-radius: 20px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .rppg-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .rppg-header h1 {
+      font-size: 2.5em;
+      margin: 0 0 10px;
+      color: var(--light-text);
+    }
+    
+    .rppg-header p {
+      font-size: 1.1em;
+      color: var(--muted);
+      margin: 0;
+    }
+    
+    .wrap{display:grid; gap:14px; padding:12px; max-width:1200px; margin:0 auto 32px}
+    @media (min-width: 980px){
+      .wrap{grid-template-columns: 1.1fr 0.9fr 1fr}
+    }
+
+    .card{
+      background:linear-gradient(180deg,#121725,#0f131e); border:1px solid #1b2334;
+      border-radius:var(--radius); padding:16px; box-shadow:0 10px 28px #0003, inset 0 1px #2a3550;
+    }
+    .card h2{margin:0 0 10px; font-size:16px; letter-spacing:.2px}
+
+    /* --- Controls --- */
+    .controls{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+    .seg{display:flex; border-radius:12px; overflow:hidden; border:1px solid #2a3550}
+    .seg button{all:unset; padding:8px 10px; cursor:pointer; color:var(--muted); background:#121725}
+    .seg button.active{color:#121725; background:#7aa2ff}
+    .seg button:not(:last-child){border-right:1px solid #2a3550}
+    .muted{color:var(--muted); font-size:12px}
+
+    /* --- SVG Scene --- */
+    .scene{display:flex; justify-content:center}
+    svg{width:100%; max-width:none; height:auto; transform-origin:50% 50%;}
+    #dermis{fill:#E9B793}
+    #epidermis{stroke:#d9b79c; stroke-width:1} 
+    #sensor{fill:#3b3f53; stroke:#a5b4fc; stroke-width:1.2}
+    #lens{fill:#1f2334}
+    .beam{opacity:.9; filter:drop-shadow(0 0 8px currentColor)}
+    .beamR{color:#ff4d4d; fill:currentColor}
+    .beamG{color:#4dff88; fill:currentColor}
+    .beamB{color:#6aa7ff; fill:currentColor}
+    .reflected{opacity:.9}
+    #vessel{fill:#b81414;} 
+    /* pulse animation removed: using traveling pulse element */ 
+    /* reduced-motion: traveling pulse uses simple translation */
+
+      /* --- RGB reflectivity bars --- */
+  .bars{display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; align-items:end; height:100px; margin-top:4px}
+    .bar{position:relative; background:#0d1220; border:1px solid #1f2a46; border-radius:12px; overflow:hidden}
+    .barFill{position:absolute; bottom:0; left:0; right:0}
+    .barFill.R{background:linear-gradient(#ff7676,#ff3a3a)}
+    .barFill.G{background:linear-gradient(#9cffc2,#2aff77)}
+    .barFill.B{background:linear-gradient(#a9c3ff,#6da2ff)}
+    .bar label{position:absolute; inset:auto 0 6px 0; text-align:center; font-size:12px; color:#c3cde1; text-shadow:0 1px 0 #000}
+
+    .legend{display:flex; gap:10px; flex-wrap:wrap; font-size:12px; color:#b8c0d8}
+    .dot{inline-size:10px; block-size:10px; border-radius:2px; display:inline-block; margin-right:6px}
+    .dot.R{background:#ff5e5e} .dot.G{background:#4dff88} .dot.B{background:#6aa7ff}
+
+    /* --- Charts --- */
+    .chartBox{background:#0e1322; border:1px solid #1f2947; border-radius:12px; padding:10px}
+
+    .explain{font-size:13px; color:#c6ccdd; line-height:1.5}
+    .foot{font-size:12px; color:#94a3b8}
+    .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .spacer{flex:1}
+    button.reset{all:unset; cursor:pointer; color:#9fb4ff; font-size:12px}
+    
+    /* Responsive adjustments for the site */
+    @media (max-width: 768px) {
+      .wrap {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      
+      .rppg-header h1 {
+        font-size: 2em;
+      }
+      
+      .rppg-container {
+        padding: 15px;
+        margin: 15px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Section -->
+  <nav>
+    <ul>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+      <li><a href="https://www.daviddasa.com/about">About</a></li>
+      <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
+      <li><a href="https://www.daviddasa.com/skills">Skills</a></li>
+      <li><a href="https://www.daviddasa.com/contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <main>
+      <!-- rPPG Visualizer Introduction -->
+      <section class="rppg-container">
+        <div class="rppg-header">
+          <h1>rPPG Fairness Visualizer</h1>
+          <p>Interactive demonstration of how skin tone affects remote photoplethysmography signal quality</p>
+        </div>
+        
+        <div class="wrap">
+          <!-- Left: Scene + controls -->
+          <section class="card" aria-labelledby="sceneTitle">
+            <h2 id="sceneTitle">Light–Skin–Sensor Schematic</h2>
+            <div class="controls" style="margin-bottom:10px">
+              <span class="muted">Primary skin type:</span>
+              <div class="seg" role="tablist" aria-label="Fitzpatrick selector">
+                <button data-type="I"  class="active" role="tab" aria-selected="true">I</button>
+                <button data-type="II" role="tab">II</button>
+                <button data-type="III" role="tab">III</button>
+                <button data-type="IV" role="tab">IV</button>
+                <button data-type="V" role="tab">V</button>
+                <button data-type="VI" role="tab">VI</button>
+              </div>
+              <span class="spacer"></span>
+              <span class="muted" id="scoreText">Signal quality: <strong>—</strong></span>
+            </div>
+
+            <div class="scene">
+              <!-- Responsive SVG drawing -->
+              <svg viewBox="0 0 520 360" role="img" aria-label="Diagram showing RGB light entering skin, interacting with a pulsing vessel, and reflecting back to a camera sensor">
+        <!-- Light source (window) -->
+        <text x="375" y="76" font-size="12" fill="#c6ccdd">Window (RGB light)</text>
+        <g id="windowSrc">
+          <rect x="370" y="80" width="110" height="40" rx="8" ry="8" fill="#d0d6e5"/>
+          <!-- soft pulsing glow aligned to RGB stack (80→120) -->
+          <rect x="370" y="80" width="110" height="40" rx="8" ry="8" fill="#ffffff" opacity="0.18">
+            <animate attributeName="opacity" values="0.16;0.32;0.16" dur="2s" repeatCount="indefinite" />
+          </rect>
+          <!-- shimmer sweep (right → left, same height as RGB stack) -->
+          <rect x="462" y="80" width="18" height="40" rx="8" ry="8" fill="#ffffff" opacity="0.35">
+            <animate attributeName="x" from="462" to="370" dur="2.2s" repeatCount="indefinite" />
+          </rect>
+        </g>
+
+        <!-- Incident RGB beams (right to left) -->
+        <g id="rgbBeams">
+          <!-- base beams with gentle opacity pulse -->
+          <rect class="beam beamR" x="220" y="80" width="150" height="10">
+            <animate attributeName="opacity" values="0.75;1;0.75" dur="1.6s" repeatCount="indefinite" />
+          </rect>
+          <rect class="beam beamG" x="220" y="95" width="150" height="10">
+            <animate attributeName="opacity" values="0.75;1;0.75" dur="1.5s" repeatCount="indefinite" />
+          </rect>
+          <rect class="beam beamB" x="220" y="110" width="150" height="10">
+            <animate attributeName="opacity" values="0.75;1;0.75" dur="1.7s" repeatCount="indefinite" />
+          </rect>
+
+          <!-- moving bright packets from window -> skin for directionality -->
+          <rect x="366" y="80" width="24" height="10" fill="#ffb3b3" opacity="0.95">
+            <animate attributeName="x" from="366" to="220" dur="1.4s" repeatCount="indefinite" />
+          </rect>
+          <rect x="366" y="80" width="24" height="10" fill="#ffb3b3" opacity="0.6">
+            <animate attributeName="x" from="366" to="220" dur="1.4s" begin="0.7s" repeatCount="indefinite" />
+          </rect>
+
+          <rect x="366" y="95" width="24" height="10" fill="#b6ffd1" opacity="0.95">
+            <animate attributeName="x" from="366" to="220" dur="1.6s" repeatCount="indefinite" />
+          </rect>
+          <rect x="366" y="95" width="24" height="10" fill="#b6ffd1" opacity="0.6">
+            <animate attributeName="x" from="366" to="220" dur="1.6s" begin="0.8s" repeatCount="indefinite" />
+          </rect>
+
+          <rect x="366" y="110" width="24" height="10" fill="#bcd0ff" opacity="0.95">
+            <animate attributeName="x" from="366" to="220" dur="1.8s" repeatCount="indefinite" />
+          </rect>
+          <rect x="366" y="110" width="24" height="10" fill="#bcd0ff" opacity="0.6">
+            <animate attributeName="x" from="366" to="220" dur="1.8s" begin="0.9s" repeatCount="indefinite" />
+          </rect>
+        </g>
+
+        <!-- Skin layers: dermis base + thin epidermis outer layer (tone varies) -->
+        <rect id="dermis"    x="100" y="60" width="120" height="220"/>
+        <rect id="epidermis" x="200" y="60" width="20"  height="220" fill="#F3D1B3"/>
+
+        <!-- Label & callout to epidermis -->
+          
+        <!-- Pulsing vessel (vertical) inside dermis -->
+        <rect id="vessel" x="145" y="60" width="20" height="220" rx="10" ry="10"/>
+
+        <!-- Traveling pulse wave inside vessel -->
+        <rect x="145" y="236" width="20" height="44" rx="10" ry="10" opacity="0.95" fill="url(#pulseGrad)">
+          <animate attributeName="y" from="236" to="60" dur="1.2s" repeatCount="indefinite" />
+        </rect>
+
+        <!-- Reflected signal path + traveling packets -->
+        <g id="outflow">
+          <path id="reflectPath" d="M 220 180 Q 300 215 410 255" stroke="#c6ccdd" stroke-width="1.2" fill="none" opacity="0.35"/>
+          <g filter="url(#softGlow)">
+            <!-- white highlight pulse -->
+            <circle r="6" fill="#ffffff" opacity="0.6">
+              <animateMotion dur="1.4s" repeatCount="indefinite" rotate="auto">
+                <mpath href="#reflectPath"/>
+              </animateMotion>
+            </circle>
+            <!-- RGB packets traveling along the path -->
+            <rect width="14" height="4" rx="2" fill="#ff7e7e" opacity="0.95">
+              <animateMotion dur="1.4s" repeatCount="indefinite" rotate="auto">
+                <mpath href="#reflectPath"/>
+              </animateMotion>
+            </rect>
+            <rect width="14" height="4" rx="2" fill="#7bffb0" opacity="0.95">
+              <animateMotion dur="1.4s" begin="0.35s" repeatCount="indefinite" rotate="auto">
+                <mpath href="#reflectPath"/>
+              </animateMotion>
+            </rect>
+            <rect width="14" height="4" rx="2" fill="#a9c3ff" opacity="0.95">
+              <animateMotion dur="1.4s" begin="0.7s" repeatCount="indefinite" rotate="auto">
+                <mpath href="#reflectPath"/>
+              </animateMotion>
+            </rect>
+          </g>
+        </g>
+
+        <!-- Reflected RGB bars (near camera) -->
+        <g id="reflectedGroup" opacity="0.95">
+          <text x="320" y="170" font-size="12" fill="#c6ccdd">Reflected RGB</text>
+          <rect class="beamR reflected" x="335" y="170" width="8" height="60"/>
+          <rect class="beamG reflected" x="348" y="170" width="8" height="60"/>
+          <rect class="beamB reflected" x="361" y="170" width="8" height="60"/>
+        </g>
+
+        <!-- Camera / sensor -->
+        <rect id="sensor" x="370" y="240" width="90" height="46" rx="9" ry="9"/>
+        <circle id="lens" cx="415" cy="263" r="12"/>
+        <text x="368" y="305" font-size="12" fill="#c7d2fe">Phone camera</text>
+
+        <defs>
+              <!-- Gradient for the moving pulse (blood vessel) -->
+    <linearGradient id="pulseGrad" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%"   stop-color="#ff6b6b" stop-opacity="0.15"/>
+      <stop offset="50%"  stop-color="#ff6b6b" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#ff6b6b" stop-opacity="0.15"/>
+    </linearGradient>
+
+    <!-- Soft glow for traveling packets -->
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="2"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#c6ccdd"/>
+    </marker>
+        </defs>
+      </svg>
+            </div>
+
+            <div class="legend" style="margin-top:8px">
+              <span><span class="dot R"></span>Red</span>
+              <span><span class="dot G"></span>Green</span>
+              <span><span class="dot B"></span>Blue</span>
+              <span class="spacer"></span>
+              <span class="muted">Wave amplitude and beam reflection scale with skin type.</span>
+            </div>
+          </section>
+
+          <!-- Middle: RGB reflectivity + waveform -->
+          <section class="card" aria-labelledby="reflectTitle">
+            <h2 id="reflectTitle">RGB Reflectivity & Simulated rPPG Waveform</h2>
+
+            <div class="row" style="margin-top:6px">
+              <div class="muted">Reflectivity (fraction of light returning):</div>
+              <div class="spacer"></div>
+              <div class="muted">Higher melanin → less green/blue reflectance.</div>
+            </div>
+
+            <div class="bars" aria-label="RGB reflectivity bars">
+              <div class="bar"><div class="barFill R" style="height:70%"></div><label>R <span class="muted" id="rPct">70%</span></label></div>
+              <div class="bar"><div class="barFill G" style="height:80%"></div><label>G <span class="muted" id="gPct">80%</span></label></div>
+              <div class="bar"><div class="barFill B" style="height:60%"></div><label>B <span class="muted" id="bPct">60%</span></label></div>
+            </div>
+
+            <div class="chartBox" style="margin-top:8px">
+              <canvas id="waveChart" height="180" aria-label="Simulated rPPG waveform"></canvas>
+            </div>
+
+            <!-- explainer between charts -->
+            <div class="explain" style="margin:8px 2px">
+              <strong>Why the waveform changes with skin tone</strong> — Melanin in the <em>epidermis</em> absorbs more of the incoming light, especially in the green band that rPPG relies on. Less green light returning → lower pulsatile signal at the sensor → a smaller, noisier waveform above. The curve below relates higher melanin content to a higher Fitzpatrick score.
+            </div>
+
+            <!-- NEW: Fitzpatrick vs Melanin chart -->
+            <div class="chartBox" style="margin-top:8px">
+              <canvas id="melaninChart" height="200" aria-label="Fitzpatrick score vs Melanin content (illustrative)"></canvas>
+              <div class="muted" style="margin-top:6px">Illustrative scatter with an approximate logarithmic trendline (higher melanin → higher Fitzpatrick score).</div>
+            </div>
+          </section>
+
+          <!-- Right: Comparison chart + info -->
+          <aside class="card" aria-labelledby="compareTitle">
+            <div class="row" style="margin-bottom:8px">
+              <h2 id="compareTitle" style="margin:0">Compare Skin Types</h2>
+              <span class="spacer"></span>
+              <button class="reset" id="resetBtn">Reset</button>
+            </div>
+
+            <div class="controls" style="margin-bottom:10px">
+              <span class="muted">Include in comparison:</span>
+              <label class="muted"><input type="checkbox" class="cmp" value="I"  checked> I</label>
+              <label class="muted"><input type="checkbox" class="cmp" value="II" checked> II</label>
+              <label class="muted"><input type="checkbox" class="cmp" value="III" checked> III</label>
+              <label class="muted"><input type="checkbox" class="cmp" value="IV" checked> IV</label>
+              <label class="muted"><input type="checkbox" class="cmp" value="V"  checked> V</label>
+              <label class="muted"><input type="checkbox" class="cmp" value="VI" checked> VI</label>
+            </div>
+
+            <div class="chartBox">
+              <canvas id="compareChart" height="190" aria-label="Bar chart of relative signal quality by skin type"></canvas>
+            </div>
+
+            <div class="explain" style="margin-top:12px">
+              <strong>What you're seeing</strong><br/>
+              We emit red, green, and blue light toward the skin. Melanin in the epidermis absorbs a share of this light. Less returned light means a smaller pulsatile component at the sensor, which reduces rPPG signal quality. In darker skin (V–VI), green and blue are attenuated more, so the waveform amplitude is lower and noise dominates.
+            </div>
+            <p class="foot" style="margin-top:10px">Numbers are synthetic but follow the general trend reported in literature and vendor notes (e.g., roughly logarithmic attenuation of the usable signal across the Fitzpatrick scale). Lighting, camera, distance, and algorithms strongly influence real outcomes.</p>
+          </aside>
+        </div>
+      </section>
+      
+      <!-- Additional Information Section -->
+      <section class="project-card">
+        <h2>About rPPG Technology</h2>
+        <div class="project-item">
+          <h3>Remote Photoplethysmography</h3>
+          <p>Remote photoplethysmography (rPPG) is a non-contact method for measuring heart rate and other cardiovascular parameters using video cameras. This technology has applications in telemedicine, fitness tracking, and remote patient monitoring.</p>
+          
+          <h3>Fairness in Healthcare AI</h3>
+          <p>This visualizer demonstrates how skin tone can affect the performance of rPPG systems, highlighting the importance of developing fair and inclusive healthcare technologies that work equally well across diverse populations.</p>
+          
+          <h3>Technical Details</h3>
+          <ul class="skills-list">
+            <li>Fitzpatrick Skin Type Classification (I-VI)</li>
+            <li>RGB Light Absorption & Reflection</li>
+            <li>Signal-to-Noise Ratio Analysis</li>
+            <li>Interactive Data Visualization</li>
+            <li>Chart.js Integration</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Footer Section -->
+  <footer>
+    <p>&copy; 2024 David Dasa</p>
+  </footer>
+
+  <!-- Chart.js for quick plotting -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    // --- Synthetic parameters per Fitzpatrick type ---
+    // Values are intentionally simple and monotonic to match high-level trends.
+    const FP = {
+      I:  { skin:'#F3D1B3', refl:{r:70,g:80,b:60}, amp:1.00, noise:0.020, quality:90 },
+      II: { skin:'#EAC5A8', refl:{r:68,g:72,b:55}, amp:0.90, noise:0.030, quality:82 },
+      III:{ skin:'#D8B090', refl:{r:65,g:60,b:45}, amp:0.75, noise:0.045, quality:70 },
+      IV: { skin:'#C29A78', refl:{r:60,g:50,b:35}, amp:0.60, noise:0.065, quality:58 },
+      V:  { skin:'#A0765A', refl:{r:55,g:35,b:25}, amp:0.45, noise:0.090, quality:44 },
+      VI: { skin:'#714D30', refl:{r:50,g:25,b:18}, amp:0.35, noise:0.120, quality:36 },
+    };
+
+    // Elements
+    const epidermis = document.getElementById('epidermis');
+    const vessel    = document.getElementById('vessel');
+    const scoreText = document.getElementById('scoreText');
+
+    const rPct = document.getElementById('rPct');
+    const gPct = document.getElementById('gPct');
+    const bPct = document.getElementById('bPct');
+
+    const barR = document.querySelector('.barFill.R');
+    const barG = document.querySelector('.barFill.G');
+    const barB = document.querySelector('.barFill.B');
+
+    const reflectedGroup = document.getElementById('reflectedGroup');
+    const [refR, refG, refB] = reflectedGroup.querySelectorAll('rect');
+
+    // Primary selector buttons
+    const segBtns = [...document.querySelectorAll('.seg button')];
+
+    // Comparison checkboxes
+    const cmpBoxes = [...document.querySelectorAll('input.cmp')];
+    const resetBtn = document.getElementById('resetBtn');
+
+    // --- Charts ---
+    const waveCtx = document.getElementById('waveChart');
+    const waveChart = new Chart(waveCtx, {
+      type: 'line',
+      data: { labels: [], datasets: [{ label:'PPG', data: [], pointRadius:0, borderWidth:2, tension:0.3 }] },
+      options: {
+        responsive:true,
+        plugins:{ legend:{ display:false } },
+        scales:{ x:{ display:false }, y:{ display:true, ticks:{ color:'#c8d0ea' }, grid:{ color:'#1e2744' } } }
+      }
+    });
+
+    // --- Melanin vs Fitzpatrick chart ---
+    const melCtx = document.getElementById('melaninChart');
+
+    // Roughly digitized points from reference figure (illustrative only)
+    const melPoints = [
+      {x:80,y:1.0},{x:110,y:2.0},{x:130,y:2.0},{x:160,y:3.0},{x:180,y:3.0},{x:210,y:3.1},
+      {x:270,y:3.0},{x:290,y:4.1},{x:310,y:4.0},{x:340,y:5.0},{x:380,y:5.0},{x:420,y:5.1},
+      {x:490,y:5.0},{x:630,y:6.0},{x:660,y:6.0},{x:860,y:6.1}
+    ];
+
+    // Simple log fit y = a + b ln(x) tuned to the visual trend
+    const a = -7.0, b = 1.93;
+    const curve = Array.from({length:89}, (_,i)=>{ const x=70+i*10; return {x, y: a + b*Math.log(x)}; });
+
+    const melaninChart = new Chart(melCtx, {
+      type:'scatter',
+      data:{
+        datasets:[
+          {label:'Data points', data:melPoints, pointRadius:3},
+          {label:'Illustrative trend', type:'line', data:curve, borderWidth:2, pointRadius:0, borderDash:[5,5]}
+        ]
+      },
+      options:{
+        plugins:{ legend:{ display:true, labels:{ color:'#c8d0ea' } } },
+        scales:{
+          x:{ type:'linear', title:{display:true, text:'Melanin content (a.u.)', color:'#c8d0ea'}, ticks:{ color:'#c8d0ea' }, grid:{ color:'#1e2744' }, suggestedMin:50, suggestedMax:1000 },
+          y:{ title:{display:true, text:'Fitzpatrick score', color:'#c8d0ea'}, ticks:{ color:'#c8d0ea' }, grid:{ color:'#1e2744' }, suggestedMin:0, suggestedMax:7 }
+        }
+      }
+    });
+
+    const cmpCtx = document.getElementById('compareChart');
+    const compareChart = new Chart(cmpCtx, {
+      type:'bar',
+      data:{ labels:[], datasets:[{ label:'Relative signal quality', data:[], borderWidth:0 }]},
+      options:{
+        plugins:{ legend:{display:false} },
+        scales:{ x:{ ticks:{ color:'#c8d0ea' } }, y:{ ticks:{ color:'#c8d0ea' }, grid:{ color:'#1e2744' }, suggestedMin:0, suggestedMax:100 } }
+      }
+    });
+
+    // --- Utils ---
+    function setPulseScale(scale){
+      const s = document.createElement('style');
+      s.textContent = `@keyframes pulse{0%,100%{transform:scaleY(1)}50%{transform:scaleY(${1+ (scale-1)*1.0})}}`;
+      document.head.appendChild(s);
+    }
+
+    function updateReflectivityBars(refl){
+      rPct.textContent = refl.r + '%';
+      gPct.textContent = refl.g + '%';
+      bPct.textContent = refl.b + '%';
+
+      barR.style.height = refl.r + '%';
+      barG.style.height = refl.g + '%';
+      barB.style.height = refl.b + '%';
+
+      // Reflected beam heights/opacity near camera
+      const SCALE = 0.8; // px per percent
+      const TOP = 230;   // y position where 0% corresponds
+      const hR = SCALE * refl.r;
+      const hG = SCALE * refl.g;
+      const hB = SCALE * refl.b;
+
+      refR.setAttribute('height', hR);
+      refG.setAttribute('height', hG);
+      refB.setAttribute('height', hB);
+
+      refR.setAttribute('y', TOP - hR);
+      refG.setAttribute('y', TOP - hG);
+      refB.setAttribute('y', TOP - hB);
+
+      refR.style.opacity = Math.max(0.2, refl.r/100);
+      refG.style.opacity = Math.max(0.2, refl.g/100);
+      refB.style.opacity = Math.max(0.2, refl.b/100);
+    }
+
+    function generateWave({amp, noise}){
+      const N = 320; // samples
+      const data = [];
+      for(let i=0;i<N;i++){
+        const t = i / 30; // seconds scale
+        const base = Math.sin(2*Math.PI*1.1*t) * 0.7 + 0.25*Math.sin(2*Math.PI*2.2*t+0.6);
+        const n = (Math.random()*2-1) * noise * 3.0; // symmetric noise
+        data.push( (base * amp * 0.9) + n );
+      }
+      return data;
+    }
+
+    function updateWave(params){
+      waveChart.data.labels = Array.from({length:320}, (_,i)=>i);
+      waveChart.data.datasets[0].data = generateWave(params);
+      waveChart.update();
+    }
+
+    function updatePrimary(type){
+      segBtns.forEach(b=> b.classList.toggle('active', b.dataset.type===type));
+      const cfg = FP[type];
+      epidermis.setAttribute('fill', cfg.skin);updateReflectivityBars(cfg.refl);
+      updateWave({amp:cfg.amp, noise:cfg.noise});
+      scoreText.innerHTML = `Signal quality: <strong>${cfg.quality}/100</strong> (amp ${cfg.amp.toFixed(2)}, noise ${cfg.noise.toFixed(2)})`;
+    }
+
+    function updateCompare(){
+      const selected = cmpBoxes.filter(b=>b.checked).map(b=>b.value);
+      compareChart.data.labels = selected;
+      compareChart.data.datasets[0].data = selected.map(k=>FP[k].quality);
+      compareChart.update();
+    }
+
+    // --- Wire up events ---
+    segBtns.forEach(btn=>{
+      btn.addEventListener('click', ()=> updatePrimary(btn.dataset.type));
+    });
+
+    cmpBoxes.forEach(chk=> chk.addEventListener('change', updateCompare));
+    resetBtn.addEventListener('click', ()=>{
+      cmpBoxes.forEach(c=> c.checked = true); updateCompare();
+    });
+
+    // Initial render
+    updatePrimary('I');
+    updateCompare();
+  </script>
+
+  <!-- Common JavaScript -->
+  <script src="main.js"></script>
+</body>
+</html>
