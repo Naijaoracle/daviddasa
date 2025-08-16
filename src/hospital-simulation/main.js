@@ -194,18 +194,18 @@ class HospitalSimulation {
         this.logActivity('Simulation started', 'info');
         
         // Start break rotation
-        this.debugLog('Starting break rotation...');
+        console.log('Starting break rotation...');
         this.startBreakRotation();
         
         // Generate initial batch of patients (4-8 patients)
         const initialPatients = Math.floor(Math.random() * 5) + 4;
-        this.debugLog(`Generating ${initialPatients} initial patients...`);
+        console.log(`Generating ${initialPatients} initial patients...`);
         for (let i = 0; i < initialPatients; i++) {
             this.generatePatient();
         }
         
         // Start patient generation
-        this.debugLog('Setting up patient generation interval...');
+        console.log('Setting up patient generation interval...');
         this.simulationInterval = setInterval(() => {
             if (this.running) {
                 // 25% chance of emergency patient
@@ -424,7 +424,7 @@ class HospitalSimulation {
     }
 
     generatePatient(isEmergency = false) {
-        this.debugLog('Generating patient:', isEmergency ? 'emergency' : 'regular');
+        console.log('Generating patient:', isEmergency ? 'emergency' : 'regular');
         const patient = new Patient(Math.random().toString(36).substr(2, 9));
         
         // Determine severity - 30% chance of urgent if not emergency
@@ -435,11 +435,11 @@ class HospitalSimulation {
             patient.isEmergency = true;
         }
 
-        this.debugLog('Patient created:', patient.name, patient.severity);
+        console.log('Patient created:', patient.name, patient.severity);
 
         // Try to add to waiting room
         if (this.waitingRoom.addPatient(patient)) {
-            this.debugLog('Patient added to waiting room');
+            console.log('Patient added to waiting room');
             this.updateWaitingRoomDisplay();
             
             // Log patient arrival
@@ -453,11 +453,11 @@ class HospitalSimulation {
 
             // Try to assign patient to staff after a short delay
             setTimeout(() => {
-                this.debugLog('Attempting to assign patient to staff:', patient.name);
+                console.log('Attempting to assign patient to staff:', patient.name);
                 this.assignPatientToStaff();
             }, 2000); // 2 second delay
         } else {
-            this.debugLog('Waiting room full, patient turned away');
+            console.log('Waiting room full, patient turned away');
             this.logActivity(
                 `${patient.name} turned away - waiting room full`,
                 'warning'
@@ -536,9 +536,9 @@ class HospitalSimulation {
     }
 
     assignPatientToStaff() {
-        this.debugLog('Checking for patients to assign...');
+        console.log('Checking for patients to assign...');
         if (this.waitingRoom.getTotalCount() === 0) {
-            this.debugLog('No patients in waiting room');
+            console.log('No patients in waiting room');
             return;
         }
         
@@ -547,7 +547,7 @@ class HospitalSimulation {
             !staff.currentPatient && !staff.onBreak && staff.status !== 'on break'
         );
         
-        this.debugLog('Available staff:', availableStaff ? availableStaff.name : 'none');
+        console.log('Available staff:', availableStaff ? availableStaff.name : 'none');
         
         if (!availableStaff) {
             this.logActivity('No staff available for treatment', 'warning');
@@ -568,7 +568,7 @@ class HospitalSimulation {
             return !anyStaffInBay;
         });
         
-        this.debugLog('Available bay:', availableBay ? availableBay[0] : 'none');
+        console.log('Available bay:', availableBay ? availableBay[0] : 'none');
         
         if (!availableBay) {
             this.logActivity('No treatment bays available', 'warning');
@@ -584,14 +584,14 @@ class HospitalSimulation {
         );
         
         if (bayIsOccupied) {
-            this.debugLog(`Bay ${bayId} was taken before assignment could be made`);
+            console.log(`Bay ${bayId} was taken before assignment could be made`);
             return;
         }
         
         const patient = this.waitingRoom.getNextPatient();
         
         if (!patient) {
-            this.debugLog('No patient available to assign');
+            console.log('No patient available to assign');
             return;
         }
         
