@@ -46,14 +46,14 @@
       margin: 0;
     }
     
-    .wrap{display:grid; gap:14px; padding:12px; max-width:1200px; margin:0 auto 32px}
-    @media (min-width: 980px){
-      .wrap{grid-template-columns: 1.1fr 0.9fr 1fr}
-    }
+      .wrap{display:grid; gap:20px; padding:16px; max-width:1200px; margin:0 auto 32px}
+  @media (min-width: 980px){
+    .wrap{grid-template-columns: 1.2fr 0.8fr 1fr}
+  }
 
     .card{
       background:linear-gradient(180deg,#121725,#0f131e); border:1px solid #1b2334;
-      border-radius:var(--radius); padding:16px; box-shadow:0 10px 28px #0003, inset 0 1px #2a3550;
+      border-radius:var(--radius); padding:20px; box-shadow:0 10px 28px #0003, inset 0 1px #2a3550;
     }
     .card h2{margin:0 0 10px; font-size:16px; letter-spacing:.2px}
 
@@ -65,9 +65,9 @@
     .seg button:not(:last-child){border-right:1px solid #2a3550}
     .muted{color:var(--muted); font-size:12px}
 
-    /* --- SVG Scene --- */
-    .scene{display:flex; justify-content:center}
-    svg{width:100%; max-width:none; height:auto; transform-origin:50% 50%;}
+      /* --- SVG Scene --- */
+  .scene{display:flex; justify-content:center; align-items:center; min-height:400px}
+  svg{width:100%; max-width:500px; height:auto; transform-origin:50% 50%;}
     #dermis{fill:#E9B793}
     #epidermis{stroke:#d9b79c; stroke-width:1} 
     #sensor{fill:#3b3f53; stroke:#a5b4fc; stroke-width:1.2}
@@ -118,6 +118,14 @@
         padding: 15px;
         margin: 15px 0;
       }
+      
+      .scene {
+        min-height: 300px;
+      }
+      
+      svg {
+        max-width: 100%;
+      }
     }
   </style>
 </head>
@@ -152,19 +160,19 @@
           <!-- Left: Scene + controls -->
           <section class="card" aria-labelledby="sceneTitle">
             <h2 id="sceneTitle">Light–Skin–Sensor Schematic</h2>
-            <div class="controls" style="margin-bottom:10px">
-              <span class="muted">Primary skin type:</span>
-              <div class="seg" role="tablist" aria-label="Fitzpatrick selector">
-                <button data-type="I"  class="active" role="tab" aria-selected="true">I</button>
-                <button data-type="II" role="tab">II</button>
-                <button data-type="III" role="tab">III</button>
-                <button data-type="IV" role="tab">IV</button>
-                <button data-type="V" role="tab">V</button>
-                <button data-type="VI" role="tab">VI</button>
-              </div>
-              <span class="spacer"></span>
-              <span class="muted" id="scoreText">Signal quality: <strong>—</strong></span>
-            </div>
+                  <div class="controls" style="margin-bottom:16px">
+        <span class="muted">Primary skin type:</span>
+        <div class="seg" role="tablist" aria-label="Fitzpatrick selector">
+          <button data-type="I"  class="active" role="tab" aria-selected="true">I</button>
+          <button data-type="II" role="tab">II</button>
+          <button data-type="III" role="tab">III</button>
+          <button data-type="IV" role="tab">IV</button>
+          <button data-type="V" role="tab">V</button>
+          <button data-type="VI" role="tab">VI</button>
+        </div>
+        <span class="spacer"></span>
+        <span class="muted" id="scoreText">Signal quality: <strong>—</strong></span>
+      </div>
 
             <div class="scene">
               <!-- Responsive SVG drawing -->
@@ -299,7 +307,7 @@
       </svg>
             </div>
 
-            <div class="legend" style="margin-top:8px">
+            <div class="legend" style="margin-top:16px">
               <span><span class="dot R"></span>Red</span>
               <span><span class="dot G"></span>Green</span>
               <span><span class="dot B"></span>Blue</span>
@@ -373,22 +381,25 @@
       
       <!-- Additional Information Section -->
       <section class="project-card">
-        <h2>About rPPG Technology</h2>
+        <h2>Why skin tone matters in rPPG</h2>
         <div class="project-item">
-          <h3>Remote Photoplethysmography</h3>
-          <p>Remote photoplethysmography (rPPG) is a non-contact method for measuring heart rate and other cardiovascular parameters using video cameras. This technology has applications in telemedicine, fitness tracking, and remote patient monitoring.</p>
+          <p>Remote photoplethysmography (rPPG) estimates vital signs by measuring tiny, periodic color changes in facial skin caused by blood volume pulses. The math behind it is the Beer–Lambert law: light entering the skin is absorbed by chromophores (notably hemoglobin), and the reflected signal that a camera sees is converted into a pulse waveform. Many rPPG methods lean heavily on the green channel of RGB video because hemoglobin absorbs strongly there—so if anything else also absorbs green light, the usable signal shrinks. Melanin is a broadband absorber in visible light, which means higher melanin content can reduce the signal-to-noise ratio (SNR) that rPPG needs, especially in the green band. Poor SNR makes the pulse harder to separate from motion, compression, and lighting artifacts.</p>
           
-          <h3>Fairness in Healthcare AI</h3>
-          <p>This visualizer demonstrates how skin tone can affect the performance of rPPG systems, highlighting the importance of developing fair and inclusive healthcare technologies that work equally well across diverse populations.</p>
+          <p>This physics interacts with data and design choices. Historically, several widely used rPPG datasets underrepresented darker skin tones—for example, published summaries report roughly ~10% dark-skinned participants in MMSE-HR, ~0% in AFRL, and ~5% in UBFC. Models trained on such distributions risk learning shortcuts that generalize poorly to the darkest skin types (Fitzpatrick V–VI). The problem isn't intent; it's coverage. When particular groups are sparse in training and validation data, even small changes in lighting, camera gain, or motion can push those users into "low-confidence" or failure modes more often.</p>
           
-          <h3>Technical Details</h3>
-          <ul class="skills-list">
-            <li>Fitzpatrick Skin Type Classification (I-VI)</li>
-            <li>RGB Light Absorption & Reflection</li>
-            <li>Signal-to-Noise Ratio Analysis</li>
-            <li>Interactive Data Visualization</li>
-            <li>Chart.js Integration</li>
-          </ul>
+          <p>Large-scale validation efforts in rPPG have also, at times, included very few participants at the extremes of skin tone, limiting statistical power to detect accuracy gaps. In one published dataset used for algorithm development, the estimated representation of Fitzpatrick V and VI was extremely small, which makes it hard to rule out clinically meaningful performance differences for those groups.</p>
+          
+          <p>Real-world usage adds further nuance. Anything that alters skin optics—make-up, facial tattoos/markings, or culturally significant scarification—can change the light path and reduce recoverable pulsatility in camera signals. That doesn't mean rPPG can't work; it means systems must detect and communicate "signal quality" transparently and provide safe fallbacks. Field studies in West Africa, for example, have highlighted how very dark skin and prominent facial markings can coincide with lower measurement success or accuracy if conditions and algorithms aren't tuned for them.</p>
+          
+          <h3>What fair rPPG looks like</h3>
+          
+          <p><strong>Physically aware signal processing:</strong> Use color spaces and features less sensitive to melanin-related attenuation (e.g., chrominance/hue approaches) and robust motion handling, rather than relying solely on raw green intensity.</p>
+          
+          <p><strong>Representative data:</strong> Train and validate on diverse skin tones (including V–VI) and real-world lighting, then publish subgroup performance so users know when to trust results.</p>
+          
+          <p><strong>Human-centered safeguards:</strong> Provide clear quality indicators, avoid overconfident outputs on low-SNR frames, and encourage confirmatory measurements when confidence is low.</p>
+          
+          <p>In short, skin tone is not an edge case in rPPG—it's central to the physics of the signal and to the ethical obligation to build tools that work reliably for everyone.</p>
         </div>
       </section>
     </main>
