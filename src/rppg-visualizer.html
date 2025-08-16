@@ -66,8 +66,8 @@
     .muted{color:var(--muted); font-size:12px}
 
       /* --- SVG Scene --- */
-  .scene{display:flex; justify-content:flex-start; align-items:flex-start; min-height:380px; padding:8px 0}
-  svg{width:100%; max-width:520px; height:auto; transform-origin:50% 50%;}
+  .scene{position:relative; display:flex; justify-content:flex-start; align-items:flex-start; min-height:380px; padding:8px 0}
+  .scene svg{position:static; width:100%; max-width:520px; height:auto; pointer-events:auto; transform-origin:50% 50%; z-index:auto}
     #dermis{fill:#E9B793}
     #epidermis{stroke:#d9b79c; stroke-width:1} 
     #sensor{fill:#3b3f53; stroke:#a5b4fc; stroke-width:1.2}
