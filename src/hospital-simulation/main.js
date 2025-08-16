@@ -390,9 +390,8 @@ class HospitalSimulation {
 
     rotateBreaks(staffType) {
         // First ensure no staff are stuck on break
-        if (this.checkAndClearStuckBreaks()) {
-            return; // If we cleared any stuck breaks, skip rotation this time
-        }
+        // Do not abort rotation if we cleared inconsistencies; proceed to evaluate rotation
+        this.checkAndClearStuckBreaks();
 
         // Count current staff on break and get their IDs
         const staffOnBreak = Object.values(this.staff)
