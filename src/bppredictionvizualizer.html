@@ -14,9 +14,9 @@
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #092917;
-      color: #fff;
-      background: linear-gradient(135deg, #2ecc71 0%, #092917 100%);
+      background-color: #0b0c10;
+      color: #e8eefc;
+      background: linear-gradient(180deg, #0b0c10 0%, #0b0c10 100%);
       position: relative;
       min-height: 100vh;
       display: flex;
@@ -30,9 +30,9 @@
       left: 0;
       width: 100%;
       z-index: 100;
-      background: rgba(9, 41, 23, 0.95);
+      background: rgba(11, 12, 16, 0.95);
       backdrop-filter: blur(10px);
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
       padding: 0.5rem 0;
     }
     
@@ -68,7 +68,7 @@
     }
     
     nav ul li a {
-      color: #fff;
+      color: #cfe0ff;
       text-decoration: none;
       padding: 0.75rem 0.5rem;
       display: inline-block;
@@ -86,7 +86,7 @@
       left: 50%;
       width: 0;
       height: 2px;
-      background: #2ecc71;
+      background: #7aa2ff;
       transition: all 0.3s ease;
       transform: translateX(-50%);
     }
@@ -97,33 +97,35 @@
     
     /* Container and layout */
     .container {
-      background-color: rgba(237, 233, 218, 0.95);
+      background-color: rgba(16, 18, 23, 0.95);
       margin: 0 auto;
       padding: 2rem;
       width: 85%;
       max-width: 1200px;
-      color: #1a1a1a;
+      color: #e8eefc;
       position: relative;
       border-radius: 1rem;
       top: 90px;
       margin-bottom: 90px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
       backdrop-filter: blur(10px);
       overflow: hidden;
+      border: 1px solid #1b2334;
     }
     
     .bp-container {
-      background: white;
+      background: linear-gradient(180deg, rgba(18, 26, 43, 0.8), rgba(18, 26, 43, 0.95));
+      border: 1px solid #1b2334;
       border-radius: 1rem;
       padding: 2rem;
       margin: 2rem 0;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       transition: all 0.3s ease;
     }
     
     .bp-container:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
     }
     
     .bp-header {
@@ -134,13 +136,13 @@
     .bp-header h1 {
       margin: 0 0 1rem;
       font-size: 2.5rem;
-      color: #092917;
+      color: #ffffff;
       font-weight: 700;
     }
     
     .bp-header p {
       margin: 0;
-      color: #4a4a4a;
+      color: #7f8ca8;
       font-size: 1.2rem;
     }
     
@@ -153,17 +155,18 @@
     }
     
     .card {
-      background: white;
-      border: 1px solid #e0e0e0;
+      background: rgba(18, 26, 43, 0.9);
+      border: 1px solid #1b2334;
       border-radius: 1rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
       overflow: hidden;
       transition: all 0.3s ease;
     }
     
     .card:hover {
       transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+      border-color: #2a3a5a;
     }
     
     .left {
@@ -173,7 +176,7 @@
     .left h3 {
       margin: 0 0 1rem;
       font-size: 1.3rem;
-      color: #092917;
+      color: #c9d6ff;
       font-weight: 600;
     }
     
@@ -188,7 +191,7 @@
     
     label {
       font-size: 0.9rem;
-      color: #4a4a4a;
+      color: #7f8ca8;
       font-weight: 500;
       margin-bottom: 0.5rem;
       display: block;
@@ -198,26 +201,26 @@
       width: 100%;
       padding: 0.75rem 1rem;
       border-radius: 0.5rem;
-      background: #f8f9fa;
-      color: #1a1a1a;
-      border: 1px solid #e0e0e0;
+      background: rgba(12, 20, 38, 0.8);
+      color: #e8eefc;
+      border: 1px solid #1b2334;
       outline: none;
       transition: all 0.3s ease;
       font-size: 0.9rem;
     }
     
     input:focus {
-      border-color: #2ecc71;
-      box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
-      background: white;
+      border-color: #7aa2ff;
+      box-shadow: 0 0 0 3px rgba(122, 162, 255, 0.1);
+      background: rgba(12, 20, 38, 1);
     }
     
     /* Buttons */
     .btn {
       cursor: pointer;
-      border: 1px solid #2ecc71;
-      background: #2ecc71;
-      color: white;
+      border: 1px solid #7aa2ff;
+      background: rgba(10, 28, 70, 0.9);
+      color: #ffffff;
       padding: 0.75rem 1.5rem;
       border-radius: 0.5rem;
       font-size: 0.9rem;
@@ -228,20 +231,20 @@
     }
     
     .btn:hover {
-      background: #27ae60;
+      background: rgba(10, 28, 70, 1);
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+      box-shadow: 0 4px 16px rgba(122, 162, 255, 0.3);
     }
     
     .btn.accent {
-      border-color: #2ecc71;
-      background: #2ecc71;
-      color: white;
+      border-color: #7aa2ff;
+      background: rgba(10, 28, 70, 0.9);
+      color: #ffffff;
     }
     
     .btn.accent:hover {
-      background: #27ae60;
-      box-shadow: 0 4px 16px rgba(46, 204, 113, 0.3);
+      background: rgba(10, 28, 70, 1);
+      box-shadow: 0 4px 16px rgba(122, 162, 255, 0.3);
     }
     
     /* Status pills */
@@ -252,28 +255,28 @@
       padding: 0.5rem 1rem;
       border-radius: 999px;
       font-size: 0.8rem;
-      border: 1px solid #e0e0e0;
-      background: #f8f9fa;
+      border: 1px solid #1b2334;
+      background: rgba(12, 20, 38, 0.8);
       font-weight: 500;
-      color: #4a4a4a;
+      color: #7f8ca8;
     }
     
     .pill.ok {
       border-color: #2dd4bf;
       background: rgba(45, 212, 191, 0.1);
-      color: #0f766e;
+      color: #b7ffef;
     }
     
     .pill.warn {
       border-color: #f59e0b;
       background: rgba(245, 158, 11, 0.1);
-      color: #92400e;
+      color: #ffd59e;
     }
     
     .pill.danger {
       border-color: #ff6b6b;
       background: rgba(255, 107, 107, 0.1);
-      color: #dc2626;
+      color: #ffb3b3;
     }
     
     /* Grid and stats */
@@ -284,8 +287,8 @@
     }
     
     .stat {
-      background: rgba(46, 204, 113, 0.05);
-      border: 1px solid rgba(46, 204, 113, 0.2);
+      background: rgba(12, 20, 38, 0.8);
+      border: 1px solid #1b2334;
       padding: 1rem;
       border-radius: 0.5rem;
       transition: transform 0.3s ease;
@@ -293,13 +296,14 @@
     
     .stat:hover {
       transform: translateY(-2px);
-      background: rgba(46, 204, 113, 0.1);
+      background: rgba(12, 20, 38, 1);
+      border-color: #2a3a5a;
     }
     
     .stat .v {
       font-size: 1.1rem;
       font-weight: 600;
-      color: #092917;
+      color: #ffffff;
     }
     
     /* Toggles */
@@ -308,14 +312,14 @@
       align-items: center;
       gap: 0.75rem;
       font-size: 0.9rem;
-      color: #4a4a4a;
+      color: #cfe0ff;
       margin: 1rem 0;
       cursor: pointer;
     }
     
     .toggle input {
       transform: translateY(1px);
-      accent-color: #2ecc71;
+      accent-color: #7aa2ff;
     }
     
     /* Chart area */
@@ -328,20 +332,20 @@
       height: 420px;
       display: block;
       border-radius: 0.5rem;
-      background: #f8f9fa;
+      background: rgba(12, 20, 38, 0.6);
     }
     
     .legend {
       display: flex;
       gap: 1rem;
       padding: 1rem 1.5rem;
-      color: #4a4a4a;
+      color: #7f8ca8;
       font-size: 0.8rem;
       flex-wrap: wrap;
-      background: #f8f9fa;
+      background: rgba(12, 20, 38, 0.8);
       border-radius: 0.5rem;
       margin-top: 1rem;
-      border: 1px solid #e0e0e0;
+      border: 1px solid #1b2334;
     }
     
     .dot {
@@ -353,7 +357,7 @@
     }
     
     .dashed {
-      border-bottom: 2px dashed #2ecc71;
+      border-bottom: 2px dashed #7aa2ff;
       width: 20px;
       height: 0;
       display: inline-block;
@@ -363,13 +367,13 @@
     /* Separators */
     .sep {
       height: 1px;
-      background: #e0e0e0;
+      background: #1b2334;
       margin: 1.5rem 0;
       border-radius: 1px;
     }
     
     .subtitle {
-      color: #6b7280;
+      color: #7f8ca8;
       font-size: 0.8rem;
       margin-top: -0.5rem;
       font-style: italic;
@@ -377,47 +381,48 @@
 
     /* Project cards */
     .project-card {
-      background: white;
-      border: 1px solid #e0e0e0;
+      background: rgba(18, 26, 43, 0.9);
+      border: 1px solid #1b2334;
       border-radius: 1rem;
       padding: 2rem;
       margin: 2rem 0;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
       transition: all 0.3s ease;
     }
     
     .project-card:hover {
       transform: translateY(-3px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+      border-color: #2a3a5a;
     }
     
     .project-card h2 {
       margin: 0 0 1rem;
-      color: #092917;
+      color: #ffffff;
       font-size: 1.8rem;
       font-weight: 600;
     }
     
     .project-card h3 {
       margin: 1.5rem 0 0.75rem;
-      color: #092917;
+      color: #c9d6ff;
       font-size: 1.3rem;
       font-weight: 500;
     }
     
     .project-item p {
-      color: #4a4a4a;
+      color: #d5e1ff;
       line-height: 1.7;
       margin: 1rem 0;
       font-size: 1rem;
     }
     
     .foot {
-      color: #f59e0b;
+      color: #ffd59e;
       font-style: italic;
       margin-top: 1.5rem;
       padding-top: 1rem;
-      border-top: 1px solid #e0e0e0;
+      border-top: 1px solid #1b2334;
     }
     
     /* Footer */
@@ -425,10 +430,11 @@
       text-align: center;
       opacity: 0.9;
       padding: 20px;
-      background-image: linear-gradient(to right, #2ecc71, #092917);
-      color: #fff;
+      background: rgba(11, 12, 16, 0.95);
+      color: #7f8ca8;
       width: 100%;
       margin-top: auto;
+      border-top: 1px solid #1b2334;
     }
 
     /* Responsive design */
@@ -489,10 +495,10 @@
         left: 0;
         width: 100%;
         padding: 0.5rem 0;
-        background: rgba(9, 41, 23, 0.95);
+        background: rgba(11, 12, 16, 0.95);
         backdrop-filter: blur(10px);
         z-index: 1000;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
       }
 
       nav ul {
@@ -516,7 +522,7 @@
       }
 
       nav ul li a {
-        color: #fff;
+        color: #cfe0ff;
         text-decoration: none;
         padding: 0.5rem 0.35rem;
         font-size: 0.85rem;
