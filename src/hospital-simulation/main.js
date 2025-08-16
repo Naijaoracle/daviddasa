@@ -354,6 +354,9 @@ class HospitalSimulation {
                 // First move to rest area
                 this.hospitalMap.moveStaffToLocation(staffToBreak.id, 'rest');
                 
+                // Ensure utilization is not counted as busy while on break
+                this.dataTracker.updateStaffUtilization(staffToBreak.id, false);
+                
                 // Then update status and start break
                 staffToBreak.takeBreak(this.breakSchedule.breakDuration, this.simulationTimeScale);
                 staffToBreak.breakPending = false;
