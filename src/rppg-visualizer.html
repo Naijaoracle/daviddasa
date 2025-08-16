@@ -95,7 +95,7 @@
     .dot.R{background:#ff5e5e} .dot.G{background:#4dff88} .dot.B{background:#6aa7ff}
 
     /* --- Charts --- */
-    .chartBox{background:#0e1322; border:1px solid #1f2947; border-radius:12px; padding:16px}
+    .chartBox{background:#0e1322; border:1px solid #1f2947; border-radius:12px; padding:12px}
 
     .explain{font-size:13px; color:#c6ccdd; line-height:1.5}
     .foot{font-size:12px; color:#94a3b8}
@@ -326,7 +326,7 @@
           <section class="card" aria-labelledby="reflectTitle">
             <h2 id="reflectTitle">RGB Reflectivity & Simulated rPPG Waveform</h2>
 
-            <div class="row" style="margin-top:6px">
+            <div class="row" style="margin-top:4px">
               <div class="muted">Reflectivity (fraction of light returning):</div>
               <div class="spacer"></div>
               <div class="muted">Higher melanin → less green/blue reflectance.</div>
@@ -338,19 +338,19 @@
               <div class="bar"><div class="barFill B" style="height:60%"></div><label>B <span class="muted" id="bPct">60%</span></label></div>
             </div>
 
-            <div class="chartBox" style="margin-top:8px">
+            <div class="chartBox" style="margin-top:4px">
               <canvas id="waveChart" height="180" aria-label="Simulated rPPG waveform"></canvas>
             </div>
 
             <!-- explainer between charts -->
-            <div class="explain" style="margin:8px 2px">
+            <div class="explain" style="margin:4px 2px">
               <strong>Why the waveform changes with skin tone</strong> — Melanin in the <em>epidermis</em> absorbs more of the incoming light, especially in the green band that rPPG relies on. Less green light returning → lower pulsatile signal at the sensor → a smaller, noisier waveform above. The curve below relates higher melanin content to a higher Fitzpatrick score.
             </div>
 
             <!-- NEW: Fitzpatrick vs Melanin chart -->
-            <div class="chartBox" style="margin-top:8px">
+            <div class="chartBox" style="margin-top:4px">
               <canvas id="melaninChart" height="200" aria-label="Fitzpatrick score vs Melanin content (illustrative)"></canvas>
-              <div class="muted" style="margin-top:6px">Illustrative scatter with an approximate logarithmic trendline (higher melanin → higher Fitzpatrick score).</div>
+              <div class="muted" style="margin-top:4px">Illustrative scatter with an approximate logarithmic trendline (higher melanin → higher Fitzpatrick score).</div>
             </div>
           </section>
 
