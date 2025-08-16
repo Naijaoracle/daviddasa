@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="BP Prediction Visualizer - Interactive demonstration of blood pressure forecasting using machine learning models">
+  <title>BP Prediction Visualizer - David Dasa</title>
+  <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  
+  <!-- BP Prediction Visualizer specific styles -->
+  <style>
+    :root{
+      --bg:#0b1220; --panel:#121a2b; --muted:#7f8ca8; --ink:#e8eefc;
+      --accent:#63b3ff; --accent2:#b58cff; --danger:#ff6b6b; --ok:#2dd4bf;
+      --warn:#f59e0b; --grid:#1c2741;
+    }
+    
+    .bp-container {
+      background: linear-gradient(180deg, #0b122099, #0b1220), radial-gradient(1200px 600px at 80% -20%, #1c2741, transparent 60%);
+      color: var(--ink);
+      border-radius: 20px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .bp-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .bp-header h1 {
+      font-size: 2.5em;
+      margin: 0 0 10px;
+      color: var(--light-text);
+    }
+    
+    .bp-header p {
+      font-size: 1.1em;
+      color: var(--muted);
+      margin: 0;
+    }
+    
+    .wrap{display:grid; grid-template-columns:320px 1fr; gap:16px; padding:16px}
+    .card{background:var(--panel); border:1px solid #182240; border-radius:16px; box-shadow:0 6px 30px rgba(0,0,0,.25)}
+    .left{padding:14px}
+    .left h3{margin:8px 0 10px; font-size:14px; color:#c9d6ff; letter-spacing:.3px}
+    .row{display:flex; gap:8px; align-items:center; margin:8px 0}
+    label{font-size:12px; color:var(--muted)}
+    input[type="number"], input[type="datetime-local"], input[type="text"]{
+      width:100%; padding:8px 10px; border-radius:10px; background:#0d1426; color:var(--ink);
+      border:1px solid #1a2644; outline:none;
+    }
+    input[type="file"]{width:100%}
+    .btn{cursor:pointer; border:1px solid #1f2d55; background:#0c1833; color:#d6e3ff; padding:8px 12px;
+         border-radius:12px; font-size:13px}
+    .btn:hover{background:#0f2047}
+    .btn.accent{border-color:#2a6bff; background:#0a1c46}
+    .pill{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; font-size:12px;
+          border:1px solid #20305e; background:#0d1730}
+    .pill.ok{border-color:#0f3b34; background:#0b2b24; color:#b7ffef}
+    .pill.warn{border-color:#4a3304; background:#2a1f05; color:#ffd59e}
+    .pill.danger{border-color:#4a0d10; background:#2a0f12; color:#ffb3b3}
+    .grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px}
+    .stat{background:#0c1428; border:1px solid #162348; padding:10px 12px; border-radius:12px}
+    .stat .v{font-size:16px}
+    .toggle{display:flex; align-items:center; gap:8px; font-size:13px; color:#cfe0ff}
+    .toggle input{transform:translateY(1px)}
+    .chartWrap{padding:10px}
+    canvas{width:100%; height:420px; display:block}
+    .legend{display:flex; gap:12px; padding:8px 12px; color:var(--muted); font-size:12px; flex-wrap:wrap}
+    .dot{width:10px; height:10px; border-radius:3px; display:inline-block}
+    .dashed{border-bottom:2px dashed var(--accent); width:16px; height:0; display:inline-block; transform:translateY(-3px)}
+    .code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; background:#0a1225; padding:2px 6px; border-radius:6px; border:1px solid #142044}
+    .sep{height:1px; background:#162348; margin:10px 0}
+    .subtitle{color:#93a6d8; font-size:12px; margin-top:-6px}
+    
+    /* Responsive adjustments for the site */
+    @media (max-width: 768px) {
+      .wrap {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 16px;
+      }
+      
+      .bp-header h1 {
+        font-size: 2em;
+      }
+      
+      .bp-container {
+        padding: 15px;
+        margin: 15px 0;
+      }
+      
+      .card {
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Section -->
+  <nav>
+    <ul>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+      <li><a href="https://www.daviddasa.com/about">About</a></li>
+      <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
+      <li><a href="https://www.daviddasa.com/skills">Skills</a></li>
+      <li><a href="https://www.daviddasa.com/contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <main>
+      <!-- BP Prediction Visualizer Introduction -->
+      <section class="bp-container">
+        <div class="bp-header">
+          <h1>BP Prediction Visualizer</h1>
+          <p>Interactive demonstration of blood pressure forecasting using machine learning models</p>
+        </div>
+        
+        <div class="wrap">
+          <!-- LEFT PANE -->
+          <section class="card left">
+            <h3>Data</h3>
+            <div class="row">
+              <input id="csvFile" type="file" accept=".csv" />
+            </div>
+            <div class="row" style="justify-content:space-between">
+              <button class="btn" id="loadCsv">Import CSV</button>
+              <small class="subtitle">CSV: <span class="code">timestamp,sys,dia</span> (ISO datetime)</small>
+            </div>
+            <div class="sep"></div>
+            <div class="grid">
+              <div>
+                <label>Generate synthetic (days)</label>
+                <input id="days" type="number" min="3" max="60" value="14">
+              </div>
+              <div>
+                <label>Noise σ (mmHg)</label>
+                <input id="noise" type="number" min="1" max="12" value="4">
+              </div>
+            </div>
+            <div class="grid" style="margin-top:6px">
+              <div>
+                <label>Sys base</label>
+                <input id="sysBase" type="number" value="122">
+              </div>
+              <div>
+                <label>Dia base</label>
+                <input id="diaBase" type="number" value="78">
+              </div>
+            </div>
+            <div class="row" style="margin-top:10px">
+              <button class="btn accent" id="gen">Generate</button>
+            </div>
+
+            <div class="sep"></div>
+            <h3>Forecast assumptions (next 48h)</h3>
+            <label class="toggle"><input type="checkbox" id="missed"> Missed meds (≈ +8 mmHg for 24h)</label>
+            <label class="toggle"><input type="checkbox" id="salt"> High salt (≈ +5 mmHg for 24h)</label>
+            <label class="toggle"><input type="checkbox" id="stress"> Stress (≈ +6 mmHg for 12h)</label>
+
+            <div class="sep"></div>
+            <h3>Add reading &amp; recalibrate</h3>
+            <div class="grid">
+              <div><label>Time</label><input id="newTs" type="datetime-local"></div>
+              <div><label>Sys / Dia</label><input id="newBP" type="text" placeholder="e.g. 128/82"></div>
+            </div>
+            <div class="row" style="margin-top:8px">
+              <button class="btn" id="recal">Recalibrate</button>
+              <small class="subtitle">Appends and refits models</small>
+            </div>
+
+            <div class="sep"></div>
+            <h3>Display</h3>
+            <label class="toggle"><input type="checkbox" id="showARX" checked> Show ARX(1) forecast</label>
+            <label class="toggle"><input type="checkbox" id="showGB" checked> Show GB-Stumps forecast</label>
+
+            <div class="sep"></div>
+            <div class="grid">
+              <div class="stat">
+                <label>MAE (last 72h) — Systolic</label>
+                <div class="v" id="maeSys">–</div>
+              </div>
+              <div class="stat">
+                <label>MAE (last 72h) — Diastolic</label>
+                <div class="v" id="maeDia">–</div>
+              </div>
+            </div>
+            <div class="row" style="margin-top:10px">
+              <div id="confPill" class="pill">Confidence: –</div>
+            </div>
+          </section>
+
+          <!-- RIGHT PANE -->
+          <section class="card">
+            <div class="chartWrap">
+              <canvas id="chart" width="1200" height="460"></canvas>
+              <div class="legend">
+                <span><span class="dot" style="background:#6ee7ff"></span> Actual Sys</span>
+                <span><span class="dot" style="background:#94ffa4"></span> Actual Dia</span>
+                <span><span class="dot" style="background:var(--accent)"></span> ARX Sys <span class="dashed"></span></span>
+                <span><span class="dot" style="background:#9aa0ff"></span> ARX Dia <span class="dashed"></span></span>
+                <span><span class="dot" style="background:#ffc46b"></span> GB Sys <span class="dashed"></span></span>
+                <span><span class="dot" style="background:#ff9ad4"></span> GB Dia <span class="dashed"></span></span>
+                <span>Shaded = 95% CI</span>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+      
+      <!-- Additional Information Section -->
+      <section class="project-card">
+        <h2>About Blood Pressure Prediction</h2>
+        <div class="project-item">
+          <p>This interactive visualizer demonstrates advanced machine learning approaches to blood pressure forecasting. The system uses two complementary models:</p>
+          
+          <h3>ARX(1) Model</h3>
+          <p><strong>AutoRegressive with eXogenous inputs:</strong> A linear model that predicts blood pressure based on previous readings and circadian patterns. The model captures the natural daily variations in blood pressure and can account for external factors like medication adherence, dietary changes, and stress levels.</p>
+          
+          <h3>Gradient Boosted Decision Stumps</h3>
+          <p><strong>Ensemble Learning:</strong> A more sophisticated approach that combines multiple simple decision trees to create a robust prediction model. This method can capture non-linear relationships and complex interactions between different factors affecting blood pressure.</p>
+          
+          <h3>Key Features</h3>
+          <ul>
+            <li><strong>48-hour forecasting:</strong> Predicts blood pressure trends up to two days ahead</li>
+            <li><strong>Real-time recalibration:</strong> Continuously improves predictions as new data becomes available</li>
+            <li><strong>Confidence assessment:</strong> Provides uncertainty estimates to help users understand prediction reliability</li>
+            <li><strong>Multiple scenarios:</strong> Simulates various real-world conditions like missed medications or high stress</li>
+          </ul>
+          
+          <h3>Clinical Applications</h3>
+          <p>While this is a research demonstration and not intended for clinical use, similar approaches are being developed for:</p>
+          <ul>
+            <li>Early warning systems for hypertensive patients</li>
+            <li>Personalized medication timing optimization</li>
+            <li>Remote patient monitoring and telehealth applications</li>
+            <li>Population health management and risk stratification</li>
+          </ul>
+          
+          <p class="foot"><strong>Important Note:</strong> This is a non-diagnostic research demonstration. Forecasts are illustrative and may be inaccurate. Not for medical use.</p>
+        </div>
+      </section>
+
+      <!-- About this Visualizer Section -->
+      <section class="project-card">
+        <h2>About this Visualizer</h2>
+        <div class="project-item">
+          
+          <h3>What this is.</h3>
+          <p>An educational prototype that shows how a simple time-series model can forecast a person's systolic and diastolic blood pressure over the next 48 hours. It's meant to spark design discussions, not to guide care.</p>
+          
+          <h3>What this isn't.</h3>
+          <p>This is not a medical device and must not be used to make clinical decisions. The models are intentionally lightweight and trained on synthetic or user-provided CSV data.</p>
+          
+          <h3>How to read the chart</h3>
+          <ul>
+            <li><strong>Solid lines</strong> = actual hourly readings (or interpolated from your CSV).</li>
+            <li><strong>Dashed lines</strong> = model forecasts (two baselines shown).</li>
+            <li><strong>Shaded bands</strong> = 95% uncertainty intervals. Wider bands → lower confidence.</li>
+            <li><strong>"Now" marker</strong> splits history (left) from forecast (right).</li>
+            <li><strong>MAE tiles</strong> show recent one-step error (last 72 hours).</li>
+            <li><strong>Confidence badge</strong> summarizes data sufficiency + error: OK, Moderate, or Low.</li>
+          </ul>
+          
+          <h3>What's under the hood (simplified)</h3>
+          <p>This demo fits two baseline models separately for systolic and diastolic:</p>
+          
+          <h4>ARX(1) with circadian term</h4>
+          <p><code>y<sub>t</sub> = c + φ y<sub>t-1</sub> + γ circadian(hour) + ε<sub>t</sub></code></p>
+          <ul>
+            <li>Captures short memory + day/night rhythm.</li>
+            <li>Uncertainty comes from the model's residual variance.</li>
+          </ul>
+          
+          <h4>Tiny Gradient-Boosted Stumps</h4>
+          <ul>
+            <li>Uses previous BP, hour of day, weekday/weekend flag, and a smooth circadian feature.</li>
+            <li>Provides an alternate forecast and residual-based uncertainty.</li>
+          </ul>
+          
+          <p>Event toggles (top-left) apply gentle, time-limited biases to the next 12–24 hours to simulate common real-world effects:</p>
+          <ul>
+            <li><strong>Missed meds:</strong> ≈ +8 / +5 mmHg for 24h (sys/dia)</li>
+            <li><strong>High salt:</strong> ≈ +5 / +3 mmHg for 24h</li>
+            <li><strong>Stress:</strong> ≈ +6 / +4 mmHg for 12h</li>
+          </ul>
+          
+          <p>Recalibrate lets you add a fresh reading; the models refit and the forecast updates.</p>
+          
+          <h3>Using your own data</h3>
+          <p>Upload a CSV with columns: <code>timestamp,sys,dia</code> (ISO time, e.g., 2025-03-26T14:00:00).<br>
+          The app resamples to an hourly grid. Sparse or noisy data will increase uncertainty and may lower the confidence badge.</p>
+          
+          <h3>Why this demo (and not a "real" predictor)</h3>
+          <ul>
+            <li><strong>Transparency:</strong> simple models make assumptions visible.</li>
+            <li><strong>Speed:</strong> everything runs in-browser; no backend required.</li>
+            <li><strong>Design space:</strong> lets you explore the impact of adherence, diet, and stress on short-term trajectories without over-promising accuracy.</li>
+          </ul>
+          
+          <h3>Key limitations</h3>
+          <ul>
+            <li><strong>No physiology or medication kinetics.</strong> Effects are coarse heuristics, not PK/PD models.</li>
+            <li><strong>No causal inference.</strong> The demo illustrates associations, not causes.</li>
+            <li><strong>Device + cuff calibration ignored.</strong> Real systems must align to a reference device and track drift.</li>
+            <li><strong>Population generalization not guaranteed.</strong> Synthetic data can't substitute for diverse, longitudinal cohorts.</li>
+          </ul>
+          
+          <h3>What a production system would add</h3>
+          
+          <h4>Data pipeline</h4>
+          <ul>
+            <li>Wearable streams (HR, activity, sleep), home-cuff BP, medication logs, and calendar/context.</li>
+            <li>Robust preprocessing, outlier handling, and device-specific calibration.</li>
+          </ul>
+          
+          <h4>Models</h4>
+          <ul>
+            <li>Hierarchical / personalized forecasting (state-space, mixed-effects, or deep temporal models).</li>
+            <li>Feature learning from multimodal data; explicit handling of weekends, shift work, travel, and illness.</li>
+            <li>Uncertainty first: predictive intervals and clear "no-forecast" states.</li>
+          </ul>
+          
+          <h4>Safety & governance</h4>
+          <ul>
+            <li>Non-diagnostic positioning unless clinically validated.</li>
+            <li>Guardrails that avoid harmful incentives (e.g., "good" prediction ≠ permission for poor behavior).</li>
+            <li>Continuous evaluation with stratified metrics (age, sex, ethnicity, comorbidities).</li>
+            <li>Privacy by design; on-device processing where feasible; consented data use.</li>
+          </ul>
+          
+          <h4>UX</h4>
+          <ul>
+            <li>Actionable, gentle guidance ("Take a reading this evening"), not prescriptive medical advice.</li>
+            <li>Explanations: which factors pushed the forecast up/down; what improved confidence.</li>
+          </ul>
+          
+          <h3>Responsible use statement</h3>
+          <p>This tool is a demonstrator for research and education. It may be inaccurate, incomplete, or inappropriate for individual users. Do not use it to diagnose, treat, or manage any health condition. Always follow advice from qualified clinicians.</p>
+          
+          <h3>Roadmap from demo → study</h3>
+          <ol>
+            <li>Define inclusion criteria, endpoints (e.g., 24–48h MAE), and safety signals.</li>
+            <li>Collect a balanced longitudinal dataset with regular cuff readings and context logs.</li>
+            <li>Train + validate personalized models; preregister analysis.</li>
+            <li>Run a prospective study; report results with confidence intervals and subgroup breakdowns.</li>
+            <li>Iterate with clinical partners; consider regulatory pathways if moving toward clinical use.</li>
+          </ol>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Footer Section -->
+  <footer>
+    <p>&copy; 2024 David Dasa</p>
+  </footer>
+
+  <!-- Particles.js Configuration -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+    });
+  </script>
+
+  <!-- Common JavaScript -->
+  <script src="main.js"></script>
+
+  <!-- BP Prediction Visualizer Script -->
+  <script>
+/* ------------------------------ Utilities ------------------------------ */
+const HOUR = 3600*1000;
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const mean = arr => arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0;
+const std = arr => {
+  if(!arr.length) return 0;
+  const m=mean(arr); return Math.sqrt(mean(arr.map(v=>(v-m)**2)));
+};
+const linspace=(a,b,n)=>Array.from({length:n},(_,i)=>a+(b-a)*(i/(n-1)));
+const lerp=(a,b,t)=>a+(b-a)*t;
+
+/* Parse CSV with headers timestamp,sys,dia (ISO date) */
+function parseCSV(text){
+  const lines = text.trim().split(/\r?\n/);
+  if(lines.length<2) return [];
+  const header = lines[0].split(",").map(s=>s.trim().toLowerCase());
+  const ti = header.indexOf("timestamp"), si = header.indexOf("sys"), di = header.indexOf("dia");
+  const out=[];
+  for(let i=1;i<lines.length;i++){
+    const cols = lines[i].split(",").map(s=>s.trim());
+    if(cols.length<3) continue;
+    const t = new Date(cols[ti] || cols[0]);
+    const sys = parseFloat(cols[si] || cols[1]);
+    const dia = parseFloat(cols[di] || cols[2]);
+    if(!isFinite(t) || !isFinite(sys) || !isFinite(dia)) continue;
+    out.push({t, sys, dia});
+  }
+  out.sort((a,b)=>a.t-b.t);
+  return out;
+}
+
+/* Resample to hourly grid via linear interpolation */
+function toHourly(data){
+  if(data.length<2) return [];
+  const t0 = new Date(Math.ceil(data[0].t.getTime()/HOUR)*HOUR); // next hour
+  const t1 = new Date(Math.floor(data[data.length-1].t.getTime()/HOUR)*HOUR);
+  const hours = Math.round((t1-t0)/HOUR)+1;
+  const grid = [];
+  let j=0;
+  for(let k=0;k<hours;k++){
+    const tk = new Date(t0.getTime()+k*HOUR);
+    while(j+1<data.length && data[j+1].t<=tk) j++;
+    const a = data[j], b = data[Math.min(j+1,data.length-1)];
+    const tA = a.t.getTime(), tB = b.t.getTime();
+    let w = (tk.getTime()-tA)/Math.max(1,(tB-tA));
+    w = clamp(w,0,1);
+    const sys = lerp(a.sys,b.sys,w);
+    const dia = lerp(a.dia,b.dia,w);
+    grid.push({t:tk, sys, dia});
+  }
+  return grid;
+}
+
+/* Circadian function: offset given hour (0-23). Positive during day, negative at night */
+function circadian(hour){
+  // Peak mid-morning and early evening, trough during sleep
+  const a = Math.sin((hour-7)/24*2*Math.PI)*4;  // ~±4
+  const b = Math.sin((hour-19)/24*2*Math.PI)*2; // subtle second harmonic
+  return a + b;
+}
+
+/* Generate synthetic hourly data for N days ending now */
+function genSynthetic(days=14, sysBase=122, diaBase=78, noise=4){
+  const end = new Date(Math.floor(Date.now()/HOUR)*HOUR); // align to hour
+  const start = new Date(end.getTime()-days*24*HOUR);
+  const out=[];
+  let sys= sysBase, dia = diaBase;
+
+  // Random real-world style events sprinkled in history
+  const events = [];
+  const nEvents = Math.max(1, Math.round(days/5));
+  for(let i=0;i<nEvents;i++){
+    const t = new Date(start.getTime()+Math.random()*(end-start));
+    const type = ["missed","salt","stress"][Math.floor(Math.random()*3)];
+    events.push({t, type});
+  }
+
+  for(let t=start.getTime(); t<=end.getTime(); t+=HOUR){
+    const d = new Date(t);
+    const h = d.getHours();
+    const circ = circadian(h);
+
+    const missed = events.some(e=> e.type==="missed" && Math.abs((t - e.t.getTime())) <= 24*HOUR);
+    const salt   = events.some(e=> e.type==="salt"   && Math.abs((t - e.t.getTime())) <= 24*HOUR);
+    const stress = events.some(e=> e.type==="stress" && Math.abs((t - e.t.getTime())) <= 12*HOUR);
+
+    const addSys = (missed?8:0) + (salt?5:0) + (stress?6:0);
+    const addDia = (missed?5:0) + (salt?3:0) + (stress?4:0);
+
+    const epsS = (Math.random()*2-1)*noise;
+    const epsD = (Math.random()*2-1)*Math.max(2,noise*0.8);
+
+    sys = sysBase + circ + addSys + epsS;
+    dia = diaBase + circ*0.6 + addDia + epsD;
+
+    out.push({t:new Date(t), sys, dia});
+  }
+  return out;
+}
+
+/* Feature builder for ML */
+function featuresAt(t, prev, knobs){
+  const d = new Date(t);
+  const hour = d.getHours(), dow = d.getDay();
+  const isNight = (hour<7 || hour>=22)?1:0;
+  const circ = circadian(hour);
+  // Forecast knobs (missed meds / salt for 24h, stress for 12h) relative to now
+  const dt = (t - NOW)/HOUR;
+  const effMiss = knobs.missed && dt>=0 && dt<24 ? 1:0;
+  const effSalt = knobs.salt && dt>=0 && dt<24 ? 1:0;
+  const effStress = knobs.stress && dt>=0 && dt<12 ? 1:0;
+
+  return {hour, dow, isNight, circ, prev, effMiss, effSalt, effStress};
+}
+
+/* ------------------------------ Models ------------------------------ */
+/* ARX(1): y_t = c + phi*y_{t-1} + gamma*circ + eps  (fit via OLS) */
+function fitARX(series){ // series: [{t, y}]
+  if(series.length<3) return null;
+  const X=[], Y=[];
+  for(let i=1;i<series.length;i++){
+    const ytm1 = series[i-1].y;
+    const circ = circadian(series[i].t.getHours());
+    X.push([1, ytm1, circ]);
+    Y.push(series[i].y);
+  }
+  // Solve beta = (X'X)^-1 X'Y (3x3)
+  const XT = numericTranspose(X);
+  const XTX = numericMatMul(XT,X);
+  const XTY = numericVecMul(XT,Y);
+  const beta = solve3x3(XTX,XTY); // [c, phi, gamma]
+  const resid = [];
+  for(let i=1;i<series.length;i++){
+    const circ = circadian(series[i].t.getHours());
+    const pred = beta[0] + beta[1]*series[i-1].y + beta[2]*circ;
+    resid.push(series[i].y - pred);
+  }
+  const sigma2 = mean(resid.map(r=>r*r)) || 25; // variance
+  return {c:beta[0], phi:beta[1], gamma:beta[2], sigma2};
+}
+function forecastARX(model, lastY, horizonHours, knobs){
+  if(!model) return {path:[], ci:[]};
+  const out=[], ci=[];
+  let y = lastY;
+  for(let k=1;k<=horizonHours;k++){
+    const t = new Date(NOW + k*HOUR);
+    const circ = circadian(t.getHours());
+    // Apply knobs as simple biases
+    const bias = (knobs.missed && k<=24?8:0) + (knobs.salt && k<=24?5:0) + (knobs.stress && k<=12?6:0);
+    y = model.c + model.phi*y + model.gamma*circ + bias;
+    out.push({t, y});
+    // 95% CI: accumulate variance like AR process (approx)
+    const var_k = model.sigma2 * (1 + Math.max(0,1-model.phi**(2*k)) / (1-model.phi**2 + 1e-6));
+    const sd = Math.sqrt(var_k);
+    ci.push({lo:y-1.96*sd, hi:y+1.96*sd});
+  }
+  return {path:out, ci};
+}
+
+/* Tiny Gradient Boosted Decision Stumps (squared error) */
+function fitGBStumps(series){ // series: [{t, y}], uses featuresAt()
+  if(series.length<5) return null;
+  const knobsZero = {missed:0,salt:0,stress:0};
+  const X=[], y=[];
+  for(let i=1;i<series.length;i++){
+    const prev = series[i-1].y;
+    const f = featuresAt(series[i].t, prev, knobsZero);
+    X.push(f); y.push(series[i].y);
+  }
+  const M = 12; // number of stumps
+  let pred = new Array(y.length).fill(mean(y));
+  const trees=[];
+  for(let m=0;m<M;m++){
+    const residual = y.map((yi,i)=> yi - pred[i]);
+    // candidate features and thresholds
+    const cands = [
+      ["prev", v=>v.prev, linspace(90,160,20)],
+      ["circ", v=>v.circ, linspace(-6,6,16)],
+      ["hour", v=>v.hour, [5,7,12,18,22]],
+      ["isNight", v=>v.isNight, [0.5]],
+      ["dow", v=>v.dow, [0.5,2.5,4.5]],
+    ];
+    let bestFeat=null, bestThr=0, bestGain=-Infinity, bestLeft={mu:0,n:0}, bestRight={mu:0,n:0};
+    for(const [name, getter, THR] of cands){
+      for(const thr of THR){
+        let sumL=0,nL=0,sumR=0,nR=0;
+        for(let i=0;i<X.length;i++){
+          if(getter(X[i])<=thr){ sumL+=residual[i]; nL++; }
+          else { sumR+=residual[i]; nR++; }
+        }
+        if(nL===0||nR===0) continue;
+        const muL=sumL/nL, muR=sumR/nR;
+        // reduction in squared error
+        let gain=0;
+        for(let i=0;i<X.length;i++){
+          const mu = (getter(X[i])<=thr)?muL:muR;
+          gain += (residual[i]**2) - ((residual[i]-mu)**2);
+        }
+        if(gain>bestGain){
+          bestGain=gain; bestFeat=[name, getter]; bestThr=thr; bestLeft={mu:muL,n:nL}; bestRight={mu:muR,n:nR};
+        }
+      }
+    }
+    const lr = 0.2;
+    trees.push({feat:bestFeat[0], thr:bestThr, left:bestLeft.mu*lr, right:bestRight.mu*lr});
+    // update prediction
+    for(let i=0;i<X.length;i++){
+      const val = (bestFeat[1](X[i])<=bestThr)?bestLeft.mu*lr:bestRight.mu*lr;
+      pred[i]+=val;
+    }
+  }
+  // residual std for CI
+  const resid = y.map((yi,i)=> yi - pred[i]);
+  const sigma = std(resid) || 6;
+  const base = mean(y);
+  return {trees, base, sigma};
+}
+function gbPredict(model, f){
+  let y = model.base;
+  for(const t of model.trees){
+    const val = (f[t.feat] <= t.thr) ? t.left : t.right;
+    y += val;
+  }
+  return y;
+}
+function forecastGB(model, lastY, horizonHours, knobs){
+  if(!model) return {path:[],ci:[]};
+  const out=[], ci=[];
+  let prev = lastY;
+  for(let k=1;k<=horizonHours;k++){
+    const t = new Date(NOW + k*HOUR);
+    const f = featuresAt(t, prev, knobs);
+    let yk = gbPredict(model, f);
+    // small bias from knobs to ensure visible effect
+    yk += (knobs.missed && k<=24?7:0) + (knobs.salt && k<=24?4:0) + (knobs.stress && k<=12?5:0);
+    out.push({t, y:yk});
+    ci.push({lo:yk-1.96*model.sigma, hi:yk+1.96*model.sigma});
+    prev = yk;
+  }
+  return {path:out, ci};
+}
+
+/* Linear algebra helpers (tiny 3x3 solver) */
+function numericTranspose(A){ const m=A.length,n=A[0].length; const T=Array.from({length:n},()=>Array(m).fill(0)); for(let i=0;i<m;i++) for(let j=0;j<n;j++) T[j][i]=A[i][j]; return T; }
+function numericMatMul(A,B){ const m=A.length, n=B[0].length, k=B.length; const C=Array.from({length:m},()=>Array(n).fill(0)); for(let i=0;i<m;i++) for(let j=0;j<n;j++){ let s=0; for(let t=0;t<k;t++) s+=A[i][t]*B[t][j]; C[i][j]=s;} return C; }
+function numericVecMul(A,b){ const m=A.length, n=A[0].length; const x=Array(m).fill(0); for(let i=0;i<m;i++){ let s=0; for(let j=0;j<n;j++) s+=A[i][j]*b[j]; x[i]=s;} return x; }
+function solve3x3(M,b){
+  // Gaussian elimination
+  const A = [M[0].slice(),M[1].slice(),M[2].slice()];
+  const y = b.slice();
+  for(let i=0;i<3;i++){
+    // pivot
+    let p=i; for(let r=i+1;r<3;r++) if(Math.abs(A[r][i])>Math.abs(A[p][i])) p=r;
+    if(p!==i){ [A[i],A[p]]=[A[p],A[i]]; [y[i],y[p]]=[y[p],y[i]]; }
+    const div = A[i][i]||1e-6;
+    for(let j=i;j<3;j++) A[i][j]/=div; y[i]/=div;
+    for(let r=0;r<3;r++) if(r!==i){
+      const f=A[r][i];
+      for(let j=i;j<3;j++) A[r][j]-=f*A[i][j];
+      y[r]-=f*y[i];
+    }
+  }
+  return y;
+}
+
+/* ------------------------------ Drawing ------------------------------ */
+const canvas = document.getElementById('chart');
+const ctx = canvas.getContext('2d');
+
+function draw(data, arxSys, arxDia, gbSys, gbDia, showARX, showGB){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // Build full timeline: last 14 days of actual + 48h horizon
+  const all = data.slice();
+  if(arxSys && arxSys.length) all.push(...arxSys.map(p=>({t:p.t, sys:p.y, dia:NaN})));
+  // x scale
+  const t0 = new Date(data[Math.max(0,data.length-24*14)].t); // last 14 days
+  const t1 = new Date(NOW + 48*HOUR);
+  const padL=50, padR=20, padT=20, padB=34;
+  const W=canvas.width-padL-padR, H=canvas.height-padT-padB;
+
+  // y extents
+  const vals = [];
+  for(const d of data){ vals.push(d.sys, d.dia); }
+  const addForecast = arr => arr?.forEach(p=>vals.push(p.y));
+  [arxSys, arxDia, gbSys, gbDia].forEach(addForecast);
+  const yMin = Math.floor((Math.min(...vals)-10)/5)*5;
+  const yMax = Math.ceil((Math.max(...vals)+10)/5)*5;
+
+  function xScale(t){ return padL + ( (t - t0) / (t1 - t0) ) * W; }
+  function yScale(v){ return padT + (1 - (v - yMin)/(yMax - yMin)) * H; }
+
+  // grid & axes
+  ctx.strokeStyle=getCss("--grid"); ctx.lineWidth=1;
+  for(let v=yMin; v<=yMax; v+=10){
+    ctx.beginPath(); ctx.moveTo(padL, yScale(v)); ctx.lineTo(padL+W, yScale(v)); ctx.stroke();
+    ctx.fillStyle="#8aa0d8"; ctx.font="11px ui-monospace,monospace";
+    ctx.fillText(v.toString(), 6, yScale(v)+3);
+  }
+  // vertical ticks every 24h
+  for(let d=new Date(t0.getTime()); d<=t1; d=new Date(d.getTime()+24*HOUR)){
+    const x=xScale(d);
+    ctx.strokeStyle="#1a294a"; ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, padT+H); ctx.stroke();
+    ctx.fillStyle="#9fb2e6"; ctx.font="11px Inter,system-ui,sans-serif";
+    const s=d.toLocaleDateString(undefined,{month:'short',day:'numeric'});
+    ctx.fillText(s, x-16, padT+H+18);
+  }
+
+  // helpers
+  function line(points, color, width=2, dash=null){
+    ctx.save(); if(dash) ctx.setLineDash(dash);
+    ctx.beginPath();
+    for(let i=0;i<points.length;i++){
+      const p=points[i];
+      if(!isFinite(p.y)) continue;
+      const x=xScale(p.t), y=yScale(p.y);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle=color; ctx.lineWidth=width; ctx.stroke(); ctx.restore();
+  }
+  function band(points, ci, color){
+    if(!points.length) return;
+    ctx.save(); ctx.fillStyle=color;
+    ctx.beginPath();
+    for(let i=0;i<points.length;i++){
+      const x = xScale(points[i].t), y = yScale(ci[i].hi);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    for(let i=points.length-1;i>=0;i--){
+      const x = xScale(points[i].t), y = yScale(ci[i].lo);
+      ctx.lineTo(x,y);
+    }
+    ctx.closePath(); ctx.globalAlpha=0.18; ctx.fill(); ctx.restore();
+  }
+
+  // actuals (last 14 days)
+  const last14 = data.slice(-24*14);
+  line(last14.map(d=>({t:d.t,y:d.sys})),"#6ee7ff",2);
+  line(last14.map(d=>({t:d.t,y:d.dia})),"#94ffa4",2);
+
+  // forecasts + CI
+  if(showARX){
+    if(arxSys?.length){ band(arxSys, arxSysCI, "#63b3ff"); line(arxSys,"#63b3ff",2,[6,6]); }
+    if(arxDia?.length){ band(arxDia, arxDiaCI, "#9aa0ff"); line(arxDia,"#9aa0ff",2,[6,6]); }
+  }
+  if(showGB){
+    if(gbSys?.length){ band(gbSys, gbSysCI, "#ffc46b"); line(gbSys,"#ffc46b",2,[6,6]); }
+    if(gbDia?.length){ band(gbDia, gbDiaCI, "#ff9ad4"); line(gbDia,"#ff9ad4",2,[6,6]); }
+  }
+
+  // Now marker
+  ctx.fillStyle="#ffe08a"; ctx.fillRect(xScale(NOW)-1, padT, 2, H+6);
+  ctx.fillStyle="#c7d2fe"; ctx.font="11px Inter,system-ui"; ctx.fillText("now", xScale(NOW)-10, padT+12);
+}
+function getCss(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+
+/* ------------------------------ MAE / Confidence ------------------------------ */
+function maeOneStep(modelSys, modelDia, seriesSys, seriesDia){
+  // last 72h one-step forecasts
+  const n = Math.min(72, seriesSys.length-2);
+  if(n<=0) return {sys:NaN, dia:NaN};
+  let errS=0, errD=0;
+  for(let i=seriesSys.length-n; i<seriesSys.length; i++){
+    // ARX prediction using previous value and circadian
+    const circ = circadian(seriesSys[i].t.getHours());
+    const yhatS = modelSys ? modelSys.c + modelSys.phi*seriesSys[i-1].y + modelSys.gamma*circ : seriesSys[i-1].y;
+    const yhatD = modelDia ? modelDia.c + modelDia.phi*seriesDia[i-1].y + modelDia.gamma*circ : seriesDia[i-1].y;
+    errS += Math.abs(seriesSys[i].y - yhatS);
+    errD += Math.abs(seriesDia[i].y - yhatD);
+  }
+  return {sys:errS/n, dia:errD/n};
+}
+function setConfidence(maeSys, maeDia, count){
+  const pill = document.getElementById('confPill');
+  const bad = (maeSys>10 || maeDia>8 || count<72);
+  const warn = (!bad && (maeSys>7 || maeDia>6));
+  pill.className="pill " + (bad?"danger":(warn?"warn":"ok"));
+  pill.textContent = "Confidence: " + (bad?"Low":(warn?"Moderate":"OK"));
+}
+
+/* ------------------------------ App State ------------------------------ */
+let DATA = [];          // hourly [{t, sys, dia}]
+let NOW  = new Date(Math.floor(Date.now()/HOUR)*HOUR).getTime();
+
+let arxS=null, arxD=null, gbS=null, gbD=null;
+let arxSys=[], arxDia=[], gbSys=[], gbDia=[], arxSysCI=[], arxDiaCI=[], gbSysCI=[], gbDiaCI=[];
+
+function refitAndRedraw(){
+  if(DATA.length<24*3){ // need at least 3 days for stability
+    draw(DATA, [], [], [], [], getShow('showARX'), getShow('showGB'));
+    document.getElementById('maeSys').textContent="–";
+    document.getElementById('maeDia').textContent="–";
+    setConfidence(99,99,DATA.length);
+    return;
+  }
+  // Fit models separately for systolic and diastolic
+  const seriesS = DATA.map(d=>({t:d.t,y:d.sys}));
+  const seriesD = DATA.map(d=>({t:d.t,y:d.dia}));
+  arxS = fitARX(seriesS);
+  arxD = fitARX(seriesD);
+  gbS  = fitGBStumps(seriesS);
+  gbD  = fitGBStumps(seriesD);
+
+  // Forecast 48h
+  const knobs = {missed:getChk('missed'), salt:getChk('salt'), stress:getChk('stress')};
+  const lastS = seriesS[seriesS.length-1].y;
+  const lastD = seriesD[seriesD.length-1].y;
+
+  const fAS = forecastARX(arxS, lastS, 48, knobs);
+  const fAD = forecastARX(arxD, lastD, 48, knobs);
+  arxSys=fAS.path; arxSysCI=fAS.ci; arxDia=fAD.path; arxDiaCI=fAD.ci;
+
+  const fGS = forecastGB(gbS, lastS, 48, knobs);
+  const fGD = forecastGB(gbD, lastD, 48, knobs);
+  gbSys=fGS.path; gbSysCI=fGS.ci; gbDia=fGD.path; gbDiaCI=fGD.ci;
+
+  // Compute MAE and confidence
+  const mae = maeOneStep(arxS, arxD, seriesS, seriesD);
+  document.getElementById('maeSys').textContent = isFinite(mae.sys)? mae.sys.toFixed(1)+" mmHg":"–";
+  document.getElementById('maeDia').textContent = isFinite(mae.dia)? mae.dia.toFixed(1)+" mmHg":"–";
+  setConfidence(mae.sys, mae.dia, DATA.length);
+
+  draw(DATA, arxSys, arxDia, gbSys, gbDia, getShow('showARX'), getShow('showGB'));
+}
+
+/* ------------------------------ Events / UI ------------------------------ */
+function getVal(id){ return document.getElementById(id).value; }
+function getChk(id){ return document.getElementById(id).checked; }
+function getShow(id){ return document.getElementById(id).checked; }
+
+document.getElementById('gen').addEventListener('click',()=>{
+  const days = parseInt(getVal('days')), noise = parseFloat(getVal('noise'));
+  const sysBase = parseFloat(getVal('sysBase')), diaBase = parseFloat(getVal('diaBase'));
+  DATA = genSynthetic(days, sysBase, diaBase, noise);
+  refitAndRedraw();
+});
+
+document.getElementById('loadCsv').addEventListener('click',()=>{
+  const f = document.getElementById('csvFile').files[0];
+  if(!f){ alert('Choose a CSV first.'); return; }
+  const reader = new FileReader();
+  reader.onload = e=>{
+    const parsed = parseCSV(e.target.result);
+    if(parsed.length<6){ alert('No/insufficient rows parsed. Expect timestamp,sys,dia.'); return; }
+    DATA = toHourly(parsed);
+    NOW  = new Date(Math.floor(DATA[DATA.length-1].t.getTime()/HOUR)*HOUR).getTime();
+    refitAndRedraw();
+  };
+  reader.readAsText(f);
+});
+
+['missed','salt','stress','showARX','showGB'].forEach(id=>{
+  document.getElementById(id).addEventListener('change',()=>refitAndRedraw());
+});
+
+document.getElementById('recal').addEventListener('click',()=>{
+  const ts = getVal('newTs');
+  const bp = getVal('newBP').trim();
+  if(!ts || !bp || !bp.includes('/')){ alert('Provide time and BP as "123/78"'); return; }
+  const [s,d] = bp.split('/').map(x=>parseFloat(x));
+  if(!isFinite(s)||!isFinite(d)){ alert('Invalid numbers.'); return; }
+  const t = new Date(ts);
+  DATA.push({t, sys:s, dia:d});
+  DATA.sort((a,b)=>a.t-b.t);
+  DATA = toHourly(DATA); // resnap to grid
+  NOW = new Date(Math.floor(DATA[DATA.length-1].t.getTime()/HOUR)*HOUR).getTime();
+  refitAndRedraw();
+});
+
+/* ------------------------------ Bootstrap ------------------------------ */
+DATA = genSynthetic(14, 122, 78, 4);
+refitAndRedraw();
+
+/* ------------------------------ End ------------------------------ */
+
+function refitAndRedraw(){
+  if(DATA.length<24*3){ // need at least 3 days for stability
+    draw(DATA, [], [], [], [], getShow('showARX'), getShow('showGB'));
+    document.getElementById('maeSys').textContent="–";
+    document.getElementById('maeDia').textContent="–";
+    setConfidence(99,99,DATA.length);
+    return;
+  }
+  // Fit models separately for systolic and diastolic
+  const seriesS = DATA.map(d=>({t:d.t,y:d.sys}));
+  const seriesD = DATA.map(d=>({t:d.t,y:d.dia}));
+  arxS = fitARX(seriesS);
+  arxD = fitARX(seriesD);
+  gbS  = fitGBStumps(seriesS);
+  gbD  = fitGBStumps(seriesD);
+
+  // Forecast 48h
+  const knobs = {missed:getChk('missed'), salt:getChk('salt'), stress:getChk('stress')};
+  const lastS = seriesS[seriesS.length-1].y;
+  const lastD = seriesD[seriesD.length-1].y;
+
+  const fAS = forecastARX(arxS, lastS, 48, knobs);
+  const fAD = forecastARX(arxD, lastD, 48, knobs);
+  arxSys=fAS.path; arxSysCI=fAS.ci; arxDia=fAD.path; arxDiaCI=fAD.ci;
+
+  const fGS = forecastGB(gbS, lastS, 48, knobs);
+  const fGD = forecastGB(gbD, lastD, 48, knobs);
+  gbSys=fGS.path; gbSysCI=fGS.ci; gbDia=fGD.path; gbDiaCI=fGD.ci;
+
+  // Compute MAE and confidence
+  const mae = maeOneStep(arxS, arxD, seriesS, seriesD);
+  document.getElementById('maeSys').textContent = isFinite(mae.sys)? mae.sys.toFixed(1)+" mmHg":"–";
+  document.getElementById('maeDia').textContent = isFinite(mae.dia)? mae.dia.toFixed(1)+" mmHg":"–";
+  setConfidence(mae.sys, mae.dia, DATA.length);
+
+  draw(DATA, arxSys, arxDia, gbSys, gbDia, getShow('showARX'), getShow('showGB'));
+}
+
+/* ------------------------------ Events / UI ------------------------------ */
+function getVal(id){ return document.getElementById(id).value; }
+function getChk(id){ return document.getElementById(id).checked; }
+function getShow(id){ return document.getElementById(id).checked; }
+
+document.getElementById('gen').addEventListener('click',()=>{
+  const days = parseInt(getVal('days')), noise = parseFloat(getVal('noise'));
+  const sysBase = parseFloat(getVal('sysBase')), diaBase = parseFloat(getVal('diaBase'));
+  DATA = genSynthetic(days, sysBase, diaBase, noise);
+  refitAndRedraw();
+});
+
+document.getElementById('loadCsv').addEventListener('click',()=>{
+  const f = document.getElementById('csvFile').files[0];
+  if(!f){ alert('Choose a CSV first.'); return; }
+  const reader = new FileReader();
+  reader.onload = e=>{
+    const parsed = parseCSV(e.target.result);
+    if(parsed.length<6){ alert('No/insufficient rows parsed. Expect timestamp,sys,dia.'); return; }
+    DATA = toHourly(parsed);
+    NOW  = new Date(Math.floor(DATA[DATA.length-1].t.getTime()/HOUR)*HOUR).getTime();
+    refitAndRedraw();
+  };
+  reader.readAsText(f);
+});
+
+['missed','salt','stress','showARX','showGB'].forEach(id=>{
+  document.getElementById(id).addEventListener('change',()=>refitAndRedraw());
+});
+
+document.getElementById('recal').addEventListener('click',()=>{
+  const ts = getVal('newTs');
+  const bp = getVal('newBP').trim();
+  if(!ts || !bp || !bp.includes('/')){ alert('Provide time and BP as "123/78"'); return; }
+  const [s,d] = bp.split('/').map(x=>parseFloat(x));
+  if(!isFinite(s)||!isFinite(d)){ alert('Invalid numbers.'); return; }
+  const t = new Date(ts);
+  DATA.push({t, sys:s, dia:d});
+  DATA.sort((a,b)=>a.t-b.t);
+  DATA = toHourly(DATA); // resnap to grid
+  NOW = new Date(Math.floor(DATA[DATA.length-1].t.getTime()/HOUR)*HOUR).getTime();
+  refitAndRedraw();
+});
+
+/* ------------------------------ Bootstrap ------------------------------ */
+DATA = genSynthetic(14, 122, 78, 4);
+refitAndRedraw();
+
+/* ------------------------------ End ------------------------------ */
+</script>
+</body>
+</html>
