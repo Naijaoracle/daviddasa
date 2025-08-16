@@ -107,6 +107,7 @@ class Staff {
         this.assistingStaff = null;
         this.icon = role === 'doctor' ? (name.includes('Dr. Smith') ? '👨‍⚕️' : '👩‍⚕️') : (name.includes('Nurse Davis') ? '👨‍⚕️' : '👩‍⚕️');
         this.activityLog = [];
+        this.breakPending = false; // when true, go on break immediately after current task
     }
 
     generateSpecializationSkills() {

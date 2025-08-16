@@ -332,7 +332,7 @@ class HospitalSimulation {
         // First try to find available staff
         let staffToBreak = eligibleStaff.find(s => s.status === 'available' && !s.currentPatient);
 
-        // If no available staff, find one that will finish soon (within 30 seconds)
+        // If no available staff, mark the one finishing soon and set breakPending
         if (!staffToBreak) {
             staffToBreak = eligibleStaff.find(s => 
                 s.status === 'busy' && 
@@ -340,6 +340,10 @@ class HospitalSimulation {
                 s.busyUntil && 
                 (s.busyUntil - Date.now() < 30000)
             );
+            if (staffToBreak) {
+                staffToBreak.breakPending = true; // ensure they go on break when free
+                console.log(`${staffToBreak.name} marked breakPending; will go on break after current patient`);
+            }
         }
 
         if (staffToBreak) {
@@ -352,6 +356,7 @@ class HospitalSimulation {
                 
                 // Then update status and start break
                 staffToBreak.takeBreak(this.breakSchedule.breakDuration, this.simulationTimeScale);
+                staffToBreak.breakPending = false;
                 this.updateStaffStatus(staffToBreak.id, { status: 'on break' });
                 this.logActivity(`${staffToBreak.name} is taking a break`, 'break');
                 
@@ -676,6 +681,13 @@ class HospitalSimulation {
         this.staffVisualizer.updateStaffStatus(staff.id, {
             status: 'available'
         });
+
+        // If they were marked to go on break next, do it now
+        if (staff.breakPending && !staff.onBreak) {
+            const group = staff.role === 'doctor' ? 'doctors' : 'nurses';
+            console.log(`${staff.name} had breakPending; sending on break now`);
+            this.sendStaffOnBreak(group);
+        }
 
         // Update staff utilization
         this.dataTracker.updateStaffUtilization(staff.id, false);
