@@ -508,10 +508,11 @@ class DataTracker {
             if (staff.currentStatus && staff.lastBusyStart) {
                 currentBusyTime += (now - staff.lastBusyStart) / 1000;
             }
-            const utilizationPercentage = staff.totalTime > 0 
+            // Only show utilization after some time has passed to avoid early 100% readings
+            const utilizationPercentage = staff.totalTime > 10 
                 ? (currentBusyTime / staff.totalTime) * 100 
                 : 0;
-            this.charts.staffUtilization.data.datasets[0].data[staffIndex] = Math.round(utilizationPercentage);
+            this.charts.staffUtilization.data.datasets[0].data[staffIndex] = Math.min(100, Math.max(0, Math.round(utilizationPercentage)));
         }
         
         this.scheduleUpdate();
@@ -566,10 +567,12 @@ class DataTracker {
             if (staff.currentStatus && staff.lastBusyStart) {
                 currentBusyTime += (Date.now() - staff.lastBusyStart) / 1000;
             }
-            return staff.totalTime > 0 ? (currentBusyTime / staff.totalTime) * 100 : 0;
+            // Ensure totalTime has accumulated before calculating percentage
+            const utilization = staff.totalTime > 10 ? (currentBusyTime / staff.totalTime) * 100 : 0;
+            return Math.min(100, Math.max(0, Math.round(utilization)));
         });
         
-        this.charts.staffUtilization.data.datasets[0].data = utilizationData.map(Math.round);
+        this.charts.staffUtilization.data.datasets[0].data = utilizationData;
         this.charts.staffUtilization.update('none');
         
         // Update condition breakdown chart

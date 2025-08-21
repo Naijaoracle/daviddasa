@@ -60,6 +60,9 @@ class HospitalMap {
         
         // Create interaction zones
         this.createInteractionAreas(scene);
+
+        // After sprites exist, sync their positions to current staff state
+        setTimeout(() => this.syncAllStaffPositions(), 0);
     }
 
     createHospitalLayout(scene) {
@@ -334,6 +337,14 @@ class HospitalMap {
                     sprite.clearTint();
                 }
                 
+                // Ensure sprite moves to the correct area for current state
+                const desiredLocation = this.getDesiredLocationForStaff(staff);
+                if (!this.paths[staff.id].active && this.paths[staff.id].target !== desiredLocation) {
+                    console.log(`Moving ${staff.name} to ${desiredLocation} (status: ${staff.status}, onBreak: ${staff.onBreak})`);
+                    this.moveStaffToLocation(staff.id, desiredLocation);
+                    this.paths[staff.id].target = desiredLocation;
+                }
+
                 // Animate staff movement if needed
                 if (staff.currentPatient && !this.paths[staff.id].active) {
                     if (staff.currentPatient.treatingBay) {
@@ -431,6 +442,28 @@ class HospitalMap {
         targetX = Math.max(30, Math.min(targetX, 770));
         targetY = Math.max(30, Math.min(targetY, 270));
         
+        // Remember target for future comparisons
+        if (this.paths[staffId]) {
+            this.paths[staffId].target = location;
+        }
+
         this.moveStaffTo(scene, staffId, targetX, targetY);
+    }
+
+    getDesiredLocationForStaff(staff) {
+        if (staff.currentPatient && staff.currentPatient.treatingBay) {
+            return staff.currentPatient.treatingBay;
+        }
+        if (staff.status === 'on break' || staff.onBreak) {
+            return 'rest';
+        }
+        return staff.role === 'doctor' ? 'doctorOffice' : 'nurseStation';
+    }
+
+    syncAllStaffPositions() {
+        this.staffMembers.forEach(staff => {
+            const desired = this.getDesiredLocationForStaff(staff);
+            this.moveStaffToLocation(staff.id, desired);
+        });
     }
 }
