@@ -241,10 +241,10 @@ class HospitalMap {
         this.createInteractionZone(scene, 250, 160, 150, 100, 'bay3');
         this.createInteractionZone(scene, 410, 160, 150, 100, 'bay4');
         
-        // Staff areas
-        this.createInteractionZone(scene, 570, 50, 210, 80, 'nurseStation');
-        this.createInteractionZone(scene, 570, 140, 100, 110, 'doctorOffice');
-        this.createInteractionZone(scene, 680, 140, 100, 110, 'restArea');
+        // Staff areas (match layout dimensions)
+        this.createInteractionZone(scene, 570, 50, 100, 80, 'nurseStation');
+        this.createInteractionZone(scene, 680, 50, 100, 80, 'doctorOffice');
+        this.createInteractionZone(scene, 570, 140, 210, 120, 'restArea');
     }
     
     createInteractionZone(scene, x, y, width, height, name) {
@@ -306,6 +306,8 @@ class HospitalMap {
     handleLocationAction(staff, location) {
         // Special actions when staff enters a location
         if (location === 'restArea' && staff.status === 'available') {
+            // Alias location so other modules can recognize it
+            staff.location = 'rest';
             staff.takeBreak();
         } else if (location === 'lab') {
             staff.addActivity('Working in the laboratory');
@@ -412,11 +414,7 @@ class HospitalMap {
                 targetY = 50 + Math.random() * 70;
                 break;
             case 'restArea':
-                // Position in the rest area below offices
-                targetX = 570 + Math.random() * 200; // Full width of rest area
-                targetY = 180 + Math.random() * 50;  // Adjusted height range
-                break;
-            case 'rest': // Add alias for rest area
+            case 'rest': // Alias for rest area
                 targetX = 570 + Math.random() * 200;
                 targetY = 180 + Math.random() * 50;
                 break;
