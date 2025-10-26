@@ -6,7 +6,8 @@
   <title>XR-NPC Ward Room Simulator</title>
   <style>
     html, body { height: 100%; margin: 0; overflow: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial; }
-    #three-root { position: fixed; inset: 0; background: #0a0f0a; cursor: default; }
+    /* Brighten the canvas backdrop */
+    #three-root { position: fixed; inset: 0; background: #eef5ee; cursor: default; }
 
     /* Overlay UI */
     .ui { position: fixed; top: 0; left: 0; right: 0; pointer-events: none; }
@@ -52,9 +53,45 @@
 
     /* Key HUD */
     #keyHUD { position: fixed; left: 10px; bottom: 10px; background: rgba(0,0,0,0.55); color: #cfe9cf; padding: 6px 8px; border-radius: 8px; font-size: 11px; pointer-events: none; z-index: 5; }
+
+    /* Home button */
+    .home-button {
+      position: fixed;
+      left: 12px;
+      top: 12px;
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      text-decoration: none;
+      z-index: 10;
+      backdrop-filter: blur(4px);
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .home-button:hover {
+      background: rgba(255,255,255,1);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .home-button svg {
+      width: 20px;
+      height: 20px;
+      fill: #2ecc71;
+    }
   </style>
 </head>
 <body>
+  <a href="/" class="home-button" aria-label="Home" title="Return to homepage">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+    </svg>
+  </a>
   <div id="three-root"></div>
 
   <div id="startOverlay">
@@ -106,7 +143,8 @@
 
     // Scene and camera rig
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x162416);
+    // Brighter background tone
+    scene.background = new THREE.Color(0xf2f8f2);
     const rig = new THREE.Object3D();
     const pitch = new THREE.Object3D();
     const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 200);
@@ -130,15 +168,17 @@
     root.appendChild(labelRenderer.domElement);
     labelRenderer.domElement.setAttribute('tabindex','-1');
 
-    // Lights
-    const hemi = new THREE.HemisphereLight(0xddeeff, 0x101820, 0.9); scene.add(hemi);
-    const dir = new THREE.DirectionalLight(0xffffff, 0.8); dir.position.set(4, 8, 2); scene.add(dir);
+    // Lights - brighter overall
+    const hemi = new THREE.HemisphereLight(0xffffff, 0xdedede, 1.4); scene.add(hemi);
+    const amb = new THREE.AmbientLight(0xffffff, 0.4); scene.add(amb);
+    const dir = new THREE.DirectionalLight(0xffffff, 1.2); dir.position.set(4, 8, 2); scene.add(dir);
 
     // Room
     const ROOM = 10; const HALF = ROOM / 2; const room = new THREE.Group(); scene.add(room);
-    const wallMat = new THREE.MeshStandardMaterial({ color: 0x3c4b3c, metalness: 0, roughness: 0.95 });
-    const floorMat = new THREE.MeshStandardMaterial({ color: 0x2a332a, roughness: 1 });
-    const trimMat  = new THREE.MeshStandardMaterial({ color: 0x7a1414, roughness: 1 });
+    // Lighter wall and floor materials
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0xe6efe6, metalness: 0, roughness: 0.9 });
+    const floorMat = new THREE.MeshStandardMaterial({ color: 0xf2f7f2, roughness: 0.95 });
+    const trimMat  = new THREE.MeshStandardMaterial({ color: 0xbf4a4a, roughness: 1 });
 
     const floor = new THREE.Mesh(new THREE.BoxGeometry(ROOM, 0.1, ROOM), floorMat); floor.position.set(0, -0.05, 0); floor.receiveShadow = true; room.add(floor);
     const ceiling = new THREE.Mesh(new THREE.BoxGeometry(ROOM, 0.1, ROOM), new THREE.MeshStandardMaterial({ color: 0xdfe7df })); ceiling.position.set(0, 3, 0); room.add(ceiling);
@@ -262,14 +302,14 @@
       let handled = false;
       // Camera rig
       if (c==='KeyW' || k==='w' || c==='ArrowUp')             { key.w = down; handled = true; }
-      if (c==='KeyA' || k==='a' || c==='ArrowLeft')           { key.a = down; handled = true; }
-      if (c==='KeyS' || k==='s' || c==='ArrowDown')           { key.s = down; handled = true; }
-      if (c==='KeyD' || k==='d' || c==='ArrowRight')          { key.d = down; handled = true; }
-      // Nurse IJKL + U/O
+      if (c==='KeyA' || k==='a')                               { key.a = down; handled = true; }
+      if (c==='KeyS' || k==='s' || c==='ArrowDown')            { key.s = down; handled = true; }
+      if (c==='KeyD' || k==='d')                               { key.d = down; handled = true; }
+      // Nurse IJKL + U/O and map ArrowLeft/ArrowRight to nurse strafe
       if (c==='KeyI' || k==='i')                              { nkey.i = down; handled = true; }
-      if (c==='KeyJ' || k==='j')                              { nkey.j = down; handled = true; }
+      if (c==='KeyJ' || k==='j' || c==='ArrowLeft')           { nkey.j = down; handled = true; }
       if (c==='KeyK' || k==='k')                              { nkey.k = down; handled = true; }
-      if (c==='KeyL' || k==='l')                              { nkey.l = down; handled = true; }
+      if (c==='KeyL' || k==='l' || c==='ArrowRight')          { nkey.l = down; handled = true; }
       if (c==='KeyU' || k==='u')                              { nkey.u = down; handled = true; }
       if (c==='KeyO' || k==='o')                              { nkey.o = down; handled = true; }
       if (handled) { e.preventDefault(); updateKeyHUD(); if(!keyboardSeen){ keyboardSeen=true; setStatus('Modules OK • Keyboard OK'); } }

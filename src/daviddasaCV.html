@@ -55,9 +55,45 @@
     #joyR { right: 16px; bottom: 16px; }
     .knob { position: absolute; width: 56px; height: 56px; border-radius: 28px; left: 50%; top: 50%; transform: translate(-50%,-50%); background: rgba(255,255,255,0.95); border: 1px solid rgba(0,0,0,0.12); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
     .touch-hint { position: fixed; left: 50%; transform: translateX(-50%); bottom: 140px; background: rgba(255,255,255,0.85); border:1px solid rgba(0,0,0,0.1); border-radius: 10px; padding: 6px 10px; font-size: 12px; z-index: 6; display: none; }
+
+    /* Home button */
+    .home-button {
+      position: fixed;
+      left: 12px;
+      top: 12px;
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      text-decoration: none;
+      z-index: 10;
+      backdrop-filter: blur(4px);
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .home-button:hover {
+      background: rgba(255,255,255,1);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .home-button svg {
+      width: 20px;
+      height: 20px;
+      fill: #2ecc71;
+    }
   </style>
 </head>
 <body>
+  <a href="/" class="home-button" aria-label="Home" title="Return to homepage">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+    </svg>
+  </a>
   <div id="three-root"></div>
   <canvas id="mini"></canvas>
   <div class="hud" id="hud"><b>Miniature CV Map</b><br>WASD or arrow keys to walk. Drag to look. On mobile use left pad to move, right pad to look. You stay on the road and sidewalks. Reach the end to loop back to the start. Press T for tests. Press M to toggle camera.</div>
