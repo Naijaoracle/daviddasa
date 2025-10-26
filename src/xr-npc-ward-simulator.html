@@ -6,7 +6,7 @@
   <title>XR-NPC Ward Room Simulator</title>
   <style>
     html, body { height: 100%; margin: 0; overflow: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial; }
-    /* Brighten the canvas backdrop */
+    /* Bright canvas backdrop */
     #three-root { position: fixed; inset: 0; background: #eef5ee; cursor: default; }
 
     /* Overlay UI */
@@ -53,51 +53,15 @@
 
     /* Key HUD */
     #keyHUD { position: fixed; left: 10px; bottom: 10px; background: rgba(0,0,0,0.55); color: #cfe9cf; padding: 6px 8px; border-radius: 8px; font-size: 11px; pointer-events: none; z-index: 5; }
-
-    /* Home button */
-    .home-button {
-      position: fixed;
-      left: 12px;
-      top: 12px;
-      width: 44px;
-      height: 44px;
-      background: rgba(255,255,255,0.9);
-      border: 1px solid rgba(0,0,0,0.1);
-      border-radius: 22px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      text-decoration: none;
-      z-index: 10;
-      backdrop-filter: blur(4px);
-      transition: all 0.2s ease;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .home-button:hover {
-      background: rgba(255,255,255,1);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-    .home-button svg {
-      width: 20px;
-      height: 20px;
-      fill: #2ecc71;
-    }
   </style>
 </head>
 <body>
-  <a href="/" class="home-button" aria-label="Home" title="Return to homepage">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-      <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-    </svg>
-  </a>
   <div id="three-root"></div>
 
   <div id="startOverlay">
     <div id="startCard">
       <div style="font-weight:700; font-size:18px; margin-bottom:6px;">Click to start</div>
-      <div id="startInfo" style="font-size:13px; opacity:0.9;">WASD or arrows to move. Click and drag to look.</div>
+      <div id="startInfo" style="font-size:13px; opacity:0.9;">WASD moves camera. Arrows move nurse. Click and drag to look.</div>
       <button id="startBtn">Start demo</button>
     </div>
   </div>
@@ -113,7 +77,7 @@
     </div>
   </div>
   <div class="crosshair" id="crosshair" title="aim"></div>
-  <div class="hint" id="hint">WASD to move. Click and drag to look.</div>
+  <div class="hint" id="hint">WASD moves camera. Arrows move nurse. Click and drag to look.</div>
   <div id="keyHUD">I:0 J:0 K:0 L:0 U:0 O:0</div>
 
   <!-- Single Three import for us and the examples -->
@@ -143,7 +107,7 @@
 
     // Scene and camera rig
     const scene = new THREE.Scene();
-    // Brighter background tone
+    // Bright background tone
     scene.background = new THREE.Color(0xf2f8f2);
     const rig = new THREE.Object3D();
     const pitch = new THREE.Object3D();
@@ -276,7 +240,7 @@
     let dragging = false, lastX = 0, lastY = 0; const maxPitch = Math.PI/2 - 0.05;
 
     function enableDragLook() {
-      root.style.cursor = 'grab'; hintEl.textContent = 'Drag to look. WASD or arrows to move.';
+      root.style.cursor = 'grab'; hintEl.textContent = 'Drag to look. WASD moves camera. Arrows move nurse.';
       const onDown = (e)=>{ dragging = true; lastX = e.clientX; lastY = e.clientY; root.style.cursor = 'grabbing'; };
       const onUp = ()=>{ dragging = false; root.style.cursor = 'grab'; };
       const onMove = (e)=>{ if(!dragging) return; const dx=e.clientX-lastX, dy=e.clientY-lastY; lastX=e.clientX; lastY=e.clientY; rig.rotation.y -= dx*0.0022; pitch.rotation.x = Math.max(-maxPitch, Math.min(maxPitch, pitch.rotation.x - dy*0.0022)); };
@@ -300,18 +264,18 @@
       const k = (e.key || '').toLowerCase();
       const c = e.code || '';
       let handled = false;
-      // Camera rig
-      if (c==='KeyW' || k==='w' || c==='ArrowUp')             { key.w = down; handled = true; }
-      if (c==='KeyA' || k==='a')                               { key.a = down; handled = true; }
-      if (c==='KeyS' || k==='s' || c==='ArrowDown')            { key.s = down; handled = true; }
-      if (c==='KeyD' || k==='d')                               { key.d = down; handled = true; }
-      // Nurse IJKL + U/O and map ArrowLeft/ArrowRight to nurse strafe
-      if (c==='KeyI' || k==='i')                              { nkey.i = down; handled = true; }
-      if (c==='KeyJ' || k==='j' || c==='ArrowLeft')           { nkey.j = down; handled = true; }
-      if (c==='KeyK' || k==='k')                              { nkey.k = down; handled = true; }
-      if (c==='KeyL' || k==='l' || c==='ArrowRight')          { nkey.l = down; handled = true; }
-      if (c==='KeyU' || k==='u')                              { nkey.u = down; handled = true; }
-      if (c==='KeyO' || k==='o')                              { nkey.o = down; handled = true; }
+      // Camera rig on WASD only
+      if (c==='KeyW' || k==='w')                       { key.w = down; handled = true; }
+      if (c==='KeyA' || k==='a')                       { key.a = down; handled = true; }
+      if (c==='KeyS' || k==='s')                       { key.s = down; handled = true; }
+      if (c==='KeyD' || k==='d')                       { key.d = down; handled = true; }
+      // Nurse IJKL + U/O and Arrow keys (flip Left and Right from previous mapping)
+      if (c==='KeyI' || k==='i' || c==='ArrowUp')      { nkey.i = down; handled = true; }
+      if (c==='KeyJ' || k==='j' || c==='ArrowLeft')    { nkey.j = down; handled = true; } // ArrowLeft -> left strafe
+      if (c==='KeyK' || k==='k' || c==='ArrowDown')    { nkey.k = down; handled = true; }
+      if (c==='KeyL' || k==='l' || c==='ArrowRight')   { nkey.l = down; handled = true; } // ArrowRight -> right strafe
+      if (c==='KeyU' || k==='u')                       { nkey.u = down; handled = true; }
+      if (c==='KeyO' || k==='o')                       { nkey.o = down; handled = true; }
       if (handled) { e.preventDefault(); updateKeyHUD(); if(!keyboardSeen){ keyboardSeen=true; setStatus('Modules OK • Keyboard OK'); } }
     }
     // Extra robust listeners
@@ -333,18 +297,29 @@
     const nurseSpeed = 1.8; const nurseRotSpeed = 1.8; let followNurse = false;
 
     function moveNurse(dt) {
-      if (nkey.u) avatar.rotation.y += nurseRotSpeed * dt; if (nkey.o) avatar.rotation.y -= nurseRotSpeed * dt;
+      if (nkey.u) avatar.rotation.y += nurseRotSpeed * dt;
+      if (nkey.o) avatar.rotation.y -= nurseRotSpeed * dt;
       const yaw = avatar.rotation.y;
       const forwardN = new THREE.Vector3(Math.sin(yaw), 0, -Math.cos(yaw));
-      const rightN = new THREE.Vector3().crossVectors(forwardN, new THREE.Vector3(0,1,0)).negate();
-      const v = new THREE.Vector3(); if(nkey.i)v.add(forwardN); if(nkey.k)v.sub(forwardN); if(nkey.j)v.sub(rightN); if(nkey.l)v.add(rightN);
+      const rightN = new THREE.Vector3().crossVectors(forwardN, new THREE.Vector3(0,1,0)); // true right vector
+      const v = new THREE.Vector3();
+      if (nkey.i) v.add(forwardN);
+      if (nkey.k) v.sub(forwardN);
+      if (nkey.j) v.sub(rightN);  // left
+      if (nkey.l) v.add(rightN);  // right
       if (v.lengthSq() > 0) v.normalize().multiplyScalar(nurseSpeed * dt);
       // axis-resolved collision
       const tryPos = avatar.position.clone();
       // X axis
-      tryPos.x += v.x; if (!circleRectOverlap(tryPos.x, avatar.position.z, nurseRadius, bedRect) && !circleRectOverlap(tryPos.x, avatar.position.z, nurseRadius, trolleyRect)) { avatar.position.x = tryPos.x; }
+      tryPos.x += v.x;
+      if (!circleRectOverlap(tryPos.x, avatar.position.z, nurseRadius, bedRect) && !circleRectOverlap(tryPos.x, avatar.position.z, nurseRadius, trolleyRect)) {
+        avatar.position.x = tryPos.x;
+      }
       // Z axis
-      tryPos.z = avatar.position.z + v.z; if (!circleRectOverlap(avatar.position.x, tryPos.z, nurseRadius, bedRect) && !circleRectOverlap(avatar.position.x, tryPos.z, nurseRadius, trolleyRect)) { avatar.position.z = tryPos.z; }
+      tryPos.z = avatar.position.z + v.z;
+      if (!circleRectOverlap(avatar.position.x, tryPos.z, nurseRadius, bedRect) && !circleRectOverlap(avatar.position.x, tryPos.z, nurseRadius, trolleyRect)) {
+        avatar.position.z = tryPos.z;
+      }
       // Clamp to room
       avatar.position.x = Math.max(bounds.minX+0.25, Math.min(bounds.maxX-0.25, avatar.position.x));
       avatar.position.z = Math.max(bounds.minZ+0.25, Math.min(bounds.maxZ-0.25, avatar.position.z));
@@ -352,16 +327,25 @@
 
     const upAxis = new THREE.Vector3(0,1,0);
     function updateCameraFollow() {
-      const offset = new THREE.Vector3(0, 0, 2.6); offset.applyAxisAngle(upAxis, avatar.rotation.y); const target = new THREE.Vector3().copy(avatar.position).add(offset);
-      rig.position.x = Math.max(bounds.minX+0.3, Math.min(bounds.maxX-0.3, target.x)); rig.position.z = Math.max(bounds.minZ+0.3, Math.min(bounds.maxZ-0.3, target.z));
+      const offset = new THREE.Vector3(0, 0, 2.6);
+      offset.applyAxisAngle(upAxis, avatar.rotation.y);
+      const target = new THREE.Vector3().copy(avatar.position).add(offset);
+      rig.position.x = Math.max(bounds.minX+0.3, Math.min(bounds.maxX-0.3, target.x));
+      rig.position.z = Math.max(bounds.minZ+0.3, Math.min(bounds.maxZ-0.3, target.z));
     }
 
     function move(dt) {
       const forward = new THREE.Vector3(Math.sin(rig.rotation.y), 0, -Math.cos(rig.rotation.y));
-      const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0,1,0)).negate();
-      const vel = new THREE.Vector3(); if(key.w)vel.add(forward); if(key.s)vel.sub(forward); if(key.a)vel.sub(right); if(key.d)vel.add(right); if(vel.lengthSq()>0) vel.normalize().multiplyScalar(speed*dt);
+      const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0,1,0));
+      const vel = new THREE.Vector3();
+      if (key.w) vel.add(forward);
+      if (key.s) vel.sub(forward);
+      if (key.a) vel.sub(right);
+      if (key.d) vel.add(right);
+      if (vel.lengthSq()>0) vel.normalize().multiplyScalar(speed*dt);
       rig.position.add(vel);
-      rig.position.x = Math.max(bounds.minX+0.3, Math.min(bounds.maxX-0.3, rig.position.x)); rig.position.z = Math.max(bounds.minZ+0.3, Math.min(bounds.maxZ-0.3, rig.position.z));
+      rig.position.x = Math.max(bounds.minX+0.3, Math.min(bounds.maxX-0.3, rig.position.x));
+      rig.position.z = Math.max(bounds.minZ+0.3, Math.min(bounds.maxZ-0.3, rig.position.z));
     }
 
     // UI and recording
@@ -372,7 +356,7 @@
         <button id="followBtn" class="secondary">Follow nurse: Off</button>
         <button id="resetNurseBtn">Reset nurse</button>
       </div>
-      <div style="font-size:11px; opacity:0.8; margin-top:6px;">Move nurse with I J K L. Rotate with U and O.</div>
+      <div style="font-size:11px; opacity:0.8; margin-top:6px;">Move nurse with I J K L or arrow keys. Rotate with U and O.</div>
     `; tray.appendChild(nurseUI);
     const followBtn = document.getElementById('followBtn'); const resetNurseBtn = document.getElementById('resetNurseBtn');
 
