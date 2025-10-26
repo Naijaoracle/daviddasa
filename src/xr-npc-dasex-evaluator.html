@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DASEX Checklist Evaluator</title>
+  <style>
+    :root{
+      --bg:#0b1214;
+      --panel:#121a1d;
+      --card:#1b262b;
+      --ink:#e6f3f7;
+      --muted:#9db3ba;
+      --accent:#2aa198;
+      --warn:#e15757;
+      --ok:#2e8b57;
+    }
+    html, body { height:100%; margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; background:var(--bg); color:var(--ink); }
+    .wrap { display:grid; grid-template-rows:auto 1fr; height:100%; }
+    header { padding:16px 20px; background:var(--panel); border-bottom:1px solid #1f2b30; display:flex; align-items:center; gap:12px; }
+    header h1 { font-size:18px; font-weight:700; margin:0; letter-spacing:.2px; }
+    header .spacer { flex:1; }
+    header button { appearance:none; border:0; border-radius:10px; padding:9px 12px; font-weight:600; cursor:pointer; color:white; background:#1565c0; }
+    header button.ghost { background:transparent; color:var(--ink); border:1px solid #254048; }
+    main { display:grid; place-items:start center; padding:24px; overflow:auto; }
+    .card { width:min(980px, 100%); background:var(--card); border:1px solid #20333a; border-radius:14px; padding:18px; box-shadow:0 20px 50px rgba(0,0,0,.35); }
+    .card h2 { margin:0 0 8px; font-size:20px; }
+    .summary { margin:8px 0 16px; font-size:14px; color:var(--muted); display:flex; flex-wrap:wrap; gap:10px 14px; }
+    .summary b { color:var(--ink); }
+    .tbl { width:100%; border-collapse:collapse; }
+    .tbl th, .tbl td { border-bottom:1px solid #22373f; padding:10px 8px; vertical-align:middle; }
+    .tbl th { position:sticky; top:0; background:var(--card); z-index:1; }
+    .axisRow td { background:#162024; color:#a7c0c8; font-weight:700; }
+    .scoreBtns { display:flex; gap:6px; }
+    .scoreBtns button { appearance:none; border:0; border-radius:8px; width:34px; height:34px; cursor:pointer; color:#0b1114; background:#b7d0d6; font-weight:700; }
+    .scoreBtns button.active { background:var(--ok); color:white; }
+    .controls { margin-top:14px; display:flex; gap:10px; }
+    .controls button { appearance:none; border:0; border-radius:10px; padding:10px 12px; font-weight:700; cursor:pointer; color:white; background:#2e7d32; }
+    .controls button.secondary { background:#1565c0; }
+    .controls button.warn { background:#b71c1c; }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
+    footer { padding:14px 20px; font-size:12px; color:var(--muted); text-align:center; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>DASEX Checklist Evaluator</h1>
+      <div class="spacer"></div>
+      <button id="exportBtn" class="ghost" title="Export scores as JSON">Export JSON</button>
+      <button id="resetBtn" class="ghost" title="Clear all scores">Reset</button>
+    </header>
+
+    <main>
+      <section class="card">
+        <h2>Checklist</h2>
+        <div id="dasexTotals" class="summary" aria-live="polite"></div>
+        <table id="dasexTable" class="tbl" role="grid" aria-describedby="dasexTotals"></table>
+        <div class="controls">
+          <button class="secondary" id="fillDemo">Fill demo scores</button>
+          <button class="warn" id="clearScores">Clear scores</button>
+        </div>
+      </section>
+    </main>
+
+    <footer>Scores are 1-5 per criterion. Axis totals are shown as achieved over maximum.</footer>
+  </div>
+
+  <script>
+    // Data model
+    const DASEX = [
+      { axis:'D', title:'Clinical accuracy and reasoning processes', items:[
+        { id:'D1', text:'Accurate initial diagnosis' },
+        { id:'D2', text:'Active differential management' },
+        { id:'D3', text:'Clinical-pathway fidelity' },
+        { id:'D4', text:'Dynamic diagnostic updates' },
+        { id:'D5', text:'Diagnostic robustness checks' },
+      ]},
+      { axis:'A', title:'Personalization and scenario responsiveness', items:[
+        { id:'A1', text:'Learner-profile adaptation' },
+        { id:'A2', text:'Physiology-driven realism' },
+        { id:'A3', text:'Emotional state calibration' },
+        { id:'A4', text:'Adaptive replay/reinforcement' },
+        { id:'A5', text:'Scenario logic consistency' },
+      ]},
+      { axis:'S', title:'Harm prevention and risk management', items:[
+        { id:'S1', text:'Intervention plausibility check' },
+        { id:'S2', text:'Protocol adherence & escalation' },
+        { id:'S3', text:'Error interception' },
+        { id:'S4', text:'Algorithmic bias safeguards' },
+        { id:'S5', text:'Safety audit trail' },
+      ]},
+      { axis:'E', title:'Collaboration, communication, and user experience', items:[
+        { id:'E1', text:'Turn-taking coordination logic' },
+        { id:'E2', text:'Structured communication' },
+        { id:'E3', text:'Coordination efficiency' },
+        { id:'E4', text:'Trust monitoring & calibration' },
+        { id:'E5', text:'Contextual debrief anchoring' },
+      ]},
+      { axis:'X', title:'Transparency and evidence-based reasoning', items:[
+        { id:'X1', text:'Transparent reasoning logs' },
+        { id:'X2', text:'Evidence alignment' },
+        { id:'X3', text:'On-demand explanations' },
+        { id:'X4', text:'Persistent documentation' },
+        { id:'X5', text:'Counterfactual rationale generation' },
+      ]},
+    ];
+
+    // State
+    const scores = new Map();  // key: id, value: 1..5
+
+    // Build table
+    function buildDasexTable(){
+      const table = document.getElementById('dasexTable');
+      const thead = `<tr>
+          <th style="width:50px;">Axis</th>
+          <th>Focus area / Criteria</th>
+          <th style="width:220px;">Score (1-5)</th>
+        </tr>`;
+      let rows = '';
+      DASEX.forEach(group => {
+        rows += `<tr class="axisRow"><td>${group.axis}</td><td colspan="2">${group.title}</td></tr>`;
+        group.items.forEach(it => {
+          const btns = [1,2,3,4,5].map(n => `<button data-score="${n}" aria-label="Set ${it.id} to ${n}">${n}</button>`).join('');
+          rows += `<tr data-id="${it.id}">
+            <td></td>
+            <td><b>${it.id}</b> - ${it.text}</td>
+            <td><div class="scoreBtns">${btns}</div></td>
+          </tr>`;
+        });
+      });
+      table.innerHTML = thead + rows;
+    }
+
+    // Totals
+    function updateTotals(){
+      // Show totals as: sum / (count * 5)
+      const perAxis = {};
+      let overallSum = 0;
+      let overallCount = 0;
+
+      DASEX.forEach(g => {
+        let sum = 0; 
+        let n = 0;
+        g.items.forEach(it => {
+          const v = scores.get(it.id);
+          if (typeof v === 'number') { sum += v; n += 1; }
+        });
+        perAxis[g.axis] = { sum, n };
+      });
+
+      const pieces = [];
+      Object.entries(perAxis).forEach(([ax, s]) => {
+        overallSum += s.sum;
+        overallCount += s.n;
+        pieces.push(`<span>${ax}: ${s.sum}/${s.n * 5}</span>`);
+      });
+
+      pieces.push(`<b>Total: ${overallSum}/${overallCount * 5}</b>`);
+      document.getElementById('dasexTotals').innerHTML = pieces.join(' • ');
+    }
+
+    // Render and wire up events
+    buildDasexTable();
+    updateTotals();
+
+    // Button handlers for scores
+    document.getElementById('dasexTable').addEventListener('click', (e) => {
+      const b = e.target.closest('button[data-score]');
+      if (!b) return;
+      const tr = e.target.closest('tr[data-id]');
+      if (!tr) return;
+      const id = tr.getAttribute('data-id');
+      const val = Number(b.getAttribute('data-score'));
+      scores.set(id, val);
+
+      // visual state
+      tr.querySelectorAll('button[data-score]').forEach(btn => btn.classList.remove('active'));
+      b.classList.add('active');
+
+      updateTotals();
+    });
+
+    // Reset and utilities
+    document.getElementById('clearScores').addEventListener('click', () => {
+      scores.clear();
+      document.querySelectorAll('#dasexTable button[data-score]').forEach(btn => btn.classList.remove('active'));
+      updateTotals();
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      scores.clear();
+      document.querySelectorAll('#dasexTable button[data-score]').forEach(btn => btn.classList.remove('active'));
+      updateTotals();
+    });
+
+    document.getElementById('fillDemo').addEventListener('click', () => {
+      // simple deterministic filler to show totals
+      let seed = 3;
+      DASEX.forEach(g => g.items.forEach(it => {
+        seed = (seed * 17 + 11) % 5; // 0..4
+        const val = seed + 1;
+        scores.set(it.id, val);
+      }));
+      // update UI buttons
+      document.querySelectorAll('#dasexTable tr[data-id]').forEach(tr => {
+        const id = tr.getAttribute('data-id');
+        const val = scores.get(id);
+        tr.querySelectorAll('button[data-score]').forEach(btn => {
+          btn.classList.toggle('active', Number(btn.dataset.score) === val);
+        });
+      });
+      updateTotals();
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', async () => {
+      const out = {};
+      DASEX.forEach(g => g.items.forEach(it => { if (scores.has(it.id)) out[it.id] = scores.get(it.id); }));
+      const blob = new Blob([JSON.stringify(out, null, 2)], { type:'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'dasex-scores.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>

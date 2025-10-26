@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Basic Ward Room Prototype</title>
+  <style>
+    html, body { height: 100%; margin: 0; overflow: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial; }
+    #three-root { position: fixed; inset: 0; background: #0a0f0a; cursor: default; }
+
+    /* Overlay UI */
+    .ui { position: fixed; top: 0; left: 0; right: 0; pointer-events: none; }
+    .tray { position: absolute; right: 16px; top: 16px; width: 320px; background: rgba(20, 24, 20, 0.85); color: #e8f5e9; border-radius: 12px; padding: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); pointer-events: auto; }
+    .tray h3 { margin: 0 0 8px; font-size: 18px; letter-spacing: 0.2px; }
+    .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    button { appearance: none; border: 0; border-radius: 10px; padding: 10px 12px; background: #2e7d32; color: white; cursor: pointer; font-weight: 600; }
+    button.secondary { background: #1565c0; }
+    button.warn { background: #b71c1c; }
+    button:active { transform: translateY(1px); }
+    .log { margin-top: 8px; background: rgba(255,255,255,0.06); padding: 8px; border-radius: 8px; height: 96px; overflow: auto; font-size: 12px; white-space: pre-wrap; }
+
+    /* Crosshair and hint */
+    .crosshair { position: fixed; left: 50%; top: 50%; width: 12px; height: 12px; margin-left: -6px; margin-top: -6px; border-radius: 50%; background: rgba(255,255,255,0.9); box-shadow: 0 0 8px rgba(255,255,255,0.5); opacity: 0.85; pointer-events: none; display: none; }
+    .hint { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); color: #cfe9cf; background: rgba(0,0,0,0.5); padding: 6px 10px; border-radius: 8px; font-size: 12px; pointer-events: none; }
+
+    /* CSS2D labels */
+    .label { color: #fff; background: rgba(0,0,0,0.65); padding: 2px 6px; border-radius: 6px; font-size: 12px; border: 1px solid rgba(255,255,255,0.2); }
+
+    /* Start overlay to guarantee a gesture before we hook mouse handlers */
+    #startOverlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.65); color: #e8f5e9; z-index: 30; }
+    #startCard { background: rgba(20,24,20,0.9); padding: 18px 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); text-align: center; width: 340px; }
+    #startBtn { margin-top: 10px; width: 100%; }
+  </style>
+</head>
+<body>
+  <div id="three-root"></div>
+
+  <div id="startOverlay">
+    <div id="startCard">
+      <div style="font-weight:700; font-size:18px; margin-bottom:6px;">Click to start</div>
+      <div id="startInfo" style="font-size:13px; opacity:0.9;">WASD or arrows to move. Click and drag to look.</div>
+      <button id="startBtn">Start demo</button>
+    </div>
+  </div>
+
+  <div class="ui">
+    <div class="tray" id="tray">
+      <h3>Select medication <span id="status" style="font-size:12px;opacity:0.85"></span></h3>
+      <div class="btns">
+        <button data-action="adrenaline">Adrenaline IM</button>
+        <button class="secondary" data-action="oxygen">Oxygen mask</button>
+        <button data-action="cannula">IV cannula</button>
+        <button class="secondary" data-action="fluids">IV fluids</button>
+      </div>
+      <div class="log" id="log"></div>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <button class="warn" id="recordBtn">Record</button>
+        <a id="downloadBtn" class="secondary" style="display:none; text-decoration:none; text-align:center; line-height:32px; padding: 0 12px; border-radius:10px; background:#1565c0; color:white;">Download log</a>
+      </div>
+    </div>
+  </div>
+  <div class="crosshair" id="crosshair" title="aim"></div>
+  <div class="hint" id="hint">WASD to move. Click and drag to look.</div>
+
+  <script type="module">
+    // Load ES modules from CDN
+    import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+    import { CSS2DRenderer, CSS2DObject } from 'https://unpkg.com/three@0.160.0/examples/jsm/renderers/CSS2DRenderer.js?module';
+
+    // Helpers
+    const statusEl = document.getElementById('status');
+    const hintEl = document.getElementById('hint');
+    const startOverlay = document.getElementById('startOverlay');
+    const startBtn = document.getElementById('startBtn');
+    const crosshair = document.getElementById('crosshair');
+
+    function setStatus(text, color = '#9ccc65') { statusEl.textContent = `• ${text}`; statusEl.style.color = color; }
+
+    try { console.assert(!!THREE && !!THREE.Scene, 'THREE failed to load'); setStatus('Modules OK'); } 
+    catch (e) { setStatus('Module load error', '#ff8a80'); console.error(e); }
+
+    // Scene
+    const root = document.getElementById('three-root');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x162416);
+
+    // Camera rig without pointer lock. Yaw on rig, pitch on pivot.
+    const rig = new THREE.Object3D();
+    const pitch = new THREE.Object3D();
+    const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 200);
+    rig.add(pitch); pitch.add(camera);
+    rig.position.set(0, 0, 3.5);
+    pitch.position.set(0, 1.6, 0);
+    scene.add(rig);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    root.appendChild(renderer.domElement);
+
+    // CSS2D name tags
+    const labelRenderer = new CSS2DRenderer();
+    labelRenderer.setSize(window.innerWidth, window.innerHeight);
+    labelRenderer.domElement.style.position = 'fixed';
+    labelRenderer.domElement.style.inset = '0';
+    labelRenderer.domElement.style.pointerEvents = 'none';
+    root.appendChild(labelRenderer.domElement);
+
+    // Lights
+    const hemi = new THREE.HemisphereLight(0xddeeff, 0x101820, 0.9);
+    scene.add(hemi);
+    const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+    dir.position.set(4, 8, 2);
+    scene.add(dir);
+
+    // Room
+    const ROOM = 10; // meters-ish
+    const HALF = ROOM / 2;
+    const room = new THREE.Group();
+    scene.add(room);
+
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0x3c4b3c, metalness: 0, roughness: 0.95 });
+    const floorMat = new THREE.MeshStandardMaterial({ color: 0x2a332a, roughness: 1 });
+    const trimMat  = new THREE.MeshStandardMaterial({ color: 0x7a1414, roughness: 1 });
+
+    const floor = new THREE.Mesh(new THREE.BoxGeometry(ROOM, 0.1, ROOM), floorMat);
+    floor.position.set(0, -0.05, 0);
+    floor.receiveShadow = true;
+    room.add(floor);
+
+    const ceiling = new THREE.Mesh(new THREE.BoxGeometry(ROOM, 0.1, ROOM), new THREE.MeshStandardMaterial({ color: 0xdfe7df }));
+    ceiling.position.set(0, 3, 0);
+    room.add(ceiling);
+
+    const makeWall = (w, h, d, x, y, z) => {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMat);
+      m.position.set(x, y, z);
+      m.castShadow = false; m.receiveShadow = true; return m;
+    };
+    room.add(makeWall(ROOM, 3, 0.2,  0, 1.5, -HALF));
+    room.add(makeWall(ROOM, 3, 0.2,  0, 1.5,  HALF));
+    room.add(makeWall(0.2, 3, ROOM, -HALF, 1.5, 0));
+    room.add(makeWall(0.2, 3, ROOM,  HALF, 1.5, 0));
+
+    // Red trim band
+    const bandLen = ROOM - 0.05;
+    const band = new THREE.Mesh(new THREE.BoxGeometry(bandLen, 0.2, 0.1), trimMat);
+    band.position.set(0, 0.8, -HALF + 0.05); room.add(band.clone());
+    const band2 = band.clone(); band2.position.set(0, 0.8, HALF - 0.05); room.add(band2);
+    const band3 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.2, bandLen), trimMat);
+    band3.position.set(-HALF + 0.05, 0.8, 0); room.add(band3.clone());
+    const band4 = band3.clone(); band4.position.set(HALF - 0.05, 0.8, 0); room.add(band4);
+
+    // Pharm box
+    const pharm = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.7, 0.7), new THREE.MeshStandardMaterial({ color: 0xc62828 }));
+    pharm.position.set(1.4, 0.35, -2.0);
+    room.add(pharm);
+
+    // Nurse avatar
+    const avatar = new THREE.Group();
+    scene.add(avatar);
+
+    const skin = 0xd1b290;
+    const scrubs = 0x1b5e20;
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.0, 0.4), new THREE.MeshStandardMaterial({ color: scrubs }));
+    body.position.y = 0.9;
+    const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), new THREE.MeshStandardMaterial({ color: skin }));
+    head.position.y = 1.55;
+    const armL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.6, 0.18), new THREE.MeshStandardMaterial({ color: scrubs }));
+    armL.position.set(-0.5, 1.0, 0);
+    const armR = armL.clone(); armR.position.x = 0.5;
+    const legL = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.7, 0.22), new THREE.MeshStandardMaterial({ color: scrubs }));
+    legL.position.set(-0.16, 0.35, 0);
+    const legR = legL.clone(); legR.position.x = 0.16;
+
+    avatar.add(body, head, armL, armR, legL, legR);
+    avatar.position.set(-0.6, 0, -2.1);
+
+    // Nurse label
+    const nurseLabelDiv = document.createElement('div');
+    nurseLabelDiv.className = 'label';
+    nurseLabelDiv.textContent = 'Nurse Sarah';
+    const nurseNameLabel = new CSS2DObject(nurseLabelDiv);
+    nurseNameLabel.position.set(0, 1.9, 0);
+    avatar.add(nurseNameLabel);
+
+    // Bed with patient
+    function makePatientBed(x, z) {
+      const g = new THREE.Group();
+
+      // Bed frame
+      const frameMat = new THREE.MeshStandardMaterial({ color: 0x707b7c, roughness: 0.8 });
+      const base = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.2, 0.9), frameMat);
+      base.position.set(0, 0.5, 0);
+      g.add(base);
+
+      // Legs
+      const legGeom = new THREE.BoxGeometry(0.12, 0.5, 0.12);
+      const leg1 = new THREE.Mesh(legGeom, frameMat); leg1.position.set(-1.0, 0.25, -0.35);
+      const leg2 = leg1.clone(); leg2.position.set( 1.0, 0.25, -0.35);
+      const leg3 = leg1.clone(); leg3.position.set(-1.0, 0.25,  0.35);
+      const leg4 = leg1.clone(); leg4.position.set( 1.0, 0.25,  0.35);
+      g.add(leg1, leg2, leg3, leg4);
+
+      // Mattress and pillow
+      const mattress = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.18, 0.8), new THREE.MeshStandardMaterial({ color: 0x99c1a8 }));
+      mattress.position.set(0, 0.7, 0);
+      const pillow = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.12, 0.35), new THREE.MeshStandardMaterial({ color: 0xffffff }));
+      pillow.position.set(0.9, 0.82, 0);
+      g.add(mattress, pillow);
+
+      // Side rails
+      const rail = new THREE.Mesh(new THREE.BoxGeometry(2.15, 0.05, 0.05), frameMat);
+      rail.position.set(0, 0.9, -0.42);
+      const rail2 = rail.clone(); rail2.position.z = 0.42;
+      g.add(rail, rail2);
+
+      // Patient model aligned along the bed X axis
+      const patient = new THREE.Group();
+      const gown = 0x1e88e5;
+
+      // Body is longer along X to match bed length
+      const pBody = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.25, 0.45), new THREE.MeshStandardMaterial({ color: gown }));
+      pBody.name = 'patientBody';
+      pBody.position.set(0.1, 0.86, 0);
+
+      // Head at pillow end
+      const pHead = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.26, 0.26), new THREE.MeshStandardMaterial({ color: 0xd1b290 }));
+      pHead.position.set(0.95, 0.95, 0);
+
+      // Arms along sides
+      const pArmL = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.12, 0.12), new THREE.MeshStandardMaterial({ color: gown }));
+      pArmL.position.set(0.2, 0.86, -0.33);
+      const pArmR = pArmL.clone(); pArmR.position.z = 0.33;
+
+      // Legs covered by a blanket from the waist down
+      const pLegL = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.16, 0.16), new THREE.MeshStandardMaterial({ color: gown }));
+      pLegL.position.set(-0.35, 0.78, -0.12);
+      const pLegR = pLegL.clone(); pLegR.position.z = 0.12;
+
+      // Blanket
+      const blanket = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.06, 0.6), new THREE.MeshStandardMaterial({ color: 0x6aa7c8, transparent: true, opacity: 0.9 }));
+      blanket.position.set(-0.15, 0.92, 0);
+
+      patient.add(pBody, pHead, pArmL, pArmR, pLegL, pLegR, blanket);
+      g.add(patient);
+
+      // Patient label near head
+      const patientLabelDiv = document.createElement('div');
+      patientLabelDiv.className = 'label';
+      patientLabelDiv.textContent = 'Patient 001';
+      const patientLabel = new CSS2DObject(patientLabelDiv);
+      patientLabel.position.set(0.95, 1.1, 0);
+      g.add(patientLabel);
+
+      g.position.set(x, 0, z);
+      return g;
+    }
+    const bed = makePatientBed(-1.5, -2.2);
+    scene.add(bed);
+
+    // Animation state
+    let t = 0;
+
+    // Simple drag to look controller
+    let dragging = false, lastX = 0, lastY = 0;
+    const maxPitch = Math.PI / 2 - 0.05;
+
+    function enableDragLook() {
+      root.style.cursor = 'grab';
+      crosshair.style.display = 'none';
+      hintEl.textContent = 'Drag to look. WASD or arrows to move.';
+
+      const onDown = (e) => { dragging = true; lastX = e.clientX; lastY = e.clientY; root.style.cursor = 'grabbing'; };
+      const onUp = () => { dragging = false; root.style.cursor = 'grab'; };
+      const onMove = (e) => {
+        if (!dragging) return;
+        const dx = e.clientX - lastX; const dy = e.clientY - lastY; lastX = e.clientX; lastY = e.clientY;
+        rig.rotation.y -= dx * 0.0022;
+        pitch.rotation.x = Math.max(-maxPitch, Math.min(maxPitch, pitch.rotation.x - dy * 0.0022));
+      };
+      renderer.domElement.addEventListener('mousedown', onDown);
+      window.addEventListener('mouseup', onUp);
+      window.addEventListener('mousemove', onMove);
+    }
+
+    // Start overlay click: no pointer lock, just enable drag look
+    startBtn.addEventListener('click', () => { startOverlay.style.display = 'none'; enableDragLook(); setStatus('Sandbox safe mode'); });
+
+    const key = { w:false, a:false, s:false, d:false };
+    window.addEventListener('keydown', e => {
+      if (e.code === 'KeyW' || e.code === 'ArrowUp') key.w = true; if (e.code === 'KeyA' || e.code === 'ArrowLeft') key.a = true; if (e.code === 'KeyS' || e.code === 'ArrowDown') key.s = true; if (e.code === 'KeyD' || e.code === 'ArrowRight') key.d = true;
+      if (e.code === 'KeyI') nkey.i = true; if (e.code === 'KeyJ') nkey.j = true; if (e.code === 'KeyK') nkey.k = true; if (e.code === 'KeyL') nkey.l = true; if (e.code === 'KeyU') nkey.u = true; if (e.code === 'KeyO') nkey.o = true;
+    });
+    window.addEventListener('keyup',   e => {
+      if (e.code === 'KeyW' || e.code === 'ArrowUp') key.w = false; if (e.code === 'KeyA' || e.code === 'ArrowLeft') key.a = false; if (e.code === 'KeyS' || e.code === 'ArrowDown') key.s = false; if (e.code === 'KeyD' || e.code === 'ArrowRight') key.d = false;
+      if (e.code === 'KeyI') nkey.i = false; if (e.code === 'KeyJ') nkey.j = false; if (e.code === 'KeyK') nkey.k = false; if (e.code === 'KeyL') nkey.l = false; if (e.code === 'KeyU') nkey.u = false; if (e.code === 'KeyO') nkey.o = false;
+    });
+
+    const speed = 2.8;
+    const bounds = { minX: -HALF + 0.5, maxX: HALF - 0.5, minZ: -HALF + 0.5, maxZ: HALF - 0.5 };
+
+    // Nurse movement state
+    const nkey = { i:false, j:false, k:false, l:false, u:false, o:false };
+    const nurseSpeed = 1.8; // m/s
+    const nurseRotSpeed = 1.8; // rad/s
+    let followNurse = false;
+
+    function moveNurse(dt) {
+      // Rotation input
+      if (nkey.u) avatar.rotation.y += nurseRotSpeed * dt; // turn left
+      if (nkey.o) avatar.rotation.y -= nurseRotSpeed * dt; // turn right
+
+      // Direction vectors from nurse yaw
+      const yaw = avatar.rotation.y;
+      const forwardN = new THREE.Vector3(Math.sin(yaw), 0, -Math.cos(yaw));
+      const rightN = new THREE.Vector3().crossVectors(forwardN, new THREE.Vector3(0,1,0)).negate();
+
+      const v = new THREE.Vector3();
+      if (nkey.i) v.add(forwardN);
+      if (nkey.k) v.sub(forwardN);
+      if (nkey.j) v.sub(rightN);
+      if (nkey.l) v.add(rightN);
+      if (v.lengthSq() > 0) v.normalize().multiplyScalar(nurseSpeed * dt);
+
+      avatar.position.add(v);
+      // Clamp nurse inside room bounds
+      avatar.position.x = Math.max(bounds.minX+0.25, Math.min(bounds.maxX-0.25, avatar.position.x));
+      avatar.position.z = Math.max(bounds.minZ+0.25, Math.min(bounds.maxZ-0.25, avatar.position.z));
+    }
+
+    const upAxis = new THREE.Vector3(0,1,0);
+    function updateCameraFollow() {
+      const offset = new THREE.Vector3(0, 0, 2.6); // behind the nurse
+      offset.applyAxisAngle(upAxis, avatar.rotation.y);
+      const target = new THREE.Vector3().copy(avatar.position).add(offset);
+      rig.position.x = Math.max(bounds.minX+0.3, Math.min(bounds.maxX-0.3, target.x));
+      rig.position.z = Math.max(bounds.minZ+0.3, Math.min(bounds.maxZ-0.3, target.z));
+      // keep rig.y fixed so pitch child keeps camera height at 1.6
+    }
+
+    function move(dt) {
+      // Compute local forward from yaw only
+      const forward = new THREE.Vector3(Math.sin(rig.rotation.y), 0, Math.cos(rig.rotation.y) * -1);
+      const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0,1,0)).negate();
+
+      const vel = new THREE.Vector3();
+      if (key.w) vel.add(forward);
+      if (key.s) vel.sub(forward);
+      if (key.a) vel.sub(right);
+      if (key.d) vel.add(right);
+      if (vel.lengthSq() > 0) vel.normalize().multiplyScalar(speed * dt);
+
+      rig.position.add(vel);
+      rig.position.x = Math.max(bounds.minX+0.3, Math.min(bounds.maxX-0.3, rig.position.x));
+      rig.position.z = Math.max(bounds.minZ+0.3, Math.min(bounds.maxZ-0.3, rig.position.z));
+    }
+
+    // Resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      labelRenderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // UI
+    const log = document.getElementById('log');
+    const tray = document.getElementById('tray');
+    // Inject Nurse control UI without changing existing markup
+    const nurseUI = document.createElement('div');
+    nurseUI.innerHTML = `
+      <div style="margin-top:10px; font-size:12px; opacity:0.9;">Nurse control</div>
+      <div class="btns" style="margin-top:6px;">
+        <button id="followBtn" class="secondary">Follow nurse: Off</button>
+        <button id="resetNurseBtn">Reset nurse</button>
+      </div>
+      <div style="font-size:11px; opacity:0.8; margin-top:6px;">Move nurse with I J K L. Rotate with U and O.</div>
+    `;
+    tray.appendChild(nurseUI);
+    const followBtn = document.getElementById('followBtn');
+    const resetNurseBtn = document.getElementById('resetNurseBtn');
+    tray.addEventListener('click', e => {
+      const btn = e.target.closest('button');
+      if (!btn || !btn.dataset.action) return;
+      const action = btn.dataset.action;
+      const now = new Date().toLocaleTimeString();
+      const msgs = {
+        adrenaline: '[STT] Give intramuscular adrenaline now.',
+        oxygen: '[STT] Start high flow oxygen.',
+        cannula: 'Place a large bore IV cannula, prepare bloods.',
+        fluids: 'Give IV fluids, monitor BP and urine output.'
+      };
+      log.textContent = `[${now}] ${msgs[action]}\n` + log.textContent;
+      logEvent('action', { action });
+    });
+
+    const recordBtn = document.getElementById('recordBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    let recording = false;
+    let events = [];
+    let sampleTimer = null;
+
+    function logEvent(type, data = {}) {
+      const entry = { t: new Date().toISOString(), type, ...data };
+      events.push(entry);
+      if (type !== 'pos') {
+        const now = new Date().toLocaleTimeString();
+        log.textContent = `[${now}] ${type === 'action' ? data.action : type}\n` + log.textContent;
+      }
+    }
+
+    function startSampling() {
+      if (sampleTimer) return;
+      sampleTimer = setInterval(() => {
+        logEvent('pos', { x: rig.position.x, y: rig.position.y, z: rig.position.z, yaw: rig.rotation.y, pitch: pitch.rotation.x });
+      }, 300);
+    }
+    function stopSampling() { if (sampleTimer) { clearInterval(sampleTimer); sampleTimer = null; } }
+
+    recordBtn.addEventListener('click', () => {
+      recording = !recording;
+      recordBtn.textContent = recording ? 'Stop' : 'Record';
+      recordBtn.classList.toggle('secondary', recording);
+      if (recording) {
+        events = [];
+        downloadBtn.style.display = 'none';
+        logEvent('record_start');
+        startSampling();
+      } else {
+        stopSampling();
+        logEvent('record_stop');
+        const blob = new Blob([JSON.stringify({ events }, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        downloadBtn.href = url;
+        downloadBtn.download = `session-log-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+        downloadBtn.style.display = 'inline-block';
+      }
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      const href = downloadBtn.href; setTimeout(() => URL.revokeObjectURL(href), 4000);
+    });
+
+    // Nurse control buttons
+    followBtn.addEventListener('click', () => {
+      followNurse = !followNurse;
+      followBtn.textContent = `Follow nurse: ${followNurse ? 'On' : 'Off'}`;
+      followBtn.classList.toggle('secondary', !followNurse);
+    });
+    resetNurseBtn.addEventListener('click', () => {
+      avatar.position.set(-0.6, 0, -2.1);
+      avatar.rotation.set(0, 0, 0);
+    });
+
+    // Self tests
+    function countLabelsByText(text) { return Array.from(document.querySelectorAll('.label')).filter(e => e.textContent.trim() === text).length; }
+    console.assert(countLabelsByText('Nurse Sarah') === 1, 'Expected a single Nurse Sarah label');
+    console.assert(scene.children.length > 0 && bed, 'Scene failed to initialize bed');
+    console.assert(rig.children.includes(pitch) && pitch.children.includes(camera), 'Camera rig not set up correctly');
+    console.assert(floor.geometry.parameters.width === ROOM, 'Room size not applied');
+    console.assert(bounds.minX < 0 && bounds.maxX > 0 && Math.abs(bounds.minX) < 6, 'Bounds reflect compact room');
+    const patientBody = bed.getObjectByName('patientBody');
+    if (patientBody && patientBody.geometry && patientBody.geometry.parameters) {
+      console.assert(patientBody.geometry.parameters.width > patientBody.geometry.parameters.depth, 'Patient body should be aligned along bed length');
+    }
+    // extra test: clicking an action button should log an action
+    const before = events.length;
+    document.querySelector('[data-action="adrenaline"]').dispatchEvent(new Event('click', { bubbles: true }));
+    console.assert(events.length > before && events.some(e => e.type === 'action'), 'Action logging did not fire');
+
+    // Test that nurse motion function moves avatar forward
+    const nurseBefore = avatar.position.clone();
+    nkey.i = true; moveNurse(0.2); nkey.i = false;
+    console.assert(avatar.position.distanceTo(nurseBefore) > 0.01, 'Nurse did not move forward during test');
+    // Test nurse rotation left on U
+    const yawBefore = avatar.rotation.y;
+    nkey.u = true; moveNurse(0.2); nkey.u = false;
+    console.assert(avatar.rotation.y > yawBefore, 'Nurse did not rotate left during test');
+    // Test follow places camera a reasonable distance behind nurse
+    const rigBefore = rig.position.clone();
+    followNurse = true; updateCameraFollow();
+    const d = rig.position.distanceTo(avatar.position);
+    console.assert(d > 1.5 && d < 3.4, 'Follow offset outside expected range');
+    followNurse = false; rig.position.copy(rigBefore);
+    // Test record start and stop toggles download visibility
+    const dispBefore = downloadBtn.style.display;
+    recordBtn.click(); // start
+    console.assert(recording === true, 'Recording did not start');
+    recordBtn.click(); // stop
+    console.assert(recording === false && downloadBtn.style.display === 'inline-block', 'Download not shown after stop');
+    downloadBtn.style.display = dispBefore;
+
+    // Loop
+    let last = performance.now();
+    function animate(now = performance.now()) {
+      const dt = Math.min(0.033, (now - last) / 1000);
+      last = now;
+
+      t += dt;
+      head.position.y = 1.55 + Math.sin(t * 2) * 0.02;
+      armL.rotation.z = Math.sin(t * 2) * 0.05;
+      armR.rotation.z = -Math.sin(t * 2) * 0.05;
+
+      move(dt);
+      moveNurse(dt);
+      if (followNurse) updateCameraFollow();
+      renderer.render(scene, camera);
+      labelRenderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
+</body>
+</html>

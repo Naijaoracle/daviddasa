@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>David Dasa - Miniature Map CV</title>
+  <link rel="icon" type="image/svg+xml" href="/src/favicon-DD-monogram.svg">
+  <link rel="alternate icon" href="/src/favicon.ico">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <style>
+    html, body { height: 100%; margin: 0; background: #e8f2fb; color: #0b1114; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial; overflow: hidden; }
+    body, #joysticks { touch-action: none; }
+    #three-root { position: fixed; inset: 0; }
+
+    .hud { position: fixed; left: 12px; top: 12px; background: rgba(255,255,255,0.75); border: 1px solid rgba(0,0,0,0.1); color: #0b1114; border-radius: 10px; padding: 10px 12px; pointer-events: none; font-size: 12px; z-index: 5; backdrop-filter: blur(4px); }
+    .hud b { font-size: 14px; }
+
+    .tray { position: fixed; right: 12px; top: 12px; display:flex; gap:8px; z-index: 5; }
+    .btn { appearance: none; border: 1px solid rgba(0,0,0,0.12); background: rgba(255,255,255,0.85); color: #0b1114; border-radius: 10px; padding: 8px 10px; cursor: pointer; font-weight: 700; backdrop-filter: blur(4px); }
+    .btn.primary { background: #ffd36b; border-color: rgba(0,0,0,0.08); }
+    .btn:active { transform: translateY(1px); }
+
+    .label { background: rgba(255,255,255,0.85); border: 1px solid rgba(0,0,0,0.12); border-radius: 8px; padding: 3px 6px; font-size: 12px; color: #0b1114; white-space: nowrap; box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+    .pop { max-width: 560px; background: #ffffff; color:#0b1114; border: 1px solid #d6e7f2; border-radius: 12px; padding: 12px; box-shadow: 0 18px 40px rgba(0,0,0,0.15); font-size: 14px; }
+    .pop h3 { margin: 0 0 6px; font-size: 16px; letter-spacing: .3px; }
+    .pop .meta { font-size: 12px; opacity: 0.9; margin-bottom: 8px; }
+    .pop ul { margin: 0 0 0 18px; padding: 0; }
+    .pop a { color: #0a6cd6; text-decoration: none; }
+    .pop .chips { margin-top: 6px; display:flex; flex-wrap:wrap; gap:6px; }
+    .chip { background: rgba(10,108,214,0.08); border:1px solid rgba(10,108,214,0.25); border-radius:999px; padding:2px 8px; font-size:12px; }
+    .pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; white-space: pre-wrap; line-height: 1.25; }
+
+    #start { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,0.15); z-index: 10; }
+    #start .card { width: 360px; background: #ffffff; color:#0b1114; border: 1px solid #cfe3ee; border-radius: 12px; padding: 16px; box-shadow: 0 20px 50px rgba(0,0,0,.15); text-align: center; }
+    #start button { margin-top: 10px; width: 100%; }
+
+    .stripe { position: fixed; left: 50%; transform: translateX(-50%); bottom: 12px; background: rgba(255,255,255,0.85); color: #0b1114; padding: 6px 10px; border-radius: 10px; font-size: 12px; pointer-events:none; z-index: 4; border:1px solid rgba(0,0,0,0.1); }
+
+    #mini { position: fixed; right: 12px; bottom: 12px; width: 180px; height: 130px; background: rgba(255,255,255,0.85); border:1px solid rgba(0,0,0,0.12); border-radius: 8px; z-index: 5; }
+
+    #fallbackBanner { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: #f6fbff; z-index: 20; }
+    #fallbackBanner .inner { background:#ffffff; border:1px solid #d5e6f2; padding:18px 20px; border-radius:12px; max-width:560px; text-align:center; box-shadow:0 12px 30px rgba(0,0,0,.12); }
+    #fallbackBanner .altCanvas { width: 92vw; height: 66vh; border-radius: 10px; border: 1px dashed #bcd4e1; margin-top: 10px; background: linear-gradient(180deg,#eef6fb,#f9fcff); }
+
+    #joysticks { position: fixed; inset: 0; z-index: 6; display: none; }
+    .joy { position: absolute; width: 120px; height: 120px; border-radius: 60px; background: rgba(255,255,255,0.35); border: 1px solid rgba(0,0,0,0.15); box-shadow: 0 8px 30px rgba(0,0,0,0.12); pointer-events: auto; }
+    #joyL { left: 16px; bottom: 16px; }
+    #joyR { right: 16px; bottom: 16px; }
+    .knob { position: absolute; width: 56px; height: 56px; border-radius: 28px; left: 50%; top: 50%; transform: translate(-50%,-50%); background: rgba(255,255,255,0.95); border: 1px solid rgba(0,0,0,0.12); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+    .touch-hint { position: fixed; left: 50%; transform: translateX(-50%); bottom: 140px; background: rgba(255,255,255,0.85); border:1px solid rgba(0,0,0,0.1); border-radius: 10px; padding: 6px 10px; font-size: 12px; z-index: 6; display: none; }
+  </style>
+</head>
+<body>
+  <div id="three-root"></div>
+  <canvas id="mini"></canvas>
+  <div class="hud" id="hud"><b>Miniature CV Map</b><br>WASD or arrow keys to walk. Drag to look. On mobile use left pad to move, right pad to look. You stay on the road and sidewalks. Reach the end to loop back to the start. Press T for tests. Press M to toggle camera.</div>
+  <div class="tray">
+    <button class="btn" id="reset">Reset</button>
+    <button class="btn" id="toggleCam">Camera: Follow</button>
+    <button class="btn primary" id="tests">Run tests</button>
+  </div>
+  <div id="start">
+    <div class="card">
+      <div style="font-weight:800; font-size:18px;">Click to start</div>
+      <div style="margin-top:6px; font-size:13px; opacity:0.9;">Welcome to a bright diorama of David's CV. Main road runs down the middle, sidewalks lead to each section. Step near a section to see details.</div>
+      <button class="btn primary" id="go">Enter</button>
+    </div>
+  </div>
+  <div id="fallbackBanner">
+    <div class="inner">
+      <div style="font-weight:800; font-size:18px;">Interactive 3D temporarily unavailable</div>
+      <div style="margin-top:6px; font-size:13px; opacity:0.9;">
+        Your browser did not grant a WebGL context. You can still browse a simplified 2D map with the same layout and popups.
+      </div>
+      <canvas id="alt2d" class="altCanvas" aria-label="2D CV Map"></canvas>
+      <div style="margin-top:8px; font-size:12px; opacity:.8;">Tip: try a modern browser with WebGL enabled for the full experience.</div>
+    </div>
+  </div>
+  <div class="stripe">Chronology guide: earliest near the gate, latest near the arch</div>
+
+  <div id="joysticks">
+    <div class="joy" id="joyL"><div class="knob" id="knobL"></div></div>
+    <div class="joy" id="joyR"><div class="knob" id="knobR"></div></div>
+  </div>
+  <div class="touch-hint" id="touchHint">Move left, look right</div>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+    import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+    let hemi, sun, sunBall, asphaltTex, concreteTex, grassTex, facadeTex;
+
+    function canMakeWebGL(){
+      try{
+        const testCanvas = document.createElement('canvas');
+        const opts = { alpha:false, antialias:false, depth:true, stencil:false, preserveDrawingBuffer:false, powerPreference:'low-power', desynchronized:true };
+        const gl = testCanvas.getContext('webgl2', opts) || testCanvas.getContext('webgl', opts) || testCanvas.getContext('experimental-webgl', opts);
+        if (gl && typeof gl.getExtension === 'function'){ gl.getExtension('WEBGL_lose_context')?.loseContext?.(); }
+        return !!gl;
+      } catch(e){ return false; }
+    }
+
+    function makeNoiseTexture(size=256, base='#9aa7af', variance=12){
+      const c = document.createElement('canvas'); c.width = c.height = size; const ctx = c.getContext('2d');
+      const img = ctx.createImageData(size, size); const baseCol = hexToRgb(base);
+      for(let y=0;y<size;y++) for(let x=0;x<size;x++){
+        const i=(y*size+x)*4; const n=(Math.random()*2-1)*variance; img.data[i]=clamp(baseCol.r+n,0,255); img.data[i+1]=clamp(baseCol.g+n,0,255); img.data[i+2]=clamp(baseCol.b+n,0,255); img.data[i+3]=255;
+      }
+      ctx.putImageData(img,0,0);
+      const tex = new THREE.CanvasTexture(c); tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.anisotropy = 4; tex.colorSpace = THREE.SRGBColorSpace; return tex;
+    }
+    function makeGridTexture(size=256, tiles=8, grid='#cfd7dc', fill='#e7ecef'){
+      const c=document.createElement('canvas'); c.width=c.height=size; const ctx=c.getContext('2d');
+      ctx.fillStyle=fill; ctx.fillRect(0,0,size,size);
+      ctx.strokeStyle=grid; ctx.lineWidth=1;
+      const step=size/tiles; ctx.beginPath(); for(let i=0;i<=tiles;i++){ const p=i*step; ctx.moveTo(0,p); ctx.lineTo(size,p); ctx.moveTo(p,0); ctx.lineTo(p,size);} ctx.stroke();
+      const tex=new THREE.CanvasTexture(c); tex.wrapS=tex.wrapT=THREE.RepeatWrapping; tex.anisotropy=4; tex.colorSpace=THREE.SRGBColorSpace; return tex;
+    }
+    function hexToRgb(h){ const n=parseInt(h.replace('#',''),16); return { r:(n>>16)&255, g:(n>>8)&255, b:n&255}; }
+    function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+
+    const CV = {
+      name: 'David Dasa',
+      role: 'Medical Doctor, MSc Digital Health & AI, PhD Researcher',
+      contact: { linkedin: 'https://www.linkedin.com/in/daviddasa' },
+      sections: [
+        { key:'2012-2018_education_mbbs', title:'MBBS - Usmanu Danfodiyo University', years:'2012 - 2018', sortDate:'2012-03-01', bullets:['Merit classification','Rotations: internal medicine, surgery, paediatrics, O&G, pathology, radiology, biostatistics'] },
+        { key:'2016_volunteering_cmda', title:'Mission Secretary - CMDA Sokoto', years:'2016', sortDate:'2016-06-01', bullets:['Led rural outreach: 47 free surgeries and 500+ consultations'] },
+        { key:'2018-2020_experience_houseofficer', title:'House Officer, Junior Doctor - Nigeria', years:'2018 - 2020', sortDate:'2018-01-01', bullets:['Foundation rotations across internal medicine, surgery, paediatrics, obstetrics and gynaecology'] },
+        { key:'2020-2022_experience_kebbi', title:'Medical Officer - Kebbi State Ministry of Health', years:'2020 - 2022', sortDate:'2020-01-01', bullets:['Supervised rural hospital, outpatient and inpatient care','Basic surgical procedures, trained 79 community health workers'] },
+        { key:'2022-2023_experience_rmo', title:'Resident Medical Officer - RMO International, UK', years:'2022 - 2023', sortDate:'2022-01-01', bullets:['Managed emergencies and post operative care'] },
+        { key:'2023-2024_education_msc', title:'MSc Digital Health & AI - Bournemouth University', years:'2023 - 2024', sortDate:'2023-09-01', bullets:['Distinction 79.9%','Dissertation: contactless BP screening (rPPG) in Nigeria, equity and deployment constraints','Projects: PyTorch chest X ray classifier, TensorFlow skin disease model, Blockchain Go Quorum security for remote monitoring'] },
+        { key:'2023-present_experience_uhd', title:'Medical Bank Doctor - University Hospitals Dorset NHS FT', years:'2023 - present', sortDate:'2023-11-01', bullets:['Acute ward work across surgical specialties, VTE assessments, safe prescribing'] },
+        { key:'2024-present_education_phd', title:'PhD Researcher - Bournemouth University', years:'2024 - present', sortDate:'2024-11-01', bullets:['Unity based VR training system with AI driven NPCs','Study of teamwork, reasoning, and safe decision making in XR training'] },
+        { key:'2025-present_experience_scale', title:'Medical Fellow - Scale AI (Human Frontier Collective)', years:'2025 - present', sortDate:'2025-01-01', bullets:['Designed 100+ clinical rubric criteria and multi specialty scenarios','Built error taxonomies and collaborated with physicians, researchers, and engineers'] },
+        { key:'2025-present_experience_invisible', title:'Clinical AI Evaluator - Invisible Technologies', years:'2025 - present', sortDate:'2025-05-01', bullets:['Evaluate LLMs on clinical vignettes for safety and accuracy'] },
+        { key:'2025_publications_xr_npc', title:'Publication - AI driven characters in XR healthcare simulations', years:'2025', sortDate:'2025-07-01', bullets:['Systematic review in Artificial Intelligence in Medicine','DASEX framework and meta analysis'], link:'https://doi.org/10.1016/j.artmed.2025.103270' },
+        { key:'2025_publications_rppg', title:'Preprint - Equity and feasibility of rPPG in Nigeria', years:'2025', sortDate:'2025-10-13', bullets:['Multi site field evaluation, equity benchmarks for rPPG in low resource clinics'], link:'https://doi.org/10.1101/2025.10.13.25337878' },
+        { key:'awards', title:'Awards and Certificates', years:'2014 - 2024', sortDate:'2014-01-01', bullets:['XR NPC PhD Studentship 2024','GMC UK full license 2022, ALS 2022','National Merit Scholarship 2014'] }
+      ],
+      summary: 'Clinician researcher in digital health, AI, and XR with 7+ years of clinical practice. Focus on safe, equitable, and scalable intelligent health systems'
+    };
+
+    // Base data must be available before any fallback or 3D path references it
+    const baseData = [
+      { key:'summary', title:'Professional Summary', years:'Profile', sortDate:'2011-01-01', bullets:[CV.summary], kind:'plaque' },
+      { key:'contact', title:'Contact and Links', years:CV.role, sortDate:'2011-01-02', bullets:['LinkedIn profile'], kind:'plaque' },
+      ...CV.sections.map(s => ({ ...s, kind:'house' }))
+    ].sort((a,b)=> new Date(a.sortDate) - new Date(b.sortDate));
+
+    const root = document.getElementById('three-root');
+    const scene = new THREE.Scene(); scene.background = new THREE.Color(0xeaf4ff);
+    scene.fog = new THREE.FogExp2(0xdbefff, 0.012);
+
+    const rig = new THREE.Object3D();
+    const pitch = new THREE.Object3D();
+    const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 400);
+    rig.add(pitch); pitch.add(camera); scene.add(rig);
+    rig.position.set(0, 0, 10); pitch.position.set(0, 1.25, 0);
+
+    let renderer = null;
+    function tryCreateRenderer(){
+      try{
+        renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false, powerPreference: 'low-power', stencil: false, depth: true, preserveDrawingBuffer: false, failIfMajorPerformanceCaveat: false });
+        renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        root.appendChild(renderer.domElement);
+        return true;
+      }catch(e){ renderer = null; return false; }
+    }
+
+    const labelRenderer = new CSS2DRenderer();
+    labelRenderer.setSize(window.innerWidth, window.innerHeight);
+    labelRenderer.domElement.style.position = 'fixed';
+    labelRenderer.domElement.style.inset = '0';
+    labelRenderer.domElement.style.pointerEvents = 'none';
+    root.appendChild(labelRenderer.domElement);
+
+    let startLoop = ()=>{};
+
+    if (!canMakeWebGL() || !tryCreateRenderer()){
+      document.getElementById('fallbackBanner').style.display = 'flex';
+      setup2DFallback();
+      bootstrapCommonWithout3D();
+    } else {
+      init3DWorld();
+      startLoop();
+    }
+
+    function setup2DFallback(){
+      const cvs = document.getElementById('alt2d');
+      const ctx = cvs.getContext('2d');
+      const DPR = Math.min(window.devicePixelRatio||1, 2);
+      function resize2d(){ cvs.width = cvs.clientWidth * DPR; cvs.height = cvs.clientHeight * DPR; ctx.setTransform(DPR,0,0,DPR,0,0); draw2d(); }
+      window.addEventListener('resize', resize2d);
+
+      const LANE_X = [-120, 120]; const startY = 40; const stepY = 48; const roadW = 80;
+      function draw2d(){
+        ctx.clearRect(0,0,cvs.width, cvs.height);
+        ctx.fillStyle = '#9aa7af'; ctx.fillRect(cvs.width/2 - roadW/2, 0, roadW, cvs.height);
+        data2d().forEach((e,i)=>{
+          const lane = i % 2; const x = cvs.width/2 + LANE_X[lane]; const y = startY + i*stepY;
+          ctx.fillStyle = '#E0E7EA'; const swX = lane? cvs.width/2 + roadW/2 : cvs.width/2 - roadW/2 - 140; const swW = Math.abs(x - swX) - 16; ctx.fillRect(Math.min(x,swX), y-6, swW, 12);
+          ctx.fillStyle = '#8aa6b2'; ctx.fillRect(x-28, y-18, 56, 36);
+          ctx.fillStyle = '#0b1114'; ctx.font = '12px system-ui, sans-serif'; ctx.fillText(e.title, x-28, y-26);
+          ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillText(e.years, x-28, y-14);
+        });
+      }
+      function data2d(){
+        return [
+          { key:'summary', title:'Professional Summary', years:'Profile', sortDate:'2011-01-01' },
+          { key:'contact', title:'Contact and Links', years:CV.role, sortDate:'2011-01-02' },
+          ...CV.sections
+        ].sort((a,b)=> new Date(a.sortDate) - new Date(b.sortDate));
+      }
+      resize2d();
+
+      window.addEventListener('keydown', e=>{ const k=(e.key||'').toLowerCase(); const d = (k==='w'||k==='arrowup')?-20:(k==='s'||k==='arrowdown')?20:0; if(d){ ctx.translate(0,d); draw2d(); e.preventDefault(); }});
+    }
+
+    function bootstrapCommonWithout3D(){
+      document.getElementById('tests').addEventListener('click', ()=>{
+        const results = [];
+        results.push(['THREE present', !!THREE && !!THREE.Scene]);
+        results.push(['baseData ready', Array.isArray(baseData) && baseData.length === (2 + CV.sections.length)]);
+        results.push(['POI count', baseData.length === (2 + CV.sections.length)]);
+        const sorted = baseData.every((e,i,arr)=> i===0 || (new Date(arr[i-1].sortDate) <= new Date(e.sortDate)));
+        results.push(['Chronology sorted', sorted]);
+        results.push(['startLoop defined', true]);
+        alert(results.map(r=>`- ${r[0]}: ${r[1] ? 'ok' : 'fail'}`).join('\n'));
+      });
+      document.getElementById('start').style.display = 'none';
+    }
+
+    function init3DWorld(){
+      // Lights and sky
+      hemi = new THREE.HemisphereLight(0xffffff, 0xd6eadf, 0.9); scene.add(hemi);
+      sun = new THREE.DirectionalLight(0xfff2c0, 1.15); sun.position.set(14, 22, 8); sun.castShadow = true; scene.add(sun);
+      sun.shadow.mapSize.set(1024,1024); sun.shadow.camera.near = 1; sun.shadow.camera.far = 80; sun.shadow.radius = 1.6;
+      sunBall = new THREE.Mesh(new THREE.SphereGeometry(0.7, 20, 20), new THREE.MeshBasicMaterial({ color: 0xfff2c0 })); sunBall.position.copy(sun.position).multiplyScalar(0.6); scene.add(sunBall);
+
+      // Textures
+      asphaltTex = makeNoiseTexture(256, '#9aa7af', 10); asphaltTex.repeat.set(4, 16);
+      concreteTex = makeGridTexture(256, 10, '#cad3d8', '#e6ecef'); concreteTex.repeat.set(2, 4);
+      grassTex = makeNoiseTexture(256, '#cfe8d5', 10); grassTex.repeat.set(6, 12);
+      facadeTex = makeNoiseTexture(256, '#8aa6b2', 8);
+
+      // Ground
+      const ground = new THREE.Mesh(new THREE.BoxGeometry(36, 1, 82), new THREE.MeshStandardMaterial({ map: grassTex, color: 0xffffff, roughness: 0.95 }));
+      ground.position.set(0, -0.6, -20); ground.receiveShadow = true; scene.add(ground);
+
+      // Road
+      const ROAD_W = 2.6; const ROAD_L = 92; const ROAD_Z = -20; window.__ROAD = {ROAD_W, ROAD_L, ROAD_Z};
+      function road(w, l, x, z){
+        const m = new THREE.Mesh(new THREE.BoxGeometry(w, 0.045, l), new THREE.MeshStandardMaterial({ map: asphaltTex, roughness: 0.95, metalness: 0.05 }));
+        m.position.set(x, 0, z); m.receiveShadow = true; scene.add(m);
+        const dashGroup = new THREE.Group(); const dashMat = new THREE.MeshStandardMaterial({ color: 0xf8f8f2, emissive: 0xffffff, emissiveIntensity: 0.25, roughness: 0.7 });
+        const dashGeom = new THREE.BoxGeometry(0.15, 0.01, 0.9);
+        for(let dz=-(l/2)+1; dz<l/2; dz+=2.2){ const d = new THREE.Mesh(dashGeom, dashMat); d.position.set(0, 0.028, dz); dashGroup.add(d); }
+        m.add(dashGroup);
+        const edgeGeom = new THREE.BoxGeometry(0.06, 0.01, l-0.6);
+        const edgeMat = new THREE.MeshStandardMaterial({ color: 0xeef2f5, emissive: 0xffffff, emissiveIntensity: 0.12, roughness: 0.7 });
+        const left = new THREE.Mesh(edgeGeom, edgeMat); left.position.set(-w/2+0.03, 0.028, 0);
+        const right = new THREE.Mesh(edgeGeom, edgeMat); right.position.set(w/2-0.03, 0.028, 0);
+        m.add(left, right);
+        return m;
+      }
+      road(ROAD_W, ROAD_L, 0, ROAD_Z);
+
+      // Plazas and buildings
+      function plaza(w, l, x, z){ const m = new THREE.Mesh(new THREE.BoxGeometry(w, 0.03, l), new THREE.MeshStandardMaterial({ map: concreteTex, roughness: 0.9 })); m.position.set(x, 0.01, z); m.receiveShadow = true; scene.add(m); return m; }
+
+      function building(w, h, d){
+        const g = new THREE.Group();
+        const baseGeom = new RoundedBoxGeometry(w, h, d, 6, Math.min(w,d)*0.08); baseGeom.translate(0, h/2, 0);
+        const base = new THREE.Mesh(baseGeom, new THREE.MeshStandardMaterial({ map: facadeTex, color: 0xffffff, roughness: 0.9, metalness: 0.02 })); base.castShadow = base.receiveShadow = true; g.add(base);
+        const roof = new THREE.Mesh(new THREE.BoxGeometry(w*1.05, 0.06, d*1.05), new THREE.MeshStandardMaterial({ color: 0x748c98, roughness: 0.5 })); roof.position.y = h + 0.035; roof.castShadow = roof.receiveShadow = true; g.add(roof);
+        const winMat = new THREE.MeshStandardMaterial({ color: 0xbfd9ff, emissive: 0xa6c8ff, emissiveIntensity: 0.15, roughness: 0.2, metalness: 0.1 });
+        const win = new THREE.Mesh(new THREE.BoxGeometry(w*0.7, 0.08, 0.02), winMat); win.position.set(0, h*0.65, d/2 + 0.011); g.add(win);
+        return g;
+      }
+
+      function plaque(text){ const g = new THREE.Group(); const slab = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.04, 0.4), new THREE.MeshStandardMaterial({ map: concreteTex, roughness: 0.9 })); slab.position.y = 0.02; slab.castShadow = slab.receiveShadow = true; g.add(slab); const d = document.createElement('div'); d.className = 'label'; d.textContent = text; const lbl = new CSS2DObject(d); lbl.position.set(0, 0.42, 0.1); g.add(lbl); return g; }
+
+      // Skill towers data
+      const TOWERS = [
+        {
+          key: 'tower_ai',
+          title: 'Clinical AI & Safety Skills',
+          z: -12,
+          side: -1,
+          desc: 'Safe deployment and evaluation of AI in healthcare environments.',
+          skills: [
+            '▰▰▰▰▰ Clinical AI Safety',
+            '▰▰▰▰▰ AI Model Evaluation',
+            '▰▰▰▰▰ Clinical Scenario Design',
+            '▰▰▰▰◯ AI Ethics',
+            '▰▰▰▰▰ Human-AI Teamwork'
+          ]
+        },
+        {
+          key: 'tower_impl',
+          title: 'Technical Implementation Skills',
+          z: -24,
+          side: 1,
+          desc: 'From research prototypes to functional demos across XR and ML.',
+          skills: [
+            '▰▰▰▰▰ PyTorch',
+            '▰▰▰▰▰ Virtual Reality (VR)',
+            '▰▰▰▰◯ Simulation Design',
+            '▰▰▰◯◯ Google Cloud Platform (GCP)',
+            '▰▰▰▰◯ Clinical Data Analysis'
+          ]
+        },
+        {
+          key: 'tower_clin',
+          title: 'Clinical Excellence Skills',
+          z: -36,
+          side: -1,
+          desc: 'Hands-on clinical experience across emergency and ward settings.',
+          skills: [
+            '▰▰▰▰▰ Advanced Life Support',
+            '▰▰▰▰▰ Clinical Procedures',
+            '▰▰▰▰▰ Emergency Medicine',
+            '▰▰▰▰▰ Patient Management (7+ Years Experience)'
+          ]
+        },
+        {
+          key: 'tower_res',
+          title: 'Research Skills & Publications',
+          z: -48,
+          side: 1,
+          desc: 'Methodical research, writing, and dissemination.',
+          skills: [
+            'Peer-reviewed publications',
+            'Systematic reviews',
+            'Study design and statistics'
+          ]
+        }
+      ];
+
+      // Touch sticks
+      const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints>0);
+      const joyMove = { x:0, y:0 };
+      const joyLook = { x:0, y:0 };
+      function setupJoysticks(){
+        const js = document.getElementById('joysticks'); const l = document.getElementById('joyL'); const r = document.getElementById('joyR'); const kl = document.getElementById('knobL'); const kr = document.getElementById('knobR'); const hint = document.getElementById('touchHint');
+        js.style.display = 'block'; hint.style.display = 'block'; setTimeout(()=>{ hint.style.display='none'; }, 4000);
+        function bind(el, knob, onChange){ let act=false, cx=0, cy=0; const max=48; const reset=()=>{ knob.style.left='50%'; knob.style.top='50%'; onChange(0,0); }; const pos=(x,y)=>{ knob.style.left=(x+cx)+'px'; knob.style.top=(y+cy)+'px'; };
+          el.addEventListener('touchstart', ev=>{ const r=el.getBoundingClientRect(); cx=r.width/2; cy=r.height/2; act=true; pos(0,0); ev.preventDefault(); }, {passive:false});
+          el.addEventListener('touchmove', ev=>{ if(!act) return; const t=ev.changedTouches[0]; const r=el.getBoundingClientRect(); const dx=t.clientX - (r.left + r.width/2); const dy=t.clientY - (r.top + r.height/2); const len=Math.hypot(dx,dy); const scl = len>max? max/len : 1; const nx=dx*scl, ny=dy*scl; pos(nx, ny); onChange(nx/max, ny/max); ev.preventDefault(); }, {passive:false});
+          el.addEventListener('touchend', ()=>{ act=false; reset(); }, {passive:false});
+          el.addEventListener('touchcancel', ()=>{ act=false; reset(); }, {passive:false}); }
+        bind(l, kl, (x,y)=>{ joyMove.x = x; joyMove.y = -y; });
+        bind(r, kr, (x,y)=>{ joyLook.x = x; joyLook.y = y; });
+      }
+      if (isTouch) setupJoysticks();
+
+      // Player avatar
+      const player = new THREE.Group();
+      const pBody = new THREE.Mesh(new THREE.CapsuleGeometry(0.18, 0.42, 8, 16), new THREE.MeshStandardMaterial({ color: 0x2cab6d, roughness: 0.7 }));
+      pBody.position.y = 0.62; pBody.castShadow = pBody.receiveShadow = true; player.add(pBody);
+      const pHead = new THREE.Mesh(new THREE.SphereGeometry(0.16, 18, 18), new THREE.MeshStandardMaterial({ color: 0xf1d7bd, roughness: 0.6 }));
+      pHead.position.y = 1.02; pHead.castShadow = pHead.receiveShadow = true; player.add(pHead);
+      player.position.set(0, 0, 10); scene.add(player);
+
+      // Build CV houses and plaques
+      const data = [...baseData];
+      const LANE_X = [-4.2, 4.2];
+      const POI = [];
+      const startZ = -2; const stepZ = -3.2;
+      data.forEach((entry, i) => {
+        const g = (entry.kind === 'house') ? building(1.3, 0.85, 1.2) : plaque(entry.title);
+        const lane = i % 2; const x = LANE_X[lane]; const z = startZ + i * stepZ; g.position.set(x, 0, z); scene.add(g);
+        if (entry.kind === 'house'){
+          const d1 = document.createElement('div'); d1.className = 'label'; d1.textContent = entry.title; const l1 = new CSS2DObject(d1); l1.position.set(0, 1.35, 0); g.add(l1);
+          const d2 = document.createElement('div'); d2.className = 'label'; d2.textContent = entry.years; const l2 = new CSS2DObject(d2); l2.position.set(0, 1.08, 0); g.add(l2);
+        }
+        const country = (() => {
+          const t = (entry.title + ' ' + (entry.bullets||[]).join(' ')).toLowerCase();
+          if (t.includes('nigeria') || t.includes('kebbi') || t.includes('sokoto')) return '\uD83C\uDDF3\uD83C\uDDEC';
+          if (t.includes('uk') || t.includes('bournemouth') || t.includes('dorset') || t.includes('nhs') || t.includes('international, uk')) return '\uD83C\uDDEC\uD83C\uDDE7';
+          return '';
+        })();
+        if (country){ const dF = document.createElement('div'); dF.className = 'label'; dF.textContent = country; const lF = new CSS2DObject(dF); lF.position.set(0.0, 1.7, 0); g.add(lF); }
+        const wrap = document.createElement('div'); wrap.className = 'pop'; const h = document.createElement('h3'); h.textContent = entry.title; wrap.appendChild(h); const meta = document.createElement('div'); meta.className = 'meta'; meta.textContent = entry.years; wrap.appendChild(meta); const ul = document.createElement('ul'); (entry.bullets||[]).forEach(b => { const li = document.createElement('li'); li.textContent = b; ul.appendChild(li); }); wrap.appendChild(ul); if (entry.link){ const a = document.createElement('a'); a.href = entry.link; a.target = '_blank'; a.textContent = 'Open link'; wrap.appendChild(document.createElement('br')); wrap.appendChild(a); }
+        if (entry.key === 'contact'){ const chips = document.createElement('div'); chips.className = 'chips'; const mk = (t, href)=>{ const a = document.createElement('a'); a.href = href; a.textContent = t; a.target = '_blank'; const c = document.createElement('span'); c.className = 'chip'; c.appendChild(a); return c; }; chips.appendChild(mk('LinkedIn', CV.contact.linkedin)); wrap.appendChild(chips); }
+        const lbl = new CSS2DObject(wrap); lbl.position.set(0, 1.75, 0); lbl.visible = false; g.add(lbl);
+        const bounds = new THREE.Box3().setFromObject(g);
+        POI.push({ entry, group:g, popup:lbl, kind:entry.kind, xz:{ minX: bounds.min.x, maxX: bounds.max.x, minZ: bounds.min.z, maxZ: bounds.max.z } });
+      });
+
+      // Roman arch near the end of the road
+      function romanArch(width, height, z){
+        const g = new THREE.Group();
+        const stone = 0xe6e1d3; const stoneDark = 0xd3ccba;
+        const plinthMat = new THREE.MeshStandardMaterial({ color: stoneDark, roughness: 0.8 });
+        const plinthL = new THREE.Mesh(new THREE.BoxGeometry(0.7,0.18,0.8), plinthMat); plinthL.position.set(-width/2+0.5,0.09,0); g.add(plinthL);
+        const plinthR = plinthL.clone(); plinthR.position.x = width/2-0.5; g.add(plinthR);
+        const pierMat = new THREE.MeshStandardMaterial({ color: stone, roughness: 0.78 });
+        const pierH = height*0.88;
+        const pierL = new THREE.Mesh(new THREE.BoxGeometry(0.5,pierH,0.6), pierMat); pierL.position.set(plinthL.position.x, pierH/2+0.18, 0); pierL.castShadow=pierL.receiveShadow=true; g.add(pierL);
+        const pierR = pierL.clone(); pierR.position.x = plinthR.position.x; g.add(pierR);
+        const colMat = new THREE.MeshStandardMaterial({ color: stoneDark, roughness: 0.72 });
+        const colL = new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,pierH*0.92, 18), colMat); colL.position.set(pierL.position.x, pierL.position.y, 0.28); colL.castShadow=colL.receiveShadow=true; g.add(colL);
+        const colR = colL.clone(); colR.position.x = pierR.position.x; g.add(colR);
+        const impostL = new THREE.Mesh(new THREE.BoxGeometry(0.6,0.12,0.7), plinthMat); impostL.position.set(pierL.position.x, pierL.position.y + pierH/2 + 0.06, 0); g.add(impostL);
+        const impostR = impostL.clone(); impostR.position.x = pierR.position.x; g.add(impostR);
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(width/2 - 0.7, 0.10, 18, 80, Math.PI), new THREE.MeshStandardMaterial({ color: stone, roughness: 0.72 }));
+        ring.rotation.x = Math.PI/2; ring.rotation.z = Math.PI; ring.position.y = impostL.position.y + 0.02; g.add(ring);
+        const keystone = new THREE.Mesh(new THREE.BoxGeometry(0.3,0.26,0.2), new THREE.MeshStandardMaterial({ color: stoneDark, roughness: 0.68 })); keystone.position.set(0, ring.position.y + 0.18, 0.02); keystone.castShadow=keystone.receiveShadow=true; g.add(keystone);
+        const ent = new THREE.Mesh(new THREE.BoxGeometry(width,0.18,0.8), plinthMat); ent.position.set(0, keystone.position.y + 0.22, 0); ent.castShadow=ent.receiveShadow=true; g.add(ent);
+        const cornice = new THREE.Mesh(new THREE.BoxGeometry(width*1.02,0.08,0.9), pierMat); cornice.position.set(0, ent.position.y + 0.13, 0); g.add(cornice);
+        const attic = new THREE.Mesh(new THREE.BoxGeometry(width*0.9,0.42,0.6), pierMat); attic.position.set(0, cornice.position.y + 0.25, 0); attic.castShadow=attic.receiveShadow=true; g.add(attic);
+        const plaque = new THREE.Mesh(new THREE.BoxGeometry(width*0.82,0.2,0.04), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 })); plaque.position.set(0, attic.position.y, 0.33); g.add(plaque);
+        const finL = new THREE.Mesh(new THREE.ConeGeometry(0.12,0.28, 8), plinthMat); finL.position.set(-width/2 + 0.35, cornice.position.y + 0.22, 0); g.add(finL);
+        const finR = finL.clone(); finR.position.x = width/2 - 0.35; g.add(finR);
+        g.position.set(0,0,z);
+        scene.add(g);
+        return g;
+      }
+      const archZ = (ROAD_Z - ROAD_L/2) + 1.2;
+      const archWidth = 3.2; const archHeight = 2.0;
+      const archGroup = romanArch(archWidth, archHeight, archZ);
+      const archMsg = document.createElement('div'); archMsg.className = 'pop pre'; archMsg.innerHTML = `HIRE THE BUILDER.<br>INVEST IN THE ARCHITECT.<br>LET'S CREATE.<br><br>Let us take the next step together.`;
+      const archLbl = new CSS2DObject(archMsg); archLbl.position.set(0, archHeight + 0.6, 0); archLbl.visible = false; archGroup.add(archLbl);
+      const archBounds = new THREE.Box3().setFromObject(archGroup);
+      POI.push({ entry:{ key:'arch_end', title:'Arch', years:'', sortDate:'9999-12-31' }, group:archGroup, popup:archLbl, kind:'arch', xz:{ minX: archBounds.min.x, maxX: archBounds.max.x, minZ: archBounds.min.z, maxZ: archBounds.max.z }, noCollide:true });
+
+      // Clock type tower
+      function clockTower(){
+        const g = new THREE.Group();
+        const stone = 0xd8d2c2; const darker = 0xbfb79f;
+        const base = new THREE.Mesh(new THREE.BoxGeometry(1.4,0.18,1.4), new THREE.MeshStandardMaterial({ color: darker, roughness: 0.85 })); base.position.y = 0.09; g.add(base);
+        const shaft = new THREE.Mesh(new THREE.BoxGeometry(0.9,2.0,0.9), new THREE.MeshStandardMaterial({ color: stone, roughness: 0.8 })); shaft.position.y = 1.18; shaft.castShadow=shaft.receiveShadow=true; g.add(shaft);
+        const belt = new THREE.Mesh(new THREE.BoxGeometry(1.02,0.08,1.02), new THREE.MeshStandardMaterial({ color: darker, roughness: 0.82 })); belt.position.y = 2.2; g.add(belt);
+        const belfry = new THREE.Mesh(new THREE.BoxGeometry(0.95,0.6,0.95), new THREE.MeshStandardMaterial({ color: stone, roughness: 0.78 })); belfry.position.y = 2.55; g.add(belfry);
+        const roof = new THREE.Mesh(new THREE.ConeGeometry(0.6,0.7, 6), new THREE.MeshStandardMaterial({ color: 0x6f7986, roughness: 0.6 })); roof.position.y = 3.05; g.add(roof);
+        const finial = new THREE.Mesh(new THREE.SphereGeometry(0.06, 10, 10), new THREE.MeshStandardMaterial({ color: 0x999fa9 })); finial.position.y = 3.45; g.add(finial);
+        base.castShadow = shaft.castShadow = belfry.castShadow = roof.castShadow = true;
+        base.receiveShadow = shaft.receiveShadow = true;
+        return g;
+      }
+
+      // Place skill towers
+      for (const t of TOWERS) {
+        const g = clockTower();
+        const x = (t.side < 0) ? -6.8 : 6.8;
+        g.position.set(x, 0, t.z);
+        scene.add(g);
+        const titleEl = document.createElement('div');
+        titleEl.className = 'label';
+        titleEl.textContent = t.title;
+        const titleLbl = new CSS2DObject(titleEl);
+        titleLbl.position.set(0, 2.8, 0);
+        g.add(titleLbl);
+        const wrap = document.createElement('div');
+        wrap.className = 'pop';
+        const h = document.createElement('h3'); h.textContent = t.title; wrap.appendChild(h);
+        if (t.desc) { const p = document.createElement('div'); p.style.margin = '4px 0 8px'; p.textContent = t.desc; wrap.appendChild(p); }
+        const meta = document.createElement('div'); meta.className = 'meta'; meta.textContent = 'Core skills'; wrap.appendChild(meta);
+        const pre = document.createElement('div'); pre.className = 'pre'; pre.textContent = (t.skills || []).join('\n'); wrap.appendChild(pre);
+        const lbl = new CSS2DObject(wrap);
+        lbl.position.set(0, 2.95, 0);
+        lbl.visible = false;
+        g.add(lbl);
+        const bounds = new THREE.Box3().setFromObject(g);
+        POI.push({ entry: { key: t.key, title: t.title }, group: g, popup: lbl, kind: 'tower', xz: { minX: bounds.min.x, maxX: bounds.max.x, minZ: bounds.min.z, maxZ: bounds.max.z } });
+      }
+
+      // Walkable zones and sidewalks
+      const SIDEWALK_W = 0.95; const walkZones = []; window.__walkZones = walkZones;
+      function addZone(rect){ walkZones.push(rect); }
+      function insideWalk(x,z){ const e=0.05; return walkZones.some(r => x>=r.minX-e && x<=r.maxX+e && z>=r.minZ-e && z<=r.maxZ+e); }
+      const roadRect = { minX: -ROAD_W/2, maxX: ROAD_W/2, minZ: ROAD_Z - ROAD_L/2, maxZ: ROAD_Z + ROAD_L/2 };
+      addZone(roadRect);
+
+      const swMat = new THREE.MeshStandardMaterial({ map: concreteTex, roughness: 0.95 });
+      POI.forEach(p => {
+        if (p.kind === 'arch') return;
+        const x = p.group.position.x; const z = p.group.position.z;
+        const edgeX = x > 0 ? ROAD_W/2 : -ROAD_W/2; const marginToBuilding = 0.35; const dist = Math.max(0.2, Math.abs(x) - (ROAD_W/2 + marginToBuilding)); const seamOverlap = 0.05; const geoLen = dist + seamOverlap; const cx = x > 0 ? edgeX + geoLen/2 : edgeX - geoLen/2; const side = new THREE.Mesh(new THREE.BoxGeometry(geoLen, 0.03, SIDEWALK_W), swMat);
+        side.position.set(cx, 0.015, z); side.receiveShadow = true; scene.add(side);
+        const rect = { minX: cx - geoLen/2, maxX: cx + geoLen/2, minZ: z - SIDEWALK_W/2, maxZ: z + SIDEWALK_W/2 };
+        addZone(rect);
+      });
+
+      // Decorative plazas and trees
+      plaza(6, 4, -6, -6); plaza(6, 4, 6, -26);
+      function tree(x,z){ const g = new THREE.Group(); const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.1,0.55,10), new THREE.MeshStandardMaterial({ color: 0x8e735a, roughness: 0.8 })); trunk.position.y = 0.27; trunk.castShadow = trunk.receiveShadow = true; g.add(trunk); const leafMat = new THREE.MeshStandardMaterial({ color: 0x78b48a, roughness: 0.6 }); const a = new THREE.Mesh(new THREE.IcosahedronGeometry(0.35, 0), leafMat); a.position.set(0.0, 0.75, 0.0); a.castShadow = a.receiveShadow = true; const b = new THREE.Mesh(new THREE.IcosahedronGeometry(0.28, 0), leafMat); b.position.set(-0.22, 0.62, 0.15); b.castShadow = b.receiveShadow = true; const c = new THREE.Mesh(new THREE.IcosahedronGeometry(0.24, 0), leafMat); c.position.set(0.22, 0.6, -0.12); c.castShadow = c.receiveShadow = true; g.add(a,b,c); g.position.set(x,0,z); scene.add(g); return g; }
+      function placeTrees(n){ for (let i=0;i<n;i++){ let x, z, tries=0; do { x = -12 + Math.random()*24; z = -6 - Math.random()*48; tries++; } while ((insideWalk(x, z)) && tries < 100); tree(x,z); } }
+      placeTrees(12);
+
+      // Camera control
+      let followCam = true; const camOffset = new THREE.Vector3(0, 2.4, 3.4);
+      function updateCamera(){ if (followCam){ const yaw = player.rotation.y; const off = camOffset.clone(); off.applyAxisAngle(new THREE.Vector3(0,1,0), yaw); const target = player.position.clone().add(off); rig.position.lerp(target, 0.18); const lookAt = player.position.clone(); camera.lookAt(lookAt.x, lookAt.y + 0.7, lookAt.z); } else { rig.position.lerp(new THREE.Vector3(0, 16, -20), 0.1); camera.lookAt(0,0,-20); } }
+
+      // Mini map
+      const mini = document.getElementById('mini'); const mctx = mini.getContext('2d');
+      function drawMini(){ const dpr = Math.min(window.devicePixelRatio||1, 2); const W=180, H=130; if (mini.width !== W*dpr){ mini.width = W*dpr; mini.height = H*dpr; mini.style.width = W+'px'; mini.style.height = H+'px'; mctx.setTransform(1,0,0,1,0,0); mctx.scale(dpr, dpr); } const scale = 4; mctx.clearRect(0,0,mini.width, mini.height); mctx.fillStyle = 'rgba(0,0,0,0.06)'; mctx.fillRect(0,0,mini.width, mini.height); function wp(x,z){ return [mini.width/2/dpr + x*scale, H*0.75 + z*scale]; } const r1 = wp(-ROAD_W/2, ROAD_Z - ROAD_L/2), r2 = wp(ROAD_W/2, ROAD_Z + ROAD_L/2); mctx.fillStyle = '#9aa7af'; mctx.fillRect(Math.min(r1[0],r2[0]), Math.min(r1[1],r2[1]), Math.abs(r2[0]-r1[0]), Math.abs(r2[1]-r1[1])); mctx.fillStyle = '#E0E7EA'; walkZones.forEach(r => { if (r!==roadRect){ const a = wp(r.minX, r.minZ), b = wp(r.maxX, r.maxZ); mctx.fillRect(a[0], a[1], b[0]-a[0], b[1]-a[1]); }}); const pp = wp(player.position.x, player.position.z); mctx.fillStyle = '#2cab6d'; mctx.beginPath(); mctx.arc(pp[0], pp[1], 3, 0, Math.PI*2); mctx.fill(); }
+
+      // Movement and collisions
+      const worldBounds = { minX: -14, maxX: 14, minZ: (ROAD_Z - ROAD_L/2) - 1.0, maxZ: (ROAD_Z + ROAD_L/2) + 2.0 };
+      const radius = 0.25;
+      function insideWalkable(nx, nz){ return insideWalk(nx, nz); }
+
+      let dragging = false, lastX = 0, lastY = 0; const maxPitch = Math.PI/2 - 0.05;
+      function enableLook(){ const onDown = (e)=>{ dragging = true; lastX = e.clientX; lastY = e.clientY; }; const onUp = ()=>{ dragging = false; }; const onMove = (e)=>{ if(!dragging) return; const dx=e.clientX-lastX, dy=e.clientY-lastY; lastX=e.clientX; lastY=e.clientY; player.rotation.y -= dx*0.002; pitch.rotation.x = Math.max(-maxPitch, Math.min(maxPitch, pitch.rotation.x - dy*0.002)); }; renderer.domElement.addEventListener('mousedown', onDown); window.addEventListener('mouseup', onUp); window.addEventListener('mousemove', onMove); }
+
+      const key = { w:false, a:false, s:false, d:false };
+      function setKey(e, down){ const tag = (e.target && e.target.tagName) || ''; if (tag === 'INPUT' || tag === 'TEXTAREA' || e.isComposing) return; const k = (e.key || '').toLowerCase(); const c = (e.code || '').toLowerCase(); let handled = false; if (c==='keyw' || k==='w' || c==='arrowup') { key.w = down; handled = true; } if (c==='keya' || k==='a' || c==='arrowleft') { key.a = down; handled = true; } if (c==='keys' || k==='s' || c==='arrowdown') { key.s = down; handled = true; } if (c==='keyd' || k==='d' || c==='arrowright') { key.d = down; handled = true; } if (handled) e.preventDefault(); }
+      window.addEventListener('keydown', e=> setKey(e, true), { capture:true }); window.addEventListener('keyup',   e=> setKey(e, false), { capture:true });
+
+      const speed = 3.0;
+      function getGroundVectors(){ const f = new THREE.Vector3(); camera.getWorldDirection(f); f.y = 0; if (f.lengthSq() < 1e-6) f.set(0,0,-1); else f.normalize(); const r = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0); r.y = 0; r.normalize(); return { fwd: f, right: r }; }
+      function move(dt){ const { fwd, right } = getGroundVectors(); const vel = new THREE.Vector3();
+        if(key.w)vel.add(fwd); if(key.s)vel.sub(fwd); if(key.a)vel.sub(right); if(key.d)vel.add(right);
+        if (Math.abs(joyMove.x)>0.01) vel.addScaledVector(r, joyMove.x);
+        if (Math.abs(joyMove.y)>0.01) vel.addScaledVector(f, joyMove.y);
+        if(vel.lengthSq()>0) vel.normalize().multiplyScalar(speed*dt);
+        let nx = player.position.x + vel.x; let nz = player.position.z; if (insideWalkable(nx, nz)) player.position.x = nx;
+        nx = player.position.x; nz = player.position.z + vel.z; if (insideWalkable(nx, nz)) player.position.z = nz;
+        player.position.x = Math.max(worldBounds.minX+radius, Math.min(worldBounds.maxX-radius, player.position.x));
+        player.position.z = Math.max(worldBounds.minZ+radius, Math.min(worldBounds.maxZ-radius, player.position.z));
+        if (player.position.z < (roadRect.minZ + 0.2)) { player.position.set(0, 0, roadRect.maxZ - 0.5); }
+      }
+
+      function applyJoyLook(dt){ if (!isTouch) return; const yaw = -joyLook.x * 2.2 * dt; const pitchDelta = -joyLook.y * 1.8 * dt; player.rotation.y += yaw; const limit = Math.PI/2 - 0.05; pitch.rotation.x = Math.max(-limit, Math.min(limit, pitch.rotation.x + pitchDelta)); }
+
+      // Popup control
+      const PROX = { default: 1.6, tower: 2.2, arch: 8.0 };
+      let openRef = null;
+      function updatePopups(){ let newOpen = null; for (const p of POI){ const d = p.group.position.distanceTo(player.position); const kind = p.kind || 'default'; const limit = PROX[kind] || PROX.default; const open = d < limit; p.popup.visible = open; if (open) newOpen = p; } if (openRef && openRef !== newOpen) { openRef.popup.visible = false; } openRef = newOpen; labelRenderer.domElement.style.pointerEvents = openRef ? 'auto' : 'none'; }
+
+      // UI buttons
+      document.getElementById('toggleCam').addEventListener('click', ()=>{ followCam = !followCam; document.getElementById('toggleCam').textContent = 'Camera: ' + (followCam?'Follow':'Overhead'); });
+      document.getElementById('reset').addEventListener('click', ()=>{ player.position.set(0,0,10); player.rotation.set(0,0,0); rig.position.copy(player.position); });
+
+      // Tests
+      function runTests(){ const results = [];
+        results.push(['THREE present', !!THREE && !!THREE.Scene]);
+        results.push(['Renderer created', !!renderer]);
+        results.push(['Label renderer created', !!labelRenderer]);
+        results.push(['Base data length', Array.isArray(baseData) && baseData.length === (2 + CV.sections.length)]);
+        const sorted = baseData.every((e,i,arr)=> i===0 || (new Date(arr[i-1].sortDate) <= new Date(e.sortDate)));
+        results.push(['Chronology sorted', sorted]);
+        const towerCount = TOWERS.length;
+        const poiTowerCount = POI.filter(p => (p.entry.key || '').startsWith('tower')).length;
+        results.push(['Tower POIs match', poiTowerCount === towerCount]);
+        const archCount = POI.filter(p => p.kind === 'arch').length;
+        results.push(['Arch present', archCount === 1]);
+        const roadMidWalkable = insideWalkable(0, __ROAD.ROAD_Z);
+        const offRoadBlocked = !insideWalkable(10, __ROAD.ROAD_Z - 30);
+        results.push(['Road center walkable', roadMidWalkable === true]);
+        results.push(['Off road blocked', offRoadBlocked === true]);
+        results.push(['Arch proximity larger than default', PROX.arch > PROX.default]);
+        alert(results.map(r => `- ${r[0]}: ${r[1] ? 'ok' : 'fail'}`).join('\n'));
+      }
+      document.getElementById('tests').addEventListener('click', runTests);
+      window.addEventListener('keydown', e => {
+        const k = (e.key || '').toLowerCase();
+        if (k === 't') { e.preventDefault(); runTests(); }
+        if (k === 'm') {
+          followCam = !followCam;
+          document.getElementById('toggleCam').textContent = 'Camera: ' + (followCam ? 'Follow' : 'Overhead');
+        }
+      }, { capture: true });
+
+      // Resize
+      function onResize(){
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        labelRenderer.setSize(window.innerWidth, window.innerHeight);
+      }
+      window.addEventListener('resize', onResize);
+
+      // Loop
+      let last = 0;
+      function animate(ts){
+        const dt = Math.min(0.05, last ? (ts - last) / 1000 : 0);
+        last = ts;
+        move(dt);
+        applyJoyLook(dt);
+        updatePopups();
+        updateCamera();
+        renderer.render(scene, camera);
+        labelRenderer.render(scene, camera);
+        drawMini();
+        requestAnimationFrame(animate);
+      }
+
+      // Click to start
+      startLoop = () => {
+        const start = document.getElementById('start');
+        const goBtn = document.getElementById('go');
+        const begin = () => {
+          start.style.display = 'none';
+          enableLook();
+          last = performance.now();
+          requestAnimationFrame(animate);
+        };
+        goBtn.addEventListener('click', begin, { once: true });
+        window.addEventListener('keydown', e => {
+          if ((e.key || '').toLowerCase() === 'enter') { e.preventDefault(); begin(); }
+        }, { once: true });
+        updateCamera();
+        renderer.render(scene, camera);
+        labelRenderer.render(scene, camera);
+        drawMini();
+      };
+    } // end init3DWorld
+  </script>
+</body>
+</html>

@@ -196,6 +196,36 @@ body {
   .about-image:hover {
     transform: scale(1.05);
   }
+
+  .profile-links { 
+    margin-top: 10px; 
+  }
+
+  .interactive-cv {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: rgba(46, 204, 113, 0.08);
+    border: 1px solid rgba(46, 204, 113, 0.35);
+    color: #0b1114;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+  }
+
+  .interactive-cv:hover {
+    transform: translateY(-1px);
+    background: rgba(46, 204, 113, 0.14);
+    box-shadow: 0 6px 18px rgba(46, 204, 113, 0.15);
+  }
+
+  .icon-3d {
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+  }
   
   .about-content {
     color: #333;

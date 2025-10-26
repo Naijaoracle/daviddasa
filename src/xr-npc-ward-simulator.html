@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>XR-NPC Ward Room Simulator</title>
+  <style>
+    html, body { height: 100%; margin: 0; overflow: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial; }
+    #three-root { position: fixed; inset: 0; background: #0a0f0a; cursor: default; }
+
+    /* Overlay UI */
+    .ui { position: fixed; top: 0; left: 0; right: 0; pointer-events: none; }
+    .tray { position: absolute; right: 16px; top: 16px; width: 340px; background: rgba(20, 24, 20, 0.85); color: #e8f5e9; border-radius: 12px; padding: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); pointer-events: auto; }
+    .tray h3 { margin: 0 0 8px; font-size: 18px; letter-spacing: 0.2px; }
+    .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    button { appearance: none; border: 0; border-radius: 10px; padding: 10px 12px; background: #2e7d32; color: white; cursor: pointer; font-weight: 600; }
+    button.secondary { background: #1565c0; }
+    button.warn { background: #b71c1c; }
+    button.ghost { background: rgba(255,255,255,0.08); }
+    button:active { transform: translateY(1px); }
+    .log { margin-top: 8px; background: rgba(255,255,255,0.06); padding: 8px; border-radius: 8px; height: 96px; overflow: auto; font-size: 12px; white-space: pre-wrap; }
+
+    /* Crosshair and hint */
+    .crosshair { position: fixed; left: 50%; top: 50%; width: 12px; height: 12px; margin-left: -6px; margin-top: -6px; border-radius: 50%; background: rgba(255,255,255,0.9); box-shadow: 0 0 8px rgba(255,255,255,0.5); opacity: 0.85; pointer-events: none; display: none; }
+    .hint { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); color: #cfe9cf; background: rgba(0,0,0,0.5); padding: 6px 10px; border-radius: 8px; font-size: 12px; pointer-events: none; }
+
+    /* CSS2D labels */
+    .label { color: #fff; background: rgba(0,0,0,0.65); padding: 2px 6px; border-radius: 6px; font-size: 12px; border: 1px solid rgba(255,255,255,0.2); }
+    .menu-card { background: rgba(31, 41, 31, 0.95); color: #e8f5e9; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 8px; min-width: 240px; max-width: 300px; box-shadow: 0 6px 18px rgba(0,0,0,0.35); }
+    .menu-card h4 { margin: 0 0 6px 0; font-size: 13px; letter-spacing: 0.2px; opacity: 0.9; }
+    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .menu-section { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 6px; }
+    .menu-section b { font-size: 12px; opacity: 0.9; }
+    .menu-section button { width: 100%; margin-top: 4px; padding: 6px 8px; font-size: 12px; border-radius: 8px; background: rgba(255,255,255,0.09); }
+    .menu-section button.selected { outline: 2px solid #9ccc65; }
+    .applied { background: rgba(0,0,0,0.75); padding: 4px 6px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); font-size: 12px; }
+    .chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+    .chip { background: rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:999px; padding:2px 8px; font-size:12px; }
+    .applied-list { max-height:72px; overflow:auto; font-size:12px; background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:6px; margin-top:6px; }
+    .kit-title { margin-top:10px; font-size:12px; opacity:0.9; }
+
+    /* Start overlay */
+    #startOverlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.65); color: #e8f5e9; z-index: 30; }
+    #startCard { background: rgba(20,24,20,0.9); padding: 18px 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); text-align: center; width: 340px; }
+    #startBtn { margin-top: 10px; width: 100%; }
+
+    /* Vitals panel */
+    .vitals { color:#e8f5e9; background: rgba(0,0,0,0.75); border:1px solid rgba(255,255,255,0.2); border-radius:10px; padding:8px 10px; font-size:12px; min-width:180px; }
+    .vitals .title { font-weight:700; font-size:13px; margin-bottom:4px; }
+    .vitals .row { display:flex; justify-content:space-between; gap:8px; }
+    .vitals .row + .row { margin-top:2px; }
+
+    /* Key HUD */
+    #keyHUD { position: fixed; left: 10px; bottom: 10px; background: rgba(0,0,0,0.55); color: #cfe9cf; padding: 6px 8px; border-radius: 8px; font-size: 11px; pointer-events: none; z-index: 5; }
+  </style>
+</head>
+<body>
+  <div id="three-root"></div>
+
+  <div id="startOverlay">
+    <div id="startCard">
+      <div style="font-weight:700; font-size:18px; margin-bottom:6px;">Click to start</div>
+      <div id="startInfo" style="font-size:13px; opacity:0.9;">WASD or arrows to move. Click and drag to look.</div>
+      <button id="startBtn">Start demo</button>
+    </div>
+  </div>
+
+  <div class="ui">
+    <div class="tray" id="tray">
+      <h3>Session <span id="status" style="font-size:12px;opacity:0.85"></span></h3>
+      <div class="log" id="log">Use the red trolley to pick kit. Walk to the patient to apply.</div>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <button class="warn" id="recordBtn">Record</button>
+        <a id="downloadBtn" class="secondary" style="display:none; text-decoration:none; text-align:center; line-height:32px; padding: 0 12px; border-radius:10px; background:#1565c0; color:white;">Download log</a>
+      </div>
+    </div>
+  </div>
+  <div class="crosshair" id="crosshair" title="aim"></div>
+  <div class="hint" id="hint">WASD to move. Click and drag to look.</div>
+  <div id="keyHUD">I:0 J:0 K:0 L:0 U:0 O:0</div>
+
+  <!-- Single Three import for us and the examples -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+      }
+    }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { CSS2DRenderer, CSS2DObject } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/renderers/CSS2DRenderer.js';
+
+    const statusEl = document.getElementById('status');
+    const hintEl = document.getElementById('hint');
+    const startOverlay = document.getElementById('startOverlay');
+    const startBtn = document.getElementById('startBtn');
+    const keyHUD = document.getElementById('keyHUD');
+    function updateKeyHUD(){ if(!keyHUD) return; keyHUD.textContent = `I:${nkey.i?1:0} J:${nkey.j?1:0} K:${nkey.k?1:0} L:${nkey.l?1:0} U:${nkey.u?1:0} O:${nkey.o?1:0}`; }
+
+    function setStatus(text, color = '#9ccc65') { statusEl.textContent = `• ${text}`; statusEl.style.color = color; }
+    try { console.assert(!!THREE && !!THREE.Scene, 'THREE failed to load'); setStatus('Modules OK'); } catch (e) { setStatus('Module load error', '#ff8a80'); console.error(e); }
+
+    const root = document.getElementById('three-root');
+    root.setAttribute('tabindex','-1');
+
+    // Scene and camera rig
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x162416);
+    const rig = new THREE.Object3D();
+    const pitch = new THREE.Object3D();
+    const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 200);
+    rig.add(pitch); pitch.add(camera);
+    rig.position.set(0, 0, 3.5);
+    pitch.position.set(0, 1.6, 0);
+    scene.add(rig);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    root.appendChild(renderer.domElement);
+    renderer.domElement.setAttribute('tabindex','-1');
+
+    // CSS2D overlay
+    const labelRenderer = new CSS2DRenderer();
+    labelRenderer.setSize(window.innerWidth, window.innerHeight);
+    labelRenderer.domElement.style.position = 'fixed';
+    labelRenderer.domElement.style.inset = '0';
+    labelRenderer.domElement.style.pointerEvents = 'none';
+    root.appendChild(labelRenderer.domElement);
+    labelRenderer.domElement.setAttribute('tabindex','-1');
+
+    // Lights
+    const hemi = new THREE.HemisphereLight(0xddeeff, 0x101820, 0.9); scene.add(hemi);
+    const dir = new THREE.DirectionalLight(0xffffff, 0.8); dir.position.set(4, 8, 2); scene.add(dir);
+
+    // Room
+    const ROOM = 10; const HALF = ROOM / 2; const room = new THREE.Group(); scene.add(room);
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0x3c4b3c, metalness: 0, roughness: 0.95 });
+    const floorMat = new THREE.MeshStandardMaterial({ color: 0x2a332a, roughness: 1 });
+    const trimMat  = new THREE.MeshStandardMaterial({ color: 0x7a1414, roughness: 1 });
+
+    const floor = new THREE.Mesh(new THREE.BoxGeometry(ROOM, 0.1, ROOM), floorMat); floor.position.set(0, -0.05, 0); floor.receiveShadow = true; room.add(floor);
+    const ceiling = new THREE.Mesh(new THREE.BoxGeometry(ROOM, 0.1, ROOM), new THREE.MeshStandardMaterial({ color: 0xdfe7df })); ceiling.position.set(0, 3, 0); room.add(ceiling);
+
+    const makeWall = (w, h, d, x, y, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMat); m.position.set(x, y, z); m.receiveShadow = true; return m; };
+    room.add(makeWall(ROOM, 3, 0.2,  0, 1.5, -HALF));
+    room.add(makeWall(ROOM, 3, 0.2,  0, 1.5,  HALF));
+    room.add(makeWall(0.2, 3, ROOM, -HALF, 1.5, 0));
+    room.add(makeWall(0.2, 3, ROOM,  HALF, 1.5, 0));
+
+    const bandLen = ROOM - 0.05;
+    const band = new THREE.Mesh(new THREE.BoxGeometry(bandLen, 0.2, 0.1), trimMat); band.position.set(0, 0.8, -HALF + 0.05); room.add(band.clone());
+    const band2 = band.clone(); band2.position.set(0, 0.8, HALF - 0.05); room.add(band2);
+    const band3 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.2, bandLen), trimMat); band3.position.set(-HALF + 0.05, 0.8, 0); room.add(band3.clone());
+    const band4 = band3.clone(); band4.position.set(HALF - 0.05, 0.8, 0); room.add(band4);
+
+    // Trolley
+    const trolley = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), new THREE.MeshStandardMaterial({ color: 0xc62828 }));
+    trolley.position.set(3.0, 0.4, 1.6);
+    room.add(trolley);
+
+    // Nurse
+    const avatar = new THREE.Group(); scene.add(avatar);
+    const skin = 0xd1b290; const scrubs = 0x1b5e20;
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.0, 0.4), new THREE.MeshStandardMaterial({ color: scrubs })); body.position.y = 0.9;
+    const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), new THREE.MeshStandardMaterial({ color: skin })); head.position.y = 1.55;
+    const armL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.6, 0.18), new THREE.MeshStandardMaterial({ color: scrubs })); armL.position.set(-0.5, 1.0, 0);
+    const armR = armL.clone(); armR.position.x = 0.5;
+    const legL = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.7, 0.22), new THREE.MeshStandardMaterial({ color: scrubs })); legL.position.set(-0.16, 0.35, 0);
+    const legR = legL.clone(); legR.position.x = 0.16;
+    avatar.add(body, head, armL, armR, legL, legR);
+    avatar.position.set(-0.6, 0, -2.1);
+
+    const nurseLabelDiv = document.createElement('div');
+    nurseLabelDiv.className = 'label';
+    nurseLabelDiv.textContent = 'Nurse Sarah';
+    const nurseNameLabel = new CSS2DObject(nurseLabelDiv);
+    nurseNameLabel.position.set(0, 1.9, 0);
+    avatar.add(nurseNameLabel);
+
+    // Kit count label above nurse
+    const kitCountDiv = document.createElement('div');
+    kitCountDiv.className = 'label';
+    kitCountDiv.textContent = 'Kit: 0';
+    const kitCountLabel = new CSS2DObject(kitCountDiv);
+    kitCountLabel.position.set(0, 2.1, 0);
+    avatar.add(kitCountLabel);
+
+    // Bed + patient
+    function makePatientBed(x, z) {
+      const g = new THREE.Group();
+      const frameMat = new THREE.MeshStandardMaterial({ color: 0x707b7c, roughness: 0.8 });
+      const base = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.2, 0.9), frameMat); base.position.set(0, 0.5, 0); g.add(base);
+      const legGeom = new THREE.BoxGeometry(0.12, 0.5, 0.12);
+      const leg1 = new THREE.Mesh(legGeom, frameMat); leg1.position.set(-1.0, 0.25, -0.35);
+      const leg2 = leg1.clone(); leg2.position.set( 1.0, 0.25, -0.35);
+      const leg3 = leg1.clone(); leg3.position.set(-1.0, 0.25,  0.35);
+      const leg4 = leg1.clone(); leg4.position.set( 1.0, 0.25,  0.35);
+      g.add(leg1, leg2, leg3, leg4);
+      const mattress = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.18, 0.8), new THREE.MeshStandardMaterial({ color: 0x99c1a8 })); mattress.position.set(0, 0.7, 0);
+      const pillow = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.12, 0.35), new THREE.MeshStandardMaterial({ color: 0xffffff })); pillow.position.set(0.9, 0.82, 0);
+      g.add(mattress, pillow);
+      const rail = new THREE.Mesh(new THREE.BoxGeometry(2.15, 0.05, 0.05), frameMat); rail.position.set(0, 0.9, -0.42);
+      const rail2 = rail.clone(); rail2.position.z = 0.42; g.add(rail, rail2);
+      const patient = new THREE.Group();
+      const gown = 0x1e88e5;
+      const pBody = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.25, 0.45), new THREE.MeshStandardMaterial({ color: gown })); pBody.name = 'patientBody'; pBody.position.set(0.1, 0.86, 0);
+      const pHead = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.26, 0.26), new THREE.MeshStandardMaterial({ color: 0xd1b290 })); pHead.position.set(0.95, 0.95, 0);
+      const pArmL = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.12, 0.12), new THREE.MeshStandardMaterial({ color: gown })); pArmL.position.set(0.2, 0.86, -0.33);
+      const pArmR = pArmL.clone(); pArmR.position.z = 0.33;
+      const pLegL = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.16, 0.16), new THREE.MeshStandardMaterial({ color: gown })); pLegL.position.set(-0.35, 0.78, -0.12);
+      const pLegR = pLegL.clone(); pLegR.position.z = 0.12;
+      const blanket = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.06, 0.6), new THREE.MeshStandardMaterial({ color: 0x6aa7c8, transparent: true, opacity: 0.9 })); blanket.position.set(-0.15, 0.92, 0);
+      patient.add(pBody, pHead, pArmL, pArmR, pLegL, pLegR, blanket); g.add(patient);
+      const patientLabelDiv = document.createElement('div'); patientLabelDiv.className = 'label'; patientLabelDiv.textContent = 'Patient 001'; const patientLabel = new CSS2DObject(patientLabelDiv); patientLabel.position.set(0.95, 1.1, 0); g.add(patientLabel);
+      g.position.set(x, 0, z); return g;
+    }
+    const bed = makePatientBed(-2.2, -2.2); scene.add(bed);
+
+    // Collision helpers
+    const bedBox = new THREE.Box3().setFromObject(bed);
+    const trolleyBox = new THREE.Box3().setFromObject(trolley);
+    function rectFromBox3(b) { return { minX: b.min.x, maxX: b.max.x, minZ: b.min.z, maxZ: b.max.z }; }
+    const bedRect = rectFromBox3(bedBox);
+    const trolleyRect = rectFromBox3(trolleyBox);
+    const nurseRadius = 0.32;
+    function circleRectOverlap(cx, cz, r, rect) {
+      const clampedX = Math.max(rect.minX, Math.min(cx, rect.maxX));
+      const clampedZ = Math.max(rect.minZ, Math.min(cz, rect.maxZ));
+      const dx = cx - clampedX; const dz = cz - clampedZ; return (dx*dx + dz*dz) <= r*r;
+    }
+
+    // Animation state
+    let t = 0;
+    let dragging = false, lastX = 0, lastY = 0; const maxPitch = Math.PI/2 - 0.05;
+
+    function enableDragLook() {
+      root.style.cursor = 'grab'; hintEl.textContent = 'Drag to look. WASD or arrows to move.';
+      const onDown = (e)=>{ dragging = true; lastX = e.clientX; lastY = e.clientY; root.style.cursor = 'grabbing'; };
+      const onUp = ()=>{ dragging = false; root.style.cursor = 'grab'; };
+      const onMove = (e)=>{ if(!dragging) return; const dx=e.clientX-lastX, dy=e.clientY-lastY; lastX=e.clientX; lastY=e.clientY; rig.rotation.y -= dx*0.0022; pitch.rotation.x = Math.max(-maxPitch, Math.min(maxPitch, pitch.rotation.x - dy*0.0022)); };
+      renderer.domElement.addEventListener('mousedown', onDown); window.addEventListener('mouseup', onUp); window.addEventListener('mousemove', onMove);
+    }
+    startBtn.addEventListener('click', ()=>{
+      startOverlay.style.display='none';
+      enableDragLook();
+      setStatus('Sandbox safe mode');
+      try { root.focus({ preventScroll: true }); } catch {}
+    });
+
+    // Keys
+    const nkey = { i:false, j:false, k:false, l:false, u:false, o:false };
+    const key = { w:false, a:false, s:false, d:false };
+
+    let keyboardSeen = false;
+    function setKey(e, down){
+      const tag = (e.target && e.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || e.isComposing) return;
+      const k = (e.key || '').toLowerCase();
+      const c = e.code || '';
+      let handled = false;
+      // Camera rig
+      if (c==='KeyW' || k==='w' || c==='ArrowUp')             { key.w = down; handled = true; }
+      if (c==='KeyA' || k==='a' || c==='ArrowLeft')           { key.a = down; handled = true; }
+      if (c==='KeyS' || k==='s' || c==='ArrowDown')           { key.s = down; handled = true; }
+      if (c==='KeyD' || k==='d' || c==='ArrowRight')          { key.d = down; handled = true; }
+      // Nurse IJKL + U/O
+      if (c==='KeyI' || k==='i')                              { nkey.i = down; handled = true; }
+      if (c==='KeyJ' || k==='j')                              { nkey.j = down; handled = true; }
+      if (c==='KeyK' || k==='k')                              { nkey.k = down; handled = true; }
+      if (c==='KeyL' || k==='l')                              { nkey.l = down; handled = true; }
+      if (c==='KeyU' || k==='u')                              { nkey.u = down; handled = true; }
+      if (c==='KeyO' || k==='o')                              { nkey.o = down; handled = true; }
+      if (handled) { e.preventDefault(); updateKeyHUD(); if(!keyboardSeen){ keyboardSeen=true; setStatus('Modules OK • Keyboard OK'); } }
+    }
+    // Extra robust listeners
+    window.addEventListener('keydown', e=> setKey(e, true),  { capture: true });
+    window.addEventListener('keyup',   e=> setKey(e, false), { capture: true });
+    document.addEventListener('keydown', e=> setKey(e, true));
+    document.addEventListener('keyup',   e=> setKey(e, false));
+    document.body.addEventListener('keydown', e=> setKey(e, true));
+    document.body.addEventListener('keyup',   e=> setKey(e, false));
+    renderer.domElement.addEventListener('keydown', e=> setKey(e, true));
+    renderer.domElement.addEventListener('keyup',   e=> setKey(e, false));
+    labelRenderer.domElement.addEventListener('keydown', e=> setKey(e, true));
+    labelRenderer.domElement.addEventListener('keyup',   e=> setKey(e, false));
+    root.addEventListener('pointerdown', ()=>{ try { root.focus({ preventScroll: true }); } catch {} });
+
+    const speed = 2.8; const bounds = { minX: -HALF + 0.5, maxX: HALF - 0.5, minZ: -HALF + 0.5, maxZ: HALF - 0.5 };
+
+    // Nurse movement
+    const nurseSpeed = 1.8; const nurseRotSpeed = 1.8; let followNurse = false;
+
+    function moveNurse(dt) {
+      if (nkey.u) avatar.rotation.y += nurseRotSpeed * dt; if (nkey.o) avatar.rotation.y -= nurseRotSpeed * dt;
+      const yaw = avatar.rotation.y;
+      const forwardN = new THREE.Vector3(Math.sin(yaw), 0, -Math.cos(yaw));
+      const rightN = new THREE.Vector3().crossVectors(forwardN, new THREE.Vector3(0,1,0)).negate();
+      const v = new THREE.Vector3(); if(nkey.i)v.add(forwardN); if(nkey.k)v.sub(forwardN); if(nkey.j)v.sub(rightN); if(nkey.l)v.add(rightN);
+      if (v.lengthSq() > 0) v.normalize().multiplyScalar(nurseSpeed * dt);
+      // axis-resolved collision
+      const tryPos = avatar.position.clone();
+      // X axis
+      tryPos.x += v.x; if (!circleRectOverlap(tryPos.x, avatar.position.z, nurseRadius, bedRect) && !circleRectOverlap(tryPos.x, avatar.position.z, nurseRadius, trolleyRect)) { avatar.position.x = tryPos.x; }
+      // Z axis
+      tryPos.z = avatar.position.z + v.z; if (!circleRectOverlap(avatar.position.x, tryPos.z, nurseRadius, bedRect) && !circleRectOverlap(avatar.position.x, tryPos.z, nurseRadius, trolleyRect)) { avatar.position.z = tryPos.z; }
+      // Clamp to room
+      avatar.position.x = Math.max(bounds.minX+0.25, Math.min(bounds.maxX-0.25, avatar.position.x));
+      avatar.position.z = Math.max(bounds.minZ+0.25, Math.min(bounds.maxZ-0.25, avatar.position.z));
+    }
+
+    const upAxis = new THREE.Vector3(0,1,0);
+    function updateCameraFollow() {
+      const offset = new THREE.Vector3(0, 0, 2.6); offset.applyAxisAngle(upAxis, avatar.rotation.y); const target = new THREE.Vector3().copy(avatar.position).add(offset);
+      rig.position.x = Math.max(bounds.minX+0.3, Math.min(bounds.maxX-0.3, target.x)); rig.position.z = Math.max(bounds.minZ+0.3, Math.min(bounds.maxZ-0.3, target.z));
+    }
+
+    function move(dt) {
+      const forward = new THREE.Vector3(Math.sin(rig.rotation.y), 0, -Math.cos(rig.rotation.y));
+      const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0,1,0)).negate();
+      const vel = new THREE.Vector3(); if(key.w)vel.add(forward); if(key.s)vel.sub(forward); if(key.a)vel.sub(right); if(key.d)vel.add(right); if(vel.lengthSq()>0) vel.normalize().multiplyScalar(speed*dt);
+      rig.position.add(vel);
+      rig.position.x = Math.max(bounds.minX+0.3, Math.min(bounds.maxX-0.3, rig.position.x)); rig.position.z = Math.max(bounds.minZ+0.3, Math.min(bounds.maxZ-0.3, rig.position.z));
+    }
+
+    // UI and recording
+    const log = document.getElementById('log'); const tray = document.getElementById('tray');
+    const nurseUI = document.createElement('div'); nurseUI.innerHTML = `
+      <div style="margin-top:10px; font-size:12px; opacity:0.9;">Nurse control</div>
+      <div class="btns" style="margin-top:6px;">
+        <button id="followBtn" class="secondary">Follow nurse: Off</button>
+        <button id="resetNurseBtn">Reset nurse</button>
+      </div>
+      <div style="font-size:11px; opacity:0.8; margin-top:6px;">Move nurse with I J K L. Rotate with U and O.</div>
+    `; tray.appendChild(nurseUI);
+    const followBtn = document.getElementById('followBtn'); const resetNurseBtn = document.getElementById('resetNurseBtn');
+
+    const kitUI = document.createElement('div');
+    kitUI.innerHTML = `
+      <div class="kit-title">Kit queue</div>
+      <div id="kitChips" class="chips"></div>
+      <div class="kit-title">Applied history</div>
+      <div id="appliedList" class="applied-list"></div>
+    `;
+    tray.appendChild(kitUI);
+    const kitChips = document.getElementById('kitChips');
+    const appliedList = document.getElementById('appliedList');
+
+    tray.addEventListener('click', (e)=>{ /* no-op */ });
+
+    const recordBtn = document.getElementById('recordBtn'); const downloadBtn = document.getElementById('downloadBtn'); let recording = false; let events = []; let sampleTimer = null;
+    function logEvent(type, data = {}) { const entry = { t: new Date().toISOString(), type, ...data }; events.push(entry); if (type !== 'pos') { const now = new Date().toLocaleTimeString(); log.textContent = `[${now}] ${type === 'action' ? data.action : type}\n` + log.textContent; } }
+    function startSampling(){ if(sampleTimer) return; sampleTimer = setInterval(()=>{ logEvent('pos', { x: rig.position.x, y: rig.position.y, z: rig.position.z, yaw: rig.rotation.y, pitch: pitch.rotation.x }); }, 300); }
+    function stopSampling(){ if(sampleTimer){ clearInterval(sampleTimer); sampleTimer = null; } }
+    recordBtn.addEventListener('click', ()=>{ recording = !recording; recordBtn.textContent = recording ? 'Stop' : 'Record'; recordBtn.classList.toggle('secondary', recording); if(recording){ events = []; downloadBtn.style.display='none'; logEvent('record_start'); startSampling(); } else { stopSampling(); logEvent('record_stop'); const blob = new Blob([JSON.stringify({ events }, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); downloadBtn.href = url; downloadBtn.download = `session-log-${new Date().toISOString().replace(/[:.]/g, '-')}.json`; downloadBtn.style.display='inline-block'; } });
+    downloadBtn.addEventListener('click', ()=>{ const href = downloadBtn.href; setTimeout(()=>URL.revokeObjectURL(href), 4000); });
+
+    followBtn.addEventListener('click', ()=>{ followNurse = !followNurse; followBtn.textContent = `Follow nurse: ${followNurse ? 'On' : 'Off'}`; followBtn.classList.toggle('secondary', !followNurse); });
+    resetNurseBtn.addEventListener('click', ()=>{ avatar.position.set(-0.6, 0, -2.1); avatar.rotation.set(0,0,0); });
+
+    // Proximity menu and apply logic
+    const menuDiv = document.createElement('div');
+    menuDiv.className = 'menu-card';
+    menuDiv.style.display = 'none';
+    menuDiv.style.pointerEvents = 'auto';
+    menuDiv.innerHTML = `
+      <h4>Resus trolley items</h4>
+      <div class="menu-grid">
+        <div class="menu-section" data-section="A"><b>A Airway</b>
+          <button data-item="Oropharyngeal airway">Oropharyngeal airway</button>
+          <button data-item="Suction catheter">Suction catheter</button>
+          <button data-item="Bag valve mask">Bag valve mask</button>
+        </div>
+        <div class="menu-section" data-section="B"><b>B Breathing</b>
+          <button data-item="Oxygen mask 15 L">Oxygen mask 15 L</button>
+          <button data-item="Nebuliser salbutamol">Nebuliser salbutamol</button>
+          <button data-item="Pulse oximeter">Pulse oximeter</button>
+        </div>
+        <div class="menu-section" data-section="C"><b>C Circulation</b>
+          <button data-item="IV cannula 18G">IV cannula 18G</button>
+          <button data-item="500 ml crystalloid">500 ml crystalloid</button>
+          <button data-item="Non invasive BP">Non invasive BP</button>
+        </div>
+        <div class="menu-section" data-section="D"><b>D Disability</b>
+          <button data-item="Glucose gel">Glucose gel</button>
+          <button data-item="Check pupils">Check pupils</button>
+          <button data-item="Pain score">Pain score</button>
+        </div>
+        <div class="menu-section" data-section="E"><b>E Exposure</b>
+          <button data-item="Temperature">Temperature</button>
+          <button data-item="Warm blanket">Warm blanket</button>
+          <button data-item="Inspect skin">Inspect skin</button>
+        </div>
+        <div class="menu-section" data-section="F"><b>Adrenaline</b>
+          <button data-item="Adrenaline IM 1:1000">Adrenaline IM 1:1000</button>
+        </div>
+      </div>
+      <div style="margin-top:6px; font-size:11px; opacity:0.8;">Click items to queue. Walk to patient to apply.</div>
+    `;
+    const trolleyMenu = new CSS2DObject(menuDiv); trolleyMenu.position.set(0, 1.2, 0); trolley.add(trolleyMenu);
+    function showMenu(){ trolleyMenu.visible = true; menuDiv.style.display = 'block'; labelRenderer.domElement.style.pointerEvents = 'auto'; }
+    function hideMenu(){ trolleyMenu.visible = false; menuDiv.style.display = 'none'; labelRenderer.domElement.style.pointerEvents = 'none'; }
+    hideMenu();
+
+    // Queue state
+    let patientPlan = [];
+    menuDiv.addEventListener('click', (e)=>{
+      const b = e.target.closest('button'); if(!b) return; const item = b.dataset.item; const idx = patientPlan.indexOf(item);
+      if (idx === -1) { patientPlan.push(item); b.classList.add('selected'); logEvent('pickup', { item }); }
+      else { patientPlan.splice(idx, 1); b.classList.remove('selected'); logEvent('drop', { item }); }
+      renderQueue();
+    });
+
+    // Applied label over patient
+    const appliedDiv = document.createElement('div'); appliedDiv.className = 'applied'; appliedDiv.textContent = ''; appliedDiv.style.display = 'none';
+    const appliedLabel = new CSS2DObject(appliedDiv); appliedLabel.position.set(0.5, 1.4, 0); bed.add(appliedLabel);
+
+    // Vitals state and panel
+    const vitals = { rr: 36, spo2: 90, onO2: false, hr: 82, sbp: 56, dbp: 30, temp: 36.8, avpu: 'U' };
+    function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+    function news2Score(v){
+      let score = 0;
+      if (v.rr <= 8) score += 3; else if (v.rr <= 11) score += 1; else if (v.rr <= 20) score += 0; else if (v.rr <= 24) score += 2; else score += 3;
+      if (v.spo2 >= 96) score += 0; else if (v.spo2 >= 94) score += 1; else if (v.spo2 >= 92) score += 2; else score += 3;
+      if (v.temp <= 35) score += 3; else if (v.temp <= 36) score += 1; else if (v.temp <= 38) score += 0; else if (v.temp <= 39) score += 1; else score += 2;
+      if (v.sbp <= 90) score += 3; else if (v.sbp <= 100) score += 2; else if (v.sbp <= 110) score += 1; else if (v.sbp <= 219) score += 0; else score += 3;
+      if (v.hr <= 40) score += 3; else if (v.hr <= 50) score += 1; else if (v.hr <= 90) score += 0; else if (v.hr <= 110) score += 1; else if (v.hr <= 130) score += 2; else score += 3;
+      if (v.avpu !== 'A') score += 3;
+      if (v.onO2) score += 2;
+      return score;
+    }
+    const LIMITS = { rr: [8, 50], spo2: [70, 100], hr: [30, 180], sbp: [40, 220], dbp: [20, 120], temp: [32, 42] };
+    function clampVitals(){
+      vitals.rr   = clamp(vitals.rr,   ...LIMITS.rr);
+      vitals.spo2 = clamp(vitals.spo2, ...LIMITS.spo2);
+      vitals.hr   = clamp(vitals.hr,   ...LIMITS.hr);
+      vitals.sbp  = clamp(vitals.sbp,  ...LIMITS.sbp);
+      vitals.dbp  = clamp(vitals.dbp,  ...LIMITS.dbp);
+      vitals.temp = clamp(vitals.temp, ...LIMITS.temp);
+    }
+    function vitalsSummary(){
+      const o2Text = vitals.onO2 ? 'on oxygen' : 'on air';
+      return [
+        { k:'RR', v: `${vitals.rr}/min` },
+        { k:'SpO2', v: `${vitals.spo2}% ${o2Text}` },
+        { k:'Temp', v: `${vitals.temp.toFixed(1)} °C` },
+        { k:'BP', v: `${vitals.sbp}/${vitals.dbp}` },
+        { k:'HR', v: `${vitals.hr}/min` },
+        { k:'AVPU', v: vitals.avpu }
+      ];
+    }
+    const vitalsDiv = document.createElement('div'); vitalsDiv.className = 'vitals';
+    function renderVitals(){
+      const score = news2Score(vitals);
+      const rows = vitalsSummary().map(r=>`<div class="row"><span>${r.k}</span><b>${r.v}</b></div>`).join('');
+      vitalsDiv.innerHTML = `<div class="title">NEWS2: ${score}</div>${rows}`;
+    }
+    renderVitals();
+    const vitalsLabel = new CSS2DObject(vitalsDiv); vitalsLabel.position.set(-0.3, 1.55, 0); bed.add(vitalsLabel);
+
+    // Apply effects
+    function applyItemEffects(items){
+      items.forEach(item=>{
+        switch(item){
+          case 'Oropharyngeal airway':
+            vitals.spo2 = clamp(vitals.spo2 + 2, 80, 99);
+            vitals.rr = clamp(vitals.rr - 2, 10, 40);
+            break;
+          case 'Suction catheter':
+            vitals.spo2 = clamp(vitals.spo2 + 1, 80, 99);
+            break;
+          case 'Bag valve mask':
+            vitals.onO2 = true;
+            vitals.spo2 = clamp(vitals.spo2 + 8, 80, 99);
+            vitals.rr = clamp(20, 10, 40);
+            break;
+          case 'Oxygen mask 15 L':
+            vitals.onO2 = true;
+            vitals.spo2 = clamp(vitals.spo2 + 6, 80, 99);
+            vitals.rr = clamp(vitals.rr - 6, 10, 40);
+            break;
+          case 'Nebuliser salbutamol':
+            vitals.rr = clamp(vitals.rr - 4, 10, 40);
+            break;
+          case 'Pulse oximeter':
+            break;
+          case 'IV cannula 18G':
+            break;
+          case '500 ml crystalloid':
+            vitals.sbp = clamp(vitals.sbp + 12, 50, 110);
+            vitals.dbp = clamp(vitals.dbp + 6, 30, 70);
+            break;
+          case 'Non invasive BP':
+            break;
+          case 'Glucose gel':
+            vitals.avpu = (vitals.avpu === 'U' || vitals.avpu === 'P') ? 'V' : 'A';
+            break;
+          case 'Check pupils':
+          case 'Pain score':
+          case 'Temperature':
+          case 'Inspect skin':
+          case 'Warm blanket':
+            if (item === 'Warm blanket' && vitals.temp < 36.5) vitals.temp = 36.5;
+            break;
+          case 'Adrenaline IM 1:1000':
+            vitals.sbp = clamp(vitals.sbp + 20, 50, 120);
+            vitals.dbp = clamp(vitals.dbp + 10, 30, 80);
+            vitals.hr  = clamp(vitals.hr + 10, 40, 140);
+            vitals.rr  = clamp(vitals.rr - 2, 10, 40);
+            break;
+        }
+      });
+    }
+
+    // Chips and history UI
+    function renderQueue(){
+      kitChips.innerHTML = '';
+      patientPlan.forEach(item => { const s = document.createElement('span'); s.className = 'chip'; s.textContent = item; kitChips.appendChild(s); });
+      kitCountDiv.textContent = 'Kit: ' + patientPlan.length;
+    }
+    function addAppliedHistory(items){
+      const row = document.createElement('div');
+      row.textContent = new Date().toLocaleTimeString() + ' Applied: ' + items.join(', ');
+      appliedList.prepend(row);
+      while (appliedList.childElementCount > 5) appliedList.removeChild(appliedList.lastChild);
+    }
+
+    // Proximity helpers
+    const PROX_MENU = 1.3;
+    const PROX_APPLY = 1.4;
+    function distXZ(a, b){ const dx = a.x - b.x, dz = a.z - b.z; return Math.hypot(dx, dz); }
+    function shouldShowTrolleyMenu(){ return distXZ(avatar.position, trolley.position) < PROX_MENU; }
+
+    // Debounce for apply label
+    let appliedTimeout = null;
+
+    function applyPlanIfNear(){
+      const d = distXZ(avatar.position, bed.position);
+      if (patientPlan.length > 0 && d < PROX_APPLY) {
+        const applied = patientPlan.slice();
+        patientPlan.length = 0;
+        renderQueue();
+        applyItemEffects(applied);
+        clampVitals();
+        renderVitals();
+        addAppliedHistory(applied);
+        logEvent('apply', { items: applied });
+        // transient label
+        appliedDiv.textContent = 'Applied: ' + applied.join(', ');
+        appliedDiv.style.display = 'block';
+        if (appliedTimeout) clearTimeout(appliedTimeout);
+        appliedTimeout = setTimeout(()=>{ appliedDiv.style.display = 'none'; }, 2000);
+      }
+    }
+
+    // Animate
+    let last = performance.now();
+    function animate(){
+      const now = performance.now();
+      const dt = Math.min(0.05, (now - last) / 1000); // cap delta
+      last = now;
+      t += dt;
+
+      move(dt);
+      moveNurse(dt);
+      if (followNurse) updateCameraFollow();
+
+      // Menu strictly follows proximity
+      if (shouldShowTrolleyMenu()) showMenu(); else hideMenu();
+
+      applyPlanIfNear();
+
+      renderer.render(scene, camera);
+      labelRenderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+
+    // Resize handling
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      labelRenderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Kick off
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>

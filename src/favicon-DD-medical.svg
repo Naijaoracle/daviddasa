@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Hexagon background (medical/health theme) -->
+  <path d="M 50 10 L 90 30 L 90 70 L 50 90 L 10 70 L 10 30 Z" 
+        fill="#2ecc71" 
+        stroke="#1a4731" 
+        stroke-width="2"/>
+  
+  <!-- DD Monogram in center -->
+  <text x="50" y="62" 
+        font-family="Arial, sans-serif" 
+        font-size="45" 
+        font-weight="bold" 
+        fill="white" 
+        text-anchor="middle">DD</text>
+  
+  <!-- Small medical cross at top -->
+  <circle cx="50" cy="15" r="2" fill="white" opacity="0.8"/>
+</svg>
