@@ -53,9 +53,144 @@
 
     /* Key HUD */
     #keyHUD { position: fixed; left: 10px; bottom: 10px; background: rgba(0,0,0,0.55); color: #cfe9cf; padding: 6px 8px; border-radius: 8px; font-size: 11px; pointer-events: none; z-index: 5; }
+
+    /* Navigation buttons */
+    .nav-buttons {
+      position: fixed;
+      left: 12px;
+      top: 12px;
+      display: flex;
+      gap: 8px;
+      z-index: 100;
+    }
+
+    .home-button, .scoring-link {
+      height: 44px;
+      background: #ffffff;
+      border: 2px solid #2ecc71;
+      border-radius: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+    }
+
+    .home-button {
+      width: 44px;
+    }
+
+    .scoring-link {
+      font-size: 12px;
+      font-weight: 600;
+      color: #2ecc71;
+      padding: 0 14px;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+    }
+
+    .home-button:hover, .scoring-link:hover {
+      background: #2ecc71;
+      transform: translateY(-1px);
+      box-shadow: 0 5px 16px rgba(46,204,113,0.4);
+    }
+
+    .home-button:hover svg {
+      fill: white;
+    }
+
+    .scoring-link svg {
+      width: 18px;
+      height: 18px;
+      fill: #2ecc71;
+      margin-right: 6px;
+    }
+
+    .scoring-link:hover svg {
+      fill: white;
+    }
+
+    .scoring-link:hover {
+      color: white;
+      background: #2ecc71;
+    }
+
+    .home-button svg {
+      width: 20px;
+      height: 20px;
+      fill: #2ecc71;
+    }
+
+    /* Mobile and tablet optimizations */
+    @media (max-width: 768px) {
+      .tray {
+        width: 280px;
+        right: 8px;
+        top: 60px;
+        padding: 10px;
+      }
+      .tray h3 {
+        font-size: 16px;
+      }
+      .btns {
+        grid-template-columns: 1fr;
+      }
+      button {
+        font-size: 13px;
+        padding: 8px 10px;
+      }
+      .log {
+        font-size: 11px;
+        height: 80px;
+      }
+      .hint {
+        font-size: 11px;
+        bottom: 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .tray {
+        width: calc(100vw - 16px);
+        max-width: 280px;
+      }
+      button {
+        font-size: 12px;
+        padding: 8px;
+      }
+      .navigation-buttons {
+        gap: 6px;
+        left: 8px;
+        top: 8px;
+      }
+      .scoring-link {
+        padding: 0 10px;
+        font-size: 11px;
+      }
+    }
   </style>
 </head>
 <body>
+  <div class="nav-buttons">
+    <a href="/" class="home-button" aria-label="Home" title="Return to homepage">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+      </svg>
+    </a>
+    <a href="/xr-npc-dasex-evaluator.html" class="scoring-link" aria-label="Scoring System" title="Open DASEX Checklist Evaluator">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+        <polyline points="10 9 9 9 8 9"></polyline>
+      </svg>
+      Scoring System
+    </a>
+  </div>
   <div id="three-root"></div>
 
   <div id="startOverlay">
