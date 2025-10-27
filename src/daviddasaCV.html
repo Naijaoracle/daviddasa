@@ -616,8 +616,8 @@
       function getGroundVectors(){ const f = new THREE.Vector3(); camera.getWorldDirection(f); f.y = 0; if (f.lengthSq() < 1e-6) f.set(0,0,-1); else f.normalize(); const r = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0); r.y = 0; r.normalize(); return { fwd: f, right: r }; }
       function move(dt){ const { fwd, right } = getGroundVectors(); const vel = new THREE.Vector3();
         if(key.w)vel.add(fwd); if(key.s)vel.sub(fwd); if(key.a)vel.sub(right); if(key.d)vel.add(right);
-        if (Math.abs(joyMove.x)>0.01) vel.addScaledVector(r, joyMove.x);
-        if (Math.abs(joyMove.y)>0.01) vel.addScaledVector(f, joyMove.y);
+        if (Math.abs(joyMove.x)>0.01) vel.addScaledVector(right, joyMove.x);
+        if (Math.abs(joyMove.y)>0.01) vel.addScaledVector(fwd, joyMove.y);
         if(vel.lengthSq()>0) vel.normalize().multiplyScalar(speed*dt);
         let nx = player.position.x + vel.x; let nz = player.position.z; if (insideWalkable(nx, nz)) player.position.x = nx;
         nx = player.position.x; nz = player.position.z + vel.z; if (insideWalkable(nx, nz)) player.position.z = nz;

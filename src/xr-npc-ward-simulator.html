@@ -54,6 +54,14 @@
     /* Key HUD */
     #keyHUD { position: fixed; left: 10px; bottom: 10px; background: rgba(0,0,0,0.55); color: #cfe9cf; padding: 6px 8px; border-radius: 8px; font-size: 11px; pointer-events: none; z-index: 5; }
 
+    /* Joysticks */
+    #joysticks { position: fixed; inset: 0; z-index: 6; display: none; pointer-events: none; }
+    .joy { position: absolute; width: 120px; height: 120px; border-radius: 60px; background: rgba(255,255,255,0.35); border: 1px solid rgba(0,0,0,0.15); box-shadow: 0 8px 30px rgba(0,0,0,0.12); pointer-events: auto; }
+    #joyL { left: 16px; bottom: 16px; }
+    #joyR { right: 16px; bottom: 16px; }
+    .knob { position: absolute; width: 56px; height: 56px; border-radius: 28px; left: 50%; top: 50%; transform: translate(-50%,-50%); background: rgba(255,255,255,0.95); border: 1px solid rgba(0,0,0,0.12); box-shadow: 0 6px 20px rgba(0,0,0,0.15); pointer-events: none; }
+    .touch-hint { position: fixed; left: 50%; transform: translateX(-50%); bottom: 140px; background: rgba(255,255,255,0.85); border:1px solid rgba(0,0,0,0.1); border-radius: 10px; padding: 6px 10px; font-size: 12px; z-index: 6; display: none; color: #0b1114; text-align: center; }
+
     /* Navigation buttons */
     .nav-buttons {
       position: fixed;
@@ -214,6 +222,11 @@
   <div class="crosshair" id="crosshair" title="aim"></div>
   <div class="hint" id="hint">WASD moves camera. Arrows move nurse. Click and drag to look.</div>
   <div id="keyHUD">I:0 J:0 K:0 L:0 U:0 O:0</div>
+  <div id="joysticks">
+    <div class="joy" id="joyL"><div class="knob" id="knobL"></div></div>
+    <div class="joy" id="joyR"><div class="knob" id="knobR"></div></div>
+  </div>
+  <div class="touch-hint" id="touchHint">Move left, look right</div>
 
   <!-- Single Three import for us and the examples -->
   <script type="importmap">
@@ -426,22 +439,92 @@
     labelRenderer.domElement.addEventListener('keyup',   e=> setKey(e, false));
     root.addEventListener('pointerdown', ()=>{ try { root.focus({ preventScroll: true }); } catch {} });
 
+    // Joystick setup for mobile
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    let joyMove = { x: 0, y: 0 };
+    let joyLook = { x: 0, y: 0 };
+
+    if (isTouch) {
+      const js = document.getElementById('joysticks');
+      const l = document.getElementById('joyL');
+      const r = document.getElementById('joyR');
+      const kl = document.getElementById('knobL');
+      const kr = document.getElementById('knobR');
+      const hint = document.getElementById('touchHint');
+      js.style.display = 'block';
+      hint.style.display = 'block';
+      setTimeout(()=>{ hint.style.display='none'; }, 4000);
+
+      function bind(el, knob, onChange){
+        let act = false, cx = 0, cy = 0;
+        const max = 48;
+        const reset = () => { knob.style.left='50%'; knob.style.top='50%'; onChange(0,0); };
+        const pos = (x,y) => { knob.style.left=(x+cx)+'px'; knob.style.top=(y+cy)+'px'; };
+        el.addEventListener('touchstart', ev=>{
+          const r = el.getBoundingClientRect();
+          cx = r.width/2;
+          cy = r.height/2;
+          act = true;
+          pos(0,0);
+          ev.preventDefault();
+        }, {passive:false});
+        el.addEventListener('touchmove', ev=>{
+          if(!act) return;
+          const t = ev.changedTouches[0];
+          const r = el.getBoundingClientRect();
+          const dx = t.clientX - (r.left + r.width/2);
+          const dy = t.clientY - (r.top + r.height/2);
+          const len = Math.hypot(dx,dy);
+          const scl = len>max ? max/len : 1;
+          const nx = dx*scl, ny = dy*scl;
+          pos(nx, ny);
+          onChange(nx/max, ny/max);
+          ev.preventDefault();
+        }, {passive:false});
+        el.addEventListener('touchend', ()=>{ act=false; reset(); }, {passive:false});
+        el.addEventListener('touchcancel', ()=>{ act=false; reset(); }, {passive:false});
+      }
+
+      // Left joystick controls camera movement
+      bind(l, kl, (x,y)=>{
+        joyMove.x = x;
+        joyMove.y = -y;
+      });
+
+      // Right joystick controls nurse movement  
+      bind(r, kr, (x,y)=>{
+        joyLook.x = x;
+        joyLook.y = y;
+      });
+    }
+
     const speed = 2.8; const bounds = { minX: -HALF + 0.5, maxX: HALF - 0.5, minZ: -HALF + 0.5, maxZ: HALF - 0.5 };
 
     // Nurse movement
     const nurseSpeed = 1.8; const nurseRotSpeed = 1.8; let followNurse = false;
 
     function moveNurse(dt) {
+      // Rotate nurse
       if (nkey.u) avatar.rotation.y += nurseRotSpeed * dt;
       if (nkey.o) avatar.rotation.y -= nurseRotSpeed * dt;
+      
       const yaw = avatar.rotation.y;
       const forwardN = new THREE.Vector3(Math.sin(yaw), 0, -Math.cos(yaw));
       const rightN = new THREE.Vector3().crossVectors(forwardN, new THREE.Vector3(0,1,0)); // true right vector
       const v = new THREE.Vector3();
+      
+      // Keyboard controls
       if (nkey.i) v.add(forwardN);
       if (nkey.k) v.sub(forwardN);
       if (nkey.j) v.sub(rightN);  // left
       if (nkey.l) v.add(rightN);  // right
+      
+      // Joystick controls - right pad controls nurse
+      if (joyLook.y > 0) v.add(forwardN);
+      if (joyLook.y < 0) v.sub(forwardN);
+      if (joyLook.x < 0) v.sub(rightN);  // left
+      if (joyLook.x > 0) v.add(rightN);  // right
+      
       if (v.lengthSq() > 0) v.normalize().multiplyScalar(nurseSpeed * dt);
       // axis-resolved collision
       const tryPos = avatar.position.clone();
@@ -473,10 +556,16 @@
       const forward = new THREE.Vector3(Math.sin(rig.rotation.y), 0, -Math.cos(rig.rotation.y));
       const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0,1,0));
       const vel = new THREE.Vector3();
+      // Keyboard controls
       if (key.w) vel.add(forward);
       if (key.s) vel.sub(forward);
       if (key.a) vel.sub(right);
       if (key.d) vel.add(right);
+      // Joystick controls
+      if (joyMove.y > 0) vel.add(forward);
+      if (joyMove.y < 0) vel.sub(forward);
+      if (joyMove.x < 0) vel.sub(right);
+      if (joyMove.x > 0) vel.add(right);
       if (vel.lengthSq()>0) vel.normalize().multiplyScalar(speed*dt);
       rig.position.add(vel);
       rig.position.x = Math.max(bounds.minX+0.3, Math.min(bounds.maxX-0.3, rig.position.x));
