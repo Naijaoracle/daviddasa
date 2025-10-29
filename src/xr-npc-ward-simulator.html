@@ -6,10 +6,8 @@
   <title>XR-NPC Ward Room Simulator</title>
   <style>
     html, body { height: 100%; margin: 0; overflow: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial; }
-    /* Bright canvas backdrop */
     #three-root { position: fixed; inset: 0; background: #eef5ee; cursor: default; }
 
-    /* Overlay UI */
     .ui { position: fixed; top: 0; left: 0; right: 0; pointer-events: none; }
     .tray { position: absolute; right: 16px; top: 16px; width: 340px; background: rgba(20, 24, 20, 0.85); color: #e8f5e9; border-radius: 12px; padding: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); pointer-events: auto; }
     .tray h3 { margin: 0 0 8px; font-size: 18px; letter-spacing: 0.2px; }
@@ -21,11 +19,9 @@
     button:active { transform: translateY(1px); }
     .log { margin-top: 8px; background: rgba(255,255,255,0.06); padding: 8px; border-radius: 8px; height: 96px; overflow: auto; font-size: 12px; white-space: pre-wrap; }
 
-    /* Crosshair and hint */
     .crosshair { position: fixed; left: 50%; top: 50%; width: 12px; height: 12px; margin-left: -6px; margin-top: -6px; border-radius: 50%; background: rgba(255,255,255,0.9); box-shadow: 0 0 8px rgba(255,255,255,0.5); opacity: 0.85; pointer-events: none; display: none; }
     .hint { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); color: #cfe9cf; background: rgba(0,0,0,0.5); padding: 6px 10px; border-radius: 8px; font-size: 12px; pointer-events: none; }
 
-    /* CSS2D labels */
     .label { color: #fff; background: rgba(0,0,0,0.65); padding: 2px 6px; border-radius: 6px; font-size: 12px; border: 1px solid rgba(255,255,255,0.2); }
     .menu-card { background: rgba(31, 41, 31, 0.95); color: #e8f5e9; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 8px; min-width: 240px; max-width: 300px; box-shadow: 0 6px 18px rgba(0,0,0,0.35); }
     .menu-card h4 { margin: 0 0 6px 0; font-size: 13px; letter-spacing: 0.2px; opacity: 0.9; }
@@ -40,21 +36,17 @@
     .applied-list { max-height:72px; overflow:auto; font-size:12px; background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:6px; margin-top:6px; }
     .kit-title { margin-top:10px; font-size:12px; opacity:0.9; }
 
-    /* Start overlay */
     #startOverlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.65); color: #e8f5e9; z-index: 30; }
     #startCard { background: rgba(20,24,20,0.9); padding: 18px 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); text-align: center; width: 340px; }
     #startBtn { margin-top: 10px; width: 100%; }
 
-    /* Vitals panel */
     .vitals { color:#e8f5e9; background: rgba(0,0,0,0.75); border:1px solid rgba(255,255,255,0.2); border-radius:10px; padding:8px 10px; font-size:12px; min-width:180px; }
     .vitals .title { font-weight:700; font-size:13px; margin-bottom:4px; }
     .vitals .row { display:flex; justify-content:space-between; gap:8px; }
     .vitals .row + .row { margin-top:2px; }
 
-    /* Key HUD */
     #keyHUD { position: fixed; left: 10px; bottom: 10px; background: rgba(0,0,0,0.55); color: #cfe9cf; padding: 6px 8px; border-radius: 8px; font-size: 11px; pointer-events: none; z-index: 5; }
 
-    /* Joysticks */
     #joysticks { position: fixed; inset: 0; z-index: 6; display: none; pointer-events: none; }
     .joy { position: absolute; width: 120px; height: 120px; border-radius: 60px; background: rgba(255,255,255,0.35); border: 1px solid rgba(0,0,0,0.15); box-shadow: 0 8px 30px rgba(0,0,0,0.12); pointer-events: auto; }
     #joyL { left: 16px; bottom: 16px; }
@@ -62,122 +54,30 @@
     .knob { position: absolute; width: 56px; height: 56px; border-radius: 28px; left: 50%; top: 50%; transform: translate(-50%,-50%); background: rgba(255,255,255,0.95); border: 1px solid rgba(0,0,0,0.12); box-shadow: 0 6px 20px rgba(0,0,0,0.15); pointer-events: none; }
     .touch-hint { position: fixed; left: 50%; transform: translateX(-50%); bottom: 140px; background: rgba(255,255,255,0.85); border:1px solid rgba(0,0,0,0.1); border-radius: 10px; padding: 6px 10px; font-size: 12px; z-index: 6; display: none; color: #0b1114; text-align: center; }
 
-    /* Navigation buttons */
-    .nav-buttons {
-      position: fixed;
-      left: 12px;
-      top: 12px;
-      display: flex;
-      gap: 8px;
-      z-index: 100;
-    }
+    .nav-buttons { position: fixed; left: 12px; top: 12px; display: flex; gap: 8px; z-index: 100; }
+    .home-button, .scoring-link { height: 44px; background: #ffffff; border: 2px solid #2ecc71; border-radius: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 3px 12px rgba(0,0,0,0.3); }
+    .home-button { width: 44px; }
+    .scoring-link { font-size: 12px; font-weight: 600; color: #2ecc71; padding: 0 14px; white-space: nowrap; display: flex; align-items: center; }
+    .home-button:hover, .scoring-link:hover { background: #2ecc71; transform: translateY(-1px); box-shadow: 0 5px 16px rgba(46,204,113,0.4); }
+    .home-button:hover svg { fill: white; }
+    .scoring-link svg { width: 18px; height: 18px; fill: #2ecc71; margin-right: 6px; }
+    .scoring-link:hover svg { fill: white; }
+    .scoring-link:hover { color: white; background: #2ecc71; }
+    .home-button svg { width: 20px; height: 20px; fill: #2ecc71; }
 
-    .home-button, .scoring-link {
-      height: 44px;
-      background: #ffffff;
-      border: 2px solid #2ecc71;
-      border-radius: 22px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.2s ease;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.3);
-    }
-
-    .home-button {
-      width: 44px;
-    }
-
-    .scoring-link {
-      font-size: 12px;
-      font-weight: 600;
-      color: #2ecc71;
-      padding: 0 14px;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-    }
-
-    .home-button:hover, .scoring-link:hover {
-      background: #2ecc71;
-      transform: translateY(-1px);
-      box-shadow: 0 5px 16px rgba(46,204,113,0.4);
-    }
-
-    .home-button:hover svg {
-      fill: white;
-    }
-
-    .scoring-link svg {
-      width: 18px;
-      height: 18px;
-      fill: #2ecc71;
-      margin-right: 6px;
-    }
-
-    .scoring-link:hover svg {
-      fill: white;
-    }
-
-    .scoring-link:hover {
-      color: white;
-      background: #2ecc71;
-    }
-
-    .home-button svg {
-      width: 20px;
-      height: 20px;
-      fill: #2ecc71;
-    }
-
-    /* Mobile and tablet optimizations */
     @media (max-width: 768px) {
-      .tray {
-        width: 280px;
-        right: 8px;
-        top: 60px;
-        padding: 10px;
-      }
-      .tray h3 {
-        font-size: 16px;
-      }
-      .btns {
-        grid-template-columns: 1fr;
-      }
-      button {
-        font-size: 13px;
-        padding: 8px 10px;
-      }
-      .log {
-        font-size: 11px;
-        height: 80px;
-      }
-      .hint {
-        font-size: 11px;
-        bottom: 12px;
-      }
+      .tray { width: 280px; right: 8px; top: 60px; padding: 10px; }
+      .tray h3 { font-size: 16px; }
+      .btns { grid-template-columns: 1fr; }
+      button { font-size: 13px; padding: 8px 10px; }
+      .log { font-size: 11px; height: 80px; }
+      .hint { font-size: 11px; bottom: 12px; }
     }
-
     @media (max-width: 480px) {
-      .tray {
-        width: calc(100vw - 16px);
-        max-width: 280px;
-      }
-      button {
-        font-size: 12px;
-        padding: 8px;
-      }
-      .navigation-buttons {
-        gap: 6px;
-        left: 8px;
-        top: 8px;
-      }
-      .scoring-link {
-        padding: 0 10px;
-        font-size: 11px;
-      }
+      .tray { width: calc(100vw - 16px); max-width: 280px; }
+      button { font-size: 12px; padding: 8px; }
+      .navigation-buttons { gap: 6px; left: 8px; top: 8px; }
+      .scoring-link { padding: 0 10px; font-size: 11px; }
     }
   </style>
 </head>
@@ -228,7 +128,6 @@
   </div>
   <div class="touch-hint" id="touchHint">Move left, look right</div>
 
-  <!-- Single Three import for us and the examples -->
   <script type="importmap">
     {
       "imports": {
@@ -253,9 +152,8 @@
     const root = document.getElementById('three-root');
     root.setAttribute('tabindex','-1');
 
-    // Scene and camera rig
+    // Scene and camera
     const scene = new THREE.Scene();
-    // Bright background tone
     scene.background = new THREE.Color(0xf2f8f2);
     const rig = new THREE.Object3D();
     const pitch = new THREE.Object3D();
@@ -280,14 +178,13 @@
     root.appendChild(labelRenderer.domElement);
     labelRenderer.domElement.setAttribute('tabindex','-1');
 
-    // Lights - brighter overall
+    // Lights
     const hemi = new THREE.HemisphereLight(0xffffff, 0xdedede, 1.4); scene.add(hemi);
     const amb = new THREE.AmbientLight(0xffffff, 0.4); scene.add(amb);
     const dir = new THREE.DirectionalLight(0xffffff, 1.2); dir.position.set(4, 8, 2); scene.add(dir);
 
     // Room
     const ROOM = 10; const HALF = ROOM / 2; const room = new THREE.Group(); scene.add(room);
-    // Lighter wall and floor materials
     const wallMat = new THREE.MeshStandardMaterial({ color: 0xe6efe6, metalness: 0, roughness: 0.9 });
     const floorMat = new THREE.MeshStandardMaterial({ color: 0xf2f7f2, roughness: 0.95 });
     const trimMat  = new THREE.MeshStandardMaterial({ color: 0xbf4a4a, roughness: 1 });
@@ -307,12 +204,74 @@
     const band3 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.2, bandLen), trimMat); band3.position.set(-HALF + 0.05, 0.8, 0); room.add(band3.clone());
     const band4 = band3.clone(); band4.position.set(HALF - 0.05, 0.8, 0); room.add(band4);
 
-    // Trolley
-    const trolley = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), new THREE.MeshStandardMaterial({ color: 0xc62828 }));
-    trolley.position.set(3.0, 0.4, 1.6);
+    // Trolley builder with shelves, posts, wheels and handle
+    function makeTrolley(){
+      const g = new THREE.Group();
+      const metal = new THREE.MeshStandardMaterial({ color: 0x6b6f70, metalness: 0.5, roughness: 0.5 });
+      const shelfMat = new THREE.MeshStandardMaterial({ color: 0xc62828, metalness: 0.1, roughness: 0.9 });
+      const rubber = new THREE.MeshStandardMaterial({ color: 0x1c1c1c, roughness: 0.8 });
+
+      const w = 0.9, d = 0.55, h = 1.05;
+      const shelfT = 0.06;
+
+      const shelfY = [0.25, 0.55, 0.85];
+      shelfY.forEach(y=>{
+        const shelf = new THREE.Mesh(new THREE.BoxGeometry(w, shelfT, d), shelfMat);
+        shelf.position.set(0, y, 0);
+        g.add(shelf);
+      });
+
+      const postGeo = new THREE.CylinderGeometry(0.04, 0.04, h, 16);
+      const posts = [
+        [-w/2+0.05, h/2, -d/2+0.05],
+        [ w/2-0.05, h/2, -d/2+0.05],
+        [-w/2+0.05, h/2,  d/2-0.05],
+        [ w/2-0.05, h/2,  d/2-0.05],
+      ];
+      posts.forEach(p=>{
+        const post = new THREE.Mesh(postGeo, metal);
+        post.position.set(p[0], p[1], p[2]);
+        g.add(post);
+      });
+
+      // Side rails
+      const railGeo = new THREE.CylinderGeometry(0.03, 0.03, w, 12);
+      const rail1 = new THREE.Mesh(railGeo, metal);
+      rail1.rotation.z = Math.PI/2;
+      rail1.position.set(0, 1.0, d/2+0.03);
+      g.add(rail1);
+
+      // Push handle
+      const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.6, 12), metal);
+      handle.rotation.z = Math.PI/2;
+      handle.position.set(w/2 + 0.08, 0.95, 0);
+      g.add(handle);
+
+      // Wheels
+      for(let i=0;i<4;i++){
+        const wx = i%2===0 ? -w/2+0.15 : w/2-0.15;
+        const wz = i<2 ? -d/2+0.15 : d/2-0.15;
+        const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.04, 16), rubber);
+        hub.rotation.x = Math.PI/2;
+        hub.position.set(wx, 0.18, wz);
+        const caster = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.1, 8), metal);
+        caster.position.set(wx, 0.23, wz);
+        g.add(hub, caster);
+      }
+
+      // Small bin on top
+      const bin = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.12, 0.18), new THREE.MeshStandardMaterial({ color: 0x9e1e1e, roughness: 0.8 }));
+      bin.position.set(-0.25, 0.95, 0.15);
+      g.add(bin);
+
+      return g;
+    }
+
+    const trolley = makeTrolley();
+    trolley.position.set(3.0, 0, 1.6);
     room.add(trolley);
 
-    // Nurse - rounded human silhouette
+    // Nurse with clear head and joints for animation
     function buildNurse() {
       const group = new THREE.Group();
       const skin = 0xf0c8a0;
@@ -320,80 +279,70 @@
       const shoes = 0x252525;
       const accent = 0x2e7d32;
 
-      // Torso
-      const torso = new THREE.Mesh(
-        new THREE.CapsuleGeometry(0.22, 0.6, 8, 16),
-        new THREE.MeshStandardMaterial({ color: scrubs, roughness: 0.95 })
-      );
+      // Torso core
+      const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.24, 0.5, 12, 20), new THREE.MeshStandardMaterial({ color: scrubs, roughness: 0.95 }));
       torso.position.y = 1.05;
 
-      // Head
-      const head = new THREE.Mesh(
-        new THREE.SphereGeometry(0.16, 24, 16),
-        new THREE.MeshStandardMaterial({ color: skin, roughness: 0.7 })
-      );
-      head.position.y = 1.52;
+      // Neck
+      const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.10, 16), new THREE.MeshStandardMaterial({ color: skin, roughness: 0.8 }));
+      neck.position.y = 1.33;
 
-      // Surgical cap
-      const cap = new THREE.Mesh(
-        new THREE.SphereGeometry(0.18, 24, 16),
-        new THREE.MeshStandardMaterial({ color: accent, roughness: 0.95 })
-      );
-      cap.scale.set(1, 0.55, 1);
-      cap.position.y = 1.58;
+      // Head lifted so it is clearly visible
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.19, 28, 18), new THREE.MeshStandardMaterial({ color: skin, roughness: 0.7 }));
+      head.position.y = 1.56;
 
-      // Simple facial features
-      const eyeGeo = new THREE.SphereGeometry(0.01, 8, 8);
+      // Cap
+      const cap = new THREE.Mesh(new THREE.SphereGeometry(0.21, 24, 16), new THREE.MeshStandardMaterial({ color: accent, roughness: 0.95 }));
+      cap.scale.set(1.0, 0.55, 1.0);
+      cap.position.y = 1.66;
+
+      // Eyes and simple mask band
+      const eyeGeo = new THREE.SphereGeometry(0.012, 8, 8);
       const eyeMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
       const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
       const eyeR = new THREE.Mesh(eyeGeo, eyeMat);
-      eyeL.position.set(-0.04, 1.53, 0.14);
-      eyeR.position.set( 0.04, 1.53, 0.14);
+      eyeL.position.set(-0.05, 1.56, 0.16);
+      eyeR.position.set( 0.05, 1.56, 0.16);
 
-      // Arms
-      const armGeo = new THREE.CapsuleGeometry(0.07, 0.32, 8, 16);
+      // Shoulders as joints
+      const shoulderL = new THREE.Object3D(); shoulderL.position.set(-0.34, 1.22, 0);
+      const shoulderR = new THREE.Object3D(); shoulderR.position.set( 0.34, 1.22, 0);
+      const armGeo = new THREE.CapsuleGeometry(0.075, 0.34, 12, 20);
       const armMat = new THREE.MeshStandardMaterial({ color: scrubs, roughness: 0.95 });
       const armL = new THREE.Mesh(armGeo, armMat);
       const armR = new THREE.Mesh(armGeo, armMat);
-      armL.position.set(-0.32, 1.2, 0);
-      armR.position.set( 0.32, 1.2, 0);
-      armL.rotation.z = 0.08;
-      armR.rotation.z = -0.08;
+      armL.position.y = -0.22;
+      armR.position.y = -0.22;
+      shoulderL.add(armL); shoulderR.add(armR);
 
-      // Hands
-      const handGeo = new THREE.SphereGeometry(0.07, 16, 12);
+      const handGeo = new THREE.SphereGeometry(0.065, 16, 12);
       const handMat = new THREE.MeshStandardMaterial({ color: skin, roughness: 0.8 });
-      const handL = new THREE.Mesh(handGeo, handMat);
-      const handR = new THREE.Mesh(handGeo, handMat);
-      handL.position.set(-0.32, 0.98, 0.02);
-      handR.position.set( 0.32, 0.98,-0.02);
+      const handL = new THREE.Mesh(handGeo, handMat); handL.position.set(0, -0.46, 0.02); shoulderL.add(handL);
+      const handR = new THREE.Mesh(handGeo, handMat); handR.position.set(0, -0.46,-0.02); shoulderR.add(handR);
 
-      // Legs
-      const legGeo = new THREE.CapsuleGeometry(0.09, 0.45, 8, 16);
+      // Hips as joints
+      const hipL = new THREE.Object3D(); hipL.position.set(-0.12, 0.90, 0);
+      const hipR = new THREE.Object3D(); hipR.position.set( 0.12, 0.90, 0);
+      const legGeo = new THREE.CapsuleGeometry(0.095, 0.46, 12, 20);
       const legMat = new THREE.MeshStandardMaterial({ color: scrubs, roughness: 0.95 });
       const legL = new THREE.Mesh(legGeo, legMat);
       const legR = new THREE.Mesh(legGeo, legMat);
-      legL.position.set(-0.11, 0.55, 0);
-      legR.position.set( 0.11, 0.55, 0);
+      legL.position.y = -0.33; legR.position.y = -0.33;
+      hipL.add(legL); hipR.add(legR);
 
       // Shoes
-      const shoeGeo = new THREE.CapsuleGeometry(0.09, 0.05, 8, 16);
+      const shoeGeo = new THREE.CapsuleGeometry(0.09, 0.06, 10, 18);
       const shoeMat = new THREE.MeshStandardMaterial({ color: shoes, roughness: 0.9 });
-      const shoeL = new THREE.Mesh(shoeGeo, shoeMat);
-      const shoeR = new THREE.Mesh(shoeGeo, shoeMat);
-      shoeL.rotation.x = Math.PI * 0.5;
-      shoeR.rotation.x = Math.PI * 0.5;
-      shoeL.position.set(-0.11, 0.25, 0.05);
-      shoeR.position.set( 0.11, 0.25, 0.05);
+      const shoeL = new THREE.Mesh(shoeGeo, shoeMat); shoeL.rotation.x = Math.PI * 0.5; shoeL.position.set(0, -0.60, 0.06); hipL.add(shoeL);
+      const shoeR = new THREE.Mesh(shoeGeo, shoeMat); shoeR.rotation.x = Math.PI * 0.5; shoeR.position.set(0, -0.60, 0.06); hipR.add(shoeR);
 
       // ID badge
-      const badge = new THREE.Mesh(
-        new THREE.BoxGeometry(0.06, 0.08, 0.005),
-        new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 })
-      );
-      badge.position.set(0.12, 1.18, 0.21);
+      const badge = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.08, 0.005), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 }));
+      badge.position.set(0.13, 1.18, 0.23);
 
-      group.add(torso, head, cap, eyeL, eyeR, armL, armR, handL, handR, legL, legR, shoeL, shoeR, badge);
+      group.add(torso, neck, head, cap, eyeL, eyeR, shoulderL, shoulderR, hipL, hipR, badge);
+
+      group.userData.limbs = { shoulderL, shoulderR, hipL, hipR, head, torso };
       return group;
     }
 
@@ -407,7 +356,6 @@
     nurseNameLabel.position.set(0, 1.9, 0);
     avatar.add(nurseNameLabel);
 
-    // Kit count label above nurse
     const kitCountDiv = document.createElement('div');
     kitCountDiv.className = 'label';
     kitCountDiv.textContent = 'Kit: 0';
@@ -459,7 +407,7 @@
       const dx = cx - clampedX; const dz = cz - clampedZ; return (dx*dx + dz*dz) <= r*r;
     }
 
-    // Animation state
+    // Input
     let t = 0;
     let dragging = false, lastX = 0, lastY = 0; const maxPitch = Math.PI/2 - 0.05;
 
@@ -477,7 +425,6 @@
       try { root.focus({ preventScroll: true }); } catch {}
     });
 
-    // Keys
     const nkey = { i:false, j:false, k:false, l:false, u:false, o:false };
     const key = { w:false, a:false, s:false, d:false };
 
@@ -488,21 +435,18 @@
       const k = (e.key || '').toLowerCase();
       const c = e.code || '';
       let handled = false;
-      // Camera rig on WASD only
-      if (c==='KeyW' || k==='w')                       { key.w = down; handled = true; }
-      if (c==='KeyA' || k==='a')                       { key.a = down; handled = true; }
-      if (c==='KeyS' || k==='s')                       { key.s = down; handled = true; }
-      if (c==='KeyD' || k==='d')                       { key.d = down; handled = true; }
-      // Nurse IJKL + U/O and Arrow keys
-      if (c==='KeyI' || k==='i' || c==='ArrowUp')      { nkey.i = down; handled = true; }
-      if (c==='KeyJ' || k==='j' || c==='ArrowLeft')    { nkey.j = down; handled = true; }
-      if (c==='KeyK' || k==='k' || c==='ArrowDown')    { nkey.k = down; handled = true; }
-      if (c==='KeyL' || k==='l' || c==='ArrowRight')   { nkey.l = down; handled = true; }
-      if (c==='KeyU' || k==='u')                       { nkey.u = down; handled = true; }
-      if (c==='KeyO' || k==='o')                       { nkey.o = down; handled = true; }
+      if (c==='KeyW' || k==='w') { key.w = down; handled = true; }
+      if (c==='KeyA' || k==='a') { key.a = down; handled = true; }
+      if (c==='KeyS' || k==='s') { key.s = down; handled = true; }
+      if (c==='KeyD' || k==='d') { key.d = down; handled = true; }
+      if (c==='KeyI' || k==='i' || c==='ArrowUp')    { nkey.i = down; handled = true; }
+      if (c==='KeyJ' || k==='j' || c==='ArrowLeft')  { nkey.j = down; handled = true; }
+      if (c==='KeyK' || k==='k' || c==='ArrowDown')  { nkey.k = down; handled = true; }
+      if (c==='KeyL' || k==='l' || c==='ArrowRight') { nkey.l = down; handled = true; }
+      if (c==='KeyU' || k==='u')                     { nkey.u = down; handled = true; }
+      if (c==='KeyO' || k==='o')                     { nkey.o = down; handled = true; }
       if (handled) { e.preventDefault(); updateKeyHUD(); if(!keyboardSeen){ keyboardSeen=true; setStatus('Modules OK • Keyboard OK'); } }
     }
-    // Extra robust listeners
     window.addEventListener('keydown', e=> setKey(e, true),  { capture: true });
     window.addEventListener('keyup',   e=> setKey(e, false), { capture: true });
     document.addEventListener('keydown', e=> setKey(e, true));
@@ -515,7 +459,7 @@
     labelRenderer.domElement.addEventListener('keyup',   e=> setKey(e, false));
     root.addEventListener('pointerdown', ()=>{ try { root.focus({ preventScroll: true }); } catch {} });
 
-    // Joystick setup for mobile
+    // Mobile joysticks
     const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     let joyMove = { x: 0, y: 0 };
     let joyLook = { x: 0, y: 0 };
@@ -561,17 +505,8 @@
         el.addEventListener('touchcancel', ()=>{ act=false; reset(); }, {passive:false});
       }
 
-      // Left joystick controls camera movement
-      bind(l, kl, (x,y)=>{
-        joyMove.x = x;
-        joyMove.y = -y;
-      });
-
-      // Right joystick controls nurse movement
-      bind(r, kr, (x,y)=>{
-        joyLook.x = x;
-        joyLook.y = y;
-      });
+      bind(l, kl, (x,y)=>{ joyMove.x = x; joyMove.y = -y; });
+      bind(r, kr, (x,y)=>{ joyLook.x = x; joyLook.y = y; });
     }
 
     const speed = 2.8; const bounds = { minX: -HALF + 0.5, maxX: HALF - 0.5, minZ: -HALF + 0.5, maxZ: HALF - 0.5 };
@@ -580,7 +515,6 @@
     const nurseSpeed = 1.8; const nurseRotSpeed = 1.8; let followNurse = false;
 
     function moveNurse(dt) {
-      // Rotate nurse
       if (nkey.u) avatar.rotation.y += nurseRotSpeed * dt;
       if (nkey.o) avatar.rotation.y -= nurseRotSpeed * dt;
 
@@ -589,36 +523,31 @@
       const rightN = new THREE.Vector3().crossVectors(forwardN, new THREE.Vector3(0,1,0));
       const v = new THREE.Vector3();
 
-      // Keyboard controls
       if (nkey.i) v.add(forwardN);
       if (nkey.k) v.sub(forwardN);
-      if (nkey.j) v.sub(rightN);  // left
-      if (nkey.l) v.add(rightN);  // right
+      if (nkey.j) v.sub(rightN);
+      if (nkey.l) v.add(rightN);
 
-      // Joystick controls - right pad controls nurse
       if (joyLook.y > 0) v.add(forwardN);
       if (joyLook.y < 0) v.sub(forwardN);
-      if (joyLook.x < 0) v.sub(rightN);  // left
-      if (joyLook.x > 0) v.add(rightN);  // right
+      if (joyLook.x < 0) v.sub(rightN);
+      if (joyLook.x > 0) v.add(rightN);
 
       if (v.lengthSq() > 0) v.normalize().multiplyScalar(nurseSpeed * dt);
-      // axis resolved collision
       const tryPos = avatar.position.clone();
-      // X axis
       tryPos.x += v.x;
       if (!circleRectOverlap(tryPos.x, avatar.position.z, nurseRadius, bedRect) && !circleRectOverlap(tryPos.x, avatar.position.z, nurseRadius, trolleyRect)) {
         avatar.position.x = tryPos.x;
       }
-      // Z axis
       tryPos.z = avatar.position.z + v.z;
       if (!circleRectOverlap(avatar.position.x, tryPos.z, nurseRadius, bedRect) && !circleRectOverlap(avatar.position.x, tryPos.z, nurseRadius, trolleyRect)) {
         avatar.position.z = tryPos.z;
       }
-      // Clamp to room
       avatar.position.x = Math.max(bounds.minX+0.25, Math.min(bounds.maxX-0.25, avatar.position.x));
       avatar.position.z = Math.max(bounds.minZ+0.25, Math.min(bounds.maxZ-0.25, avatar.position.z));
     }
 
+    // Camera follow
     const upAxis = new THREE.Vector3(0,1,0);
     function updateCameraFollow() {
       const offset = new THREE.Vector3(0, 0, 2.6);
@@ -632,12 +561,10 @@
       const forward = new THREE.Vector3(Math.sin(rig.rotation.y), 0, -Math.cos(rig.rotation.y));
       const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0,1,0));
       const vel = new THREE.Vector3();
-      // Keyboard controls
       if (key.w) vel.add(forward);
       if (key.s) vel.sub(forward);
       if (key.a) vel.sub(right);
       if (key.d) vel.add(right);
-      // Joystick controls
       if (joyMove.y > 0) vel.add(forward);
       if (joyMove.y < 0) vel.sub(forward);
       if (joyMove.x < 0) vel.sub(right);
@@ -671,7 +598,7 @@
     const kitChips = document.getElementById('kitChips');
     const appliedList = document.getElementById('appliedList');
 
-    tray.addEventListener('click', (e)=>{ /* no-op */ });
+    tray.addEventListener('click', (e)=>{});
 
     const recordBtn = document.getElementById('recordBtn'); const downloadBtn = document.getElementById('downloadBtn'); let recording = false; let events = []; let sampleTimer = null;
     function logEvent(type, data = {}) { const entry = { t: new Date().toISOString(), type, ...data }; events.push(entry); if (type !== 'pos') { const now = new Date().toLocaleTimeString(); log.textContent = `[${now}] ${type === 'action' ? data.action : type}\n` + log.textContent; } }
@@ -683,7 +610,7 @@
     followBtn.addEventListener('click', ()=>{ followNurse = !followNurse; followBtn.textContent = `Follow nurse: ${followNurse ? 'On' : 'Off'}`; followBtn.classList.toggle('secondary', !followNurse); });
     resetNurseBtn.addEventListener('click', ()=>{ avatar.position.set(-0.6, 0, -2.1); avatar.rotation.set(0,0,0); });
 
-    // Proximity menu and apply logic
+    // Proximity menu
     const menuDiv = document.createElement('div');
     menuDiv.className = 'menu-card';
     menuDiv.style.display = 'none';
@@ -722,7 +649,7 @@
       </div>
       <div style="margin-top:6px; font-size:11px; opacity:0.8;">Click items to queue. Walk to patient to apply.</div>
     `;
-    const trolleyMenu = new CSS2DObject(menuDiv); trolleyMenu.position.set(0, 1.2, 0); trolley.add(trolleyMenu);
+    const trolleyMenu = new CSS2DObject(menuDiv); trolleyMenu.position.set(0, 1.05, 0); trolley.add(trolleyMenu);
     function showMenu(){ trolleyMenu.visible = true; menuDiv.style.display = 'block'; labelRenderer.domElement.style.pointerEvents = 'auto'; }
     function hideMenu(){ trolleyMenu.visible = false; menuDiv.style.display = 'none'; labelRenderer.domElement.style.pointerEvents = 'none'; }
     hideMenu();
@@ -740,7 +667,7 @@
     const appliedDiv = document.createElement('div'); appliedDiv.className = 'applied'; appliedDiv.textContent = ''; appliedDiv.style.display = 'none';
     const appliedLabel = new CSS2DObject(appliedDiv); appliedLabel.position.set(0.5, 1.4, 0); bed.add(appliedLabel);
 
-    // Vitals state and panel
+    // Vitals
     const vitals = { rr: 36, spo2: 90, onO2: false, hr: 82, sbp: 56, dbp: 30, temp: 36.8, avpu: 'U' };
     function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
     function news2Score(v){
@@ -783,7 +710,6 @@
     renderVitals();
     const vitalsLabel = new CSS2DObject(vitalsDiv); vitalsLabel.position.set(-0.3, 1.55, 0); bed.add(vitalsLabel);
 
-    // Apply effects
     function applyItemEffects(items){
       items.forEach(item=>{
         switch(item){
@@ -807,25 +733,15 @@
           case 'Nebuliser salbutamol':
             vitals.rr = clamp(vitals.rr - 4, 10, 40);
             break;
-          case 'Pulse oximeter':
-            break;
-          case 'IV cannula 18G':
-            break;
           case '500 ml crystalloid':
             vitals.sbp = clamp(vitals.sbp + 12, 50, 110);
             vitals.dbp = clamp(vitals.dbp + 6, 30, 70);
             break;
-          case 'Non invasive BP':
-            break;
           case 'Glucose gel':
             vitals.avpu = (vitals.avpu === 'U' || vitals.avpu === 'P') ? 'V' : 'A';
             break;
-          case 'Check pupils':
-          case 'Pain score':
-          case 'Temperature':
-          case 'Inspect skin':
           case 'Warm blanket':
-            if (item === 'Warm blanket' && vitals.temp < 36.5) vitals.temp = 36.5;
+            if (vitals.temp < 36.5) vitals.temp = 36.5;
             break;
           case 'Adrenaline IM 1:1000':
             vitals.sbp = clamp(vitals.sbp + 20, 50, 120);
@@ -837,7 +753,6 @@
       });
     }
 
-    // Chips and history UI
     function renderQueue(){
       kitChips.innerHTML = '';
       patientPlan.forEach(item => { const s = document.createElement('span'); s.className = 'chip'; s.textContent = item; kitChips.appendChild(s); });
@@ -856,9 +771,7 @@
     function distXZ(a, b){ const dx = a.x - b.x, dz = a.z - b.z; return Math.hypot(dx, dz); }
     function shouldShowTrolleyMenu(){ return distXZ(avatar.position, trolley.position) < PROX_MENU; }
 
-    // Debounce for apply label
     let appliedTimeout = null;
-
     function applyPlanIfNear(){
       const d = distXZ(avatar.position, bed.position);
       if (patientPlan.length > 0 && d < PROX_APPLY) {
@@ -870,7 +783,6 @@
         renderVitals();
         addAppliedHistory(applied);
         logEvent('apply', { items: applied });
-        // transient label
         appliedDiv.textContent = 'Applied: ' + applied.join(', ');
         appliedDiv.style.display = 'block';
         if (appliedTimeout) clearTimeout(appliedTimeout);
@@ -878,21 +790,51 @@
       }
     }
 
+    // Simple walk cycle driven by movement
+    let prevPos = avatar.position.clone();
+    let walkPhase = 0;
+
+    function updateNurseAnimation(dt){
+      const limbs = avatar.userData.limbs;
+      if (!limbs) return;
+      const d = avatar.position.distanceTo(prevPos);
+      prevPos.copy(avatar.position);
+      const speedNow = d / Math.max(1e-6, dt);
+      const moving = Math.min(speedNow / 1.2, 1.0); // normalize
+
+      walkPhase += speedNow * 4.0 * dt;
+
+      const swing = Math.sin(walkPhase) * 0.6 * moving;
+      const counter = Math.sin(walkPhase + Math.PI) * 0.6 * moving;
+
+      limbs.shoulderL.rotation.x = swing * 0.6;
+      limbs.shoulderR.rotation.x = counter * 0.6;
+
+      limbs.hipL.rotation.x = -swing * 0.7;
+      limbs.hipR.rotation.x = -counter * 0.7;
+
+      // small torso bob and lean
+      limbs.torso.position.y = 1.05 + Math.sin(walkPhase * 2.0) * 0.02 * moving;
+      avatar.rotation.z = Math.sin(walkPhase) * 0.03 * moving;
+
+      // keep head upright
+      limbs.head.rotation.set(0, 0, 0);
+    }
+
     // Animate
     let last = performance.now();
     function animate(){
       const now = performance.now();
-      const dt = Math.min(0.05, (now - last) / 1000); // cap delta
+      const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       t += dt;
 
       move(dt);
       moveNurse(dt);
+      updateNurseAnimation(dt);
       if (followNurse) updateCameraFollow();
 
-      // Menu strictly follows proximity
       if (shouldShowTrolleyMenu()) showMenu(); else hideMenu();
-
       applyPlanIfNear();
 
       renderer.render(scene, camera);
@@ -900,7 +842,7 @@
       requestAnimationFrame(animate);
     }
 
-    // Resize handling
+    // Resize
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
@@ -908,7 +850,7 @@
       labelRenderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // Kick off
+    // Start
     requestAnimationFrame(animate);
   </script>
 </body>
