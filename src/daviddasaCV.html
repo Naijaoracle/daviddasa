@@ -478,9 +478,18 @@
           const d2 = document.createElement('div'); d2.className = 'label'; d2.textContent = entry.years; const l2 = new CSS2DObject(d2); l2.position.set(0, 1.08, 0); g.add(l2);
         }
         const country = (() => {
-          const t = (entry.title + ' ' + (entry.bullets||[]).join(' ')).toLowerCase();
-          if (t.includes('nigeria') || t.includes('kebbi') || t.includes('sokoto')) return '\uD83C\uDDF3\uD83C\uDDEC';
-          if (t.includes('uk') || t.includes('bournemouth') || t.includes('dorset') || t.includes('nhs') || t.includes('international, uk')) return '\uD83C\uDDEC\uD83C\uDDE7';
+          // Prioritize title for location detection, then check bullets as fallback
+          const titleLower = (entry.title || '').toLowerCase();
+          const bulletsLower = (entry.bullets || []).join(' ').toLowerCase();
+          
+          // Check title first (higher priority)
+          if (titleLower.includes('uk') || titleLower.includes('bournemouth') || titleLower.includes('dorset') || titleLower.includes('nhs') || titleLower.includes('international, uk')) return '\uD83C\uDDEC\uD83C\uDDE7';
+          if (titleLower.includes('nigeria') || titleLower.includes('kebbi') || titleLower.includes('sokoto')) return '\uD83C\uDDF3\uD83C\uDDEC';
+          
+          // Fallback to bullets if title doesn't specify location
+          if (bulletsLower.includes('nigeria') || bulletsLower.includes('kebbi') || bulletsLower.includes('sokoto')) return '\uD83C\uDDF3\uD83C\uDDEC';
+          if (bulletsLower.includes('uk') || bulletsLower.includes('bournemouth') || bulletsLower.includes('dorset') || bulletsLower.includes('nhs') || bulletsLower.includes('international, uk')) return '\uD83C\uDDEC\uD83C\uDDE7';
+          
           return '';
         })();
         if (country){ const dF = document.createElement('div'); dF.className = 'label'; dF.textContent = country; const lF = new CSS2DObject(dF); lF.position.set(0.0, 1.7, 0); g.add(lF); }
