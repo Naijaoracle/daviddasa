@@ -10,6 +10,24 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+    <style>
+        .nav-buttons { position: fixed; left: 12px; top: 12px; display: flex; gap: 8px; z-index: 1000; }
+        .home-button, .er-link { height: 44px; background: #ffffff; border: 2px solid #2ecc71; border-radius: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 3px 12px rgba(0,0,0,0.3); }
+        .home-button { width: 44px; }
+        .er-link { font-size: 12px; font-weight: 600; color: #2ecc71; padding: 0 14px; white-space: nowrap; }
+        .home-button:hover, .er-link:hover { background: #2ecc71; transform: translateY(-1px); box-shadow: 0 5px 16px rgba(46,204,113,0.4); color: #fff; }
+        .home-button svg { width: 20px; height: 20px; fill: #2ecc71; }
+        .home-button:hover svg { fill: #fff; }
+    </style>
+
+    <div class="nav-buttons">
+        <a href="/" class="home-button" aria-label="Home" title="Return to homepage">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+            </svg>
+        </a>
+        <a href="/src/xr-npc-ward-simulator.html" class="er-link" aria-label="Emergency Room" title="Open Emergency Room">Emergency Room</a>
+    </div>
     <div class="container">
         <div class="main-content">
             <div class="left-column">
@@ -19,7 +37,7 @@
                         <div class="waiting-patients"></div>
                     </div>
                     
-                    <div class="emergency-room">
+                    <div class="emergency-room" id="er">
                         <h2>Emergency Room</h2>
                         <div class="treatment-areas">
                             <div class="treatment-bay" id="bay1">Bay 1</div>
