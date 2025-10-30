@@ -266,8 +266,9 @@
       const handleMat = new THREE.MeshStandardMaterial({ color: 0xd7d9db, metalness: 0.7, roughness: 0.3 });
 
       const labelStyle = 'padding:2px 4px;background:#fff;color:#111;border-radius:3px;border:1px solid rgba(0,0,0,0.25);font-size:10px;letter-spacing:0.3px;';
-      const labelTexts = ['AIRWAY','BREATHING','CIRCULATION','I.V. FLUIDS'];
-      let labelIndex = 0;
+      // From bottom to top (i increases upward). We'll reserve top for ADRENALINE, bottom for CARDIAC/ANAPHYLAXIS,
+      // and fill the middle from bottom-up as: IV FLUIDS, CIRCULATION, BREATHING, AIRWAY
+      const drawerLabelsMid = ['IV FLUIDS','CIRCULATION','BREATHING','AIRWAY'];
 
       for(let i=0;i<drawCount;i++){
         const y = body.position.y - bodyH/2 + 0.03 + i*(drawH+gap) + drawH/2;
@@ -292,8 +293,15 @@
           const l1 = new CSS2DObject(div);   l1.position.set(-bodyW*0.32, y, bodyD/2 + frontDepth + 0.001);
           const l2 = new CSS2DObject(div2);  l2.position.set( bodyW*0.28, y, bodyD/2 + frontDepth + 0.001);
           g.add(l1, l2);
+        } else if (i === drawCount - 1) {
+          // Top-most drawer label
+          div.textContent = 'ADRENALINE';
+          const lab = new CSS2DObject(div);
+          lab.position.set(-bodyW*0.34, y, bodyD/2 + frontDepth + 0.001);
+          g.add(lab);
         } else {
-          div.textContent = labelTexts[labelIndex++] || 'SUPPLIES';
+          const text = drawerLabelsMid[i-1] || 'SUPPLIES';
+          div.textContent = text;
           const lab = new CSS2DObject(div);
           lab.position.set(-bodyW*0.34, y, bodyD/2 + frontDepth + 0.001);
           g.add(lab);
@@ -320,7 +328,7 @@
     room.add(trolley);
 
     // Nurse with visible head and simple walk animation
-    function buildNurse(colorMain = 0x1b5e20, colorCap = 0x2067d4){
+    function buildNurse(colorMain = 0x1b5e20, colorCap = 0x2e7d32){
       const group = new THREE.Group();
       const skin = 0xf0c8a0;
       const shoes = 0x252525;
@@ -379,8 +387,8 @@
     }
 
     // Nurse avatar
-    const avatar = buildNurse(0x1b5e20); scene.add(avatar);
-    avatar.position.set(-0.6, 0, -3.5);
+    const avatar = buildNurse(0x1b5e20, 0x2e7d32); scene.add(avatar);
+    avatar.position.set(-0.6, 0, -3.9);
     avatar.lookAt(-2.2, 0, -2.2);
 
     const nurseLabelDiv = document.createElement('div');
@@ -398,11 +406,10 @@
     avatar.add(kitCountLabel);
 
     // Doctor NPC - static blocker facing the patient
-    const doctor = buildNurse(0x26418f, 0x2067d4); // blue base, blue cap
+    const doctor = buildNurse(0x26418f, 0x2067d4);
     scene.add(doctor);
-    doctor.position.set(-2.6, 0, -0.6); // farther from bed
-    if (doctor.userData.cap) doctor.userData.cap.material.color.set(0x2067d4);
-    doctor.rotation.y = 0;
+    doctor.position.set(-2.6, 0, -0.6);
+    doctor.lookAt(-2.2, 0, -2.2);
     const doctorNameDiv = document.createElement('div');
     doctorNameDiv.className = 'label';
     doctorNameDiv.textContent = 'Dr James';
@@ -568,53 +575,48 @@
     const nurseSpeed = 1.8; const nurseRotSpeed = 1.8; let followNurse = false;
 
     function moveNurse(dt) {
-      const keys = nkey.i||nkey.j||nkey.k||nkey.l;
-      let v = new THREE.Vector3();
-      if (keys) {
-        if (nkey.u) avatar.rotation.y += nurseRotSpeed * dt;
-        if (nkey.o) avatar.rotation.y -= nurseRotSpeed * dt;
+      // Always allow rotation keys
+      if (nkey.u) avatar.rotation.y += nurseRotSpeed * dt;
+      if (nkey.o) avatar.rotation.y -= nurseRotSpeed * dt;
 
-        const yaw = avatar.rotation.y;
-        const forwardN = new THREE.Vector3(Math.sin(yaw), 0, -Math.cos(yaw));
-        const rightN = new THREE.Vector3().crossVectors(forwardN, new THREE.Vector3(0,1,0));
+      // Movement only if I/J/K/L (or arrows) are pressed; no joystick drift
+      if (!(nkey.i||nkey.j||nkey.k||nkey.l)) return;
 
-        if (nkey.i) v.add(forwardN);
-        if (nkey.k) v.sub(forwardN);
-        if (nkey.j) v.sub(rightN);
-        if (nkey.l) v.add(rightN);
+      const yaw = avatar.rotation.y;
+      const forwardN = new THREE.Vector3(Math.sin(yaw), 0, -Math.cos(yaw));
+      const rightN = new THREE.Vector3().crossVectors(forwardN, new THREE.Vector3(0,1,0));
+      const v = new THREE.Vector3();
 
-        if (joyLook.y > 0) v.add(forwardN);
-        if (joyLook.y < 0) v.sub(forwardN);
-        if (joyLook.x < 0) v.sub(rightN);
-        if (joyLook.x > 0) v.add(rightN);
+      if (nkey.i) v.add(forwardN);
+      if (nkey.k) v.sub(forwardN);
+      if (nkey.j) v.sub(rightN);
+      if (nkey.l) v.add(rightN);
 
-        if (v.lengthSq() > 1e-8) v.normalize().multiplyScalar(nurseSpeed * dt);
+      if (v.lengthSq() === 0) return;
+      v.normalize().multiplyScalar(nurseSpeed * dt);
 
-        const tryPos = avatar.position.clone();
-
-        // X axis
-        tryPos.x += v.x;
-        if (
-          !circleRectOverlap(tryPos.x, avatar.position.z, nurseRadius, bedRect) &&
-          !circleRectOverlap(tryPos.x, avatar.position.z, nurseRadius, trolleyRect) &&
-          !circleCircleOverlap(tryPos.x, avatar.position.z, nurseRadius, doctor.position.x, doctor.position.z, doctorRadius)
-        ) {
-          avatar.position.x = tryPos.x;
-        }
-
-        // Z axis
-        tryPos.z = avatar.position.z + v.z;
-        if (
-          !circleRectOverlap(avatar.position.x, tryPos.z, nurseRadius, bedRect) &&
-          !circleRectOverlap(avatar.position.x, tryPos.z, nurseRadius, trolleyRect) &&
-          !circleCircleOverlap(avatar.position.x, tryPos.z, nurseRadius, doctor.position.x, doctor.position.z, doctorRadius)
-        ) {
-          avatar.position.z = tryPos.z;
-        }
-
-        avatar.position.x = Math.max(bounds.minX+0.25, Math.min(bounds.maxX-0.25, avatar.position.x));
-        avatar.position.z = Math.max(bounds.minZ+0.25, Math.min(bounds.maxZ-0.25, avatar.position.z));
+      const tryPos = avatar.position.clone();
+      // X axis
+      tryPos.x += v.x;
+      if (
+        !circleRectOverlap(tryPos.x, avatar.position.z, nurseRadius, bedRect) &&
+        !circleRectOverlap(tryPos.x, avatar.position.z, nurseRadius, trolleyRect) &&
+        !circleCircleOverlap(tryPos.x, avatar.position.z, nurseRadius, doctor.position.x, doctor.position.z, doctorRadius)
+      ) {
+        avatar.position.x = tryPos.x;
       }
+      // Z axis
+      tryPos.z = avatar.position.z + v.z;
+      if (
+        !circleRectOverlap(avatar.position.x, tryPos.z, nurseRadius, bedRect) &&
+        !circleRectOverlap(avatar.position.x, tryPos.z, nurseRadius, trolleyRect) &&
+        !circleCircleOverlap(avatar.position.x, tryPos.z, nurseRadius, doctor.position.x, doctor.position.z, doctorRadius)
+      ) {
+        avatar.position.z = tryPos.z;
+      }
+
+      avatar.position.x = Math.max(bounds.minX+0.25, Math.min(bounds.maxX-0.25, avatar.position.x));
+      avatar.position.z = Math.max(bounds.minZ+0.25, Math.min(bounds.maxZ-0.25, avatar.position.z));
     }
 
     // Camera follow
@@ -775,6 +777,47 @@
       return clamp(100 * pn / d, 50, 100);
     }
 
+    // --- Vitals UI (NEWS2) ---
+    const LIMITS = { rr: [8, 50], spo2: [70, 100], hr: [30, 180], sbp: [40, 220], dbp: [20, 120], temp: [32, 42] };
+    function clampVitals(){
+      vitals.rr   = clamp(vitals.rr,   ...LIMITS.rr);
+      vitals.spo2 = clamp(vitals.spo2, ...LIMITS.spo2);
+      vitals.hr   = clamp(vitals.hr,   ...LIMITS.hr);
+      vitals.sbp  = clamp(vitals.sbp,  ...LIMITS.sbp);
+      vitals.dbp  = clamp(vitals.dbp,  ...LIMITS.dbp);
+      vitals.temp = clamp(vitals.temp, ...LIMITS.temp);
+    }
+    function news2Score(v){
+      let score = 0;
+      if (v.rr <= 8) score += 3; else if (v.rr <= 11) score += 1; else if (v.rr <= 20) score += 0; else if (v.rr <= 24) score += 2; else score += 3;
+      if (v.spo2 >= 96) score += 0; else if (v.spo2 >= 94) score += 1; else if (v.spo2 >= 92) score += 2; else score += 3;
+      if (v.temp <= 35) score += 3; else if (v.temp <= 36) score += 1; else if (v.temp <= 38) score += 0; else if (v.temp <= 39) score += 1; else score += 2;
+      if (v.sbp <= 90) score += 3; else if (v.sbp <= 100) score += 2; else if (v.sbp <= 110) score += 1; else if (v.sbp <= 219) score += 0; else score += 3;
+      if (v.hr <= 40) score += 3; else if (v.hr <= 50) score += 1; else if (v.hr <= 90) score += 0; else if (v.hr <= 110) score += 1; else if (v.hr <= 130) score += 2; else score += 3;
+      if (v.avpu !== 'A') score += 3;
+      if (v.onO2) score += 2;
+      return score;
+    }
+    function vitalsSummary(){
+      const o2Text = vitals.onO2 ? 'on oxygen' : 'on air';
+      return [
+        { k:'RR', v: `${Math.round(vitals.rr)}/min` },
+        { k:'SpO2', v: `${Math.round(vitals.spo2)}% ${o2Text}` },
+        { k:'Temp', v: `${vitals.temp.toFixed(1)} °C` },
+        { k:'BP', v: `${Math.round(vitals.sbp)}/${Math.round(vitals.dbp)}` },
+        { k:'HR', v: `${Math.round(vitals.hr)}/min` },
+        { k:'AVPU', v: vitals.avpu }
+      ];
+    }
+    const vitalsDiv = document.createElement('div'); vitalsDiv.className = 'vitals';
+    function renderVitals(){
+      const score = news2Score(vitals);
+      const rows = vitalsSummary().map(r=>`<div class="row"><span>${r.k}</span><b>${r.v}</b></div>`).join('');
+      vitalsDiv.innerHTML = `<div class="title">NEWS2: ${score}</div>${rows}`;
+    }
+    renderVitals();
+    const vitalsLabel = new CSS2DObject(vitalsDiv); vitalsLabel.position.set(-0.3, 1.55, 0); bed.add(vitalsLabel);
+
     // Dynamics core
     function updatePhys(dt) {
       // Drug and intervention kinetics
@@ -858,6 +901,8 @@
         vitals.mapEst = lerp1(vitals.mapEst, MAP, 30, dt);
       }
       vitals.avpu = avpuNow;
+      // Refresh HUD each update cycle
+      renderVitals();
     }
 
     // --- Item/Intervention Application ---
