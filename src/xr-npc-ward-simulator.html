@@ -88,7 +88,7 @@
         <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
       </svg>
     </a>
-    <a href="/src/hospital-simulation/index.html" class="scoring-link" aria-label="Hospital Simulation" title="Hospital Simulation">Hospital Simulation</a>
+    <a href="/hospital-simulation/" class="scoring-link" aria-label="Hospital Simulation" title="Hospital Simulation">Hospital Simulation</a>
     <a href="/xr-npc-dasex-evaluator.html" class="scoring-link" aria-label="Scoring System" title="Open DASEX Checklist Evaluator">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -732,6 +732,9 @@
     const appliedDiv = document.createElement('div'); appliedDiv.className = 'applied'; appliedDiv.textContent = ''; appliedDiv.style.display = 'none';
     const appliedLabel = new CSS2DObject(appliedDiv); appliedLabel.position.set(0.5, 1.4, 0); bed.add(appliedLabel);
 
+    // Therapy prerequisites
+    let hasIVAccess = false;
+
     // --- Physiology state (hidden) ---
     const phys = {
       bloodVol: 0.55,         // 1.0 is normal circulating volume (hypovolemic start)
@@ -927,8 +930,19 @@
             phys.catechol = clamp(phys.catechol + 0.05, 0, 1.5);
             break;
           case 'IV cannula 18G':
-            break; // future effect
+            hasIVAccess = true;
+            logEvent('action', { action: 'IV access established' });
+            break;
           case '500 ml crystalloid':
+            if (!hasIVAccess) {
+              // Block action; show notice and exit
+              appliedDiv.textContent = 'Needs IV access';
+              appliedDiv.style.display = 'block';
+              if (appliedTimeout) clearTimeout(appliedTimeout);
+              appliedTimeout = setTimeout(()=>{ appliedDiv.style.display = 'none'; }, 1500);
+              logEvent('notice', { reason: 'Needs IV access' });
+              return; // do not apply fluids
+            }
             phys.fluidPool = clamp(phys.fluidPool + 500, 0, 3000);
             phys.bloodVol  = clamp(phys.bloodVol + 0.05, 0.2, 1.4);
             break;
