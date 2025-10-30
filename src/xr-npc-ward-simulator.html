@@ -77,6 +77,8 @@
       .tray { width: calc(100vw - 16px); max-width: 248px; top: 52px; }
       button { font-size: 12px; padding: 7px; }
       .log { height: 48px; }
+      .btns { gap: 6px; }
+      .kit-title { font-size: 11px; }
       .navigation-buttons { gap: 6px; left: 8px; top: 8px; }
       .scoring-link, .cv-link { padding: 0 10px; font-size: 11px; }
     }
@@ -647,14 +649,17 @@
       const forward = new THREE.Vector3(Math.sin(rig.rotation.y), 0, -Math.cos(rig.rotation.y));
       const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0,1,0));
       const vel = new THREE.Vector3();
+      // Keyboard camera movement
       if (key.w) vel.add(forward);
       if (key.s) vel.sub(forward);
       if (key.a) vel.sub(right);
       if (key.d) vel.add(right);
-      if (joyMove.y > 0) vel.add(forward);
-      if (joyMove.y < 0) vel.sub(forward);
-      if (joyMove.x < 0) vel.sub(right);
-      if (joyMove.x > 0) vel.add(right);
+      // Touch: right joystick controls camera (use joyLook)
+      const camStick = isTouch ? joyLook : joyMove;
+      if (camStick.y > 0) vel.add(forward.multiplyScalar(camStick.y));
+      if (camStick.y < 0) vel.sub(forward.multiplyScalar(-camStick.y));
+      if (camStick.x < 0) vel.sub(right.multiplyScalar(-camStick.x));
+      if (camStick.x > 0) vel.add(right.multiplyScalar(camStick.x));
       if (vel.lengthSq()>0) vel.normalize().multiplyScalar(speed*dt);
       rig.position.add(vel);
       rig.position.x = Math.max(bounds.minX+0.3, Math.min(bounds.maxX-0.3, rig.position.x));
