@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Backpropagation: the Quiet Revolution that Taught Neural Nets to Learn - Research Note by David Dasa">
+  <title>Backpropagation: the Quiet Revolution - Research Notes - David Dasa</title>
+  <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+  <nav>
+    <ul>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+      <li><a href="https://www.daviddasa.com/research-notes">Research Notes</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <main>
+      <section style="background: rgba(255,255,255,0.85); border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 6px 18px rgba(0,0,0,0.04); padding: 1rem 1.25rem; border-radius: 10px;">
+        <header class="article-header">
+          <h1># Backpropagation: the Quiet Revolution that Taught Neural Nets to Learn</h1>
+          <div class="article-meta">
+            <span class="article-date">October 30, 2025</span>
+            <span class="article-type">Paper</span>
+          </div>
+          <p><em>A clinician’s guide to the 1986 paper that unlocked modern AI—and why it matters for healthcare.</em></p>
+        </header>
+
+        <hr>
+
+        <section>
+          <h2>The elevator pitch</h2>
+          <p>In 1986, David Rumelhart, Geoffrey Hinton, and Ronald Williams published a paper with a sleep-inducing title—“Learning Representations by Back-Propagating Errors.” Under the hood was dynamite: a practical, general way to teach multi-layer neural networks by sending blame backward from the output to every connection that contributed to a mistake. With that recipe, deep models stopped being clever toys and started becoming trainable tools.</p>
+          <p>If you’ve used anything from an ECG arrhythmia classifier to a note-summarizing language model, you’ve benefited from this idea. Backprop is the stethoscope of modern AI: simple in principle, endlessly useful, still essential even as the rest of the kit gets fancier.</p>
+        </section>
+
+        <section>
+          <h2>The clinical metaphor</h2>
+          <ul>
+            <li>The final diagnosis is the model’s output.</li>
+            <li>The error is the gap between what we said and what we should have said.</li>
+            <li>Feedback travels backward through the chain assigning proportional responsibility.</li>
+            <li>Everyone tweaks behaviour for next time. That’s backprop.</li>
+          </ul>
+          <p>Backprop formalizes this cascade with the chain rule: compute how much each weight nudged the final error, then nudge it the opposite way a little. Repeat, and the network improves.</p>
+        </section>
+
+        <section>
+          <h2>One-paragraph intuition</h2>
+          <p>A neural network stacks simple units that add inputs, squash them, and pass them on. You choose a loss. Backprop efficiently answers “if I twitch this weight, how much does the loss change?” That derivative is the gradient. Move each weight against its gradient by a small step (learning rate). Do it for all weights, all examples—learning emerges.</p>
+        </section>
+
+        <section>
+          <h2>Why it mattered</h2>
+          <ul>
+            <li>A single backward pass computes all gradients.</li>
+            <li>Hidden layers learn useful internal features without hand-coding.</li>
+            <li>Demonstrated nontrivial tasks—proof that representation learning works.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>What it unlocked in healthcare</h2>
+          <ul>
+            <li>Medical imaging (U-Nets, ResNets), signals (ECG/EEG/PPG), language (transformers), and multimodal models.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Strengths and caveats</h2>
+          <ul>
+            <li>General-purpose, data-driven, composable.</li>
+            <li>Mind the pitfalls: vanishing/exploding gradients, overfitting, shortcut learning, data drift, local explanations.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Bottom line</h2>
+          <ul>
+            <li>Backprop is the learning engine of modern AI.</li>
+            <li>Ask about loss, gradients, validation; if answers are mushy, the model is mushy.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>References</h2>
+          <p>Original paper (Nature): <a href="https://www.cs.utoronto.ca/~hinton/absps/naturebp.pdf" target="_blank" rel="noopener">Learning representations by back-propagating errors</a>.</p>
+        </section>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
+
+

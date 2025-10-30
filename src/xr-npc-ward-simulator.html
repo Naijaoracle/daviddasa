@@ -296,7 +296,7 @@
           g.add(l1, l2);
         } else if (i === drawCount - 1) {
           // Top-most drawer label
-          div.textContent = 'ADRENALINE';
+          div.textContent = 'AIRWAY';
           const lab = new CSS2DObject(div);
           lab.position.set(-bodyW*0.34, y, bodyD/2 + frontDepth + 0.001);
           g.add(lab);
@@ -859,11 +859,12 @@
       // Stroke volume and cardiac output
       const SVml = clamp(70*preload*inotropy/(1+0.35*(SVR-1)), 20, 110);
       const baseHR = 70+30*phys.catechol+10*phys.epiLevel-15*phys.sedation+7*(phys.tempSet-37);
-      // Soft-baroreflex
-      let baro = clamp(0.4*(70-vitals.mapEst), -25, 25);
-      if(baro > 0) baro = baro*0.6+5*Math.tanh(baro/12); // ceiling to avoid runaway tachy
-      if(baro < 0) baro = baro*0.5-2*Math.tanh(baro/8);  // floor so brady shows at high MAP
-      const hrTarget = clamp(baseHR + baro, 40, 160);
+      // Soft-baroreflex scaled by preload so severe hypovolaemia cannot self-correct quickly
+      let baroSoft = clamp(0.4*(70-vitals.mapEst), -25, 25);
+      if(baroSoft > 0) baroSoft = baroSoft*0.6+5*Math.tanh(baroSoft/12);
+      if(baroSoft < 0) baroSoft = baroSoft*0.5-2*Math.tanh(baroSoft/8);
+      const baroGain = clamp((preload - 0.9) * 3.0, 0, 1); // no strong reflex when preload is low
+      const hrTarget = clamp(baseHR + baroSoft * baroGain, 40, 160);
       const COlpm = clamp((hrTarget*SVml)/1000, 2.0, 9.0);
       const MAP = clamp(45+18*COlpm*SVR, 35, 110);
 
