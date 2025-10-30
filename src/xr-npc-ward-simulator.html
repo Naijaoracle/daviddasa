@@ -320,7 +320,7 @@
     room.add(trolley);
 
     // Nurse with visible head and simple walk animation
-    function buildNurse(colorMain = 0x1b5e20){
+    function buildNurse(colorMain = 0x1b5e20, colorCap = 0x2067d4){
       const group = new THREE.Group();
       const skin = 0xf0c8a0;
       const shoes = 0x252525;
@@ -335,7 +335,7 @@
       const head = new THREE.Mesh(new THREE.SphereGeometry(0.19, 28, 18), new THREE.MeshStandardMaterial({ color: skin, roughness: 0.7 }));
       head.position.y = 1.56;
 
-      const cap = new THREE.Mesh(new THREE.SphereGeometry(0.21, 24, 16), new THREE.MeshStandardMaterial({ color: accent, roughness: 0.95 }));
+      const cap = new THREE.Mesh(new THREE.SphereGeometry(0.21, 24, 16), new THREE.MeshStandardMaterial({ color: colorCap, roughness: 0.95 }));
       cap.scale.set(1.0, 0.55, 1.0);
       cap.position.y = 1.66;
 
@@ -374,6 +374,7 @@
 
       group.add(torso, neck, head, cap, eyeL, eyeR, shoulderL, shoulderR, hipL, hipR, badge);
       group.userData.limbs = { shoulderL, shoulderR, hipL, hipR, head, torso };
+      group.userData.cap = cap;
       return group;
     }
 
@@ -397,10 +398,11 @@
     avatar.add(kitCountLabel);
 
     // Doctor NPC - static blocker facing the patient
-    const doctor = buildNurse(0x26418f); // darker blue
+    const doctor = buildNurse(0x26418f, 0x2067d4); // blue base, blue cap
     scene.add(doctor);
-    doctor.position.set(-2.2, 0, -1.25);   // in front of the bed, closer to the camera
-    doctor.rotation.y = 0;                 // face toward negative Z
+    doctor.position.set(-2.6, 0, -0.6); // farther from bed
+    if (doctor.userData.cap) doctor.userData.cap.material.color.set(0x2067d4);
+    doctor.rotation.y = 0;
     const doctorNameDiv = document.createElement('div');
     doctorNameDiv.className = 'label';
     doctorNameDiv.textContent = 'Dr James';
@@ -566,50 +568,53 @@
     const nurseSpeed = 1.8; const nurseRotSpeed = 1.8; let followNurse = false;
 
     function moveNurse(dt) {
-      if (nkey.u) avatar.rotation.y += nurseRotSpeed * dt;
-      if (nkey.o) avatar.rotation.y -= nurseRotSpeed * dt;
+      const keys = nkey.i||nkey.j||nkey.k||nkey.l;
+      let v = new THREE.Vector3();
+      if (keys) {
+        if (nkey.u) avatar.rotation.y += nurseRotSpeed * dt;
+        if (nkey.o) avatar.rotation.y -= nurseRotSpeed * dt;
 
-      const yaw = avatar.rotation.y;
-      const forwardN = new THREE.Vector3(Math.sin(yaw), 0, -Math.cos(yaw));
-      const rightN = new THREE.Vector3().crossVectors(forwardN, new THREE.Vector3(0,1,0));
-      const v = new THREE.Vector3();
+        const yaw = avatar.rotation.y;
+        const forwardN = new THREE.Vector3(Math.sin(yaw), 0, -Math.cos(yaw));
+        const rightN = new THREE.Vector3().crossVectors(forwardN, new THREE.Vector3(0,1,0));
 
-      if (nkey.i) v.add(forwardN);
-      if (nkey.k) v.sub(forwardN);
-      if (nkey.j) v.sub(rightN);
-      if (nkey.l) v.add(rightN);
+        if (nkey.i) v.add(forwardN);
+        if (nkey.k) v.sub(forwardN);
+        if (nkey.j) v.sub(rightN);
+        if (nkey.l) v.add(rightN);
 
-      if (joyLook.y > 0) v.add(forwardN);
-      if (joyLook.y < 0) v.sub(forwardN);
-      if (joyLook.x < 0) v.sub(rightN);
-      if (joyLook.x > 0) v.add(rightN);
+        if (joyLook.y > 0) v.add(forwardN);
+        if (joyLook.y < 0) v.sub(forwardN);
+        if (joyLook.x < 0) v.sub(rightN);
+        if (joyLook.x > 0) v.add(rightN);
 
-      if (v.lengthSq() > 0) v.normalize().multiplyScalar(nurseSpeed * dt);
+        if (v.lengthSq() > 1e-8) v.normalize().multiplyScalar(nurseSpeed * dt);
 
-      const tryPos = avatar.position.clone();
+        const tryPos = avatar.position.clone();
 
-      // X axis
-      tryPos.x += v.x;
-      if (
-        !circleRectOverlap(tryPos.x, avatar.position.z, nurseRadius, bedRect) &&
-        !circleRectOverlap(tryPos.x, avatar.position.z, nurseRadius, trolleyRect) &&
-        !circleCircleOverlap(tryPos.x, avatar.position.z, nurseRadius, doctor.position.x, doctor.position.z, doctorRadius)
-      ) {
-        avatar.position.x = tryPos.x;
+        // X axis
+        tryPos.x += v.x;
+        if (
+          !circleRectOverlap(tryPos.x, avatar.position.z, nurseRadius, bedRect) &&
+          !circleRectOverlap(tryPos.x, avatar.position.z, nurseRadius, trolleyRect) &&
+          !circleCircleOverlap(tryPos.x, avatar.position.z, nurseRadius, doctor.position.x, doctor.position.z, doctorRadius)
+        ) {
+          avatar.position.x = tryPos.x;
+        }
+
+        // Z axis
+        tryPos.z = avatar.position.z + v.z;
+        if (
+          !circleRectOverlap(avatar.position.x, tryPos.z, nurseRadius, bedRect) &&
+          !circleRectOverlap(avatar.position.x, tryPos.z, nurseRadius, trolleyRect) &&
+          !circleCircleOverlap(avatar.position.x, tryPos.z, nurseRadius, doctor.position.x, doctor.position.z, doctorRadius)
+        ) {
+          avatar.position.z = tryPos.z;
+        }
+
+        avatar.position.x = Math.max(bounds.minX+0.25, Math.min(bounds.maxX-0.25, avatar.position.x));
+        avatar.position.z = Math.max(bounds.minZ+0.25, Math.min(bounds.maxZ-0.25, avatar.position.z));
       }
-
-      // Z axis
-      tryPos.z = avatar.position.z + v.z;
-      if (
-        !circleRectOverlap(avatar.position.x, tryPos.z, nurseRadius, bedRect) &&
-        !circleRectOverlap(avatar.position.x, tryPos.z, nurseRadius, trolleyRect) &&
-        !circleCircleOverlap(avatar.position.x, tryPos.z, nurseRadius, doctor.position.x, doctor.position.z, doctorRadius)
-      ) {
-        avatar.position.z = tryPos.z;
-      }
-
-      avatar.position.x = Math.max(bounds.minX+0.25, Math.min(bounds.maxX-0.25, avatar.position.x));
-      avatar.position.z = Math.max(bounds.minZ+0.25, Math.min(bounds.maxZ-0.25, avatar.position.z));
     }
 
     // Camera follow
@@ -875,11 +880,7 @@
             phys.o2Device = 'nr15';
             break;
           case 'Nebuliser salbutamol':
-            let t = 0; const id = setInterval(()=>{
-              t += 1;
-              phys.bronchoLevel = clamp(phys.bronchoLevel + 0.02, 0, 1);
-              if (t >= 180) clearInterval(id);
-            }, 1000);
+            scheduleIntervention(() => phys.bronchoLevel = clamp(phys.bronchoLevel + 0.02,0,1), 1000, true, 'salb');
             phys.catechol = clamp(phys.catechol + 0.05, 0, 1.5);
             break;
           case 'IV cannula 18G':
@@ -898,10 +899,7 @@
             phys.tempSet = clamp(phys.tempSet - 0.5, 35.5, 37.0);
             break;
           case 'Adrenaline IM 1:1000':
-            let u = 0; const eid = setInterval(()=>{
-              u += 1; phys.epiLevel = clamp(phys.epiLevel+0.02, 0, 1);
-              if (u>=180) clearInterval(eid);
-            }, 1000);
+            scheduleIntervention(() => phys.epiLevel = clamp(phys.epiLevel+0.02,0,1), 1000, true, 'epi');
             break;
         }
       });
@@ -986,6 +984,8 @@
       if (shouldShowTrolleyMenu()) showMenu(); else hideMenu();
       applyPlanIfNear();
 
+      processScheduler();
+
       renderer.render(scene, camera);
       labelRenderer.render(scene, camera);
       requestAnimationFrame(animate);
@@ -1001,6 +1001,27 @@
 
     // Start
     requestAnimationFrame(animate);
+
+    // Intervention scheduler
+    const interventionScheduler = [];
+    function scheduleIntervention(fn, delayMs, repeat, tag) {
+      const now = performance.now();
+      interventionScheduler.push({ fn, time: now + delayMs, repeat, period: delayMs, tag });
+    }
+    function processScheduler() {
+      const now = performance.now();
+      for (let i = interventionScheduler.length-1; i >= 0; --i) {
+        const s = interventionScheduler[i];
+        if (now >= s.time) {
+          s.fn();
+          if (s.repeat) {
+            s.time += s.period;
+          } else {
+            interventionScheduler.splice(i,1);
+          }
+        }
+      }
+    }
   </script>
 </body>
 </html>
