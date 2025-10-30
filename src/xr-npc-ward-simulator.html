@@ -55,14 +55,14 @@
     .touch-hint { position: fixed; left: 50%; transform: translateX(-50%); bottom: 140px; background: rgba(255,255,255,0.85); border:1px solid rgba(0,0,0,0.1); border-radius: 10px; padding: 6px 10px; font-size: 12px; z-index: 6; display: none; color: #0b1114; text-align: center; }
 
     .nav-buttons { position: fixed; left: 12px; top: 12px; display: flex; gap: 8px; z-index: 100; }
-    .home-button, .scoring-link { height: 44px; background: #ffffff; border: 2px solid #2ecc71; border-radius: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 3px 12px rgba(0,0,0,0.3); }
+    .home-button, .scoring-link, .cv-link { height: 44px; background: #ffffff; border: 2px solid #2ecc71; border-radius: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 3px 12px rgba(0,0,0,0.3); }
     .home-button { width: 44px; }
-    .scoring-link { font-size: 12px; font-weight: 600; color: #2ecc71; padding: 0 14px; white-space: nowrap; display: flex; align-items: center; }
-    .home-button:hover, .scoring-link:hover { background: #2ecc71; transform: translateY(-1px); box-shadow: 0 5px 16px rgba(46,204,113,0.4); }
+    .scoring-link, .cv-link { font-size: 12px; font-weight: 600; color: #2ecc71; padding: 0 14px; white-space: nowrap; display: flex; align-items: center; }
+    .home-button:hover, .scoring-link:hover, .cv-link:hover { background: #2ecc71; transform: translateY(-1px); box-shadow: 0 5px 16px rgba(46,204,113,0.4); }
     .home-button:hover svg { fill: white; }
-    .scoring-link svg { width: 18px; height: 18px; fill: #2ecc71; margin-right: 6px; }
-    .scoring-link:hover svg { fill: white; }
-    .scoring-link:hover { color: white; background: #2ecc71; }
+    .scoring-link svg, .cv-link svg { width: 18px; height: 18px; fill: #2ecc71; margin-right: 6px; }
+    .scoring-link:hover svg, .cv-link:hover svg { fill: white; }
+    .scoring-link:hover, .cv-link:hover { color: white; background: #2ecc71; }
     .home-button svg { width: 20px; height: 20px; fill: #2ecc71; }
 
     @media (max-width: 768px) {
@@ -77,7 +77,7 @@
       .tray { width: calc(100vw - 16px); max-width: 280px; }
       button { font-size: 12px; padding: 8px; }
       .navigation-buttons { gap: 6px; left: 8px; top: 8px; }
-      .scoring-link { padding: 0 10px; font-size: 11px; }
+      .scoring-link, .cv-link { padding: 0 10px; font-size: 11px; }
     }
   </style>
 </head>
@@ -97,6 +97,15 @@
         <polyline points="10 9 9 9 8 9"></polyline>
       </svg>
       Scoring System
+    </a>
+    <a href="/daviddasaCV.html" class="cv-link" aria-label="Interactive CV" title="View Interactive CV">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+        <circle cx="9" cy="7" r="4"></circle>
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+      </svg>
+      Interactive CV
     </a>
   </div>
   <div id="three-root"></div>
@@ -204,115 +213,143 @@
     const band3 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.2, bandLen), trimMat); band3.position.set(-HALF + 0.05, 0.8, 0); room.add(band3.clone());
     const band4 = band3.clone(); band4.position.set(HALF - 0.05, 0.8, 0); room.add(band4);
 
-    // Trolley builder with shelves, posts, wheels and handle
-    function makeTrolley(){
+    // Resus trolley - drawers, handles, frame, wheels, labels
+    function makeResusTrolley(){
       const g = new THREE.Group();
-      const metal = new THREE.MeshStandardMaterial({ color: 0x6b6f70, metalness: 0.5, roughness: 0.5 });
-      const shelfMat = new THREE.MeshStandardMaterial({ color: 0xc62828, metalness: 0.1, roughness: 0.9 });
-      const rubber = new THREE.MeshStandardMaterial({ color: 0x1c1c1c, roughness: 0.8 });
 
-      const w = 0.9, d = 0.55, h = 1.05;
-      const shelfT = 0.06;
+      const red = new THREE.MeshStandardMaterial({ color: 0xc62828, roughness: 0.9 });
+      const grey = new THREE.MeshStandardMaterial({ color: 0xb0b4b7, metalness: 0.3, roughness: 0.5 });
+      const dark = new THREE.MeshStandardMaterial({ color: 0x1c1c1c, roughness: 0.8 });
 
-      const shelfY = [0.25, 0.55, 0.85];
-      shelfY.forEach(y=>{
-        const shelf = new THREE.Mesh(new THREE.BoxGeometry(w, shelfT, d), shelfMat);
-        shelf.position.set(0, y, 0);
-        g.add(shelf);
-      });
+      const W = 0.9, D = 0.6, H = 1.05;
+      const bodyW = 0.74, bodyD = 0.5, bodyH = 0.82;
 
-      const postGeo = new THREE.CylinderGeometry(0.04, 0.04, h, 16);
+      // Outer posts
+      const postGeo = new THREE.BoxGeometry(0.08, H, 0.08);
       const posts = [
-        [-w/2+0.05, h/2, -d/2+0.05],
-        [ w/2-0.05, h/2, -d/2+0.05],
-        [-w/2+0.05, h/2,  d/2-0.05],
-        [ w/2-0.05, h/2,  d/2-0.05],
+        [-W/2, H/2, -D/2],
+        [ W/2, H/2, -D/2],
+        [-W/2, H/2,  D/2],
+        [ W/2, H/2,  D/2]
       ];
-      posts.forEach(p=>{
-        const post = new THREE.Mesh(postGeo, metal);
-        post.position.set(p[0], p[1], p[2]);
-        g.add(post);
-      });
+      posts.forEach(p=>{ const m = new THREE.Mesh(postGeo, grey); m.position.set(p[0], p[1], p[2]); g.add(m); });
 
-      // Side rails
-      const railGeo = new THREE.CylinderGeometry(0.03, 0.03, w, 12);
-      const rail1 = new THREE.Mesh(railGeo, metal);
-      rail1.rotation.z = Math.PI/2;
-      rail1.position.set(0, 1.0, d/2+0.03);
-      g.add(rail1);
+      // Top work surface with rails
+      const top = new THREE.Mesh(new THREE.BoxGeometry(W-0.1, 0.05, D-0.1), grey);
+      top.position.set(0, H-0.02, 0); g.add(top);
+      const railGeo = new THREE.CylinderGeometry(0.025, 0.025, W-0.18, 14);
+      const railF = new THREE.Mesh(railGeo, grey); railF.rotation.z = Math.PI/2; railF.position.set(0, H+0.08, D/2 - 0.1);
+      const railB = railF.clone(); railB.position.z = -D/2 + 0.1;
+      const railL = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, D-0.18, 14), grey); railL.position.set(-W/2 + 0.1, H+0.08, 0);
+      const railR = railL.clone(); railR.position.x = W/2 - 0.1;
+      railL.rotation.x = railR.rotation.x = Math.PI/2;
+      g.add(railF, railB, railL, railR);
 
-      // Push handle
-      const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.6, 12), metal);
+      // Push handle on right side
+      const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.6, 12), grey);
       handle.rotation.z = Math.PI/2;
-      handle.position.set(w/2 + 0.08, 0.95, 0);
+      handle.position.set(W/2 + 0.07, H-0.15, 0);
       g.add(handle);
 
-      // Wheels
-      for(let i=0;i<4;i++){
-        const wx = i%2===0 ? -w/2+0.15 : w/2-0.15;
-        const wz = i<2 ? -d/2+0.15 : d/2-0.15;
-        const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.04, 16), rubber);
-        hub.rotation.x = Math.PI/2;
-        hub.position.set(wx, 0.18, wz);
-        const caster = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.1, 8), metal);
-        caster.position.set(wx, 0.23, wz);
-        g.add(hub, caster);
+      // Cabinet body
+      const body = new THREE.Mesh(new THREE.BoxGeometry(bodyW, bodyH, bodyD), red);
+      body.position.set(0, 0.26 + bodyH/2, 0);
+      g.add(body);
+
+      // Drawers with handles
+      const drawCount = 5;
+      const gap = 0.01;
+      const usableH = bodyH - 0.06;
+      const drawH = usableH / drawCount - gap;
+      const frontDepth = 0.02;
+
+      const handleMat = new THREE.MeshStandardMaterial({ color: 0xd7d9db, metalness: 0.7, roughness: 0.3 });
+
+      const labelStyle = 'padding:2px 4px;background:#fff;color:#111;border-radius:3px;border:1px solid rgba(0,0,0,0.25);font-size:10px;letter-spacing:0.3px;';
+      const labelTexts = ['AIRWAY','BREATHING','CIRCULATION','I.V. FLUIDS'];
+      let labelIndex = 0;
+
+      for(let i=0;i<drawCount;i++){
+        const y = body.position.y - bodyH/2 + 0.03 + i*(drawH+gap) + drawH/2;
+        const front = new THREE.Mesh(new THREE.BoxGeometry(bodyW+0.02, drawH, frontDepth), red);
+        front.position.set(0, y, bodyD/2 + frontDepth/2);
+        g.add(front);
+
+        // Handle bar
+        const handleBar = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, bodyW*0.45, 16), handleMat);
+        handleBar.rotation.z = Math.PI/2;
+        handleBar.position.set(0, y, bodyD/2 + frontDepth + 0.03);
+        g.add(handleBar);
+
+        // Drawer labels as CSS2D
+        const div = document.createElement('div');
+        div.style.cssText = labelStyle;
+        if (i === 0) {
+          div.textContent = 'CARDIAC';
+          const div2 = document.createElement('div');
+          div2.style.cssText = labelStyle;
+          div2.textContent = 'ANAPHYLAXIS';
+          const l1 = new CSS2DObject(div);   l1.position.set(-bodyW*0.32, y, bodyD/2 + frontDepth + 0.001);
+          const l2 = new CSS2DObject(div2);  l2.position.set( bodyW*0.28, y, bodyD/2 + frontDepth + 0.001);
+          g.add(l1, l2);
+        } else {
+          div.textContent = labelTexts[labelIndex++] || 'SUPPLIES';
+          const lab = new CSS2DObject(div);
+          lab.position.set(-bodyW*0.34, y, bodyD/2 + frontDepth + 0.001);
+          g.add(lab);
+        }
       }
 
-      // Small bin on top
-      const bin = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.12, 0.18), new THREE.MeshStandardMaterial({ color: 0x9e1e1e, roughness: 0.8 }));
-      bin.position.set(-0.25, 0.95, 0.15);
-      g.add(bin);
+      // Wheels and casters
+      for(let i=0;i<4;i++){
+        const wx = i%2===0 ? -W/2 + 0.12 : W/2 - 0.12;
+        const wz = i<2 ? -D/2 + 0.12 : D/2 - 0.12;
+        const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.04, 20), dark);
+        wheel.rotation.x = Math.PI/2;
+        wheel.position.set(wx, 0.12, wz);
+        const caster = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.1, 12), grey);
+        caster.position.set(wx, 0.18, wz);
+        g.add(wheel, caster);
+      }
 
       return g;
     }
 
-    const trolley = makeTrolley();
+    const trolley = makeResusTrolley();
     trolley.position.set(3.0, 0, 1.6);
     room.add(trolley);
 
-    // Nurse with clear head and joints for animation
-    function buildNurse() {
+    // Nurse with visible head and simple walk animation
+    function buildNurse(colorMain = 0x1b5e20){
       const group = new THREE.Group();
       const skin = 0xf0c8a0;
-      const scrubs = 0x1b5e20;
       const shoes = 0x252525;
       const accent = 0x2e7d32;
 
-      // Torso core
-      const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.24, 0.5, 12, 20), new THREE.MeshStandardMaterial({ color: scrubs, roughness: 0.95 }));
+      const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.24, 0.5, 12, 20), new THREE.MeshStandardMaterial({ color: colorMain, roughness: 0.95 }));
       torso.position.y = 1.05;
 
-      // Neck
       const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.10, 16), new THREE.MeshStandardMaterial({ color: skin, roughness: 0.8 }));
       neck.position.y = 1.33;
 
-      // Head lifted so it is clearly visible
       const head = new THREE.Mesh(new THREE.SphereGeometry(0.19, 28, 18), new THREE.MeshStandardMaterial({ color: skin, roughness: 0.7 }));
       head.position.y = 1.56;
 
-      // Cap
       const cap = new THREE.Mesh(new THREE.SphereGeometry(0.21, 24, 16), new THREE.MeshStandardMaterial({ color: accent, roughness: 0.95 }));
       cap.scale.set(1.0, 0.55, 1.0);
       cap.position.y = 1.66;
 
-      // Eyes and simple mask band
       const eyeGeo = new THREE.SphereGeometry(0.012, 8, 8);
       const eyeMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
-      const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
-      const eyeR = new THREE.Mesh(eyeGeo, eyeMat);
-      eyeL.position.set(-0.05, 1.56, 0.16);
-      eyeR.position.set( 0.05, 1.56, 0.16);
+      const eyeL = new THREE.Mesh(eyeGeo, eyeMat); eyeL.position.set(-0.05, 1.56, 0.16);
+      const eyeR = new THREE.Mesh(eyeGeo, eyeMat); eyeR.position.set( 0.05, 1.56, 0.16);
 
-      // Shoulders as joints
       const shoulderL = new THREE.Object3D(); shoulderL.position.set(-0.34, 1.22, 0);
       const shoulderR = new THREE.Object3D(); shoulderR.position.set( 0.34, 1.22, 0);
       const armGeo = new THREE.CapsuleGeometry(0.075, 0.34, 12, 20);
-      const armMat = new THREE.MeshStandardMaterial({ color: scrubs, roughness: 0.95 });
-      const armL = new THREE.Mesh(armGeo, armMat);
-      const armR = new THREE.Mesh(armGeo, armMat);
-      armL.position.y = -0.22;
-      armR.position.y = -0.22;
+      const armMat = new THREE.MeshStandardMaterial({ color: colorMain, roughness: 0.95 });
+      const armL = new THREE.Mesh(armGeo, armMat); armL.position.y = -0.22;
+      const armR = new THREE.Mesh(armGeo, armMat); armR.position.y = -0.22;
       shoulderL.add(armL); shoulderR.add(armR);
 
       const handGeo = new THREE.SphereGeometry(0.065, 16, 12);
@@ -320,33 +357,28 @@
       const handL = new THREE.Mesh(handGeo, handMat); handL.position.set(0, -0.46, 0.02); shoulderL.add(handL);
       const handR = new THREE.Mesh(handGeo, handMat); handR.position.set(0, -0.46,-0.02); shoulderR.add(handR);
 
-      // Hips as joints
       const hipL = new THREE.Object3D(); hipL.position.set(-0.12, 0.90, 0);
       const hipR = new THREE.Object3D(); hipR.position.set( 0.12, 0.90, 0);
       const legGeo = new THREE.CapsuleGeometry(0.095, 0.46, 12, 20);
-      const legMat = new THREE.MeshStandardMaterial({ color: scrubs, roughness: 0.95 });
-      const legL = new THREE.Mesh(legGeo, legMat);
-      const legR = new THREE.Mesh(legGeo, legMat);
-      legL.position.y = -0.33; legR.position.y = -0.33;
-      hipL.add(legL); hipR.add(legR);
+      const legMat = new THREE.MeshStandardMaterial({ color: colorMain, roughness: 0.95 });
+      const legL = new THREE.Mesh(legGeo, legMat); legL.position.y = -0.33; hipL.add(legL);
+      const legR = new THREE.Mesh(legGeo, legMat); legR.position.y = -0.33; hipR.add(legR);
 
-      // Shoes
       const shoeGeo = new THREE.CapsuleGeometry(0.09, 0.06, 10, 18);
       const shoeMat = new THREE.MeshStandardMaterial({ color: shoes, roughness: 0.9 });
-      const shoeL = new THREE.Mesh(shoeGeo, shoeMat); shoeL.rotation.x = Math.PI * 0.5; shoeL.position.set(0, -0.60, 0.06); hipL.add(shoeL);
-      const shoeR = new THREE.Mesh(shoeGeo, shoeMat); shoeR.rotation.x = Math.PI * 0.5; shoeR.position.set(0, -0.60, 0.06); hipR.add(shoeR);
+      const shoeL = new THREE.Mesh(shoeGeo, shoeMat); shoeL.rotation.x = Math.PI*0.5; shoeL.position.set(0, -0.60, 0.06); hipL.add(shoeL);
+      const shoeR = new THREE.Mesh(shoeGeo, shoeMat); shoeR.rotation.x = Math.PI*0.5; shoeR.position.set(0, -0.60, 0.06); hipR.add(shoeR);
 
-      // ID badge
       const badge = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.08, 0.005), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 }));
       badge.position.set(0.13, 1.18, 0.23);
 
       group.add(torso, neck, head, cap, eyeL, eyeR, shoulderL, shoulderR, hipL, hipR, badge);
-
       group.userData.limbs = { shoulderL, shoulderR, hipL, hipR, head, torso };
       return group;
     }
 
-    const avatar = buildNurse(); scene.add(avatar);
+    // Nurse avatar
+    const avatar = buildNurse(0x1b5e20); scene.add(avatar);
     avatar.position.set(-0.6, 0, -2.1);
 
     const nurseLabelDiv = document.createElement('div');
@@ -362,6 +394,18 @@
     const kitCountLabel = new CSS2DObject(kitCountDiv);
     kitCountLabel.position.set(0, 2.1, 0);
     avatar.add(kitCountLabel);
+
+    // Doctor NPC - static blocker facing the patient
+    const doctor = buildNurse(0x26418f); // darker blue
+    scene.add(doctor);
+    doctor.position.set(-2.2, 0, -1.25);   // in front of the bed, closer to the camera
+    doctor.rotation.y = 0;                 // face toward negative Z
+    const doctorNameDiv = document.createElement('div');
+    doctorNameDiv.className = 'label';
+    doctorNameDiv.textContent = 'Dr James';
+    const doctorName = new CSS2DObject(doctorNameDiv);
+    doctorName.position.set(0, 1.9, 0);
+    doctor.add(doctorName);
 
     // Bed + patient
     function makePatientBed(x, z) {
@@ -401,10 +445,16 @@
     const bedRect = rectFromBox3(bedBox);
     const trolleyRect = rectFromBox3(trolleyBox);
     const nurseRadius = 0.32;
+    const doctorRadius = 0.34;
+
     function circleRectOverlap(cx, cz, r, rect) {
       const clampedX = Math.max(rect.minX, Math.min(cx, rect.maxX));
       const clampedZ = Math.max(rect.minZ, Math.min(cz, rect.maxZ));
       const dx = cx - clampedX; const dz = cz - clampedZ; return (dx*dx + dz*dz) <= r*r;
+    }
+    function circleCircleOverlap(cx, cz, r, ox, oz, or){
+      const dx = cx - ox, dz = cz - oz;
+      return (dx*dx + dz*dz) <= (r+or)*(r+or);
     }
 
     // Input
@@ -442,7 +492,7 @@
       if (c==='KeyI' || k==='i' || c==='ArrowUp')    { nkey.i = down; handled = true; }
       if (c==='KeyJ' || k==='j' || c==='ArrowLeft')  { nkey.j = down; handled = true; }
       if (c==='KeyK' || k==='k' || c==='ArrowDown')  { nkey.k = down; handled = true; }
-      if (c==='KeyL' || k==='l' || c==='ArrowRight') { nkey.l = down; handled = true; }
+      if (c==='KeyL' || k==='l' || c==='ArrowRight'){ nkey.l = down; handled = true; }
       if (c==='KeyU' || k==='u')                     { nkey.u = down; handled = true; }
       if (c==='KeyO' || k==='o')                     { nkey.o = down; handled = true; }
       if (handled) { e.preventDefault(); updateKeyHUD(); if(!keyboardSeen){ keyboardSeen=true; setStatus('Modules OK • Keyboard OK'); } }
@@ -534,15 +584,29 @@
       if (joyLook.x > 0) v.add(rightN);
 
       if (v.lengthSq() > 0) v.normalize().multiplyScalar(nurseSpeed * dt);
+
       const tryPos = avatar.position.clone();
+
+      // X axis
       tryPos.x += v.x;
-      if (!circleRectOverlap(tryPos.x, avatar.position.z, nurseRadius, bedRect) && !circleRectOverlap(tryPos.x, avatar.position.z, nurseRadius, trolleyRect)) {
+      if (
+        !circleRectOverlap(tryPos.x, avatar.position.z, nurseRadius, bedRect) &&
+        !circleRectOverlap(tryPos.x, avatar.position.z, nurseRadius, trolleyRect) &&
+        !circleCircleOverlap(tryPos.x, avatar.position.z, nurseRadius, doctor.position.x, doctor.position.z, doctorRadius)
+      ) {
         avatar.position.x = tryPos.x;
       }
+
+      // Z axis
       tryPos.z = avatar.position.z + v.z;
-      if (!circleRectOverlap(avatar.position.x, tryPos.z, nurseRadius, bedRect) && !circleRectOverlap(avatar.position.x, tryPos.z, nurseRadius, trolleyRect)) {
+      if (
+        !circleRectOverlap(avatar.position.x, tryPos.z, nurseRadius, bedRect) &&
+        !circleRectOverlap(avatar.position.x, tryPos.z, nurseRadius, trolleyRect) &&
+        !circleCircleOverlap(avatar.position.x, tryPos.z, nurseRadius, doctor.position.x, doctor.position.z, doctorRadius)
+      ) {
         avatar.position.z = tryPos.z;
       }
+
       avatar.position.x = Math.max(bounds.minX+0.25, Math.min(bounds.maxX-0.25, avatar.position.x));
       avatar.position.z = Math.max(bounds.minZ+0.25, Math.min(bounds.maxZ-0.25, avatar.position.z));
     }
@@ -610,7 +674,7 @@
     followBtn.addEventListener('click', ()=>{ followNurse = !followNurse; followBtn.textContent = `Follow nurse: ${followNurse ? 'On' : 'Off'}`; followBtn.classList.toggle('secondary', !followNurse); });
     resetNurseBtn.addEventListener('click', ()=>{ avatar.position.set(-0.6, 0, -2.1); avatar.rotation.set(0,0,0); });
 
-    // Proximity menu
+    // Trolley proximity menu
     const menuDiv = document.createElement('div');
     menuDiv.className = 'menu-card';
     menuDiv.style.display = 'none';
@@ -649,7 +713,7 @@
       </div>
       <div style="margin-top:6px; font-size:11px; opacity:0.8;">Click items to queue. Walk to patient to apply.</div>
     `;
-    const trolleyMenu = new CSS2DObject(menuDiv); trolleyMenu.position.set(0, 1.05, 0); trolley.add(trolleyMenu);
+    const trolleyMenu = new CSS2DObject(menuDiv); trolleyMenu.position.set(0, 1.12, 0); trolley.add(trolleyMenu);
     function showMenu(){ trolleyMenu.visible = true; menuDiv.style.display = 'block'; labelRenderer.domElement.style.pointerEvents = 'auto'; }
     function hideMenu(){ trolleyMenu.visible = false; menuDiv.style.display = 'none'; labelRenderer.domElement.style.pointerEvents = 'none'; }
     hideMenu();
@@ -790,18 +854,16 @@
       }
     }
 
-    // Simple walk cycle driven by movement
+    // Simple walk cycle for nurse
     let prevPos = avatar.position.clone();
     let walkPhase = 0;
-
     function updateNurseAnimation(dt){
       const limbs = avatar.userData.limbs;
       if (!limbs) return;
       const d = avatar.position.distanceTo(prevPos);
       prevPos.copy(avatar.position);
       const speedNow = d / Math.max(1e-6, dt);
-      const moving = Math.min(speedNow / 1.2, 1.0); // normalize
-
+      const moving = Math.min(speedNow / 1.2, 1.0);
       walkPhase += speedNow * 4.0 * dt;
 
       const swing = Math.sin(walkPhase) * 0.6 * moving;
@@ -809,15 +871,11 @@
 
       limbs.shoulderL.rotation.x = swing * 0.6;
       limbs.shoulderR.rotation.x = counter * 0.6;
-
       limbs.hipL.rotation.x = -swing * 0.7;
       limbs.hipR.rotation.x = -counter * 0.7;
 
-      // small torso bob and lean
       limbs.torso.position.y = 1.05 + Math.sin(walkPhase * 2.0) * 0.02 * moving;
       avatar.rotation.z = Math.sin(walkPhase) * 0.03 * moving;
-
-      // keep head upright
       limbs.head.rotation.set(0, 0, 0);
     }
 
