@@ -19,76 +19,99 @@
 
   <div class="container">
     <main>
-      <section style="background: rgba(255,255,255,0.85); border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 6px 18px rgba(0,0,0,0.04); padding: 1rem 1.25rem; border-radius: 10px;">
-        <header class="article-header">
-          <h1># Backpropagation: the Quiet Revolution that Taught Neural Nets to Learn</h1>
+      <!-- INTRO -->
+      <section class="project-card">
+        <div class="article-header">
+          <h1>Backpropagation: the Quiet Revolution that Taught Neural Nets to Learn</h1>
           <div class="article-meta">
             <span class="article-date">October 30, 2025</span>
             <span class="article-type">Paper</span>
           </div>
-          <p><em>A clinician’s guide to the 1986 paper that unlocked modern AI—and why it matters for healthcare.</em></p>
-        </header>
+        </div>
+        <p><em>A clinician’s guide to the 1986 paper that unlocked modern AI—and why it matters for healthcare.</em></p>
+        <p>In 1986, David Rumelhart, Geoffrey Hinton, and Ronald Williams showed a practical, general way to <strong>teach multi‑layer neural networks by sending blame backward</strong> from the output to every connection that contributed to an error. With that recipe, deep models stopped being clever toys and became trainable tools.</p>
+        <p>If you’ve used anything from an ECG arrhythmia classifier to a note‑summarizing language model, you’ve benefited from this idea. Backprop is the stethoscope of modern AI: simple in principle, endlessly useful, and still essential even as the rest of the kit gets fancier.</p>
+      </section>
 
-        <hr>
+      <!-- TLDR -->
+      <section class="project-card">
+        <h2>TLDR</h2>
+        <ul>
+          <li>Backprop efficiently computes gradients for every weight via one backward pass (chain rule).</li>
+          <li>Hidden layers learn useful internal features without manual engineering.</li>
+          <li>It unlocked modern imaging, signal, language and multimodal models in healthcare.</li>
+        </ul>
+      </section>
 
-        <section>
-          <h2>The elevator pitch</h2>
-          <p>In 1986, David Rumelhart, Geoffrey Hinton, and Ronald Williams published a paper with a sleep-inducing title—“Learning Representations by Back-Propagating Errors.” Under the hood was dynamite: a practical, general way to teach multi-layer neural networks by sending blame backward from the output to every connection that contributed to a mistake. With that recipe, deep models stopped being clever toys and started becoming trainable tools.</p>
-          <p>If you’ve used anything from an ECG arrhythmia classifier to a note-summarizing language model, you’ve benefited from this idea. Backprop is the stethoscope of modern AI: simple in principle, endlessly useful, still essential even as the rest of the kit gets fancier.</p>
-        </section>
+      <!-- CONTENT -->
+      <section class="project-card">
+        <h2>Content</h2>
+        <h3>The clinical metaphor</h3>
+        <ul>
+          <li>Final diagnosis ↔ model output; error ↔ gap from truth.</li>
+          <li>Feedback travels backward through the chain assigning proportional responsibility.</li>
+          <li>Backprop formalizes this with the chain rule; nudge weights opposite the gradient.</li>
+        </ul>
 
-        <section>
-          <h2>The clinical metaphor</h2>
-          <ul>
-            <li>The final diagnosis is the model’s output.</li>
-            <li>The error is the gap between what we said and what we should have said.</li>
-            <li>Feedback travels backward through the chain assigning proportional responsibility.</li>
-            <li>Everyone tweaks behaviour for next time. That’s backprop.</li>
-          </ul>
-          <p>Backprop formalizes this cascade with the chain rule: compute how much each weight nudged the final error, then nudge it the opposite way a little. Repeat, and the network improves.</p>
-        </section>
+        <h3>One‑paragraph intuition</h3>
+        <p>A network stacks simple units that add inputs, squash them, and pass them on. Choose a loss; backprop answers “if I twitch this weight, how much does the loss change?” Move each weight against that gradient by a small step. Do this for all weights, all examples—learning emerges.</p>
 
-        <section>
-          <h2>One-paragraph intuition</h2>
-          <p>A neural network stacks simple units that add inputs, squash them, and pass them on. You choose a loss. Backprop efficiently answers “if I twitch this weight, how much does the loss change?” That derivative is the gradient. Move each weight against its gradient by a small step (learning rate). Do it for all weights, all examples—learning emerges.</p>
-        </section>
+        <h3>Why the 1986 paper mattered</h3>
+        <ul>
+          <li>General algorithm for multi‑layer training; one backward pass for all gradients.</li>
+          <li>Internal representations emerge in hidden layers.</li>
+          <li>Worked on non‑trivial tasks (e.g., symmetry detection, family trees).</li>
+        </ul>
 
-        <section>
-          <h2>Why it mattered</h2>
-          <ul>
-            <li>A single backward pass computes all gradients.</li>
-            <li>Hidden layers learn useful internal features without hand-coding.</li>
-            <li>Demonstrated nontrivial tasks—proof that representation learning works.</li>
-          </ul>
-        </section>
+        <h3>Tiny worked example</h3>
+        <ol>
+          <li>Forward: inputs → weights/bias → activation → next layer → prediction 0.72.</li>
+          <li>Loss: true label 1; compute error.</li>
+          <li>Backward: propagate error to each weight.</li>
+          <li>Update: step opposite the gradient. Repeat across cases.</li>
+        </ol>
 
-        <section>
-          <h2>What it unlocked in healthcare</h2>
-          <ul>
-            <li>Medical imaging (U-Nets, ResNets), signals (ECG/EEG/PPG), language (transformers), and multimodal models.</li>
-          </ul>
-        </section>
+        <h3>What this unlocked for healthcare</h3>
+        <ul>
+          <li><strong>Imaging:</strong> U‑Nets, ResNets for segmentation/classification.</li>
+          <li><strong>Signals:</strong> ECG/EEG/PPG models learn temporal features.</li>
+          <li><strong>Language:</strong> transformers for clinical text; safety via fine‑tuning.</li>
+          <li><strong>Multimodality:</strong> notes + labs + images with shared internal concepts.</li>
+        </ul>
 
-        <section>
-          <h2>Strengths and caveats</h2>
-          <ul>
-            <li>General-purpose, data-driven, composable.</li>
-            <li>Mind the pitfalls: vanishing/exploding gradients, overfitting, shortcut learning, data drift, local explanations.</li>
-          </ul>
-        </section>
+        <h3>Strengths</h3>
+        <ul>
+          <li>General‑purpose, data‑driven, composable.</li>
+        </ul>
 
-        <section>
-          <h2>Bottom line</h2>
-          <ul>
-            <li>Backprop is the learning engine of modern AI.</li>
-            <li>Ask about loss, gradients, validation; if answers are mushy, the model is mushy.</li>
-          </ul>
-        </section>
+        <h3>Things to note</h3>
+        <ul>
+          <li>Vanishing/exploding gradients → use ReLUs, good init, normalization, residuals.</li>
+          <li>Overfitting → regularize, augment, early stop, external validation.</li>
+          <li>Shortcut learning → counterfactual tests, audits, subgroup analysis.</li>
+          <li>Data drift → monitor, recalibrate, retrain.</li>
+          <li>Explainability is local; gradients are guides, not proofs.</li>
+        </ul>
 
-        <section>
-          <h2>References</h2>
-          <p>Original paper (Nature): <a href="https://www.cs.utoronto.ca/~hinton/absps/naturebp.pdf" target="_blank" rel="noopener">Learning representations by back-propagating errors</a>.</p>
-        </section>
+        <h3>Due‑diligence checklist</h3>
+        <ol>
+          <li>Loss aligned to clinical metric; calibration and decision‑curve matter.</li>
+          <li>Training/validation curves; learning‑rate schedule.</li>
+          <li>Patient‑level splits; no leakage; deduplication.</li>
+          <li>Robustness: subgroups, site transfer, temporal drift, counterfactuals.</li>
+          <li>Human factors: uncertainty, refusals, safe UI.</li>
+        </ol>
+      </section>
+
+      <!-- CONCLUSION -->
+      <section class="project-card">
+        <h2>Conclusion</h2>
+        <ul>
+          <li>Backprop is the learning engine of modern AI.</li>
+          <li>Use it with honest measurement, monitoring, and humility.</li>
+        </ul>
+        <h3>References</h3>
+        <p>Original paper (Nature): <a href="https://www.cs.utoronto.ca/~hinton/absps/naturebp.pdf" target="_blank" rel="noopener">Learning representations by back‑propagating errors</a>.</p>
       </section>
     </main>
   </div>
