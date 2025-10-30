@@ -903,8 +903,9 @@
       // RR target from drive, hypoxia, fatigue
       const rrTarget = clamp(18*phys.metabolic + 10*(PaO2<60 ? (60-PaO2)/30 : 0) - 8*phys.fatigue, 8, 48);
 
-      // Stroke volume and cardiac output
-      const SVml = clamp(70*preload*inotropy/(1+0.35*(SVR-1)), 20, 110);
+      // Stroke volume and cardiac output — make hypovolaemia actually low SV
+      let SVml = 70*preload*inotropy/(1+0.35*(SVR-1));
+      SVml = clamp(SVml, 8, 110);
       const baseHR = 70+30*phys.catechol+10*phys.epiLevel-15*phys.sedation+7*(phys.tempSet-37);
       // Soft-baroreflex scaled by preload so severe hypovolaemia cannot self-correct quickly
       let baroSoft = clamp(0.4*(70-vitals.mapEst), -25, 25);
@@ -912,8 +913,9 @@
       if(baroSoft < 0) baroSoft = baroSoft*0.5-2*Math.tanh(baroSoft/8);
       const baroGain = clamp((preload - 0.9) * 3.0, 0, 1); // no strong reflex when preload is low
       const hrTarget = clamp(baseHR + baroSoft * baroGain, 40, 160);
-      const COlpm = clamp((hrTarget*SVml)/1000, 2.0, 9.0);
-      const MAP = clamp(45+18*COlpm*SVR, 35, 110);
+      const COlpm = clamp((hrTarget*SVml)/1000, 1.2, 7.0);
+      const preloadGain = clamp(preload, 0.3, 1.0);
+      const MAP = clamp(45+18*COlpm*SVR*preloadGain, 35, 95);
 
       // SpO2 via dissociation, with lag, and curve shifting
       const spo2Target = satFromPaO2(PaO2, P50adj);
@@ -923,7 +925,7 @@
       const tempNow = lerp1(vitals.temp, phys.tempSet, 900, dt);
 
       // Pulse pressure: wider when contractility/SV is high, narrows if high SVR
-      const pulsePressure = clamp(25+20*inotropy+0.12*SVml-10*SVR+5*phys.catechol,15,70);
+      const pulsePressure = clamp(22+18*inotropy+0.10*SVml-10*SVR+4*phys.catechol,12,60);
       const sbpNow = clamp(MAP+pulsePressure*2/3,50,220);
       const dbpNow = clamp(MAP-pulsePressure*1/3,25,120);
       // CPP proxy for AVPU
