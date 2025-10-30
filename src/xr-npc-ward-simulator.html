@@ -66,16 +66,17 @@
     .home-button svg { width: 20px; height: 20px; fill: #2ecc71; }
 
     @media (max-width: 768px) {
-      .tray { width: 280px; right: 8px; top: 60px; padding: 10px; }
+      .tray { width: 260px; right: 8px; top: 56px; padding: 8px; }
       .tray h3 { font-size: 16px; }
       .btns { grid-template-columns: 1fr; }
-      button { font-size: 13px; padding: 8px 10px; }
-      .log { font-size: 11px; height: 80px; }
+      button { font-size: 12px; padding: 7px 9px; }
+      .log { font-size: 11px; height: 56px; }
       .hint { font-size: 11px; bottom: 12px; }
     }
     @media (max-width: 480px) {
-      .tray { width: calc(100vw - 16px); max-width: 280px; }
-      button { font-size: 12px; padding: 8px; }
+      .tray { width: calc(100vw - 16px); max-width: 248px; top: 52px; }
+      button { font-size: 12px; padding: 7px; }
+      .log { height: 48px; }
       .navigation-buttons { gap: 6px; left: 8px; top: 8px; }
       .scoring-link, .cv-link { padding: 0 10px; font-size: 11px; }
     }
@@ -576,22 +577,34 @@
     const nurseSpeed = 1.8; const nurseRotSpeed = 1.8; let followNurse = false;
 
     function moveNurse(dt) {
-      // Always allow rotation keys
+      // Rotation: keys or right joystick (x)
       if (nkey.u) avatar.rotation.y += nurseRotSpeed * dt;
       if (nkey.o) avatar.rotation.y -= nurseRotSpeed * dt;
+      if (Math.abs(joyLook.x) > 0.06) avatar.rotation.y += nurseRotSpeed * dt * joyLook.x;
 
-      // Movement only if I/J/K/L (or arrows) are pressed; no joystick drift
-      if (!(nkey.i||nkey.j||nkey.k||nkey.l)) return;
+      const useKeys = (nkey.i||nkey.j||nkey.k||nkey.l);
+      const useJoy = Math.hypot(joyMove.x, joyMove.y) > 0.08;
+      if (!useKeys && !useJoy) return;
 
       const yaw = avatar.rotation.y;
       const forwardN = new THREE.Vector3(Math.sin(yaw), 0, -Math.cos(yaw));
       const rightN = new THREE.Vector3().crossVectors(forwardN, new THREE.Vector3(0,1,0));
       const v = new THREE.Vector3();
 
-      if (nkey.i) v.add(forwardN);
-      if (nkey.k) v.sub(forwardN);
-      if (nkey.j) v.sub(rightN);
-      if (nkey.l) v.add(rightN);
+      // Keyboard movement
+      if (useKeys) {
+        if (nkey.i) v.add(forwardN);
+        if (nkey.k) v.sub(forwardN);
+        if (nkey.j) v.sub(rightN);
+        if (nkey.l) v.add(rightN);
+      }
+      // Joystick movement (left stick)
+      if (useJoy) {
+        if (joyMove.y > 0) v.add(forwardN.multiplyScalar(joyMove.y));
+        if (joyMove.y < 0) v.sub(forwardN.multiplyScalar(-joyMove.y));
+        if (joyMove.x < 0) v.sub(rightN.multiplyScalar(-joyMove.x));
+        if (joyMove.x > 0) v.add(rightN.multiplyScalar(joyMove.x));
+      }
 
       if (v.lengthSq() === 0) return;
       v.normalize().multiplyScalar(nurseSpeed * dt);

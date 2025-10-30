@@ -27,89 +27,34 @@
             <span class="article-date">October 30, 2025</span>
             <span class="article-type">Paper</span>
           </div>
+          <div class="article-tags">
+            <span class="tag">AI/ML</span>
+            <span class="tag">Neural Networks</span>
+            <span class="tag">Healthcare AI</span>
+          </div>
         </div>
-        <p><em>A clinician’s guide to the 1986 paper that unlocked modern AI—and why it matters for healthcare.</em></p>
-        <p>In 1986, David Rumelhart, Geoffrey Hinton, and Ronald Williams showed a practical, general way to <strong>teach multi‑layer neural networks by sending blame backward</strong> from the output to every connection that contributed to an error. With that recipe, deep models stopped being clever toys and became trainable tools.</p>
-        <p>If you’ve used anything from an ECG arrhythmia classifier to a note‑summarizing language model, you’ve benefited from this idea. Backprop is the stethoscope of modern AI: simple in principle, endlessly useful, and still essential even as the rest of the kit gets fancier.</p>
+        <h2>INTRO</h2>
+        <p>In 1986, Rumelhart, Hinton, and Williams published a paper with an unflashy promise: take the error a neural network makes at its output and flow that “blame” backward through every layer so each connection can adjust itself. That’s backpropagation. If you’ve seen a model read an ECG, outline a tumor, or draft a clinic letter, this is the learning engine underneath. Think of a ward round debrief: the consultant spots a missed diagnosis, then feedback travels back through the team—registrar, SHO, notes, triage—so each part improves next time. Backprop is that feedback cascade written in calculus. The magic isn’t mysticism; it’s bookkeeping done efficiently so the model improves with every example rather than relying on hand-crafted rules.</p>
       </section>
 
       <!-- TLDR -->
       <section class="project-card">
         <h2>TLDR</h2>
-        <ul>
-          <li>Backprop efficiently computes gradients for every weight via one backward pass (chain rule).</li>
-          <li>Hidden layers learn useful internal features without manual engineering.</li>
-          <li>It unlocked modern imaging, signal, language and multimodal models in healthcare.</li>
-        </ul>
+        <p>Backpropagation turns “being wrong” into useful updates. By using the chain rule from calculus, it tells each weight in a neural network how to change to reduce future error. That let multi-layer networks learn internal concepts—edges in images, arrhythmia signatures in signals, medication negations in notes—without engineers spelling them out. Nearly all modern systems in healthcare AI, from U-Nets to transformers, still learn this way.</p>
       </section>
 
       <!-- CONTENT -->
       <section class="project-card">
-        <h2>Content</h2>
-        <h3>The clinical metaphor</h3>
-        <ul>
-          <li>Final diagnosis ↔ model output; error ↔ gap from truth.</li>
-          <li>Feedback travels backward through the chain assigning proportional responsibility.</li>
-          <li>Backprop formalizes this with the chain rule; nudge weights opposite the gradient.</li>
-        </ul>
-
-        <h3>One‑paragraph intuition</h3>
-        <p>A network stacks simple units that add inputs, squash them, and pass them on. Choose a loss; backprop answers “if I twitch this weight, how much does the loss change?” Move each weight against that gradient by a small step. Do this for all weights, all examples—learning emerges.</p>
-
-        <h3>Why the 1986 paper mattered</h3>
-        <ul>
-          <li>General algorithm for multi‑layer training; one backward pass for all gradients.</li>
-          <li>Internal representations emerge in hidden layers.</li>
-          <li>Worked on non‑trivial tasks (e.g., symmetry detection, family trees).</li>
-        </ul>
-
-        <h3>Tiny worked example</h3>
-        <ol>
-          <li>Forward: inputs → weights/bias → activation → next layer → prediction 0.72.</li>
-          <li>Loss: true label 1; compute error.</li>
-          <li>Backward: propagate error to each weight.</li>
-          <li>Update: step opposite the gradient. Repeat across cases.</li>
-        </ol>
-
-        <h3>What this unlocked for healthcare</h3>
-        <ul>
-          <li><strong>Imaging:</strong> U‑Nets, ResNets for segmentation/classification.</li>
-          <li><strong>Signals:</strong> ECG/EEG/PPG models learn temporal features.</li>
-          <li><strong>Language:</strong> transformers for clinical text; safety via fine‑tuning.</li>
-          <li><strong>Multimodality:</strong> notes + labs + images with shared internal concepts.</li>
-        </ul>
-
-        <h3>Strengths</h3>
-        <ul>
-          <li>General‑purpose, data‑driven, composable.</li>
-        </ul>
-
-        <h3>Things to note</h3>
-        <ul>
-          <li>Vanishing/exploding gradients → use ReLUs, good init, normalization, residuals.</li>
-          <li>Overfitting → regularize, augment, early stop, external validation.</li>
-          <li>Shortcut learning → counterfactual tests, audits, subgroup analysis.</li>
-          <li>Data drift → monitor, recalibrate, retrain.</li>
-          <li>Explainability is local; gradients are guides, not proofs.</li>
-        </ul>
-
-        <h3>Due‑diligence checklist</h3>
-        <ol>
-          <li>Loss aligned to clinical metric; calibration and decision‑curve matter.</li>
-          <li>Training/validation curves; learning‑rate schedule.</li>
-          <li>Patient‑level splits; no leakage; deduplication.</li>
-          <li>Robustness: subgroups, site transfer, temporal drift, counterfactuals.</li>
-          <li>Human factors: uncertainty, refusals, safe UI.</li>
-        </ol>
+        <h2>CONTENT</h2>
+        <p>Picture a tiny network predicting DVT risk from a few inputs. It combines the inputs with different strengths, squashes the total to a value between 0 and 1, and compares that to truth. The single number that measures wrongness is the loss. Now imagine nudging one weight by a hair and asking, “Would the loss rise or fall?” That slope is the gradient. Backprop computes those slopes for every weight by passing an “error signal” backward, layer by layer. Each weight steps a little in the downhill direction. Repeat across many patients and the network starts to encode useful intermediate features—patterns you didn’t predefine but that help the task.</p>
+        <p>This mattered because early neural nets could only learn shallow representations. The 1986 result gave a general recipe for multiple hidden layers, and those layers learned structure not obvious at the input. In the original paper, the network discovered family-tree relationships and symmetry rules; in clinics today, analogous layers learn vessel edges, ST-segment forms, or the habit of writing “no evidence of …” and treating that as negation. Nothing mystical: the system just keeps editing itself to make tomorrow’s error smaller than today’s.</p>
+        <p>A few practical notes keep the romance honest. Deep stacks of squashing functions used to choke the gradient signal; modern activations and residual connections keep information flowing. Models happily learn shortcuts—like associating portable X-ray markers with sicker patients—so evaluation has to be broader than a shiny AUROC. External validation, subgroup checks, and drift monitoring are the bread and butter. And while gradients can be visualized to see what influenced a prediction, those pictures are guides, not proof of causality. The safest deployments pair this learning engine with workflow rules: refuse dosing, show uncertainty, cite sources, escalate when inputs look odd.</p>
       </section>
 
       <!-- CONCLUSION -->
       <section class="project-card">
-        <h2>Conclusion</h2>
-        <ul>
-          <li>Backprop is the learning engine of modern AI.</li>
-          <li>Use it with honest measurement, monitoring, and humility.</li>
-        </ul>
+        <h2>CONCLUSION</h2>
+        <p>Backpropagation didn’t make neural networks wise; it made them educable. That single capability—turning error into improvement—opened the door to imaging systems that contour organs, monitors that flag deteriorations earlier, and language models that draft but don’t prescribe. The clinical posture that fits this technology is straightforward: measure the right thing, let the model learn, keep humans in the loop, and watch for the usual failure modes. When someone pitches a model, ask about the loss they optimized, how gradients were monitored during training, how they prevented shortcuts, and how they’ll detect drift once the system meets real patients. If those answers are clear, you’re standing on the solid, slightly unglamorous foundation laid in 1986—and that’s exactly where safe healthcare AI belongs.</p>
         <h3>References</h3>
         <p>Original paper (Nature): <a href="https://www.cs.utoronto.ca/~hinton/absps/naturebp.pdf" target="_blank" rel="noopener">Learning representations by back‑propagating errors</a>.</p>
       </section>
