@@ -82,6 +82,13 @@
       .navigation-buttons { gap: 6px; left: 8px; top: 8px; }
       .scoring-link, .cv-link { padding: 0 10px; font-size: 11px; }
     }
+    /* Compact tray mode (mobile) */
+    .tray.compact { padding: 6px; }
+    .tray.compact .log,
+    .tray.compact .btns,
+    .tray.compact #kitChips,
+    .tray.compact #appliedList,
+    .tray.compact .kit-title { display: none; }
   </style>
 </head>
 <body>
@@ -124,7 +131,10 @@
 
   <div class="ui">
     <div class="tray" id="tray">
-      <h3>Session <span id="status" style="font-size:12px;opacity:0.85"></span></h3>
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+        <h3>Session <span id="status" style="font-size:12px;opacity:0.85"></span></h3>
+        <button id="trayToggle" class="ghost" style="display:none; font-size:11px; padding:4px 6px;">Compact</button>
+      </div>
       <div class="log" id="log">Use the red trolley to pick kit. Walk to the patient to apply.</div>
       <div style="display:flex; gap:8px; margin-top:8px;">
         <button class="warn" id="recordBtn">Record</button>
@@ -655,11 +665,18 @@
       if (key.a) vel.sub(right);
       if (key.d) vel.add(right);
       // Touch: right joystick controls camera (use joyLook)
-      const camStick = isTouch ? joyLook : joyMove;
-      if (camStick.y > 0) vel.add(forward.multiplyScalar(camStick.y));
-      if (camStick.y < 0) vel.sub(forward.multiplyScalar(-camStick.y));
-      if (camStick.x < 0) vel.sub(right.multiplyScalar(-camStick.x));
-      if (camStick.x > 0) vel.add(right.multiplyScalar(camStick.x));
+      if (isTouch) {
+        if (joyLook.y > 0) vel.sub(forward.multiplyScalar(joyLook.y)); // invert forward/back for camera on mobile
+        if (joyLook.y < 0) vel.add(forward.multiplyScalar(-joyLook.y));
+        if (joyLook.x < 0) vel.sub(right.multiplyScalar(-joyLook.x));
+        if (joyLook.x > 0) vel.add(right.multiplyScalar(joyLook.x));
+      } else {
+        const camStick = joyMove;
+        if (camStick.y > 0) vel.add(forward.multiplyScalar(camStick.y));
+        if (camStick.y < 0) vel.sub(forward.multiplyScalar(-camStick.y));
+        if (camStick.x < 0) vel.sub(right.multiplyScalar(-camStick.x));
+        if (camStick.x > 0) vel.add(right.multiplyScalar(camStick.x));
+      }
       if (vel.lengthSq()>0) vel.normalize().multiplyScalar(speed*dt);
       rig.position.add(vel);
       rig.position.x = Math.max(bounds.minX+0.3, Math.min(bounds.maxX-0.3, rig.position.x));
@@ -697,6 +714,18 @@
     function stopSampling(){ if(sampleTimer){ clearInterval(sampleTimer); sampleTimer = null; } }
     recordBtn.addEventListener('click', ()=>{ recording = !recording; recordBtn.textContent = recording ? 'Stop' : 'Record'; recordBtn.classList.toggle('secondary', recording); if(recording){ events = []; downloadBtn.style.display='none'; logEvent('record_start'); startSampling(); } else { stopSampling(); logEvent('record_stop'); const blob = new Blob([JSON.stringify({ events }, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); downloadBtn.href = url; downloadBtn.download = `session-log-${new Date().toISOString().replace(/[:.]/g, '-')}.json`; downloadBtn.style.display='inline-block'; } });
     downloadBtn.addEventListener('click', ()=>{ const href = downloadBtn.href; setTimeout(()=>URL.revokeObjectURL(href), 4000); });
+
+    // Tray compact toggle (mobile)
+    const trayEl = document.getElementById('tray');
+    const trayToggle = document.getElementById('trayToggle');
+    function applyTrayToggleVisibility(){
+      if (window.innerWidth <= 768) { trayToggle.style.display = 'inline-block'; }
+      else { trayToggle.style.display = 'none'; trayEl.classList.remove('compact'); }
+      trayToggle.textContent = trayEl.classList.contains('compact') ? 'Expand' : 'Compact';
+    }
+    trayToggle.addEventListener('click', ()=>{ trayEl.classList.toggle('compact'); trayToggle.textContent = trayEl.classList.contains('compact') ? 'Expand' : 'Compact'; });
+    window.addEventListener('resize', applyTrayToggleVisibility);
+    applyTrayToggleVisibility();
 
     followBtn.addEventListener('click', ()=>{ followNurse = !followNurse; followBtn.textContent = `Follow nurse: ${followNurse ? 'On' : 'Off'}`; followBtn.classList.toggle('secondary', !followNurse); });
     resetNurseBtn.addEventListener('click', ()=>{ avatar.position.set(-0.6, 0, -2.1); avatar.rotation.set(0,0,0); });
