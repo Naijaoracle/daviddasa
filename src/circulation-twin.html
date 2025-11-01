@@ -549,18 +549,40 @@
     // Geometry spec shared by WebGL and 2D
     function segmentSpec(W,P){
       const leftCol=W.left+0.45, rightCol=W.right-0.45, topRow=W.top-0.25, botRow=W.bottom+0.25;
+      // Structure: [start, mid, end, systemic, oxySet, radius, isArtery]
+      // oxySet: null=continue, true=become oxygenated, false=become deoxygenated
       return [
-        [P.RA,{x:-0.9,y:-0.15},P.RV,false,null,0.08],
-        [P.RV,{x:leftCol-0.45,y:0.25},{x:leftCol, y:1.05},false,null,0.10],
-        [{x:leftCol,y:1.05},{x:leftCol,y:topRow+0.15},{x:-0.25, y:topRow},false,null,0.10],
-        [{x:-0.25, y:topRow},{x:0.25, y:topRow},{x:rightCol, y:topRow},false,true,0.10],
-        [{x:rightCol, y:topRow},{x:rightCol, y:1.15},P.LA,false,null,0.10],
-        [P.LA,{x:0.9,y:-0.1},P.LV,false,null,0.08],
-        [P.LV,{x:1.0,y:0.4},{x:rightCol-0.1, y:0.9},true,null,0.12],
-        [{x:rightCol-0.1, y:0.9},{x:rightCol, y:0.6},{x:rightCol, y:-2.0},true,null,0.12],
-        [{x:rightCol,y:-2.0},{x:rightCol,y:botRow-0.12},{x:0.55,y:botRow},true,null,0.12],
-        [{x:0.55,y:botRow},{x:-0.55,y:botRow},{x:leftCol, y:botRow},true,false,0.12],
-        [{x:leftCol, y:botRow},{x:leftCol, y:-1.3},P.RA,true,null,0.12]
+        [P.RA,{x:-0.9,y:-0.15},P.RV,false,null,0.08,false],
+        [P.RV,{x:leftCol-0.45,y:0.25},{x:leftCol, y:1.05},false,null,0.10,false],
+        // Split pulmonary artery before lungs - branch 1
+        [{x:leftCol,y:1.05},{x:leftCol-0.12,y:topRow+0.08},{x:-0.35, y:topRow+0.05},false,null,0.09,false],
+        // Split pulmonary artery before lungs - branch 2
+        [{x:leftCol,y:1.05},{x:leftCol+0.12,y:topRow+0.08},{x:-0.15, y:topRow+0.05},false,null,0.09,false],
+        // Inside lungs - color change happens here (start deoxygenated)
+        [{x:-0.35, y:topRow+0.05},{x:-0.25, y:topRow},{x:-0.25, y:topRow-0.05},false,true,0.08,false],
+        [{x:-0.15, y:topRow+0.05},{x:-0.05, y:topRow},{x:0.05, y:topRow-0.05},false,true,0.08,false],
+        // Rejoin pulmonary veins after lungs - branch 1
+        [{x:-0.25, y:topRow-0.05},{x:0.05, y:topRow-0.08},{x:rightCol-0.15, y:topRow-0.08},false,null,0.09,false],
+        // Rejoin pulmonary veins after lungs - branch 2
+        [{x:0.05, y:topRow-0.05},{x:0.25, y:topRow-0.08},{x:rightCol+0.15, y:topRow-0.08},false,null,0.09,false],
+        // Rejoined pulmonary vein to LA
+        [{x:rightCol, y:topRow-0.08},{x:rightCol, y:1.15},P.LA,false,null,0.10,false],
+        [P.LA,{x:0.9,y:-0.1},P.LV,false,null,0.08,false],
+        [P.LV,{x:1.0,y:0.4},{x:rightCol-0.1, y:0.9},true,null,0.12,true],  // Aorta start - artery
+        [{x:rightCol-0.1, y:0.9},{x:rightCol, y:0.6},{x:rightCol, y:-1.8},true,null,0.12,true],  // Aorta - artery
+        // Split aorta before body - branch 1
+        [{x:rightCol,y:-1.8},{x:rightCol-0.15,y:botRow+0.08},{x:0.35, y:botRow+0.05},true,null,0.11,true],
+        // Split aorta before body - branch 2
+        [{x:rightCol,y:-1.8},{x:rightCol+0.15,y:botRow+0.08},{x:0.15, y:botRow+0.05},true,null,0.11,true],
+        // Inside body - color change happens here (start oxygenated)
+        [{x:0.35, y:botRow+0.05},{x:0.25, y:botRow},{x:0.25, y:botRow-0.05},true,false,0.09,false],
+        [{x:0.15, y:botRow+0.05},{x:0.05, y:botRow},{x:-0.05, y:botRow-0.05},true,false,0.09,false],
+        // Rejoin vena cava after body - branch 1
+        [{x:0.25, y:botRow-0.05},{x:-0.05, y:botRow-0.08},{x:leftCol+0.15, y:botRow-0.08},true,null,0.10,false],
+        // Rejoin vena cava after body - branch 2
+        [{x:-0.05, y:botRow-0.05},{x:-0.25, y:botRow-0.08},{x:leftCol-0.15, y:botRow-0.08},true,null,0.10,false],
+        // Rejoined vena cava to RA
+        [{x:leftCol, y:botRow-0.08},{x:leftCol, y:-1.3},P.RA,true,null,0.12,false]
       ];
     }
 
@@ -643,17 +665,17 @@
 
       const C=THREE.CatmullRomCurve3; const segments=[];
       function validPoint(p){ return p && Number.isFinite(p.x) && Number.isFinite(p.y) }
-      function addSeg(a,b,c,systemic=false, oxySet=null, radius=0.10){
+      function addSeg(a,b,c,systemic=false, oxySet=null, radius=0.10, isArtery=false){
         if(!validPoint(a)||!validPoint(b)||!validPoint(c)) throw new Error('Invalid segment point');
         const curve=new C([ new THREE.Vector3(a.x,a.y,0), new THREE.Vector3(b.x,b.y,0), new THREE.Vector3(c.x,c.y,0) ], false, 'centripetal');
         const geom=new THREE.TubeGeometry(curve, 80, radius, 20, false);
         const mat=new THREE.MeshStandardMaterial({color:0x333333, metalness:0.2, roughness:0.6});
         const mesh=new THREE.Mesh(geom, mat); scene.add(mesh);
-        segments.push({curve, mesh, systemic, oxySet});
+        segments.push({curve, mesh, systemic, oxySet, isArtery, baseRadius: radius});
       }
 
       const spec=segmentSpec({ left:-3.2, right:3.2, top:2.6, bottom:-2.6 }, { RA:{x:-0.7,y:0.45}, RV:{x:-0.7,y:-0.65}, LA:{x:0.7,y:0.45}, LV:{x:0.7,y:-0.65} });
-      for(const s of spec){ addSeg(s[0],s[1],s[2],s[3],s[4],s[5]) }
+      for(const s of spec){ addSeg(s[0],s[1],s[2],s[3],s[4],s[5],s[6]) }
 
       const oxyAtSeg=[]; { let oxy=false; for(let i=0;i<segments.length;i++){ oxyAtSeg[i]=oxy; if(segments[i].oxySet!==null) oxy=segments[i].oxySet } }
       for(let i=0;i<segments.length;i++){ segments[i].mesh.material.color.copy(oxyAtSeg[i]?RED:BLUE) }
@@ -678,7 +700,16 @@
         const aAmp=Math.min(0.30*vAmp, 0.03);
         const aScale=1 + aAmp*aBeat;
         ra.scale.setScalar(aScale); la.scale.setScalar(aScale); lv.scale.setScalar(vScale); rv.scale.setScalar(vScale*0.98);
-        const sysScale=clamp(1/Math.sqrt(state.svr),0.7,1.6); for(const s of segments){ if(s.systemic){ s.mesh.scale.set(sysScale, sysScale, 1) } }
+        const sysScale=clamp(1/Math.sqrt(state.svr),0.7,1.6);
+        // Artery pulsation - subtle pulse synchronized with heartbeat
+        const arteryPulse = 1.0 + 0.03 * vBeat; // 3% pulsation
+        for(const s of segments){
+          if(s.systemic){
+            const baseScale = sysScale;
+            const pulseScale = s.isArtery ? baseScale * arteryPulse : baseScale;
+            s.mesh.scale.set(pulseScale, pulseScale, s.isArtery ? arteryPulse : 1);
+          }
+        }
         const speed=clamp(0.16 + 0.10*(state.co-4.9), 0.05, 0.36); const attr=blood.geometry.getAttribute('position'); const prog=blood.geometry.getAttribute('progress'); const col=blood.geometry.getAttribute('color');
         for(let i=0;i<N;i++){ let u=prog.array[i]+speed*dt; if(u>1) u-=1; prog.array[i]=u; const {pos,seg}=getPointByU(u); attr.array[i*3]=pos.x; attr.array[i*3+1]=pos.y; attr.array[i*3+2]=pos.z; const c=oxyAtSeg[seg]?RED:BLUE; col.array[i*3]=c.r; col.array[i*3+1]=c.g; col.array[i*3+2]=c.b }
         prog.needsUpdate=true; attr.needsUpdate=true; col.needsUpdate=true; updateUI(); controls.update(); renderer.render(scene,camera) }
@@ -719,7 +750,7 @@
       }
 
       const leftCol=W.left+0.45, rightCol=W.right-0.45, topRow=W.top-0.25, botRow=W.bottom+0.25;
-      const segs=segmentSpec(W,P).map(s=>({ a:s[0], b:s[1], c:s[2], systemic:s[3], oxySet:s[4] }));
+      const segs=segmentSpec(W,P).map(s=>({ a:s[0], b:s[1], c:s[2], systemic:s[3], oxySet:s[4], isArtery:s[6]||false }));
 
       function capillaryKnot(center,size,color){ ctx.strokeStyle=color; ctx.lineWidth=2; const c=w2s(center); const s=size*20; ctx.beginPath(); for(let i=0;i<14;i++){ const a=i/14*Math.PI*2; const x=c.x + Math.cos(a*2.1)*(s*0.58) + Math.cos(a)*s*0.25; const y=c.y + Math.sin(a*1.8)*(s*0.48) + Math.sin(a*1.2)*s*0.15; if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y) } ctx.closePath(); ctx.stroke() }
       function qPoint(a,b,c,t){ return { x: (1-t)*(1-t)*a.x + 2*(1-t)*t*b.x + t*t*c.x, y: (1-t)*(1-t)*a.y + 2*(1-t)*t*b.y + t*t*c.y } }
@@ -740,11 +771,17 @@
         drawBackground();
         capillaryKnot({x:0,y:topRow+0.03}, 1.0, '#cfe8ff');
         capillaryKnot({x:0,y:botRow-0.03}, 1.0, '#ffd2d2');
+        const beatHz=state.hr/60; const vBeat=Math.max(0, Math.sin(2*Math.PI*beatHz*state.t)); const vAmp=Math.max(0.02, Math.min(0.10, 0.04 + 0.004*(state.sv-BASE.SV))); const vScale=1+vAmp*vBeat; const aBeat=Math.max(0, Math.sin(2*Math.PI*beatHz*(state.t + PR_LEAD))); const aAmp=Math.min(0.30*vAmp, 0.03); const aScale=1 + aAmp*aBeat;
+        const arteryPulse = 1.0 + 0.03 * vBeat; // 3% pulsation for arteries
         for(let i=0;i<info.length;i++){
-          const s=info[i]; const A=w2s(s.a), B=w2s(s.b), C=w2s(s.c); const width=s.systemic? Math.max(3, 6*(1/Math.sqrt(state.svr))) : 5; ctx.lineWidth=width; const oxy=oxyAtSeg[i]; ctx.strokeStyle=oxy?RED:BLUE; ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.quadraticCurveTo(B.x,B.y,C.x,C.y); ctx.stroke();
+          const s=info[i]; const A=w2s(s.a), B=w2s(s.b), C=w2s(s.c);
+          let width=s.systemic? Math.max(3, 6*(1/Math.sqrt(state.svr))) : 5;
+          // Apply pulsation to arteries
+          if(s.isArtery){ width *= arteryPulse; }
+          ctx.lineWidth=width;
+          const oxy=oxyAtSeg[i]; ctx.strokeStyle=oxy?RED:BLUE; ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.quadraticCurveTo(B.x,B.y,C.x,C.y); ctx.stroke();
           drawArrow(i,0.22, ctx.strokeStyle); drawArrow(i,0.55, ctx.strokeStyle); drawArrow(i,0.84, ctx.strokeStyle);
         }
-        const beatHz=state.hr/60; const vBeat=Math.max(0, Math.sin(2*Math.PI*beatHz*state.t)); const vAmp=Math.max(0.02, Math.min(0.10, 0.04 + 0.004*(state.sv-BASE.SV))); const vScale=1+vAmp*vBeat; const aBeat=Math.max(0, Math.sin(2*Math.PI*beatHz*(state.t + PR_LEAD))); const aAmp=Math.min(0.30*vAmp, 0.03); const aScale=1 + aAmp*aBeat;
         circle(P.RA,16*aScale,'#4aa8ff'); circle(P.RV,16*vScale*0.98,'#4aa8ff'); circle(P.LA,16*aScale,'#ff6677'); circle(P.LV,18*vScale,'#ff6677');
         // RA/RV/LA/LV labels in fallback
         ctx.fillStyle='#ffffff'; ctx.font='12px system-ui, sans-serif'; ctx.textAlign='center';
@@ -779,7 +816,9 @@
       ok('Geometry points defined', allDefined);
       let flips=0, oxy=false; for(const s of gSpec){ if(s[4]!==null){ if(s[4]!==oxy){ flips++; oxy=s[4] } } }
       ok('Oxygenation flips twice', flips===2, `flips ${flips}`);
-      const archY=gSpec[6][2].y; ok('Aortic arch ascends', archY>0.6, `peak y ${archY}`);
+      // Find aorta segment (should be segment 10 based on new structure: LV to aorta start)
+      const aortaSeg = gSpec.find(s => s[6] === true && s[0] && s[0].x > 0.5); // isArtery and starts from LV area
+      const archY=aortaSeg ? aortaSeg[2].y : 0; ok('Aortic arch ascends', archY>0.5, `peak y ${archY}`);
       // Atrial timing tests
       const atrialLeadOk = PR_LEAD>=0.08 && PR_LEAD<=0.20; ok('Atrial lead 80-200 ms', atrialLeadOk, `lead ${PR_LEAD}s`);
       const vAmpForTest=0.06, aAmpForTest=Math.min(0.30*vAmpForTest,0.03); ok('Atrial amplitude smaller than ventricular', aAmpForTest < vAmpForTest, `aAmp ${aAmpForTest.toFixed(3)} vAmp ${vAmpForTest.toFixed(3)}`);
