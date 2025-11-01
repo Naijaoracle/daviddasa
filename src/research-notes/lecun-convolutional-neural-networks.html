@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Convolutional Neural Networks: The Architecture That Learned to Read - Research Note by David Dasa">
+  <title>Convolutional Neural Networks: The Architecture That Learned to Read - Research Notes - David Dasa</title>
+  <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
+  <nav>
+    <ul>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+      <li><a href="https://www.daviddasa.com/research-notes">Research Notes</a></li>
+    </ul>
+  </nav>
+
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
+  <div class="container">
+    <main>
+      <!-- Back Navigation -->
+      <div style="margin-bottom: 2rem;">
+        <a href="../research-notes/" style="color: #2ecc71; text-decoration: none; font-weight: 500;">← Back to Research Notes</a>
+      </div>
+      <!-- INTRO -->
+      <section class="project-card">
+        <div class="article-header">
+          <h1>Convolutional Neural Networks: The Architecture That Learned to Read</h1>
+          <div class="article-meta">
+            <span class="article-date">November 1, 2025</span>
+            <span class="article-type">Paper</span>
+          </div>
+          <div class="article-tags">
+            <span class="tag">AI/ML</span>
+            <span class="tag">Computer Vision</span>
+            <span class="tag">Healthcare AI</span>
+            <span class="tag">Medical Imaging</span>
+          </div>
+        </div>
+        <h2>INTRO</h2>
+        <p>In 1998, Yann LeCun and colleagues published a long, careful field report on how to get machines to read—postal codes, bank checks, full words—without hand-crafting fragile rules. The paper's plain thesis: if you pick the right architecture and train it end-to-end with gradients, the network can learn its own features directly from pixels and beat traditional pipelines. That architecture is the convolutional neural network (CNN), and the exemplar is LeNet. The authors also introduce a way to train entire, multi-module recognition systems together—Graph Transformer Networks (GTNs)—and show the approach at industrial scale by reading millions of bank checks per day. For healthcare folks, this isn't just history. It's the blueprint for modern imaging AI, ECG analysis, pathology slide classification, and any workflow where raw signals must become reliable, low-latency decisions.</p>
+      </section>
+
+      <!-- TLDR -->
+      <section class="project-card">
+        <h2>TLDR</h2>
+        <p>CNNs—built from small, repeated filters with shared weights and occasional down-sampling—learn translation-tolerant features and need far fewer parameters than fully connected nets. Trained by backpropagation, they outperform rival methods on handwritten digit benchmarks and scale into production. The same ingredients (end-to-end learning, weight sharing, light preprocessing, and global training of multi-step systems) map cleanly onto clinical tasks from OCR in EHRs to radiology triage.</p>
+      </section>
+
+      <!-- CONTENT -->
+      <section class="project-card">
+        <h2>CONTENT</h2>
+        <p>The story starts with a practical observation: brittle, hand-tuned features don't generalize. If you let a network see the raw image and push the error signal all the way to the first pixels, it will discover features that matter for the task. That's the "gradient-based learning" promise, and the paper contrasts it with methods that bolt a classifier atop human-designed feature extractors.</p>
+        <p>What makes a CNN special? Three ideas that healthcare readers will recognize from today's models:</p>
+
+        <p><strong>1. Local receptive fields with shared weights.</strong> Instead of learning a separate weight for every pixel-to-neuron connection, a small filter slides across the image. Every location uses the same few numbers. This "weight sharing" slashes the number of trainable parameters and bakes in translation tolerance—vital when the same structure appears in different places on a chest X-ray or a histology tile. In LeNet-5, the network had hundreds of thousands of connections but only tens of thousands of free parameters because many connections reuse the same filter weights.</p>
+
+        <p><strong>2. Alternating convolution and subsampling (down-sampling).</strong> As you go deeper, spatial resolution shrinks while the number of feature maps grows. You lose exact location but gain richer, more abstract cues—think "there's a nodule-like edge pattern somewhere here" rather than "a bright pixel at (x,y)." The paper links this design back to simple and complex cells in visual cortex, but the engineering benefit is robust invariance to small shifts and deformations.</p>
+
+        <p><strong>3. End-to-end training with backpropagation.</strong> The gradients flow from the final decision through all layers to the pixels. Contrary to earlier worries about local minima, the authors argue that in practice backprop works well, especially when networks have enough capacity. They also point to the power of stochastic (mini-batch/online) updates over heavy second-order optimizers for large datasets—a lesson modern healthcare AI still lives by.</p>
+
+        <p>Do these design choices pay off? Yes. On handwritten digit recognition, CNNs outperformed alternative approaches of the time (nearest neighbors, tangent distance, and support vector machines at comparable memory/computation), and boosting a small committee of CNNs squeezed accuracy even further. The paper is refreshingly honest about trade-offs—SVMs can be very accurate but costly in memory/compute—yet the through-line remains: with enough data and the right inductive bias, CNNs are hard to beat.</p>
+
+        <p>Then the paper widens the lens from single characters to full documents. Real systems have multiple moving parts: find fields, segment characters, recognize them, and apply language constraints. Train those modules separately and you get local optima at the system level; train them together and you can minimize the error you actually care about (e.g., the read rate for a whole check). Graph Transformer Networks are their mechanism for "global training" over directed graphs of modules, and the payoff is tangible: a deployed system reading several million bank checks per day. That production claim matters—this wasn't a toy; it was engineered reality.</p>
+
+        <p>Healthcare translation is straightforward:</p>
+
+        <p><strong>* Medical imaging:</strong> CNNs' locality and weight sharing match the physics of images. They learn edges, textures, and shapes that discriminate effusions from normal lung, tumor from tissue, or hemorrhage from parenchyma—without brittle hand-crafted features. The invariances built by subsampling resemble what makes a model tolerate different scanner positions or small patient motion.</p>
+
+        <p><strong>* Clinical waveforms:</strong> Time-delay neural networks (1-D CNN cousins) apply the same recipe along time. That's useful for ECG rhythm classification or respiratory waveforms in critical care. The paper explicitly connects CNNs and TDNNs for phonemes; swap audio for ECG, and the mapping is obvious.</p>
+
+        <p><strong>* EHR OCR and forms digitization:</strong> The check-reading demonstration is a blueprint for claims forms, lab requisitions, and legacy scanned charts. Use a CNN for character/word recognition, wire it into a graph that models field structure and language constraints, and train the whole pipeline toward the end goal (e.g., correct patient ID + correct test code), not just per-character accuracy.</p>
+
+        <p>Along the way, the authors document practical tricks that still show up in hospital-grade AI: data augmentation via small geometric distortions; committee/ensemble methods (boosting) to reduce residual error; and careful accounting of memory and runtime so models fit inside operational constraints.</p>
+      </section>
+
+      <!-- CONCLUSION -->
+      <section class="project-card">
+        <h2>CONCLUSION</h2>
+        <p>If you're a clinician, buyer, or regulator, the 1998 paper is useful not because it's nostalgic, but because it lays down durable engineering ethics for AI that touches real workflows:</p>
+
+        <p><strong>* Prefer architectures that embed problem structure (locality, invariance) over clever post-hoc features.</strong></p>
+
+        <p><strong>* Train end-to-end on the outcome you care about; don't rely on intermediate proxies.</strong></p>
+
+        <p><strong>* Keep an eye on memory/compute, not just accuracy; clinical deployment has a budget.</strong></p>
+
+        <p><strong>* Expect steady gains from simple tools—augmentation, ensembling—rather than exotic algorithms.</strong></p>
+
+        <p>Modern radiology and pathology CNNs are bigger and trained on GPUs, but philosophically they're LeNet's children. If you want a single historical paper that still informs how to build safe, effective clinical perception systems today, this is it.</p>
+        <h3>References</h3>
+        <p>Original paper: <a href="http://vision.stanford.edu/cs598_spring07/papers/Lecun98.pdf" target="_blank" rel="noopener">Gradient-Based Learning Applied to Document Recognition</a>.</p>
+      </section>
+    </main>
+  </div>
+
+  <!-- Particles.js Configuration to match Turing page -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+    });
+  </script>
+
+  <style>
+    /* Copy layout refinements used on Turing page */
+    .article-header h1 { color: #092917; margin-bottom: 1rem; font-size: 2.2rem; }
+    .article-meta { display: flex; gap: 2rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .article-date { color: #2ecc71; font-weight: 600; font-size: 1rem; }
+    .article-type { color: #1a4731; font-weight: 500; background: rgba(46, 204, 113, 0.1); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.9rem; }
+    .article-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .tag { background: rgba(46, 204, 113, 0.12); color: #092917; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.8rem; font-weight: 500; }
+    .container { max-width: 820px; }
+    main { line-height: 1.7; }
+    p { line-height: 1.7; }
+    .project-card { background: rgba(255,255,255,0.82); border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
+    @media (max-width: 768px) {
+      .article-header h1 { font-size: 1.8rem; }
+      .article-meta { flex-direction: column; gap: 0.5rem; }
+    }
+  </style>
+</body>
+</html>

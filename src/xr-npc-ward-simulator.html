@@ -66,6 +66,11 @@
     .home-button svg { width: 20px; height: 20px; fill: #2ecc71; }
 
     @media (max-width: 768px) {
+      .nav-buttons { flex-wrap: wrap; gap: 6px; }
+      .home-button, .scoring-link, .cv-link { height: 36px; font-size: 11px; }
+      .home-button { width: 36px; }
+      .scoring-link, .cv-link { padding: 0 10px; }
+      .scoring-link svg, .cv-link svg { width: 14px; height: 14px; margin-right: 4px; }
       .tray { width: 260px; right: 8px; top: 56px; padding: 8px; }
       .tray h3 { font-size: 16px; }
       .btns { grid-template-columns: 1fr; }
@@ -74,13 +79,16 @@
       .hint { font-size: 11px; bottom: 12px; }
     }
     @media (max-width: 480px) {
+      .nav-buttons { gap: 4px; left: 8px; top: 8px; }
+      .home-button, .scoring-link, .cv-link { height: 32px; font-size: 10px; }
+      .home-button { width: 32px; }
+      .scoring-link, .cv-link { padding: 0 8px; }
+      .scoring-link svg, .cv-link svg { width: 12px; height: 12px; margin-right: 3px; }
       .tray { width: calc(100vw - 16px); max-width: 248px; top: 52px; }
       button { font-size: 12px; padding: 7px; }
       .log { height: 48px; }
       .btns { gap: 6px; }
       .kit-title { font-size: 11px; }
-      .navigation-buttons { gap: 6px; left: 8px; top: 8px; }
-      .scoring-link, .cv-link { padding: 0 10px; font-size: 11px; }
     }
     /* Compact tray mode (mobile) */
     .tray.compact { padding: 6px; }
@@ -99,6 +107,7 @@
       </svg>
     </a>
     <a href="/hospital-simulation/" class="scoring-link" aria-label="Hospital Simulation" title="Hospital Simulation">Hospital Simulation</a>
+    <a href="/circulation-twin.html" class="scoring-link" aria-label="Circulation Digital Twin" title="Circulation Digital Twin">Circulation Digital Twin</a>
     <a href="/xr-npc-dasex-evaluator.html" class="scoring-link" aria-label="Scoring System" title="Open DASEX Checklist Evaluator">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -777,7 +786,7 @@
 
     // Applied label over patient
     const appliedDiv = document.createElement('div'); appliedDiv.className = 'applied'; appliedDiv.textContent = ''; appliedDiv.style.display = 'none';
-    const appliedLabel = new CSS2DObject(appliedDiv); appliedLabel.position.set(0.5, 1.4, 0); bed.add(appliedLabel);
+    const appliedLabel = new CSS2DObject(appliedDiv); appliedLabel.position.set(0.5, 1.85, 0); bed.add(appliedLabel);
 
     // Therapy prerequisites
     let hasIVAccess = false;

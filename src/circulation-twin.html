@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Circulatory System Simulator</title>
+  <style>
+    :root{ --bg:#0f1220; --panel:#161a2b; --ink:#e6e9f5; --muted:#99a1c2; --accent:#5ad1ff; --ok:#43d17b; --warn:#ffbd2e; --bad:#ff5566 }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:radial-gradient(1200px 700px at 20% 0%, #1a2140 0%, #0f1220 60%);
+      color:var(--ink); font:14px/1.35 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial;
+      display:grid; grid-template-columns: 400px 1fr; grid-template-rows: auto 1fr; grid-template-areas: "header header" "panel view";
+      gap:12px; padding:12px;
+    }
+    header{grid-area:header; display:flex; align-items:center; justify-content:space-between; background:var(--panel); border-radius:14px; padding:10px 14px; box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    header h1{font-size:16px; margin:0; letter-spacing:.3px}
+    header small{color:var(--muted)}
+
+    #panel{grid-area:panel; background:var(--panel); border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,.25); padding:14px; overflow:auto}
+    #view{grid-area:view; position:relative; background:#0b0f1b; border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,.25); overflow:hidden}
+
+    .section{margin-bottom:16px; border:1px solid #232845; border-radius:12px}
+    .section h2{margin:0; font-size:13px; letter-spacing:.4px; color:var(--muted); padding:10px 12px; border-bottom:1px solid #232845}
+    .section .content{padding:10px 12px}
+
+    .kpis{display:grid; grid-template-columns: 1fr 1fr; gap:8px}
+    .kpi{background:#12162a; border:1px solid #232845; border-radius:10px; padding:10px; display:flex; flex-direction:column; gap:6px}
+    .kpi .label{font-size:12px; color:var(--muted)}
+    .kpi .value{font-size:20px}
+    .row{display:flex; align-items:center; justify-content:space-between; gap:8px; margin:6px 0}
+    .row label{font-size:13px; color:var(--ink)}
+
+    input[type="range"]{width:100%}
+    .pill{display:inline-flex; align-items:center; gap:8px; padding:4px 8px; background:#10152a; border:1px solid #232845; border-radius:999px; font-size:12px; color:var(--muted)}
+    .grid{display:grid; gap:8px}
+    .grid.cols-2{grid-template-columns: 1fr 1fr}
+    .grid.cols-3{grid-template-columns: 1fr 1fr 1fr}
+    .btn{cursor:pointer; border:1px solid #232845; background:#131935; color:var(--ink); padding:8px 10px; border-radius:10px}
+    .btn:hover{border-color:#2f3761}
+    .btn.warn{border-color:#51410f; background:#2a220b; color:#ffdf7a}
+    .btn.ok{border-color:#1f3b26; background:#0e1f14; color:#a7f3c9}
+    .btn.ghost{background:transparent}
+    .muted{color:var(--muted)}
+    .small{font-size:12px}
+    .switch{position:relative; display:inline-block; width:44px; height:22px}
+    .switch input{opacity:0; width:0; height:0}
+    .slider{position:absolute; cursor:pointer; inset:0; background:#303554; transition:.2s; border-radius:999px}
+    .slider:before{content:""; position:absolute; height:18px; width:18px; left:2px; top:2px; background:white; border-radius:50%; transition:.2s}
+    input:checked + .slider{background:var(--accent)}
+    input:checked + .slider:before{transform:translateX(22px)}
+    .hr{height:1px; background:#232845; margin:10px -12px}
+
+    canvas{display:block}
+    #hud{position:absolute; top:10px; left:10px; background:rgba(0,0,0,.35); border:1px solid rgba(255,255,255,.1); padding:10px; border-radius:10px; backdrop-filter: blur(4px)}
+    #hud .line{display:flex; align-items:center; gap:8px}
+    #hud .key{color:#cbd2ff; font-size:12px; min-width:110px}
+    #tests{white-space:pre-wrap; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; background:#10152a; border:1px solid #232845; border-radius:10px; padding:8px}
+
+    .legend{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+    .dot{width:10px; height:10px; border-radius:50%}
+    .oxy{background:#ff6677}
+    .deoxy{background:#4aa8ff}
+  </style>
+
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.156.1/build/three.module.js" } }
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Circulatory System Simulator <small class="muted">single file</small></h1>
+    <div class="pill" id="ctxPill">Renderer: auto</div>
+  </header>
+
+  <aside id="panel">
+    <div class="section">
+      <h2>Readouts</h2>
+      <div class="content">
+        <div class="kpis" id="kpis">
+          <div class="kpi" data-kpi="hr">
+            <div class="row"><span class="label">Heart Rate</span>
+              <label class="switch"><input type="checkbox" id="toggleHR" checked><span class="slider"></span></label>
+            </div>
+            <div class="value" id="hrVal">-- bpm</div>
+          </div>
+          <div class="kpi" data-kpi="bp">
+            <div class="row"><span class="label">Blood Pressure</span>
+              <label class="switch"><input type="checkbox" id="toggleBP" checked><span class="slider"></span></label>
+            </div>
+            <div class="value" id="bpVal">-- / -- mmHg</div>
+            <div class="small muted" id="mapVal">MAP -- mmHg</div>
+          </div>
+          <div class="kpi" data-kpi="vol">
+            <div class="row"><span class="label">Circulating Volume</span>
+              <label class="switch"><input type="checkbox" id="toggleVOL" checked><span class="slider"></span></label>
+            </div>
+            <div class="value" id="volVal">-- L</div>
+            <div class="small muted">Infusion <span id="infRateVal">0</span> mL/h</div>
+          </div>
+          <div class="kpi" data-kpi="co">
+            <div class="row"><span class="label">Cardiac Output</span>
+              <span class="pill small">derived</span>
+            </div>
+            <div class="value" id="coVal">-- L/min</div>
+            <div class="small muted">SV <span id="svVal">--</span> mL • SVR <span id="svrVal">--</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Medications</h2>
+      <div class="content grid">
+        <div class="row"><strong>Adrenaline</strong><span class="small muted" id="adrVal">0.00</span></div>
+        <input type="range" id="adr" min="0" max="1" step="0.01" value="0">
+        <div class="small muted">Effect: ↑HR, ↑contractility, ↑SVR</div>
+        <div class="hr"></div>
+
+        <div class="row"><strong>Alpha blocker</strong><span class="small muted" id="alphaVal">0.00</span></div>
+        <input type="range" id="alpha" min="0" max="1" step="0.01" value="0">
+        <div class="small muted">Effect: ↓SVR, reflex ↑HR</div>
+        <div class="hr"></div>
+
+        <div class="row"><strong>Calcium channel blocker</strong><span class="small muted" id="ccbVal">0.00</span></div>
+        <input type="range" id="ccb" min="0" max="1" step="0.01" value="0">
+        <div class="small muted">Effect: ↓HR, ↓contractility, mild ↓SVR</div>
+        <div class="hr"></div>
+
+        <div class="row"><strong>Fluids</strong></div>
+        <div class="grid cols-3">
+          <button class="btn ok" id="bolus250">+250 mL</button>
+          <button class="btn ok" id="bolus500">+500 mL</button>
+          <button class="btn" id="diurese">-250 mL</button>
+        </div>
+        <div class="row">
+          <label>Infusion rate</label>
+          <span class="small muted" id="infusionLabel">0 mL/h</span>
+        </div>
+        <input type="range" id="infusion" min="0" max="2000" step="25" value="0">
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Simulation</h2>
+      <div class="content">
+        <div class="grid cols-2">
+          <button class="btn" id="reset">Reset</button>
+          <label class="row" style="justify-content:flex-start; gap:10px">
+            <span>Pause</span>
+            <label class="switch"><input type="checkbox" id="pause"><span class="slider"></span></label>
+          </label>
+        </div>
+        <div class="small muted" style="margin-top:8px">This is a simplified model for teaching. Not a medical device.</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Legend</h2>
+      <div class="content legend">
+        <span class="dot oxy"></span><span class="small">Oxygenated</span>
+        <span class="dot deoxy"></span><span class="small">Deoxygenated</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Diagnostics</h2>
+      <div class="content">
+        <div class="row">
+          <button class="btn" id="runTests">Run tests</button>
+          <span class="small muted">Quick model checks</span>
+        </div>
+        <div id="tests"></div>
+      </div>
+    </div>
+  </aside>
+
+  <main id="view">
+    <div id="hud">
+      <div class="line"><span class="key">Flow speed</span> <span id="flowHud">--</span></div>
+      <div class="line"><span class="key">Systemic caliber</span> <span id="radHud">--</span></div>
+    </div>
+  </main>
+
+  <script type="module">
+    // Shared physiology model and UI hooks
+    const BASE = { HR:70, SV:70, VOL:5.0, SVR:1.0, MAP_TARGET:93, MMHG_GAIN:19 };
+    const PR_LEAD = 0.12; // seconds atrial lead over ventricular systole
+    const state = { t:0, paused:false, volumeL:BASE.VOL, hr:BASE.HR, contractility:0, svr:BASE.SVR, sv:BASE.SV, co:0, map:0, sbp:0, dbp:0, pulsePressure:40, med:{ adr:0, alpha:0, ccb:0, infusion_mL_per_h:0 } };
+    const clamp=(x,a,b)=>Math.max(a,Math.min(b,x)); const lerp=(a,b,t)=>a+(b-a)*t;
+
+    function updateModel(dt){
+      const dV=(state.med.infusion_mL_per_h/3600)*dt/1000; state.volumeL=clamp(state.volumeL+dV,2.0,9.0);
+      const adr=state.med.adr, alp=state.med.alpha, ccb=state.med.ccb;
+      const dHR_med=30*adr+10*alp-15*ccb; const dInot_med=0.5*adr-0.3*ccb; const svr_med_mult=(1+0.4*adr)*(1-0.45*alp)*(1-0.12*ccb);
+      state.contractility=clamp(lerp(state.contractility,dInot_med,0.5*dt),-0.6,0.8);
+      state.svr=clamp(lerp(state.svr,BASE.SVR*svr_med_mult,0.8*dt),0.4,2.2);
+      const preload=clamp(0.6+0.4*Math.sqrt(state.volumeL/BASE.VOL),0.5,1.5); const afterload=1/(1+0.35*(state.svr-1));
+      const sv_unclamped=BASE.SV*preload*(1+state.contractility)*afterload; state.sv=clamp(sv_unclamped,30,130);
+      const co_now=(state.hr*state.sv)/1000; state.map=clamp(co_now*state.svr*BASE.MMHG_GAIN,30,160);
+      const reflex=0.18*(BASE.MAP_TARGET-state.map); const targetHR=clamp(BASE.HR+dHR_med+reflex,35,160); state.hr=lerp(state.hr,targetHR,0.8*dt);
+      state.co=(state.hr*state.sv)/1000; const pp=clamp(40*(state.sv/BASE.SV)*Math.pow(1/state.svr,0.5),20,90); state.pulsePressure=pp; state.sbp=clamp(state.map+0.5*pp,60,220); state.dbp=clamp(state.map-0.5*pp,30,130); state.t+=dt;
+    }
+
+    // Geometry spec shared by WebGL and 2D
+    function segmentSpec(W,P){
+      const leftCol=W.left+0.45, rightCol=W.right-0.45, topRow=W.top-0.25, botRow=W.bottom+0.25;
+      return [
+        [P.RA,{x:-0.9,y:-0.15},P.RV,false,null,0.08],
+        [P.RV,{x:leftCol-0.45,y:0.25},{x:leftCol, y:1.05},false,null,0.10],
+        [{x:leftCol,y:1.05},{x:leftCol,y:topRow+0.15},{x:-0.25, y:topRow},false,null,0.10],
+        [{x:-0.25, y:topRow},{x:0.25, y:topRow},{x:rightCol, y:topRow},false,true,0.10],
+        [{x:rightCol, y:topRow},{x:rightCol, y:1.15},P.LA,false,null,0.10],
+        [P.LA,{x:0.9,y:-0.1},P.LV,false,null,0.08],
+        [P.LV,{x:1.0,y:0.4},{x:rightCol-0.1, y:0.9},true,null,0.12],
+        [{x:rightCol-0.1, y:0.9},{x:rightCol, y:0.6},{x:rightCol, y:-2.0},true,null,0.12],
+        [{x:rightCol,y:-2.0},{x:rightCol,y:botRow-0.12},{x:0.55,y:botRow},true,null,0.12],
+        [{x:0.55,y:botRow},{x:-0.55,y:botRow},{x:leftCol, y:botRow},true,false,0.12],
+        [{x:leftCol, y:botRow},{x:leftCol, y:-1.3},P.RA,true,null,0.12]
+      ];
+    }
+
+    const el=s=>document.querySelector(s);
+    const hrVal=el('#hrVal'); const bpVal=el('#bpVal'); const mapVal=el('#mapVal'); const volVal=el('#volVal'); const coVal=el('#coVal'); const svVal=el('#svVal'); const svrVal=el('#svrVal'); const infRateVal=el('#infRateVal');
+    const adr=el('#adr'); const alpha=el('#alpha'); const ccb=el('#ccb'); const adrVal=el('#adrVal'); const alphaVal=el('#alphaVal'); const ccbVal=el('#ccbVal');
+    const infusion=el('#infusion'); const infusionLabel=el('#infusionLabel'); const bolus250=el('#bolus250'); const bolus500=el('#bolus500'); const diurese=el('#diurese');
+    const resetBtn=el('#reset'); const pause=el('#pause'); const toggleHR=el('#toggleHR'); const toggleBP=el('#toggleBP'); const toggleVOL=el('#toggleVOL');
+    const kpiHR=document.querySelector('[data-kpi="hr"]'); const kpiBP=document.querySelector('[data-kpi="bp"]'); const kpiVOL=document.querySelector('[data-kpi="vol"]');
+    function refreshToggles(){ kpiHR.style.display=toggleHR.checked?'':'none'; kpiBP.style.display=toggleBP.checked?'':'none'; kpiVOL.style.display=toggleVOL.checked?'':'none' }
+    toggleHR.addEventListener('change',refreshToggles); toggleBP.addEventListener('change',refreshToggles); toggleVOL.addEventListener('change',refreshToggles);
+    function updateUI(){ hrVal.textContent=`${state.hr.toFixed(0)} bpm`; bpVal.textContent=`${state.sbp.toFixed(0)} / ${state.dbp.toFixed(0)} mmHg`; mapVal.textContent=`MAP ${state.map.toFixed(0)} mmHg`; volVal.textContent=`${state.volumeL.toFixed(2)} L`; coVal.textContent=`${state.co.toFixed(2)} L/min`; svVal.textContent=state.sv.toFixed(0); svrVal.textContent=state.svr.toFixed(2); infRateVal.textContent=state.med.infusion_mL_per_h.toFixed(0); adrVal.textContent=Number(adr.value).toFixed(2); alphaVal.textContent=Number(alpha.value).toFixed(2); ccbVal.textContent=Number(ccb.value).toFixed(2); infusionLabel.textContent=`${infusion.value} mL/h`; el('#flowHud').textContent=`${(state.co/5).toFixed(2)} x baseline`; el('#radHud').textContent=`${(1/state.svr).toFixed(2)} relative` }
+    adr.addEventListener('input',()=>state.med.adr=Number(adr.value)); alpha.addEventListener('input',()=>state.med.alpha=Number(alpha.value)); ccb.addEventListener('input',()=>state.med.ccb=Number(ccb.value)); infusion.addEventListener('input',()=>{ state.med.infusion_mL_per_h=Number(infusion.value) });
+    bolus250.addEventListener('click',()=>{ state.volumeL=clamp(state.volumeL+0.25,2.0,9.0) }); bolus500.addEventListener('click',()=>{ state.volumeL=clamp(state.volumeL+0.50,2.0,9.0) }); diurese.addEventListener('click',()=>{ state.volumeL=clamp(state.volumeL-0.25,2.0,9.0) });
+    resetBtn.addEventListener('click',()=>{ Object.assign(state,{ volumeL:BASE.VOL, hr:BASE.HR, contractility:0, svr:BASE.SVR, sv:BASE.SV, med:{ adr:0, alpha:0, ccb:0, infusion_mL_per_h:0 } }); adr.value=0; alpha.value=0; ccb.value=0; infusion.value=0; runTests() });
+    pause.addEventListener('change',()=>{ state.paused=pause.checked }); refreshToggles();
+
+    const view=document.getElementById('view'); const ctxPill=document.getElementById('ctxPill');
+
+    // Bootstrap: try WebGL path, else 2D canvas fallback
+    (async function start(){
+      try{
+        const THREE = await import('three');
+        const { OrbitControls } = await import('https://cdn.jsdelivr.net/npm/three@0.156.1/examples/jsm/controls/OrbitControls.js');
+        try{ initThree(THREE, OrbitControls); ctxPill.textContent='Renderer: WebGL' }catch(e){ console.warn('WebGL init failed', e); initFallback2D(); ctxPill.textContent='Renderer: 2D canvas' }
+      }catch(e){ console.warn('Three not available', e); initFallback2D(); ctxPill.textContent='Renderer: 2D canvas' }
+    })();
+
+    // 3D renderer path
+    function initThree(THREE, OrbitControls){
+      const renderer=new THREE.WebGLRenderer({antialias:true, powerPreference:'low-power'});
+      renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(1,1); view.appendChild(renderer.domElement);
+      const scene=new THREE.Scene(); scene.background=new THREE.Color(0x0b0f1b);
+      const camera=new THREE.PerspectiveCamera(45,1,0.1,100); camera.position.set(0,0,12);
+      const controls=new OrbitControls(camera,renderer.domElement); controls.enableDamping=true; controls.enablePan=false; controls.minDistance=6; controls.maxDistance=20;
+      const hemi=new THREE.HemisphereLight(0x88aaff,0x101020,1.0); scene.add(hemi); const dir=new THREE.DirectionalLight(0xff6688,0.9); dir.position.set(5,5,5); scene.add(dir);
+
+      const RED=new THREE.Color(0xff6677), BLUE=new THREE.Color(0x4aa8ff);
+
+      const W={ left:-3.2, right:3.2, top:2.6, bottom:-2.6 };
+      const P={ RA:new THREE.Vector3(-0.7, 0.45, 0), RV:new THREE.Vector3(-0.7,-0.65,0), LA:new THREE.Vector3( 0.7, 0.45, 0), LV:new THREE.Vector3( 0.7,-0.65,0) };
+
+      function roundedRectShape(x,y,w,h,r){ const s=new THREE.Shape(); s.moveTo(x+r,y); s.lineTo(x+w-r,y); s.quadraticCurveTo(x+w,y,x+w,y+r); s.lineTo(x+w,y+h-r); s.quadraticCurveTo(x+w,y+h,x+w-r,y+h); s.lineTo(x+r,y+h); s.quadraticCurveTo(x,y+h,x,y+h-r); s.lineTo(x,y+r); s.quadraticCurveTo(x,y,x+r,y); return s }
+      function addExtrudedShape(shape, color, opacity=0.22, depth=0.08){ const geo=new THREE.ExtrudeGeometry(shape,{depth, bevelEnabled:false}); const mat=new THREE.MeshStandardMaterial({color, transparent:true, opacity, metalness:0.05, roughness:0.9}); const mesh=new THREE.Mesh(geo,mat); mesh.position.z=-0.15; scene.add(mesh); return mesh }
+      function ellipseShape(cx,cy,rx,ry){ const s=new THREE.Shape(); s.absellipse(cx,cy,rx,ry,0,Math.PI*2,false,0); return s }
+      addExtrudedShape(ellipseShape(-0.6, 2.35-0.45, 0.7, 0.9), 0x86bfff, 0.25);
+      addExtrudedShape(ellipseShape( 0.6, 2.35-0.45, 0.7, 0.9), 0x86bfff, 0.25);
+      const trach=new THREE.Mesh(new THREE.BoxGeometry(0.15,0.6,0.06), new THREE.MeshStandardMaterial({color:0xcfe8ff, transparent:true, opacity:0.35, metalness:0.05})); trach.position.set(0, 2.35-0.2, -0.12); scene.add(trach);
+      const bodyShape=roundedRectShape(-1.3, -2.35-0.8, 2.6, 0.9, 0.18); addExtrudedShape(bodyShape, 0xff9aa0, 0.22);
+
+      const heartShape=roundedRectShape(-1.35, -1.05, 2.7, 1.95, 0.26);
+      const heartGeo=new THREE.ExtrudeGeometry(heartShape,{depth:0.2, bevelEnabled:false});
+      const heartMat=new THREE.MeshStandardMaterial({color:0xff9aa0, transparent:true, opacity:0.18, metalness:0.1, roughness:0.7});
+      const heartMesh=new THREE.Mesh(heartGeo,heartMat); heartMesh.position.z=-0.11; scene.add(heartMesh);
+      const septum=new THREE.Mesh(new THREE.BoxGeometry(0.06,1.85,0.18), new THREE.MeshStandardMaterial({color:0xff9aa0, metalness:0.1, roughness:0.6})); septum.position.set(0,-0.07,-0.02); scene.add(septum);
+
+      function chamber(v,color,r=0.32){ const g=new THREE.SphereGeometry(r,42,42); const m=new THREE.MeshStandardMaterial({color, metalness:0.15, roughness:0.5}); const mesh=new THREE.Mesh(g,m); mesh.position.copy(v); scene.add(mesh); return mesh }
+      const ra=chamber(P.RA, BLUE, 0.32); const rv=chamber(P.RV, BLUE, 0.34); const la=chamber(P.LA, RED, 0.32); const lv=chamber(P.LV, RED, 0.36);
+
+      function makeLabel(text){ const canvas=document.createElement('canvas'); const s=256; canvas.width=s; canvas.height=64; const c=canvas.getContext('2d'); c.fillStyle='#00000088'; c.fillRect(0,0,s,64); c.font='28px sans-serif'; c.fillStyle='#fff'; c.textAlign='center'; c.textBaseline='middle'; c.fillText(text,s/2,32); const tex=new THREE.CanvasTexture(canvas); tex.anisotropy=4; const mat=new THREE.SpriteMaterial({map:tex, transparent:true}); const sp=new THREE.Sprite(mat); sp.scale.set(1.8,0.45,1); return sp }
+      // chamber labels with RV/LV below, RA/LA above for clarity
+      const raLabel=makeLabel('RA'); const raPos=P.RA.clone(); raPos.y+=0.55; raLabel.position.copy(raPos); scene.add(raLabel);
+      const laLabel=makeLabel('LA'); const laPos=P.LA.clone(); laPos.y+=0.55; laLabel.position.copy(laPos); scene.add(laLabel);
+      const rvLabel=makeLabel('RV'); const rvPos=P.RV.clone(); rvPos.y-=0.55; rvLabel.position.copy(rvPos); scene.add(rvLabel);
+      const lvLabel=makeLabel('LV'); const lvPos=P.LV.clone(); lvPos.y-=0.55; lvLabel.position.copy(lvPos); scene.add(lvLabel);
+      const lungsLabel=makeLabel('Lungs'); lungsLabel.position.set(0, 2.6-0.25+0.55, 0); scene.add(lungsLabel);
+      const bodyLabel=makeLabel('Body'); bodyLabel.position.set(0, -2.6+0.25-0.55, 0); scene.add(bodyLabel);
+      const aortaLabel=makeLabel('Aorta'); aortaLabel.position.set(3.2-0.45+0.3, -0.2, 0); aortaLabel.scale.multiplyScalar(0.8); scene.add(aortaLabel);
+      const vcLabel=makeLabel('Vena cava'); vcLabel.position.set(-3.2+0.45-0.3, -0.2, 0); vcLabel.scale.multiplyScalar(0.8); scene.add(vcLabel);
+      const paLabel=makeLabel('Pulmonary artery'); paLabel.position.set(-2.2, 2.15, 0); paLabel.scale.multiplyScalar(0.8); scene.add(paLabel);
+      const pvLabel=makeLabel('Pulmonary vein'); pvLabel.position.set( 2.2, 2.15, 0); pvLabel.scale.multiplyScalar(0.8); scene.add(pvLabel);
+
+      const C=THREE.CatmullRomCurve3; const segments=[];
+      function validPoint(p){ return p && Number.isFinite(p.x) && Number.isFinite(p.y) }
+      function addSeg(a,b,c,systemic=false, oxySet=null, radius=0.10){
+        if(!validPoint(a)||!validPoint(b)||!validPoint(c)) throw new Error('Invalid segment point');
+        const curve=new C([ new THREE.Vector3(a.x,a.y,0), new THREE.Vector3(b.x,b.y,0), new THREE.Vector3(c.x,c.y,0) ], false, 'centripetal');
+        const geom=new THREE.TubeGeometry(curve, 80, radius, 20, false);
+        const mat=new THREE.MeshStandardMaterial({color:0x333333, metalness:0.2, roughness:0.6});
+        const mesh=new THREE.Mesh(geom, mat); scene.add(mesh);
+        segments.push({curve, mesh, systemic, oxySet});
+      }
+
+      const spec=segmentSpec({ left:-3.2, right:3.2, top:2.6, bottom:-2.6 }, { RA:{x:-0.7,y:0.45}, RV:{x:-0.7,y:-0.65}, LA:{x:0.7,y:0.45}, LV:{x:0.7,y:-0.65} });
+      for(const s of spec){ addSeg(s[0],s[1],s[2],s[3],s[4],s[5]) }
+
+      const oxyAtSeg=[]; { let oxy=false; for(let i=0;i<segments.length;i++){ oxyAtSeg[i]=oxy; if(segments[i].oxySet!==null) oxy=segments[i].oxySet } }
+      for(let i=0;i<segments.length;i++){ segments[i].mesh.material.color.copy(oxyAtSeg[i]?RED:BLUE) }
+
+      const path=segments.map(s=>({ curve:s.curve, len:s.curve.getLength() }));
+      const totalLen=path.reduce((a,b)=>a+b.len,0); const cum=[]; let acc=0; for(const p of path){ cum.push(acc); acc+=p.len }
+      function getPointByU(u){ const d=u*totalLen; let i=0; while(i<path.length-1 && d>=cum[i+1]) i++; const local=(d-cum[i])/path[i].len; return { pos:path[i].curve.getPoint(local), seg:i } }
+
+      const N=1400; const positions=new Float32Array(N*3); const progress=new Float32Array(N); const colors=new Float32Array(N*3); const bloodGeom=new THREE.BufferGeometry(); const bloodMat=new THREE.PointsMaterial({size:0.035,sizeAttenuation:true,vertexColors:true});
+      for(let i=0;i<N;i++){ progress[i]=Math.random(); const {pos,seg}=getPointByU(progress[i]); positions[i*3]=pos.x; positions[i*3+1]=pos.y; positions[i*3+2]=pos.z; const c=oxyAtSeg[seg]?RED:BLUE; colors[i*3]=c.r; colors[i*3+1]=c.g; colors[i*3+2]=c.b }
+      bloodGeom.setAttribute('position',new THREE.BufferAttribute(positions,3)); bloodGeom.setAttribute('progress',new THREE.BufferAttribute(progress,1)); bloodGeom.setAttribute('color',new THREE.BufferAttribute(colors,3)); const blood=new THREE.Points(bloodGeom,bloodMat); scene.add(blood);
+
+      function onResize(){ const rect=view.getBoundingClientRect(); renderer.setSize(rect.width,rect.height); camera.aspect=rect.width/rect.height; camera.updateProjectionMatrix() } window.addEventListener('resize',onResize); onResize();
+
+      let last=performance.now();
+      function animate(now){ requestAnimationFrame(animate); const dt=Math.min(0.05,(now-last)/1000); last=now; if(!state.paused){ updateModel(dt) }
+        const beatHz=state.hr/60;
+        const vBeat=Math.max(0, Math.sin(2*Math.PI*beatHz*state.t));
+        const vAmp=clamp(0.04+0.004*(state.sv-BASE.SV),0.02,0.10);
+        const vScale=1+vAmp*vBeat;
+        const aBeat=Math.max(0, Math.sin(2*Math.PI*beatHz*(state.t + PR_LEAD)));
+        const aAmp=Math.min(0.30*vAmp, 0.03);
+        const aScale=1 + aAmp*aBeat;
+        ra.scale.setScalar(aScale); la.scale.setScalar(aScale); lv.scale.setScalar(vScale); rv.scale.setScalar(vScale*0.98);
+        const sysScale=clamp(1/Math.sqrt(state.svr),0.7,1.6); for(const s of segments){ if(s.systemic){ s.mesh.scale.set(sysScale, sysScale, 1) } }
+        const speed=clamp(0.16 + 0.10*(state.co-4.9), 0.05, 0.36); const attr=blood.geometry.getAttribute('position'); const prog=blood.geometry.getAttribute('progress'); const col=blood.geometry.getAttribute('color');
+        for(let i=0;i<N;i++){ let u=prog.array[i]+speed*dt; if(u>1) u-=1; prog.array[i]=u; const {pos,seg}=getPointByU(u); attr.array[i*3]=pos.x; attr.array[i*3+1]=pos.y; attr.array[i*3+2]=pos.z; const c=oxyAtSeg[seg]?RED:BLUE; col.array[i*3]=c.r; col.array[i*3+1]=c.g; col.array[i*3+2]=c.b }
+        prog.needsUpdate=true; attr.needsUpdate=true; col.needsUpdate=true; updateUI(); controls.update(); renderer.render(scene,camera) }
+      requestAnimationFrame(animate)
+    }
+
+    // 2D canvas fallback
+    function initFallback2D(){
+      const canvas=document.createElement('canvas'); canvas.id='fallback2d'; view.appendChild(canvas); const ctx=canvas.getContext('2d');
+      function onResize(){ const r=view.getBoundingClientRect(); canvas.width=r.width; canvas.height=r.height } window.addEventListener('resize',onResize); onResize();
+
+      const RED='#ff6677', BLUE='#4aa8ff', PBG='rgba(120,190,255,0.10)', SBG='rgba(255,160,160,0.10)';
+      const text='#fff';
+
+      const W={ left:-3.2, right:3.2, top:2.6, bottom:-2.6 };
+      const P={ RA:{x:-0.7,y:0.45}, RV:{x:-0.7,y:-0.65}, LA:{x:0.7,y:0.45}, LV:{x:0.7,y:-0.65} };
+
+      function w2s(p){ const r=canvas.getBoundingClientRect(); const sx=r.width/(W.right-W.left); const sy=r.height/(W.top-W.bottom); return { x:(p.x-W.left)*sx, y:(W.top-p.y)*sy } }
+      function rrect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath() }
+
+      function drawBackground(){
+        const t=w2s({x:W.left+0.2,y:W.top}); const b=w2s({x:W.left+0.2,y:W.bottom}); const tr=w2s({x:W.right-0.2,y:W.top}); const br=w2s({x:W.right-0.2,y:W.bottom});
+        const heartTop=w2s({x:0,y:0.95}); const heartBot=w2s({x:0,y:-1.25});
+        ctx.fillStyle=PBG; ctx.strokeStyle='#86bfff'; ctx.lineWidth=2; rrect(t.x, t.y, tr.x-t.x, heartTop.y-t.y, 18); ctx.fill(); ctx.stroke();
+        ctx.fillStyle=SBG; ctx.strokeStyle='#ff9aa0'; ctx.lineWidth=2; rrect(b.x, heartBot.y, br.x-b.x, b.y-heartBot.y, 18); ctx.fill(); ctx.stroke();
+        ctx.fillStyle=text; ctx.font='14px system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillText('Pulmonary circulation', (t.x+tr.x)/2, t.y+20); ctx.fillText('Systemic circulation', (b.x+br.x)/2, b.y-14);
+        ctx.font='12px system-ui, sans-serif'; ctx.fillText('Lung capillaries', (t.x+tr.x)/2, t.y+38); ctx.fillText('Capillaries of the body and organs', (b.x+br.x)/2, b.y-30);
+        const hb=w2s({x:-1.35,y:-1.05}), ht=w2s({x:1.35,y:0.9}); const hx=hb.x, hy=ht.y, hw=ht.x-hb.x, hh=w2s({x:0,y:-1.05}).y-hy;
+        ctx.fillStyle='rgba(255,120,120,0.12)'; ctx.strokeStyle='#ff9aa0'; ctx.lineWidth=2; rrect(hx, hy, hw, hh, 26); ctx.fill(); ctx.stroke();
+        ctx.strokeStyle='#ff9aa0'; ctx.lineWidth=2; ctx.beginPath(); const sx=(hx+ht.x)/2; ctx.moveTo(sx,hy+6); ctx.lineTo(sx,hy+hh-6); ctx.stroke();
+        function oval(cx,cy,rx,ry,fill,stroke){ const s=w2s({x:cx,y:cy}); const rxp=rx*(canvas.width/(W.right-W.left)); const ryp=ry*(canvas.height/(W.top-W.bottom)); const grad=ctx.createRadialGradient(s.x,s.y,1,s.x,s.y,Math.max(rxp,ryp)); grad.addColorStop(0, fill); grad.addColorStop(1, 'rgba(134,191,255,0.15)'); ctx.fillStyle=grad; ctx.beginPath(); ctx.ellipse(s.x,s.y,rxp,ryp,0,0,Math.PI*2); ctx.fill(); ctx.strokeStyle=stroke; ctx.stroke() }
+        const topRow=W.top-0.25, botRow=W.bottom+0.25;
+        ctx.lineWidth=1.5; oval(-0.6, topRow-0.45, 0.7, 0.9, 'rgba(134,191,255,0.35)', '#86bfff'); oval(0.6, topRow-0.45, 0.7, 0.9, 'rgba(134,191,255,0.35)', '#86bfff');
+        const txy1=w2s({x:0,y:topRow-0.2}); ctx.fillStyle='rgba(207,232,255,0.5)'; ctx.fillRect(txy1.x-6,txy1.y-30,12,60);
+        const bbx=w2s({x:-1.3,y:botRow-0.8}); const bbw=w2s({x:1.3,y:botRow+0.1}); ctx.strokeStyle='#ff9aa0'; ctx.lineWidth=2; rrect(bbx.x, bbx.y, bbw.x-bbx.x, bbw.y-bbx.y, 16); ctx.fillStyle='rgba(255,154,160,0.18)'; ctx.fill(); ctx.stroke();
+        function fibers(color,rows){ ctx.strokeStyle=color; for(let r=0;r<rows;r++){ ctx.globalAlpha=0.8; ctx.lineWidth=1; const y=bbx.y+14+r*((bbw.y-bbx.y)-28)/(rows-1); ctx.beginPath(); for(let x=bbx.x+10;x<=bbw.x-10;x+=6){ const t=(x-bbx.x)*0.06+r; const dy=Math.sin(t)*3 + Math.sin(t*1.7)*1.5; if(x===bbx.x+10) ctx.moveTo(x,y+dy); else ctx.lineTo(x,y+dy) } ctx.stroke(); ctx.globalAlpha=1 } }
+        fibers('#ff99aa',4); fibers('#7dbdff',4);
+      }
+
+      const leftCol=W.left+0.45, rightCol=W.right-0.45, topRow=W.top-0.25, botRow=W.bottom+0.25;
+      const segs=segmentSpec(W,P).map(s=>({ a:s[0], b:s[1], c:s[2], systemic:s[3], oxySet:s[4] }));
+
+      function capillaryKnot(center,size,color){ ctx.strokeStyle=color; ctx.lineWidth=2; const c=w2s(center); const s=size*20; ctx.beginPath(); for(let i=0;i<14;i++){ const a=i/14*Math.PI*2; const x=c.x + Math.cos(a*2.1)*(s*0.58) + Math.cos(a)*s*0.25; const y=c.y + Math.sin(a*1.8)*(s*0.48) + Math.sin(a*1.2)*s*0.15; if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y) } ctx.closePath(); ctx.stroke() }
+      function qPoint(a,b,c,t){ return { x: (1-t)*(1-t)*a.x + 2*(1-t)*t*b.x + t*t*c.x, y: (1-t)*(1-t)*a.y + 2*(1-t)*t*b.y + t*t*c.y } }
+      function qTangent(a,b,c,t){ return { x: 2*(1-t)*(b.x-a.x) + 2*t*(c.x-b.x), y: 2*(1-t)*(b.y-a.y) + 2*t*(c.y-b.y) } }
+      function qPathLen(a,b,c){ const steps=32; let len=0; let prev=w2s(a); for(let i=1;i<=steps;i++){ const p=w2s(qPoint(a,b,c,i/steps)); len+=Math.hypot(p.x-prev.x,p.y-prev.y); prev=p } return len }
+      const info=segs.map(s=>({ ...s, len:qPathLen(s.a,s.b,s.c) }));
+      const totalLen=info.reduce((s,v)=>s+v.len,0); const cum=[]; let acc=0; for(const s of info){ cum.push(acc); acc+=s.len }
+      const oxyAtSeg=[]; { let oxy=false; for(let i=0;i<info.length;i++){ oxyAtSeg[i]=oxy; if(info[i].oxySet!==null) oxy=info[i].oxySet } }
+
+      const N=1300; const parts=new Float32Array(N); for(let i=0;i<N;i++) parts[i]=Math.random();
+      function getPointByU(u){ const d=u*totalLen; let i=0; while(i<info.length-1 && d>=cum[i+1]) i++; const s=info[i]; const local=(d-cum[i])/s.len; const p=qPoint(s.a,s.b,s.c,local); const scr=w2s(p); return {x:scr.x,y:scr.y, seg:i, t:local} }
+      function drawArrow(segIdx,t,color){ const s=info[segIdx]; const p=qPoint(s.a,s.b,s.c,t); const d=qTangent(s.a,s.b,s.c,t); const n=Math.hypot(d.x,d.y)||1; const ux=d.x/n, uy=d.y/n; const sp=w2s(p); ctx.fillStyle=color; ctx.beginPath(); const size=s.systemic?8:6; ctx.moveTo(sp.x+ux*0, sp.y+uy*0); ctx.lineTo(sp.x-uy*size+ux*size, sp.y+ux*size+uy*size); ctx.lineTo(sp.x+uy*size+ux*size, sp.y-ux*size+uy*size); ctx.closePath(); ctx.fill() }
+
+      function circle(p,r,color){ const s=w2s(p); ctx.fillStyle=color; ctx.beginPath(); ctx.arc(s.x,s.y,r,0,Math.PI*2); ctx.fill() }
+
+      function draw(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        drawBackground();
+        capillaryKnot({x:0,y:topRow+0.03}, 1.0, '#cfe8ff');
+        capillaryKnot({x:0,y:botRow-0.03}, 1.0, '#ffd2d2');
+        for(let i=0;i<info.length;i++){
+          const s=info[i]; const A=w2s(s.a), B=w2s(s.b), C=w2s(s.c); const width=s.systemic? Math.max(3, 6*(1/Math.sqrt(state.svr))) : 5; ctx.lineWidth=width; const oxy=oxyAtSeg[i]; ctx.strokeStyle=oxy?RED:BLUE; ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.quadraticCurveTo(B.x,B.y,C.x,C.y); ctx.stroke();
+          drawArrow(i,0.22, ctx.strokeStyle); drawArrow(i,0.55, ctx.strokeStyle); drawArrow(i,0.84, ctx.strokeStyle);
+        }
+        const beatHz=state.hr/60; const vBeat=Math.max(0, Math.sin(2*Math.PI*beatHz*state.t)); const vAmp=Math.max(0.02, Math.min(0.10, 0.04 + 0.004*(state.sv-BASE.SV))); const vScale=1+vAmp*vBeat; const aBeat=Math.max(0, Math.sin(2*Math.PI*beatHz*(state.t + PR_LEAD))); const aAmp=Math.min(0.30*vAmp, 0.03); const aScale=1 + aAmp*aBeat;
+        circle(P.RA,16*aScale,'#4aa8ff'); circle(P.RV,16*vScale*0.98,'#4aa8ff'); circle(P.LA,16*aScale,'#ff6677'); circle(P.LV,18*vScale,'#ff6677');
+        // RA/RV/LA/LV labels in fallback
+        ctx.fillStyle='#ffffff'; ctx.font='12px system-ui, sans-serif'; ctx.textAlign='center';
+        const raP=w2s(P.RA), rvP=w2s(P.RV), laP=w2s(P.LA), lvP=w2s(P.LV);
+        ctx.fillText('RA', raP.x, raP.y-20); ctx.fillText('RV', rvP.x, rvP.y+22); ctx.fillText('LA', laP.x, laP.y-20); ctx.fillText('LV', lvP.x, lvP.y+24);
+        ctx.fillStyle='#c9d6ff'; ctx.font='11px system-ui, sans-serif'; ctx.textAlign='center';
+        ctx.fillText('Pulmonary artery', w2s({x:-2.6,y:1.2}).x, w2s({x:0,y:1.2}).y);
+        ctx.fillText('Pulmonary vein', w2s({x:2.6,y:1.2}).x, w2s({x:0,y:1.2}).y);
+        ctx.fillText('Aorta', w2s({x:2.6,y:-0.2}).x, w2s({x:0,y:-0.2}).y);
+        ctx.fillText('Vena cava', w2s({x:-2.6,y:-0.2}).x, w2s({x:0,y:-0.2}).y);
+      }
+
+      let last=performance.now();
+      function loop(now){ requestAnimationFrame(loop); const dt=Math.min(0.05,(now-last)/1000); last=now; if(!state.paused){ updateModel(dt) } updateUI(); draw() }
+      requestAnimationFrame(loop)
+    }
+
+    // ---------- Tests ----------
+    const testsOut=el('#tests'); el('#runTests').addEventListener('click',runTests);
+    function modelStep(s,dt){ const clamp=(x,a,b)=>Math.max(a,Math.min(b,x)); const lerp=(a,b,t)=>a+(b-a)*t; const dV=(s.med.infusion_mL_per_h/3600)*dt/1000; s.volumeL=clamp(s.volumeL+dV,2.0,9.0); const adr=s.med.adr, alp=s.med.alpha, ccb=s.med.ccb; const dHR_med=30*adr+10*alp-15*ccb; const dInot_med=0.5*adr-0.3*ccb; const svr_med_mult=(1+0.4*adr)*(1-0.45*alp)*(1-0.12*ccb); s.contractility=clamp(lerp(s.contractility,dInot_med,0.5*dt),-0.6,0.8); s.svr=clamp(lerp(s.svr,BASE.SVR*svr_med_mult,0.8*dt),0.4,2.2); const preload=clamp(0.6+0.4*Math.sqrt(s.volumeL/BASE.VOL),0.5,1.5); const afterload=1/(1+0.35*(s.svr-1)); const sv_unclamped=BASE.SV*preload*(1+s.contractility)*afterload; s.sv=clamp(sv_unclamped,30,130); const co_now=(s.hr*s.sv)/1000; s.map=clamp(co_now*s.svr*BASE.MMHG_GAIN,30,160); const reflex=0.18*(BASE.MAP_TARGET-s.map); const targetHR=clamp(BASE.HR+dHR_med+reflex,35,160); s.hr=lerp(s.hr,targetHR,0.8*dt); s.co=(s.hr*s.sv)/1000; const pp=clamp(40*(s.sv/BASE.SV)*Math.pow(1/s.svr,0.5),20,90); s.sbp=clamp(s.map+0.5*pp,60,220); s.dbp=clamp(s.map-0.5*pp,30,130); s.t+=dt; return s }
+    function runTests(){ const lines=[]; const tol=(a,b,t)=>Math.abs(a-b)<=t; function sim(seconds,prep){ let s={ t:0, paused:false, volumeL:BASE.VOL, hr:BASE.HR, contractility:0, svr:BASE.SVR, sv:BASE.SV, co:0, map:0, sbp:0, dbp:0, pulsePressure:40, med:{ adr:0, alpha:0, ccb:0, infusion_mL_per_h:0 } }; if(prep) prep(s); let dt=0.02; for(let t=0;t<seconds;t+=dt){ s=modelStep(s,dt) } return s } function ok(name,cond,detail=""){ lines.push(`${cond?'PASS':'FAIL'} - ${name}${detail?` - ${detail}`:''}`) }
+      let s0=sim(8); ok('Baseline HR near 70 bpm', tol(s0.hr,70,5), `got ${s0.hr.toFixed(1)}`); ok('Baseline CO near 4.9 L/min', tol(s0.co,4.9,0.8), `got ${s0.co.toFixed(2)}`); ok('Baseline MAP plausible', s0.map>70 && s0.map<110, `got ${s0.map.toFixed(1)}`);
+      let sAdr=sim(8, s=>{ s.med.adr=0.8 }); ok('Adrenaline raises HR', sAdr.hr>s0.hr, `base ${s0.hr.toFixed(1)} now ${sAdr.hr.toFixed(1)}`); ok('Adrenaline raises MAP', sAdr.map>=s0.map, `base ${s0.map.toFixed(1)} now ${sAdr.map.toFixed(1)}`);
+      let sAlp=sim(8, s=>{ s.med.alpha=0.8 }); ok('Alpha blocker lowers SVR', sAlp.svr<s0.svr, `base ${s0.svr.toFixed(2)} now ${sAlp.svr.toFixed(2)}`); ok('Alpha blocker non-increase MAP', sAlp.map<=s0.map+2, `base ${s0.map.toFixed(1)} now ${sAlp.map.toFixed(1)}`); ok('Alpha blocker reflex HR not lower than baseline', sAlp.hr>=s0.hr-2, `base ${s0.hr.toFixed(1)} now ${sAlp.hr.toFixed(1)}`);
+      let sCcb=sim(8, s=>{ s.med.ccb=0.8 }); ok('CCB lowers HR', sCcb.hr<s0.hr, `base ${s0.hr.toFixed(1)} now ${sCcb.hr.toFixed(1)}`); ok('CCB non-increase MAP', sCcb.map<=s0.map+2, `base ${s0.map.toFixed(1)} now ${sCcb.map.toFixed(1)}`);
+      let sVol=sim(8, s=>{ s.volumeL=BASE.VOL+0.5 }); ok('Bolus raises SV', sVol.sv>=s0.sv, `base ${s0.sv.toFixed(1)} now ${sVol.sv.toFixed(1)}`); ok('Bolus raises CO', sVol.co>=s0.co, `base ${s0.co.toFixed(2)} now ${sVol.co.toFixed(2)}`);
+      let sInf=sim(600, s=>{ s.med.infusion_mL_per_h=1200 }); ok('Infusion raises volume', sInf.volumeL>s0.volumeL, `base ${s0.volumeL.toFixed(2)} now ${sInf.volumeL.toFixed(2)}`);
+      let sMaxAdr=sim(10, s=>{ s.med.adr=1.0; s.med.alpha=0; s.med.ccb=0 }); ok('HR upper clamp', sMaxAdr.hr<=160+1, `hr ${sMaxAdr.hr.toFixed(1)}`);
+      let sMaxCcb=sim(10, s=>{ s.med.ccb=1.0; s.med.adr=0; s.med.alpha=0 }); ok('HR lower clamp', sMaxCcb.hr>=35-1, `hr ${sMaxCcb.hr.toFixed(1)}`);
+      const gSpec=segmentSpec({ left:-3.2, right:3.2, top:2.6, bottom:-2.6 }, { RA:{x:-0.7,y:0.45}, RV:{x:-0.7,y:-0.65}, LA:{x:0.7,y:0.45}, LV:{x:0.7,y:-0.65} });
+      const allDefined=gSpec.every(s=>s[0]&&s[1]&&s[2]&&Number.isFinite(s[0].x)&&Number.isFinite(s[1].x)&&Number.isFinite(s[2].x));
+      ok('Geometry points defined', allDefined);
+      let flips=0, oxy=false; for(const s of gSpec){ if(s[4]!==null){ if(s[4]!==oxy){ flips++; oxy=s[4] } } }
+      ok('Oxygenation flips twice', flips===2, `flips ${flips}`);
+      const archY=gSpec[6][2].y; ok('Aortic arch ascends', archY>0.6, `peak y ${archY}`);
+      // Atrial timing tests
+      const atrialLeadOk = PR_LEAD>=0.08 && PR_LEAD<=0.20; ok('Atrial lead 80-200 ms', atrialLeadOk, `lead ${PR_LEAD}s`);
+      const vAmpForTest=0.06, aAmpForTest=Math.min(0.30*vAmpForTest,0.03); ok('Atrial amplitude smaller than ventricular', aAmpForTest < vAmpForTest, `aAmp ${aAmpForTest.toFixed(3)} vAmp ${vAmpForTest.toFixed(3)}`);
+      testsOut.textContent=lines.join('\n'); return lines.every(l=>l.startsWith('PASS')) }
+    runTests();
+  </script>
+</body>
+</html>
