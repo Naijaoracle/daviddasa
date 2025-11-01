@@ -553,11 +553,11 @@
       // oxySet: null=continue, true=become oxygenated, false=become deoxygenated
       return [
         [P.RA,{x:-0.9,y:-0.15},P.RV,false,null,0.08,false],
-        [P.RV,{x:leftCol-0.45,y:0.25},{x:leftCol, y:1.05},false,null,0.10,false],
+        [P.RV,{x:leftCol-0.45,y:0.25},{x:leftCol, y:1.05},false,null,0.10,true],  // Pulmonary artery - very mild pulse
         // Split pulmonary artery before lungs - branch 1
-        [{x:leftCol,y:1.05},{x:leftCol-0.12,y:topRow+0.08},{x:-0.35, y:topRow+0.05},false,null,0.09,false],
+        [{x:leftCol,y:1.05},{x:leftCol-0.12,y:topRow+0.08},{x:-0.35, y:topRow+0.05},false,null,0.09,true],  // Pulmonary artery branch
         // Split pulmonary artery before lungs - branch 2
-        [{x:leftCol,y:1.05},{x:leftCol+0.12,y:topRow+0.08},{x:-0.15, y:topRow+0.05},false,null,0.09,false],
+        [{x:leftCol,y:1.05},{x:leftCol+0.12,y:topRow+0.08},{x:-0.15, y:topRow+0.05},false,null,0.09,true],  // Pulmonary artery branch
         // Inside lungs - color change happens here (start deoxygenated)
         [{x:-0.35, y:topRow+0.05},{x:-0.25, y:topRow},{x:-0.25, y:topRow-0.05},false,true,0.08,false],
         [{x:-0.15, y:topRow+0.05},{x:-0.05, y:topRow},{x:0.05, y:topRow-0.05},false,true,0.08,false],
@@ -701,13 +701,24 @@
         const aScale=1 + aAmp*aBeat;
         ra.scale.setScalar(aScale); la.scale.setScalar(aScale); lv.scale.setScalar(vScale); rv.scale.setScalar(vScale*0.98);
         const sysScale=clamp(1/Math.sqrt(state.svr),0.7,1.6);
-        // Artery pulsation - subtle pulse synchronized with heartbeat
-        const arteryPulse = 1.0 + 0.03 * vBeat; // 3% pulsation
+        // Artery pulsation - different amplitudes for systemic vs pulmonary
+        const systemicArteryPulse = 1.0 + 0.01 * vBeat; // 1% pulsation for aorta (reduced)
+        const pulmonaryArteryPulse = 1.0 + 0.005 * vBeat; // 0.5% pulsation for pulmonary (very mild)
         for(const s of segments){
-          if(s.systemic){
-            const baseScale = sysScale;
-            const pulseScale = s.isArtery ? baseScale * arteryPulse : baseScale;
-            s.mesh.scale.set(pulseScale, pulseScale, s.isArtery ? arteryPulse : 1);
+          if(s.isArtery){
+            // Differentiate systemic (aorta) from pulmonary arteries
+            const pulse = s.systemic ? systemicArteryPulse : pulmonaryArteryPulse;
+            if(s.systemic){
+              // Systemic artery (aorta) - apply with systemic scale
+              const baseScale = sysScale;
+              s.mesh.scale.set(baseScale * pulse, baseScale * pulse, pulse);
+            } else {
+              // Pulmonary artery - apply without systemic scale
+              s.mesh.scale.set(pulse, pulse, pulse);
+            }
+          } else if(s.systemic){
+            // Non-artery systemic vessels
+            s.mesh.scale.set(sysScale, sysScale, 1);
           }
         }
         const speed=clamp(0.16 + 0.10*(state.co-4.9), 0.05, 0.36); const attr=blood.geometry.getAttribute('position'); const prog=blood.geometry.getAttribute('progress'); const col=blood.geometry.getAttribute('color');
@@ -772,12 +783,16 @@
         capillaryKnot({x:0,y:topRow+0.03}, 1.0, '#cfe8ff');
         capillaryKnot({x:0,y:botRow-0.03}, 1.0, '#ffd2d2');
         const beatHz=state.hr/60; const vBeat=Math.max(0, Math.sin(2*Math.PI*beatHz*state.t)); const vAmp=Math.max(0.02, Math.min(0.10, 0.04 + 0.004*(state.sv-BASE.SV))); const vScale=1+vAmp*vBeat; const aBeat=Math.max(0, Math.sin(2*Math.PI*beatHz*(state.t + PR_LEAD))); const aAmp=Math.min(0.30*vAmp, 0.03); const aScale=1 + aAmp*aBeat;
-        const arteryPulse = 1.0 + 0.03 * vBeat; // 3% pulsation for arteries
+        const systemicArteryPulse = 1.0 + 0.01 * vBeat; // 1% pulsation for aorta (reduced)
+        const pulmonaryArteryPulse = 1.0 + 0.005 * vBeat; // 0.5% pulsation for pulmonary (very mild)
         for(let i=0;i<info.length;i++){
           const s=info[i]; const A=w2s(s.a), B=w2s(s.b), C=w2s(s.c);
           let width=s.systemic? Math.max(3, 6*(1/Math.sqrt(state.svr))) : 5;
-          // Apply pulsation to arteries
-          if(s.isArtery){ width *= arteryPulse; }
+          // Apply different pulsation to arteries based on type
+          if(s.isArtery){
+            const pulse = s.systemic ? systemicArteryPulse : pulmonaryArteryPulse;
+            width *= pulse;
+          }
           ctx.lineWidth=width;
           const oxy=oxyAtSeg[i]; ctx.strokeStyle=oxy?RED:BLUE; ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.quadraticCurveTo(B.x,B.y,C.x,C.y); ctx.stroke();
           drawArrow(i,0.22, ctx.strokeStyle); drawArrow(i,0.55, ctx.strokeStyle); drawArrow(i,0.84, ctx.strokeStyle);
