@@ -682,6 +682,12 @@
 
       const path=segments.map(s=>({ curve:s.curve, len:s.curve.getLength() }));
       const totalLen=path.reduce((a,b)=>a+b.len,0); const cum=[]; let acc=0; for(const p of path){ cum.push(acc); acc+=p.len }
+      
+      // Store segment positions for wave calculations
+      for(let i=0;i<segments.length;i++){
+        segments[i].pathStart = cum[i] / totalLen; // normalized start position in circuit
+        segments[i].pathLen = path[i].len / totalLen; // normalized segment length
+      }
       function getPointByU(u){ const d=u*totalLen; let i=0; while(i<path.length-1 && d>=cum[i+1]) i++; const local=(d-cum[i])/path[i].len; return { pos:path[i].curve.getPoint(local), seg:i } }
 
       const N=1400; const positions=new Float32Array(N*3); const progress=new Float32Array(N); const colors=new Float32Array(N*3); const bloodGeom=new THREE.BufferGeometry(); const bloodMat=new THREE.PointsMaterial({size:0.035,sizeAttenuation:true,vertexColors:true});
@@ -701,13 +707,37 @@
         const aScale=1 + aAmp*aBeat;
         ra.scale.setScalar(aScale); la.scale.setScalar(aScale); lv.scale.setScalar(vScale); rv.scale.setScalar(vScale*0.98);
         const sysScale=clamp(1/Math.sqrt(state.svr),0.7,1.6);
-        // Artery pulsation - different amplitudes for systemic vs pulmonary
-        const systemicArteryPulse = 1.0 + 0.01 * vBeat; // 1% pulsation for aorta (reduced)
-        const pulmonaryArteryPulse = 1.0 + 0.005 * vBeat; // 0.5% pulsation for pulmonary (very mild)
+        // Traveling pulse wave - propagates through the circuit
+        // Wave speed: one full circuit per heartbeat cycle
+        const waveSpeed = beatHz; // cycles per second
+        const wavePhase = (state.t * waveSpeed) % 1.0; // normalized position of wave in circuit
+        const waveWidth = 0.15; // width of pulse wave (as fraction of circuit)
+        
+        // Reduced amplitudes by half
+        const systemicArteryBaseAmp = 0.005; // 0.5% base pulsation for aorta
+        const pulmonaryArteryBaseAmp = 0.0025; // 0.25% base pulsation for pulmonary
+        
         for(const s of segments){
           if(s.isArtery){
-            // Differentiate systemic (aorta) from pulmonary arteries
-            const pulse = s.systemic ? systemicArteryPulse : pulmonaryArteryPulse;
+            // Calculate wave contribution at this segment's position
+            const segMid = s.pathStart + s.pathLen * 0.5; // middle of segment
+            let waveContrib = 0;
+            // Check if wave overlaps with this segment
+            const dist = Math.min(
+              Math.abs(wavePhase - segMid),
+              Math.abs(wavePhase + 1.0 - segMid),
+              Math.abs(wavePhase - 1.0 - segMid)
+            );
+            if(dist < waveWidth){
+              // Wave envelope: smooth falloff
+              const envelope = Math.cos((dist / waveWidth) * Math.PI * 0.5);
+              waveContrib = envelope * envelope; // squared for smoother falloff
+            }
+            
+            const baseAmp = s.systemic ? systemicArteryBaseAmp : pulmonaryArteryBaseAmp;
+            const waveAmp = baseAmp * (1.0 + 2.0 * waveContrib); // wave adds up to 2x base at peak
+            const pulse = 1.0 + waveAmp * vBeat;
+            
             if(s.systemic){
               // Systemic artery (aorta) - apply with systemic scale
               const baseScale = sysScale;
@@ -769,6 +799,13 @@
       function qPathLen(a,b,c){ const steps=32; let len=0; let prev=w2s(a); for(let i=1;i<=steps;i++){ const p=w2s(qPoint(a,b,c,i/steps)); len+=Math.hypot(p.x-prev.x,p.y-prev.y); prev=p } return len }
       const info=segs.map(s=>({ ...s, len:qPathLen(s.a,s.b,s.c) }));
       const totalLen=info.reduce((s,v)=>s+v.len,0); const cum=[]; let acc=0; for(const s of info){ cum.push(acc); acc+=s.len }
+      
+      // Store segment positions for wave calculations
+      for(let i=0;i<info.length;i++){
+        info[i].pathStart = cum[i] / totalLen; // normalized start position in circuit
+        info[i].pathLen = info[i].len / totalLen; // normalized segment length
+      }
+      
       const oxyAtSeg=[]; { let oxy=false; for(let i=0;i<info.length;i++){ oxyAtSeg[i]=oxy; if(info[i].oxySet!==null) oxy=info[i].oxySet } }
 
       const N=1300; const parts=new Float32Array(N); for(let i=0;i<N;i++) parts[i]=Math.random();
@@ -783,16 +820,37 @@
         capillaryKnot({x:0,y:topRow+0.03}, 1.0, '#cfe8ff');
         capillaryKnot({x:0,y:botRow-0.03}, 1.0, '#ffd2d2');
         const beatHz=state.hr/60; const vBeat=Math.max(0, Math.sin(2*Math.PI*beatHz*state.t)); const vAmp=Math.max(0.02, Math.min(0.10, 0.04 + 0.004*(state.sv-BASE.SV))); const vScale=1+vAmp*vBeat; const aBeat=Math.max(0, Math.sin(2*Math.PI*beatHz*(state.t + PR_LEAD))); const aAmp=Math.min(0.30*vAmp, 0.03); const aScale=1 + aAmp*aBeat;
-        const systemicArteryPulse = 1.0 + 0.01 * vBeat; // 1% pulsation for aorta (reduced)
-        const pulmonaryArteryPulse = 1.0 + 0.005 * vBeat; // 0.5% pulsation for pulmonary (very mild)
+        
+        // Traveling pulse wave - same as 3D version
+        const waveSpeed = beatHz;
+        const wavePhase = (state.t * waveSpeed) % 1.0;
+        const waveWidth = 0.15;
+        const systemicArteryBaseAmp = 0.005; // 0.5% base pulsation for aorta
+        const pulmonaryArteryBaseAmp = 0.0025; // 0.25% base pulsation for pulmonary
+        
         for(let i=0;i<info.length;i++){
           const s=info[i]; const A=w2s(s.a), B=w2s(s.b), C=w2s(s.c);
           let width=s.systemic? Math.max(3, 6*(1/Math.sqrt(state.svr))) : 5;
-          // Apply different pulsation to arteries based on type
+          
+          // Apply traveling wave pulsation to arteries
           if(s.isArtery){
-            const pulse = s.systemic ? systemicArteryPulse : pulmonaryArteryPulse;
+            const segMid = s.pathStart + s.pathLen * 0.5;
+            let waveContrib = 0;
+            const dist = Math.min(
+              Math.abs(wavePhase - segMid),
+              Math.abs(wavePhase + 1.0 - segMid),
+              Math.abs(wavePhase - 1.0 - segMid)
+            );
+            if(dist < waveWidth){
+              const envelope = Math.cos((dist / waveWidth) * Math.PI * 0.5);
+              waveContrib = envelope * envelope;
+            }
+            const baseAmp = s.systemic ? systemicArteryBaseAmp : pulmonaryArteryBaseAmp;
+            const waveAmp = baseAmp * (1.0 + 2.0 * waveContrib);
+            const pulse = 1.0 + waveAmp * vBeat;
             width *= pulse;
           }
+          
           ctx.lineWidth=width;
           const oxy=oxyAtSeg[i]; ctx.strokeStyle=oxy?RED:BLUE; ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.quadraticCurveTo(B.x,B.y,C.x,C.y); ctx.stroke();
           drawArrow(i,0.22, ctx.strokeStyle); drawArrow(i,0.55, ctx.strokeStyle); drawArrow(i,0.84, ctx.strokeStyle);
