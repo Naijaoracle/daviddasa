@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cardiomyocyte Simulator</title>
+<style>
+  :root{ --bg:#0f1220; --panel:#161a2b; --ink:#e6e9f5; --muted:#99a1c2; --accent:#5ad1ff; --ok:#43d17b; --bad:#ff5566 }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0; background:radial-gradient(1200px 700px at 15% 0%, #1a2140 0%, #0f1220 60%); color:var(--ink); font:14px/1.35 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial; display:grid; grid-template-columns:1fr; grid-template-rows:auto auto 1fr; grid-template-areas:"header" "view" "panel"; gap:12px; padding:12px}
+  @media (min-width: 900px) {
+    body{grid-template-columns:400px 1fr; grid-template-rows:auto 1fr; grid-template-areas:"header header" "panel view"; height:100vh; overflow:hidden}
+    #panel{overflow-y:auto}
+  }
+  header{grid-area:header; display:flex; justify-content:space-between; align-items:center; background:#161a2b; border-radius:14px; padding:10px 14px; box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  header h1{font-size:16px; margin:0}
+  #panel{grid-area:panel; background:#161a2b; border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,.25); padding:14px; overflow:auto}
+  #view{grid-area:view; background:#0b0f1b; border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,.25); position:relative; overflow:hidden; display:flex; flex-direction:column}
+  .section{margin-bottom:16px; border:1px solid #232845; border-radius:12px}
+  .section h2{margin:0; font-size:13px; color:#99a1c2; padding:10px 12px; border-bottom:1px solid #232845}
+  .section .content{padding:10px 12px}
+  .row{display:flex; align-items:center; justify-content:space-between; gap:8px; margin:6px 0}
+  .grid{display:grid; gap:8px}
+  .cols-2{grid-template-columns: 1fr 1fr}
+  .cols-3{grid-template-columns: 1fr 1fr 1fr}
+  .kpi{background:#12162a; border:1px solid #232845; border-radius:10px; padding:10px; display:flex; flex-direction:column; gap:4px}
+  .kpis{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+  .kpi .label{font-size:12px; color:#99a1c2}
+  .kpi .value{font-size:20px}
+  input[type="range"]{width:100%}
+  .switch{position:relative; display:inline-block; width:44px; height:22px}
+  .switch input{opacity:0; width:0; height:0}
+  .slider{position:absolute; inset:0; border-radius:999px; background:#2f3558}
+  .slider:before{content:""; position:absolute; left:2px; top:2px; width:18px; height:18px; border-radius:50%; background:#fff; transition:.15s}
+  .switch input:checked + .slider{background:#5ad1ff}
+  .switch input:checked + .slider:before{transform:translateX(22px)}
+  .btn{cursor:pointer; border:1px solid #232845; background:#131935; color:#e6e9f5; padding:8px 10px; border-radius:10px}
+  .btn.ok{border-color:#1f3b26; background:#0e1f14; color:#a7f3c9}
+  .small{font-size:12px; color:#99a1c2}
+
+  /* Views */
+  #cellWrap{position:relative; flex:1 1 56%; min-height:260px; margin:10px; border-radius:10px; border:1px solid rgba(255,255,255,0.08); background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.0))}
+  #plotsWrap{position:relative; flex:1 1 44%; min-height:240px; margin:10px; border-radius:10px; border:1px solid rgba(255,255,255,0.08); background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.0))}
+  .toolbar{position:absolute; top:8px; left:8px; right:8px; height:36px; display:flex; align-items:center; gap:8px; padding:6px 8px; background:rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.12); border-radius:8px; backdrop-filter: blur(4px)}
+  .toolbar .title{font-size:12px; color:#cbd2ff}
+  canvas{display:block}
+  #cell2d{width:100%; height:100%; display:block}
+  #cell3dContainer{width:100%; height:100%; display:none}
+
+  #scope{position:absolute; inset:42px 10px 10px 10px; border-radius:10px; overflow:hidden}
+  /* split inside cardiomyocyte pane */
+  #split{position:absolute; inset:42px 10px 10px 10px; display:grid; grid-template-columns: 1.1fr 0.9fr; gap:12px}
+  #cellArea, #memArea{position:relative; border:1px solid rgba(255,255,255,0.08); border-radius:10px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.0))}
+  #membrane{width:100%; height:100%; display:block}
+  #tests{white-space:pre-wrap; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; background:#10152a; border:1px solid #232845; border-radius:10px; padding:8px}
+
+  .explainer-card { position: fixed; right: 12px; bottom: 12px; background: var(--panel); border: 1px solid #232845; border-radius: 14px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.25); max-width: 280px; z-index: 100; transform: translateX(-20%); }
+</style>
+
+</head>
+<body>
+  <header>
+    <h1>Cardiomyocyte Simulator</h1>
+    <div class="small">Teaching model. Not a device.</div>
+  </header>
+
+  <aside id="panel">
+    <div class="section">
+      <h2>Readouts</h2>
+      <div class="content kpis">
+        <div class="kpi" data-kpi="rate"><div class="row"><span class="label">Rate</span><label class="switch"><input type="checkbox" id="toggleRate" checked><span class="slider"></span></label></div><div class="value" id="rateVal">-- bpm</div><div class="small">Cycle length <span id="clVal">--</span> ms</div></div>
+        <div class="kpi" data-kpi="ap"><div class="row"><span class="label">AP metrics</span><label class="switch"><input type="checkbox" id="toggleAP" checked><span class="slider"></span></label></div><div class="value" id="apdVal">APD90 -- ms</div><div class="small">dV/dtmax <span id="dvdtVal">--</span> V/s</div></div>
+        <div class="kpi" data-kpi="ca"><div class="row"><span class="label">Calcium</span><label class="switch"><input type="checkbox" id="toggleCa" checked><span class="slider"></span></label></div><div class="value" id="caVal">Peak -- nM</div><div class="small">Tau50 <span id="tauVal">--</span> ms</div></div>
+        <div class="kpi" data-kpi="force"><div class="row"><span class="label">Force</span><label class="switch"><input type="checkbox" id="toggleForce" checked><span class="slider"></span></label></div><div class="value" id="fVal">Peak -- rel</div><div class="small">Length <span id="lenVal">--</span> µm</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Pacing and environment</h2>
+      <div class="content grid">
+        <div class="row"><label>Rate</label><span class="small" id="rateLbl">70</span></div>
+        <input type="range" id="rate" min="20" max="200" step="1" value="70">
+        <div class="row"><label>[Ca]o mM</label><span class="small" id="caoLbl">2.0</span></div>
+        <input type="range" id="cao" min="0.5" max="4.0" step="0.1" value="2.0">
+        <div class="row"><label>Temperature factor</label><span class="small" id="q10Lbl">1.0</span></div>
+        <input type="range" id="q10" min="0.6" max="1.6" step="0.01" value="1.0">
+        <div class="row"><label>Noise</label><span class="small" id="noiseLbl">0.00</span></div>
+        <input type="range" id="noise" min="0" max="0.2" step="0.01" value="0">
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Currents and drugs</h2>
+      <div class="content grid">
+        <div class="row"><strong>β tone</strong><span class="small" id="betaLbl">0.00</span></div>
+        <input type="range" id="beta" min="0" max="1" step="0.01" value="0">
+        <div class="row"><strong>Disease state</strong></div>
+        <select id="diseaseState" style="width:100%; padding:4px; border:1px solid #232845; border-radius:6px; background:#12162a; color:#e6e9f5">
+          <option value="normal">Normal</option>
+          <option value="hf">Heart Failure</option>
+          <option value="ischemia">Ischemia</option>
+          <option value="hypertrophy">Hypertrophy</option>
+        </select>
+        <div class="row"><strong>Na block</strong><span class="small" id="nablkLbl">0.00</span></div>
+        <input type="range" id="nablk" min="0" max="1" step="0.01" value="0">
+        <div class="row"><strong>L-type Ca block</strong><span class="small" id="cablkLbl">0.00</span></div>
+        <input type="range" id="cablk" min="0" max="1" step="0.01" value="0">
+        <div class="row"><strong>T-type Ca block</strong><span class="small" id="catblkLbl">0.00</span></div>
+        <input type="range" id="catblk" min="0" max="1" step="0.01" value="0">
+        <div class="row"><strong>K block</strong><span class="small" id="kblkLbl">0.00</span></div>
+        <input type="range" id="kblk" min="0" max="1" step="0.01" value="0">
+        <div class="row"><strong>Ca-Cl block</strong><span class="small" id="clcablkLbl">0.00</span></div>
+        <input type="range" id="clcablk" min="0" max="1" step="0.01" value="0">
+        <div class="row"><strong>NCX scale</strong><span class="small" id="ncxLbl">1.00</span></div>
+        <input type="range" id="ncx" min="0.2" max="2.0" step="0.01" value="1.0">
+        <div class="row"><strong>SERCA scale</strong><span class="small" id="sercaLbl">1.00</span></div>
+        <input type="range" id="serca" min="0.2" max="2.0" step="0.01" value="1.0">
+        <div class="row"><strong>PMCA scale</strong><span class="small" id="pmcaLbl">1.00</span></div>
+        <input type="range" id="pmca" min="0.2" max="2.0" step="0.01" value="1.0">
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Mechanics</h2>
+      <div class="content grid">
+        <div class="row"><label>Preload sarcomere length µm</label><span class="small" id="sl0Lbl">1.90</span></div>
+        <input type="range" id="sl0" min="1.6" max="2.3" step="0.01" value="1.90">
+        <div class="row"><label>Afterload (relative)</label><span class="small" id="afterLbl">0.40</span></div>
+        <input type="range" id="afterload" min="0" max="1.0" step="0.01" value="0.40">
+        <div class="row"><label>Passive stiffness</label><span class="small" id="stiffLbl">0.50</span></div>
+        <input type="range" id="stiff" min="0.1" max="2.0" step="0.01" value="0.50">
+        <div class="row"><span>Isometric</span><label class="switch"><input type="checkbox" id="isometric"><span class="slider"></span></label></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Controls</h2>
+      <div class="content grid cols-2">
+        <button class="btn" id="reset">Reset</button>
+        <button class="btn" id="exportBtn">Export CSV</button>
+        <label class="row" style="justify-content:flex-start; gap:8px"><span>Pause</span><label class="switch"><input type="checkbox" id="pause"><span class="slider"></span></label></label>
+        <button class="btn" id="runTests">Run tests</button>
+        <div class="small">Fast checks for expected effects</div>
+        <div id="tests"></div>
+      </div>
+    </div>
+  </aside>
+
+  <main id="view">
+    <div id="cellWrap">
+      <div class="toolbar">
+        <span class="title">Cardiomyocyte view</span>
+        <label class="row" style="justify-content:flex-start; gap:6px"><span class="small">Show channels</span><label class="switch"><input type="checkbox" id="showChannels" checked><span class="slider"></span></label></label>
+        <label class="row" style="justify-content:flex-start; gap:6px"><span class="small">Animate ions</span><label class="switch"><input type="checkbox" id="animateIons" checked><span class="slider"></span></label></label>
+      </div>
+      <div id="split">
+        <div id="cellArea">
+          <canvas id="cell2d"></canvas>
+        </div>
+        <div id="memArea">
+          <canvas id="membrane"></canvas>
+        </div>
+      </div>
+    </div>
+    <div id="plotsWrap">
+      <div class="toolbar"><span class="title">Waveforms</span></div>
+      <div id="scope">
+        <canvas id="plot"></canvas>
+      </div>
+    </div>
+  </main>
+
+<script>
+// ---------- Model parameters ----------
+const P = {
+  Cm: 1.0,              // uF/cm2
+  gNa: 14.0,            // mS/cm2
+  gCaL: 0.12,           // base mS/cm2
+  gCaT: 0.02,           // T-type Ca channel mS/cm2
+  gKr: 0.03,
+  gKs: 0.05,
+  gK1: 0.3,
+  gLeak: 0.002,
+  gClCa: 0.001,         // Ca-activated Cl current
+  ENa: 50.0,            // mV
+  EK: -90.0,            // mV
+  ECl: -30.0,           // mV
+  ELeak: -50.0,
+  Cao: 2.0,             // mM
+  Vrest: -86.0,
+  Vth: -40.0,
+  // Calcium handling
+  Vc: 0.0164,           // volume cell (µL)
+  Vsr: 0.0011,          // volume SR (µL)
+  kRel: 20.0,           // RyR release gain
+  kLeak: 0.2,
+  kSERCA: 2.5,
+  kNCX: 0.8,
+  kPMCA: 0.05,          // plasma membrane Ca ATPase
+  betaTone: 0.0,
+  // Disease states
+  diseaseState: 'normal', // 'normal', 'hf', 'ischemia', 'hypertrophy'
+  // Mechanics
+  Fmax: 1.0,
+  KdCa: 0.0006,         // mM
+  hillN: 3.0,
+  SL0: 1.90,            // um preload
+  afterload: 0.4,
+  k_passive: 0.5,
+  isometric: false,
+  // Pacing
+  IstimAmp: 5000,
+  IstimDur: 0.008,
+  // Constants
+  F: 96485,             // Faraday constant C/mol
+  CaConvFactor: 0.316   // ICaL to dCai conversion factor (mM/ms per µA/µF)
+};
+
+const State = {
+  t:0, Vm:-86.0, m:0.0, h:0.75, j:0.75, d:0.0, f:1.0, b:0.0, g:1.0, xr:0.0, xs:0.0,
+  Cai: 0.0001, CaSR: 1.3, CaSS: 0.0001, // mM, SR and subspace in mM equiv
+  Len: P.SL0, vLen:0,
+  // beat metrics
+  lastUp:null, apd90:NaN, dvdtMax:NaN, caPeak:NaN, tau50:NaN, forcePeak:NaN,
+  // Coupling to circulation
+  preload_pressure: 0,    // mmHg preload pressure from circulation
+  afterload_pressure: 80,  // mmHg afterload pressure from circulation
+};
+
+const Env = { bpm:70, temp:1.0, noise:0.0, blocks:{ Na:0, CaL:0, CaT:0, K:0, ClCa:0 }, scales:{ NCX:1.0, SERCA:1.0, PMCA:1.0 }, Cao:P.Cao };
+
+// ---------- Helpers ----------
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+function nernstCa(Cao, Cai){ // mV at 37C
+  return 13.356 * Math.log(Cao/Math.max(Cai,1e-6));
+}
+function xinf(V,k,half){ return 1/(1+Math.exp(-(V-half)/k)); }
+function tau_sigmoid(V,base,amp,center,width){ return base + amp*Math.exp(-((V-center)*(V-center))/(width*width)); }
+
+function applyDiseaseModifiers(p){
+  const disease = p.diseaseState;
+  const base = {
+    NaScale: 1.0, NaTau: 1.0,
+    CaLScale: 1.0, CaTScale: 1.0, CaTau: 1.0,
+    KScale: 1.0, K1Scale: 1.0, KTau: 1.0,
+    ClCaScale: 1.0, LeakScale: 1.0,
+    CaHandlingScale: 1.0
+  };
+
+  switch(disease){
+    case 'hf': // Heart failure - reduced currents, slower kinetics
+      return {
+        ...base,
+        NaScale: 0.7, NaTau: 1.3,
+        CaLScale: 0.6, CaTau: 1.5,
+        KScale: 0.8, K1Scale: 0.9, KTau: 1.2,
+        CaHandlingScale: 0.7
+      };
+    case 'ischemia': // Ischemia - metabolic stress
+      return {
+        ...base,
+        NaScale: 0.8, NaTau: 1.4,
+        CaLScale: 0.9, CaTau: 1.2,
+        KScale: 1.1, // K ATP channels activate
+        CaHandlingScale: 0.8,
+        LeakScale: 1.2
+      };
+    case 'hypertrophy': // Hypertrophy - altered expression
+      return {
+        ...base,
+        NaScale: 0.9, NaTau: 0.9,
+        CaLScale: 1.2, CaTScale: 1.1,
+        KScale: 0.9,
+        CaHandlingScale: 1.1
+      };
+    default: // normal
+      return base;
+  }
+}
+
+// ---------- Currents ----------
+function currents(s,p){
+  const V=s.Vm;
+  const beta = P.betaTone;
+  const disease = applyDiseaseModifiers(p);
+
+  // Rush-Larsen integration helper
+  const rl = (gate, inf, tau) => inf + (gate - inf) * Math.exp(-dt/tau);
+
+  // Na activation/inactivation kinetics
+  const minf=xinf(V,6.2,-35), hinf=xinf(V,-7.0,-62), jinf=hinf;
+  const taum=tau_sigmoid(V,0.05,0.1,-30,12) * disease.NaTau;
+  const tauh=tau_sigmoid(V,0.3,0.7,-60,20) * disease.NaTau;
+  const tauj=tauh;
+  
+  s.m = rl(s.m, minf, taum);
+  s.h = rl(s.h, hinf, tauh);
+  s.j = rl(s.j, jinf, tauj);
+
+  let gNa = p.gNa * disease.NaScale * (1-Env.blocks.Na);
+  gNa *= (1 + 0.1*beta); // beta slightly boosts Na
+  const INa = gNa * s.m*s.m*s.m * s.h * s.j * (V - p.ENa);
+
+  // L-type Ca current
+  const dInf=xinf(V,6.0,-10), fInf=xinf(V,-7.0,-28);
+  const taud=tau_sigmoid(V,0.08,0.12,-10,9) * disease.CaTau;
+  const tauf=tau_sigmoid(V,0.3,0.5,-28,18) * disease.CaTau;
+  
+  s.d = rl(s.d, dInf, taud);
+  s.f = rl(s.f, fInf, tauf);
+
+  let gCaL = p.gCaL * disease.CaLScale * (1-Env.blocks.CaL);
+  gCaL *= (1 + 0.9*beta); // beta boosts CaL
+  const ECa = nernstCa(Env.Cao, s.CaSS); // Use subspace Ca for reversal potential
+  const ICaL = gCaL * s.d * s.f * (V - ECa);
+
+  // T-type Ca current
+  const bInf=xinf(V,6.0,-60), gInf=xinf(V,-7.0,-80);
+  const taub=tau_sigmoid(V,0.1,0.2,-60,15);
+  const taug=tau_sigmoid(V,0.5,1.0,-80,25);
+  
+  s.b = rl(s.b, bInf, taub);
+  s.g = rl(s.g, gInf, taug);
+
+  let gCaT = p.gCaT * disease.CaTScale * (1-Env.blocks.CaT);
+  gCaT *= (1 + 0.5*beta);
+  const ICaT = gCaT * s.b*s.b * s.g * (V - ECa);
+
+  // Delayed rectifiers lumped
+  const xrInf=xinf(V,7.0,-5); const xsInf=xinf(V,10.0,-20);
+  const tauxr=tau_sigmoid(V,50,200,-20,30) * disease.KTau;
+  const tauxs=tau_sigmoid(V,100,300,-20,40) * disease.KTau;
+  
+  s.xr = rl(s.xr, xrInf, tauxr);
+  s.xs = rl(s.xs, xsInf, tauxs);
+
+  let gK = (p.gKr*s.xr + p.gKs*s.xs*s.xs) * disease.KScale * (1-Env.blocks.K);
+  gK *= (1 + 0.5*beta); // beta upregulates IKs
+  const IK = gK * (V - p.EK);
+
+  // IK1
+  const K1inf=1/(1+Math.exp(0.07*(V - p.EK - 10)));
+  const IK1 = p.gK1 * disease.K1Scale * K1inf * (V - p.EK);
+
+  // Ca-activated Cl current - make it more prominent
+  const ClCaInf = s.CaSS / (s.CaSS + 0.0005); // Increased Ca sensitivity
+  let gClCa = p.gClCa * disease.ClCaScale * (1-Env.blocks.ClCa) * 2.0; // Doubled conductance
+  gClCa *= (1 + 0.5*beta); // Increased beta sensitivity
+  const IClCa = gClCa * ClCaInf * (V - p.ECl);
+
+  // Background leak
+  const Ib = p.gLeak * disease.LeakScale * (V - p.ELeak);
+
+  return { INa, ICaL, ICaT, IK, IK1, IClCa, Ib, K1inf };
+}
+
+// Calcium handling and mechanics
+function calcium_and_mechanics(s,p,I){
+  const beta = P.betaTone;
+  const disease = applyDiseaseModifiers(p);
+  const CaScale = disease.CaHandlingScale;
+
+  // Calcium subspace (near membrane)
+  const CaDiffusion = 0.1; // diffusion between subspace and bulk
+  const dCaSS = (s.Cai - s.CaSS) * CaDiffusion - I.ICaL * p.CaConvFactor * 1e-3 - I.ICaT * p.CaConvFactor * 1e-3;
+  s.CaSS += dCaSS * dt;
+  s.CaSS = clamp(s.CaSS, 1e-6, 0.01);
+
+  // SR calcium handling - temperature affects kinetics
+  const tempFactor = Math.pow(Env.temp, 2); // Temperature affects calcium handling too
+  const relGain = p.kRel * CaScale * tempFactor * (1 + 0.6*beta);
+  const Jrel = relGain * s.d * s.f * (s.CaSR - s.CaSS) * Math.max(0, (s.Vm+5)/100); // trigger by V and Ca gradient
+  const Jleak = p.kLeak * CaScale * tempFactor * (s.CaSR - s.Cai);
+  const Jserca = p.kSERCA * Env.scales.SERCA * CaScale * tempFactor * (1 + 0.5*beta) * s.CaSS; // SERCA pumps from subspace
+
+  // Calcium removal mechanisms
+  const Incx = p.kNCX * Env.scales.NCX * CaScale * (s.Cai - 0.0001); // NCX from bulk
+  const Ipmca = p.kPMCA * Env.scales.PMCA * CaScale * s.CaSS; // PMCA from subspace
+
+  // Total calcium balance (proper units now!)
+  const dCai = -I.ICaL * p.CaConvFactor * 1e-3 - I.ICaT * p.CaConvFactor * 1e-3
+               - Jrel + Jleak - Incx - Ipmca + (s.CaSS - s.Cai) * CaDiffusion;
+  const dCaSR = Jserca - Jrel - Jleak;
+
+  s.Cai += dCai * dt;
+  s.CaSR = clamp(s.CaSR + dCaSR * dt, 0.2, 2.5);
+  s.Cai = clamp(s.Cai, 0.00005, 0.01);
+  s.CaSS = clamp(s.CaSS, 1e-6, 0.01);
+
+  // Activation to force (use subspace Ca for better fidelity)
+  // Make calcium sensitivity more responsive to show clear contractions
+  const KdCa_adjusted = p.KdCa * (1 - 0.5 * Env.temp); // Temperature increases sensitivity
+  const A = Math.pow(s.CaSS, p.hillN) / (Math.pow(s.CaSS, p.hillN) + Math.pow(KdCa_adjusted, p.hillN));
+  const fLen = Math.exp(-Math.pow((s.Len - 2.1)/0.35, 2)); // length-tension bell
+  const Factive = p.Fmax * A * fLen * CaScale * (1 + 0.5*beta);
+  const Fpassive = p.k_passive * (s.Len - p.SL0);
+
+  let Ftot = Factive + Fpassive;
+  if(p.isometric){
+    s.vLen = 0;
+    // Even in isometric mode, show length change for visualization
+    s.Len = p.SL0 - 0.1 * A; // Show "intended" shortening
+    s.Len = clamp(s.Len, 1.6, 2.4);
+  } else {
+    // Coupling to circulation model - use pressure-based afterload
+    const afterload_from_pressure = s.afterload_pressure / 100; // Convert mmHg to relative units
+    const damping = 4.0; // Reduced damping for more visible motion
+    const drive = Ftot - Math.max(p.afterload, afterload_from_pressure);
+    s.vLen += (-drive - damping*s.vLen)*dt; s.Len += s.vLen*dt; s.Len = clamp(s.Len, 1.6, 2.4);
+  }
+  return {A, Factive, Fpassive, Ftot};
+}
+
+// Stimulus - continuous pacing with guaranteed action potentials
+function I_stim(t){
+  const cl = 60/Env.bpm; // s - cycle length
+  const tInBeat = t % cl;
+
+  // Very strong stimulus to ensure action potentials
+  const stimDuration = 0.015; // 15ms stimulus duration for reliability
+  const stimStrength = P.IstimAmp * 10.0; // 10x strength for guaranteed triggering
+
+  // Stimulate at regular intervals regardless of current Vm - this ensures continuous activity
+  if (tInBeat < stimDuration) {
+    return stimStrength; // uA/uF - very strong depolarizing current
+  }
+
+  return 0.0;
+}
+
+// ---------- Integrator ----------
+let dt = 0.0005; // s
+let paused=false;
+
+// traces buffers - initialize with some data
+const BUFSZ = 4096;
+const trace = { t:new Float32Array(BUFSZ), V:new Float32Array(BUFSZ), Cai:new Float32Array(BUFSZ), F:new Float32Array(BUFSZ) };
+let head=0;
+
+// Pre-fill trace buffers with realistic baseline values for immediate display
+function initializeTraceBuffers(){
+  const now = performance.now() / 1000; // current time in seconds
+  for(let i=0; i<BUFSZ; i++){
+    const timeOffset = (i - BUFSZ + 1) * 0.001; // 1ms intervals, most recent at end
+    trace.t[i] = now + timeOffset;
+    trace.V[i] = -86.0 + Math.sin(i * 0.1) * 2; // slight variation to show activity
+    trace.Cai[i] = 100 + Math.sin(i * 0.05) * 10; // baseline calcium with variation
+    trace.F[i] = 0.1 + Math.sin(i * 0.08) * 0.05; // baseline force with variation
+  }
+  head = BUFSZ - 1; // Start with most recent data at the end
+}
+initializeTraceBuffers();
+
+// Ensure continuous activity by adding an initial stimulus sequence
+function ensureContinuousActivity(){
+  // Add a brief initial stimulus to kickstart activity
+  setTimeout(() => {
+    if(State.t < 0.1){ // Only in first 100ms
+      State.Vm = 20; // Brief depolarization to trigger first AP
+    }
+  }, 100);
+}
+
+// DOM-bound refs will be assigned after DOMContentLoaded
+let cell2d, c2, plot, ctx, testsOut, membrane, mctx;
+let showChannels = true, animateIons = true; let ions = []; let lastDrawTS = performance.now();
+
+function resizeAll(){
+  const areaL=document.getElementById('cellArea'); const areaR=document.getElementById('memArea');
+  if(areaL){ const rL=areaL.getBoundingClientRect(); if(cell2d){ cell2d.width=rL.width; cell2d.height=rL.height } }
+  if(areaR){ const rR=areaR.getBoundingClientRect(); if(membrane){ membrane.width=rR.width; membrane.height=rR.height } }
+  const r2=document.getElementById('scope').getBoundingClientRect(); if(plot){ plot.width=r2.width; plot.height=r2.height }
+}
+
+// drawing helpers
+function drawCell2D(){
+  if(!c2||!cell2d) return;
+  const W=cell2d.width, H=cell2d.height; c2.clearRect(0,0,W,H);
+  if(W<=0||H<=0) return;
+  const pad=20; const cx=W/2, cy=H/2; const L= Math.min(W-2*pad, H-2*pad)*0.9;
+  const delta = clamp((P.SL0 - State.Len)/0.2, -1, 1); // >0 when shortening
+  const contractionFactor = 0.25; // Make contractions more visible
+  const axial = L*(0.90 - contractionFactor*delta);
+  const radial = axial*0.35*(1 + 0.20*delta);
+  c2.save(); c2.translate(cx,cy);
+  // membrane with visible thickness change on contraction
+  const thickness = 3 + 3.0*Math.max(0,delta); // More visible contraction
+  c2.strokeStyle='#9ec9ff'; c2.lineWidth=thickness; c2.fillStyle='rgba(120,170,255,0.08)';
+  capsulePath(-axial/2,-radial, axial, 2*radial, 30); c2.fill(); c2.stroke();
+
+  // Add pulsing effect to make contractions more obvious
+  const pulseAlpha = 0.1 + 0.2 * Math.abs(delta);
+  c2.save(); c2.globalAlpha = pulseAlpha;
+  c2.fillStyle = delta > 0 ? '#ff6b6b' : '#4ecdc4'; // Red when contracting, blue when relaxing
+  capsulePath(-axial/2+2,-radial+2, axial-4, 2*radial-4, 28); c2.fill();
+  c2.restore();
+  // calcium glow overlay - Cai (bulk) and CaSS (subspace)
+  const bulkGlow = clamp((State.Cai*1e6)/1000, 0, 1);
+  const ssGlow = clamp((State.CaSS*1e6)/2000, 0, 1); // subspace has higher concentration
+  c2.save(); c2.globalAlpha = 0.15*bulkGlow; c2.fillStyle = '#ffd166'; capsulePath(-axial/2+4,-radial+4, axial-8, 2*radial-8, 26); c2.fill();
+  // subspace calcium near membrane
+  c2.globalAlpha = 0.25*ssGlow; c2.fillStyle = '#ffaa44'; c2.beginPath(); c2.arc(0, -radial*0.8, axial*0.15, 0, Math.PI*2); c2.fill();
+  c2.restore();
+  // nucleus
+  c2.fillStyle='rgba(180,120,255,0.15)'; c2.strokeStyle='#caa6ff'; c2.lineWidth=2; circle( -axial*0.15, 0, radial*0.60 ); c2.fill(); c2.stroke();
+  // SR region
+  c2.strokeStyle='#ffb0b0'; c2.lineWidth=1.2; dashedRect(-axial*0.35,-radial*0.6, axial*0.7, radial*1.2, 6);
+  // sarcomere stripes - tighten with contraction, slightly brighter at peak
+  const stripes=10; c2.strokeStyle=`rgba(255,255,255,${0.10 + 0.10*Math.max(0,delta)})`; c2.lineWidth=2; const width=axial*0.9*(1-0.08*delta); for(let i=0;i<=stripes;i++){ const x=-width/2 + i*(width)/stripes; c2.beginPath(); c2.moveTo(x,-radial*0.85); c2.lineTo(x,radial*0.85); c2.stroke() }
+  // channels and ion particles
+  if(showChannels){ const gates = channelOpenProbs(); drawChannelsAround(axial, radial, gates); if(animateIons) updateAndDrawIons(axial, radial, gates); }
+  // readouts on canvas
+  c2.fillStyle='#cbd2ff'; c2.font='12px system-ui'; c2.fillText(`Vm ${State.Vm.toFixed(0)} mV`, -axial*0.48, -radial-10);
+  const shortPct = clamp((P.SL0 - State.Len)/P.SL0, -1, 1)*100;
+  c2.fillText(`Cai ${(State.Cai*1e6).toFixed(0)} nM`, -axial*0.48, radial+10);
+  c2.fillText(`CaSS ${(State.CaSS*1e6).toFixed(0)} nM`, -axial*0.48, radial+25);
+  c2.fillText(`Shortening ${shortPct.toFixed(1)}%`, axial*0.15, -radial-10);
+  c2.restore();
+  // legend bottom right of the view
+  drawLegend(W,H,axial,radial);
+}
+
+function capsulePath(x,y,w,h,r){ c2.beginPath(); const rr=Math.min(r,h/2,w/2); c2.moveTo(x+rr,y); c2.arcTo(x+w,y,x+w,y+h,rr); c2.arcTo(x+w,y+h,x,y+h,rr); c2.arcTo(x,y+h,x,y,rr); c2.arcTo(x,y,x+w,y,rr); c2.closePath() }
+function circle(x,y,r){ c2.beginPath(); c2.arc(x,y,r,0,Math.PI*2) }
+function dashedRect(x,y,w,h,d){ c2.setLineDash([d,d]); c2.strokeRect(x,y,w,h); c2.setLineDash([]) }
+
+function channelOpenProbs(){
+  const PNa = Math.max(0, Math.min(1, State.m*State.m*State.m*State.h*State.j));
+  const PCa = Math.max(0, Math.min(1, State.d*State.f));
+  const PK = Math.max(0, Math.min(1, 0.5*(State.xr + State.xs*State.xs)));
+  const PK1 = currents(State,P).K1inf; // last value computed inside currents
+  return {PNa, PCa, PK, PK1};
+}
+
+function drawChannelsAround(axial, radial, g){
+  const N=36; for(let i=0;i<N;i++){
+    const t=i/(N-1); const xpos=-axial*0.5 + t*axial;
+    const prob = channelProbForIndex(i, g);
+    const color = channelColorForIndex(i);
+    const size = 4 + 10*prob;
+    c2.fillStyle=color; c2.globalAlpha=0.8; c2.beginPath(); c2.arc(xpos, -radial, size*0.6, 0, Math.PI*2); c2.fill();
+    c2.beginPath(); c2.arc(xpos, radial, size*0.6, 0, Math.PI*2); c2.fill();
+  }
+  c2.globalAlpha=1.0;
+  const ncx=Env.scales.NCX; smallPump(-axial*0.48,0,'#ffe08a',ncx); smallPump(axial*0.48,0,'#ffe08a',ncx)
+  const ser=Env.scales.SERCA; smallPump(-axial*0.2, -radial*0.45,'#ff9aa0',ser); smallPump(axial*0.2, radial*0.45,'#ff9aa0',ser)
+}
+function channelProbForIndex(i,g){ const zone = i%4; if(zone===0) return g.PNa; if(zone===1) return g.PCa; if(zone===2) return g.PK; return g.PK1 }
+function channelColorForIndex(i){ const zone = i%4; return zone===0?'#70d6ff': zone===1?'#ffd166': zone===2?'#aaf683':'#9aa4ff' }
+function spawnIon(type, x, y, vx, vy, life){ ions.push({type,x,y,vx,vy,life,ttl:life,color: type==='Na'?'#70d6ff': type==='Ca'?'#ffd166': type==='K'?'#aaf683':'#9aa4ff'}) }
+function updateAndDrawIons(axial, radial, g){ const now=performance.now(); const dtv=Math.min(0.05,(now-lastDrawTS)/1000); lastDrawTS=now; const rate={Na:80, Ca:60, K:60, K1:40};
+  function trySpawn(type, prob){ const r=rate[type]*prob*dtv; const count=Math.floor(r); const frac=r-count; for(let j=0;j<count;j++){ emitOne(type) } if(Math.random()<frac) emitOne(type); function emitOne(type){ const t=Math.random(); const xpos=-axial*0.5 + t*axial; const side=Math.random()<0.5?-1:1; const y= side*radial; const speed= 40 + 40*Math.random(); const dir= (type==='Na'||type==='Ca')? -side : side; const vx=(Math.random()-0.5)*10; const vy= dir*speed; spawnIon(type, xpos, y, vx, vy, 0.6) } }
+  trySpawn('Na', g.PNa); trySpawn('Ca', g.PCa); trySpawn('K', g.PK); trySpawn('K1', g.PK1);
+  const ncx=Env.scales.NCX; if(Math.random()<ncx*30*dtv){ spawnIon('Ca', -axial*0.48, 0, -60, 0, 0.5) } if(Math.random()<ncx*30*dtv){ spawnIon('Ca', axial*0.48, 0, 60, 0, 0.5) }
+  const ser=Env.scales.SERCA; if(Math.random()<ser*20*dtv){ spawnIon('Ca', -axial*0.25, -radial*0.45, 40, 30, 0.4) } if(Math.random()<ser*20*dtv){ spawnIon('Ca', axial*0.25, radial*0.45, -40, -30, 0.4) }
+  for(let i=ions.length-1;i>=0;i--){ const p=ions[i]; p.x+=p.vx*dtv; p.y+=p.vy*dtv; p.ttl-=dtv; c2.fillStyle=p.color; c2.globalAlpha=Math.max(0, p.ttl/p.life); c2.beginPath(); c2.arc(p.x,p.y,2.2,0,Math.PI*2); c2.fill(); if(p.ttl<=0 || Math.abs(p.x)>axial || Math.abs(p.y)>radial*1.8){ ions.splice(i,1) } } c2.globalAlpha=1 }
+function smallPump(x,y,color,scale){ c2.save(); c2.translate(x,y); c2.rotate(Math.sin(State.t*6)*0.1); c2.fillStyle=color; c2.globalAlpha=0.7; c2.beginPath(); c2.moveTo(-6*scale, -4); c2.lineTo(6*scale, 0); c2.lineTo(-6*scale, 4); c2.closePath(); c2.fill(); c2.globalAlpha=1; c2.restore() }
+
+function drawLegend(W,H,axial,radial){
+  const items = 11; // total legend rows
+  const margin=10; const boxW=Math.min(240, W*0.36); const boxH=20 + items*16 + 12; const x0=W - boxW - margin; const y0=H - boxH - margin;
+  c2.save();
+  c2.fillStyle='rgba(0,0,0,0.35)'; c2.strokeStyle='rgba(255,255,255,0.15)'; c2.lineWidth=1; c2.beginPath(); const r=8; const x=x0, y=y0; const w=boxW, h=boxH; c2.moveTo(x+r,y); c2.arcTo(x+w,y,x+w,y+h,r); c2.arcTo(x+w,y+h,x,y+h,r); c2.arcTo(x,y+h,x,y,r); c2.arcTo(x,y,x+w,y,r); c2.closePath(); c2.fill(); c2.stroke();
+  let rowY=y+12; const rowX=x+12; c2.font='12px system-ui'; c2.fillStyle='#cbd2ff'; c2.fillText('Key', rowX, rowY); rowY+=8;
+  function row(swatch, label){ rowY+=16; swatch(rowX, rowY); c2.fillStyle='#cbd2ff'; c2.fillText(label, rowX+18, rowY+4) }
+  const dot=(color)=> (x,y)=>{ c2.fillStyle=color; c2.beginPath(); c2.arc(x+6,y+2,4,0,Math.PI*2); c2.fill() };
+  const tri=(color)=> (x,y)=>{ c2.fillStyle=color; c2.beginPath(); c2.moveTo(x+2,y-4); c2.lineTo(x+14,y+2); c2.lineTo(x+2,y+8); c2.closePath(); c2.fill() };
+  const oval=(color)=> (x,y)=>{ c2.fillStyle=color; c2.beginPath(); c2.ellipse(x+7,y+3,7,4,0,0,Math.PI*2); c2.fill() };
+  const box=(color)=> (x,y)=>{ c2.strokeStyle=color; c2.setLineDash([3,3]); c2.strokeRect(x+1,y-5,14,10); c2.setLineDash([]) };
+  const ring=(color)=> (x,y)=>{ c2.strokeStyle=color; c2.lineWidth=2; c2.beginPath(); c2.arc(x+6,y+2,6,0,Math.PI*2); c2.stroke() };
+  row(dot('#70d6ff'),'Na channel'); row(dot('#ffd166'),'L-type Ca'); row(dot('#ffaa44'),'T-type Ca'); row(dot('#aaf683'),'K channel'); row(dot('#9aa4ff'),'K1 channel'); row(tri('#ffe08a'),'NCX'); row(tri('#ff9aa0'),'SERCA'); row(dot('#ffccaa'),'PMCA'); row(oval('rgba(180,120,255,0.35)'),'Nucleus'); row(box('#ffb0b0'),'SR region'); row(ring('#aaaaff'),'T-tubules'); row(dot('#aaffaa'),'Mitochondria');
+  c2.restore();
+}
+
+
+// ---------- Plot ----------
+function drawPlots(){
+  if(!plot||!ctx) return;
+  const W=plot.width, H=plot.height; ctx.clearRect(0,0,W,H);
+  const pad=10, gap=10; const paneH=(H-4*pad-2*gap)/3; const left=50, right=W-10;
+  function axes(y0,label,ymin,ymax){ ctx.strokeStyle='#303756'; ctx.lineWidth=1; ctx.strokeRect(left-1,y0,right-left+1,paneH); ctx.fillStyle='#99a1c2'; ctx.font='12px system-ui'; ctx.fillText(label, left+6, y0+14); return {y0, ymin, ymax} }
+  const ax1=axes(pad,'Membrane potential mV', -100, 50);
+  const ax2=axes(pad+paneH+gap,'Cytosolic Ca nM', 0, 1000);
+  const ax3=axes(pad+2*(paneH+gap),'Force rel', 0, 1.2);
+  function ymap(v,ax){ return ax.y0 + paneH - (v-ax.ymin)/(ax.ymax-ax.ymin)*paneH }
+
+  // Continuous scrolling traces - show time-based data
+  function drawScrollingTrace(arr,ax,color,timeWindow=10.0){
+    ctx.strokeStyle=color; ctx.lineWidth=2; ctx.beginPath();
+    let firstPoint = true;
+
+    for(let i=0; i<BUFSZ; i++){
+      const idx = (head - i + BUFSZ) % BUFSZ;
+      const dataTime = trace.t[idx];
+      const currentTime = State.t;
+
+      // Only show data within the time window
+      if(currentTime - dataTime <= timeWindow){
+        const timeFraction = (currentTime - dataTime) / timeWindow;
+        const x = right - timeFraction * (right - left); // Most recent on the right
+        const y = ymap(arr[idx], ax);
+
+        if(firstPoint){
+          ctx.moveTo(x, y);
+          firstPoint = false;
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+    }
+    ctx.stroke();
+  }
+
+  drawScrollingTrace(trace.V,ax1,'#70d6ff');
+  drawScrollingTrace(trace.Cai,ax2,'#ffd166');
+  drawScrollingTrace(trace.F,ax3,'#aaf683');
+
+  // Time scale indicator
+  ctx.fillStyle='#99a1c2'; ctx.font='10px system-ui';
+  ctx.fillText('← Older | Newer →', left + 100, ax3.y0 + paneH + 20);
+
+  ctx.fillStyle='#cbd2ff'; ctx.font='12px system-ui';
+  ctx.fillText(`APD90 ${isFinite(State.apd90)?State.apd90.toFixed(0):'--'} ms  dV/dtmax ${isFinite(State.dvdtMax)?State.dvdtMax.toFixed(0):'--'} V/s`, left+120, ax1.y0+14);
+  ctx.fillText(`Peak ${isFinite(State.caPeak)?State.caPeak.toFixed(0):'--'} nM`, left+120, ax2.y0+14);
+  ctx.fillText(`Peak F ${isFinite(State.forcePeak)?State.forcePeak.toFixed(2):'--'}  SL ${State.Len.toFixed(2)} µm`, left+120, ax3.y0+14);
+}
+
+function plotResize(){ const r=document.getElementById('scope').getBoundingClientRect(); if(plot){ plot.width=r.width; plot.height=r.height } }
+
+// ---------- Simulation loop ----------
+function step(){
+  // Single physics step
+  const s = State; const p = P;
+  const I = currents(s,p);
+  const Iion = I.INa + I.ICaL + I.ICaT + I.IK + I.IK1 + I.IClCa + I.Ib;
+  const Istim = I_stim(s.t);
+  const dV = -(Iion + Istim)/p.Cm + (Env.noise*(Math.random()-0.5));
+  const prevV = s.Vm; s.Vm += dV*dt*Env.temp; s.t += dt*Env.temp;
+
+  // Make temperature effects more visible - also slow down calcium handling
+  const tempFactor = Math.pow(Env.temp, 2); // Quadratic effect for more dramatic changes
+  const dvdt = (s.Vm - prevV)/(dt*Env.temp)/1000;
+  const mech = calcium_and_mechanics(s,p,I);
+  if(prevV < -40 && s.Vm >= -40){ State.lastUp = { t:s.t, V0:prevV, Vmax:s.Vm, dvdtMax:dvdt, rep90:null, caPeak: s.Cai, forcePeak: mech.Ftot } }
+  if(State.lastUp){ State.lastUp.dvdtMax = Math.max(State.lastUp.dvdtMax, dvdt); State.lastUp.caPeak = Math.max(State.lastUp.caPeak, s.Cai); State.lastUp.forcePeak = Math.max(State.lastUp.forcePeak, mech.Ftot); const V90 = State.lastUp.V0 + 0.1*(State.lastUp.Vmax - State.lastUp.V0); if(!State.lastUp.rep90 && s.Vm < V90){ State.lastUp.rep90 = s.t; State.apd90 = (State.lastUp.rep90 - State.lastUp.t)*1000; State.dvdtMax = State.lastUp.dvdtMax; State.caPeak = State.lastUp.caPeak*1e6; State.forcePeak = State.lastUp.forcePeak } }
+  head=(head+1)%BUFSZ; trace.t[head]=s.t; trace.V[head]=s.Vm; trace.Cai[head]=s.Cai*1e6; trace.F[head]=mech.Ftot;
+}
+
+let accumulator = 0;
+let lastTime = performance.now();
+
+function loop(){
+  const now = performance.now();
+  let frameTime = (now - lastTime) / 1000;
+  if (frameTime > 0.25) frameTime = 0.25; // Cap max frame time to avoid spiral of death
+  lastTime = now;
+
+  if(!paused){
+    accumulator += frameTime;
+    while (accumulator >= dt) {
+      step();
+      accumulator -= dt;
+    }
+  }
+  
+  drawPlots(); 
+  drawCell2D(); 
+  drawMembrane2D(); 
+  updateUI(); 
+  
+  requestAnimationFrame(loop); 
+}
+
+function exportCSV() {
+  let csv = "Time (s),Vm (mV),Cai (nM),Force (rel)\n";
+  // Reconstruct ordered data from circular buffer
+  for(let i=0; i<BUFSZ; i++){
+    const idx = (head - BUFSZ + 1 + i + BUFSZ) % BUFSZ;
+    csv += `${trace.t[idx].toFixed(4)},${trace.V[idx].toFixed(2)},${trace.Cai[idx].toFixed(1)},${trace.F[idx].toFixed(4)}\n`;
+  }
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  link.setAttribute("href", url);
+  link.setAttribute("download", "cardiomyocyte_data.csv");
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+// ---------- UI helpers ----------
+const $=s=>document.querySelector(s);
+function updateUI(){
+  const rEl=$('#rateVal'), clEl=$('#clVal');
+  if(rEl) rEl.textContent=`${Env.bpm} bpm`;
+  if(clEl) clEl.textContent=(60000/Env.bpm).toFixed(0);
+  $('#apdVal').textContent=`APD90 ${isFinite(State.apd90)?State.apd90.toFixed(0):'--'} ms`;
+  $('#dvdtVal').textContent=`${isFinite(State.dvdtMax)?State.dvdtMax.toFixed(0):'--'}`;
+  $('#caVal').textContent=`Peak ${isFinite(State.caPeak)?State.caPeak.toFixed(0):'--'} nM`;
+  $('#lenVal').textContent=State.Len.toFixed(2);
+  $('#fVal').textContent=`Peak ${isFinite(State.forcePeak)?State.forcePeak.toFixed(2):'--'}`;
+
+  // Add visual feedback for controls that might not be obvious
+  const tempEl = document.getElementById('q10');
+  if(tempEl) {
+    const temp = parseFloat(tempEl.value);
+    tempEl.style.backgroundColor = temp < 0.8 ? '#ffcccc' : temp > 1.2 ? '#ccffcc' : '#12162a';
+  }
+
+  const sercaEl = document.getElementById('serca');
+  if(sercaEl) {
+    const serca = parseFloat(sercaEl.value);
+    sercaEl.style.backgroundColor = serca < 0.5 ? '#ffcccc' : '#12162a';
+  }
+}
+
+// ---------- Tests ----------
+function cloneState(){ return JSON.parse(JSON.stringify({P,Env,State})) }
+function runSuite(){
+  const log=[]; function ok(name,cond,detail=''){ log.push(`${cond?'PASS':'FAIL'} - ${name}${detail?` - ${detail}`:''}`) }
+  function sim(seconds, mod){ const checkpoint=cloneState(); if(mod) mod(); let end=State.t+seconds; let minLen=1e9, maxLen=-1e9; while(State.t<end){ step(); if(State.Len<minLen) minLen=State.Len; if(State.Len>maxLen) maxLen=State.Len; } const out={ dvdt:State.dvdtMax||0, apd:State.apd90||0, ca:State.caPeak||0, f:State.forcePeak||0, short: Math.max(0, maxLen - minLen) }; Object.assign(P,checkpoint.P); Object.assign(Env,checkpoint.Env); Object.assign(State,checkpoint.State); return out }
+  const base=sim(6, ()=>{ Object.assign(P,{betaTone:0, diseaseState:'normal'}); Object.assign(Env,{ bpm:70, blocks:{Na:0,CaL:0,CaT:0,K:0,ClCa:0}, scales:{NCX:1,SERCA:1,PMCA:1} }); });
+  ok('Baseline dv/dt computed', base.dvdt>100, `dvdt ${base.dvdt.toFixed(0)}`);
+  const naBlk=sim(6, ()=>{ Env.blocks.Na=0.8 }); ok('Na block lowers upstroke', naBlk.dvdt<base.dvdt, `base ${base.dvdt.toFixed(0)} now ${naBlk.dvdt.toFixed(0)}`);
+  const caBlk=sim(6, ()=>{ Env.blocks.CaL=0.8 }); ok('CaL block lowers Ca peak', caBlk.ca<base.ca, `base ${base.ca.toFixed(0)} now ${caBlk.ca.toFixed(0)}`); ok('CaL block lowers force', caBlk.f<base.f, `base ${base.f.toFixed(2)} now ${caBlk.f.toFixed(2)}`);
+  const catBlk=sim(6, ()=>{ Env.blocks.CaT=0.9 }); ok('CaT block reduces Ca peak', catBlk.ca<base.ca*0.95, `base ${base.ca.toFixed(0)} now ${catBlk.ca.toFixed(0)}`);
+  const kBlk=sim(6, ()=>{ Env.blocks.K=0.7 }); ok('K block prolongs APD90', kBlk.apd>base.apd, `base ${base.apd.toFixed(0)} now ${kBlk.apd.toFixed(0)}`);
+  const beta=sim(6, ()=>{ P.betaTone=0.8 }); ok('beta tone raises Ca peak', beta.ca>base.ca, `base ${base.ca.toFixed(0)} now ${beta.ca.toFixed(0)}`); ok('beta tone raises peak force', beta.f>base.f, `base ${base.f.toFixed(2)} now ${beta.f.toFixed(2)}`);
+  const preload=sim(6, ()=>{ P.SL0=2.2; State.Len=P.SL0 }); ok('Higher preload increases force', preload.f>=base.f, `base ${base.f.toFixed(2)} now ${preload.f.toFixed(2)}`);
+  // new test: afterload effect on shortening
+  const lowAfter=sim(6, ()=>{ P.afterload=0.2 });
+  const highAfter=sim(6, ()=>{ P.afterload=0.8 });
+  ok('Higher afterload reduces shortening', highAfter.short<lowAfter.short, `low ${lowAfter.short.toFixed(3)} high ${highAfter.short.toFixed(3)}`);
+  // disease state tests
+  const hf=sim(8, ()=>{ P.diseaseState='hf' }); ok('HF reduces Ca peak', hf.ca<base.ca, `base ${base.ca.toFixed(0)} HF ${hf.ca.toFixed(0)}`); ok('HF prolongs APD', hf.apd>base.apd, `base ${base.apd.toFixed(0)} HF ${hf.apd.toFixed(0)}`);
+  const ischemia=sim(8, ()=>{ P.diseaseState='ischemia' }); ok('Ischemia increases K current', ischemia.apd<base.apd, `base ${base.apd.toFixed(0)} ischemia ${ischemia.apd.toFixed(0)}`);
+  const hypertrophy=sim(8, ()=>{ P.diseaseState='hypertrophy' }); ok('Hypertrophy increases Ca peak', hypertrophy.ca>base.ca, `base ${base.ca.toFixed(0)} hypertrophy ${hypertrophy.ca.toFixed(0)}`);
+  // calcium handling tests
+  const sercaUp=sim(6, ()=>{ Env.scales.SERCA=2.0 }); ok('SERCA upregulation increases Ca peak', sercaUp.ca>base.ca, `base ${base.ca.toFixed(0)} SERCA↑ ${sercaUp.ca.toFixed(0)}`);
+  const pmcaUp=sim(6, ()=>{ Env.scales.PMCA=2.0 }); ok('PMCA upregulation decreases Ca peak', pmcaUp.ca<base.ca, `base ${base.ca.toFixed(0)} PMCA↑ ${pmcaUp.ca.toFixed(0)}`);
+  if(testsOut) testsOut.textContent=log.join('\n'); return log.every(l=>l.startsWith('PASS'))
+}
+
+// ---------- DOMContentLoaded boot ----------
+document.addEventListener('DOMContentLoaded', () => {
+  // wire DOM elements safely
+  cell2d = document.getElementById('cell2d');
+  membrane = document.getElementById('membrane');
+  plot = document.getElementById('plot');
+  testsOut = document.getElementById('tests');
+  if(cell2d) c2 = cell2d.getContext('2d');
+  if(membrane) mctx = membrane.getContext('2d');
+  if(plot) ctx = plot.getContext('2d');
+
+  const showChEl = document.getElementById('showChannels');
+  const animEl = document.getElementById('animateIons');
+  if(showChEl) showChEl.addEventListener('change', e=>{ showChannels=e.target.checked });
+  if(animEl) animEl.addEventListener('change', e=>{ animateIons=e.target.checked });
+
+  // side panel controls
+  const bindInput=(sel, fn)=>{ const el=document.querySelector(sel); if(el) el.addEventListener('input', fn) };
+  bindInput('#rate', e=>{ Env.bpm=+e.target.value; const lbl=document.getElementById('rateLbl'); if(lbl) lbl.textContent=Env.bpm });
+  bindInput('#cao', e=>{ Env.Cao=+e.target.value; const lbl=document.getElementById('caoLbl'); if(lbl) lbl.textContent=Env.Cao.toFixed(1) });
+  bindInput('#q10', e=>{ Env.temp=+e.target.value; const lbl=document.getElementById('q10Lbl'); if(lbl) lbl.textContent=Env.temp.toFixed(2) });
+  bindInput('#noise', e=>{ Env.noise=+e.target.value; const lbl=document.getElementById('noiseLbl'); if(lbl) lbl.textContent=Env.noise.toFixed(2) });
+  bindInput('#beta', e=>{ P.betaTone=+e.target.value; const lbl=document.getElementById('betaLbl'); if(lbl) lbl.textContent=P.betaTone.toFixed(2) });
+  const diseaseEl = document.getElementById('diseaseState'); if(diseaseEl) diseaseEl.addEventListener('change', e=>{ P.diseaseState=e.target.value });
+
+  // Toggle switches for readouts
+  function refreshReadoutToggles(){
+    const kpiRate = document.querySelector('[data-kpi="rate"]'); if(kpiRate) kpiRate.style.display = document.getElementById('toggleRate').checked ? '' : 'none';
+    const kpiAP = document.querySelector('[data-kpi="ap"]'); if(kpiAP) kpiAP.style.display = document.getElementById('toggleAP').checked ? '' : 'none';
+    const kpiCa = document.querySelector('[data-kpi="ca"]'); if(kpiCa) kpiCa.style.display = document.getElementById('toggleCa').checked ? '' : 'none';
+    const kpiForce = document.querySelector('[data-kpi="force"]'); if(kpiForce) kpiForce.style.display = document.getElementById('toggleForce').checked ? '' : 'none';
+  }
+  document.getElementById('toggleRate').addEventListener('change', refreshReadoutToggles);
+  document.getElementById('toggleAP').addEventListener('change', refreshReadoutToggles);
+  document.getElementById('toggleCa').addEventListener('change', refreshReadoutToggles);
+  document.getElementById('toggleForce').addEventListener('change', refreshReadoutToggles);
+  refreshReadoutToggles();
+
+  bindInput('#nablk', e=>{ Env.blocks.Na=+e.target.value; const lbl=document.getElementById('nablkLbl'); if(lbl) lbl.textContent=Env.blocks.Na.toFixed(2) });
+  bindInput('#cablk', e=>{ Env.blocks.CaL=+e.target.value; const lbl=document.getElementById('cablkLbl'); if(lbl) lbl.textContent=Env.blocks.CaL.toFixed(2) });
+  bindInput('#catblk', e=>{ Env.blocks.CaT=+e.target.value; const lbl=document.getElementById('catblkLbl'); if(lbl) lbl.textContent=Env.blocks.CaT.toFixed(2) });
+  bindInput('#kblk', e=>{ Env.blocks.K=+e.target.value; const lbl=document.getElementById('kblkLbl'); if(lbl) lbl.textContent=Env.blocks.K.toFixed(2) });
+  bindInput('#clcablk', e=>{ Env.blocks.ClCa=+e.target.value; const lbl=document.getElementById('clcablkLbl'); if(lbl) lbl.textContent=Env.blocks.ClCa.toFixed(2) });
+  bindInput('#ncx', e=>{ Env.scales.NCX=+e.target.value; const lbl=document.getElementById('ncxLbl'); if(lbl) lbl.textContent=Env.scales.NCX.toFixed(2) });
+  bindInput('#serca', e=>{ Env.scales.SERCA=+e.target.value; const lbl=document.getElementById('sercaLbl'); if(lbl) lbl.textContent=Env.scales.SERCA.toFixed(2) });
+  bindInput('#pmca', e=>{ Env.scales.PMCA=+e.target.value; const lbl=document.getElementById('pmcaLbl'); if(lbl) lbl.textContent=Env.scales.PMCA.toFixed(2) });
+  bindInput('#sl0', e=>{ P.SL0=+e.target.value; const lbl=document.getElementById('sl0Lbl'); if(lbl) lbl.textContent=P.SL0.toFixed(2) });
+  bindInput('#afterload', e=>{ P.afterload=+e.target.value; const lbl=document.getElementById('afterLbl'); if(lbl) lbl.textContent=P.afterload.toFixed(2) });
+  bindInput('#stiff', e=>{ P.k_passive=+e.target.value; const lbl=document.getElementById('stiffLbl'); if(lbl) lbl.textContent=P.k_passive.toFixed(2) });
+  const iso=document.getElementById('isometric'); if(iso) iso.addEventListener('change', e=>{ P.isometric=e.target.checked });
+  const pause=document.getElementById('pause'); if(pause) pause.addEventListener('change', e=>{ paused=e.target.checked });
+  const reset=document.getElementById('reset'); if(reset) reset.addEventListener('click', ()=>{ Object.assign(P,{Cao:2.0, betaTone:0, SL0:1.90, afterload:0.4, k_passive:0.5, isometric:false, diseaseState:'normal'}); Object.assign(Env,{ bpm:70, temp:1.0, noise:0, blocks:{Na:0,CaL:0,CaT:0,K:0,ClCa:0}, scales:{NCX:1,SERCA:1,PMCA:1}, Cao:2.0 }); Object.assign(State,{ t:0, Vm:-86, m:0, h:0.75, j:0.75, d:0, f:1, b:0, g:1, xr:0, xs:0, Cai:0.0001, CaSR:1.3, CaSS:0.0001, Len:P.SL0, vLen:0, lastUp:null, apd90:NaN, dvdtMax:NaN, caPeak:NaN, tau50:NaN, forcePeak:NaN, preload_pressure:0, afterload_pressure:80 }); const ids=['cao','q10','noise','beta','nablk','cablk','catblk','kblk','clcablk','ncx','serca','pmca','sl0','afterload','stiff']; for(const id of ids){ const el=document.getElementById(id); if(el) el.dispatchEvent(new Event('input')) } if(iso) iso.checked=false; const diseaseEl=document.getElementById('diseaseState'); if(diseaseEl) diseaseEl.value='normal'; const rate=document.getElementById('rate'); if(rate) rate.value=Env.bpm; const rateLbl=document.getElementById('rateLbl'); if(rateLbl) rateLbl.textContent=Env.bpm; });
+
+  const runBtn=document.getElementById('runTests'); if(runBtn) runBtn.addEventListener('click', runSuite);
+  const exportBtn=document.getElementById('exportBtn'); if(exportBtn) exportBtn.addEventListener('click', exportCSV);
+
+  // initial layout and start
+  resizeAll(); plotResize();
+  setupTooltips();
+  ensureContinuousActivity();
+  requestAnimationFrame(loop);
+  addEventListener('resize', resizeAll);
+});
+
+// membrane pane drawing
+let memIons=[]; let lastMemTS=performance.now();
+function drawMembrane2D(){ if(!mctx||!membrane) return; const W=membrane.width, H=membrane.height; mctx.clearRect(0,0,W,H); if(W<=0||H<=0) return; const pad=28; const h=Math.min(110, Math.max(60, H*0.45)); const y=H*0.55; const x0=pad, x1=W-pad; // zoomed strip
+  // ECF/ICF bands
+  mctx.fillStyle='rgba(120,150,220,0.06)'; mctx.fillRect(0,0,W,y-h/2-6); // ECF band
+  mctx.fillStyle='rgba(120,220,170,0.04)'; mctx.fillRect(0,y+h/2+6,W-(0),H-(y+h/2+6)); // ICF band
+  // membrane
+  mctx.fillStyle='rgba(160,170,200,0.10)'; mctx.strokeStyle='#51609a'; mctx.lineWidth=3; mctx.beginPath(); mctx.moveTo(x0,y-h/2); mctx.lineTo(x1,y-h/2); mctx.arcTo(x1+8,y-h/2,x1+8,y+h/2,8); mctx.lineTo(x1,y+h/2); mctx.lineTo(x0,y+h/2); mctx.arcTo(x0-8,y+h/2,x0-8,y-h/2,8); mctx.closePath(); mctx.fill(); mctx.stroke();
+  // labels
+  mctx.fillStyle='#9fb4ff'; mctx.font='12px system-ui'; mctx.fillText('ECF (Extracellular)', x1-32, y-h/2-14); mctx.fillText('ICF (Intracellular)', x1-30, y+h/2+18); mctx.fillText('Cell Membrane Channels & Pumps', x0+6, y-h/2-14);
+
+  // Create zoomed regions for different channel types
+  const g=channelOpenProbs();
+
+  // Left region: Voltage-gated channels (Na, Ca)
+  const leftX = x0 + 20, leftW = (x1-x0)*0.4;
+  mctx.fillStyle='rgba(255,255,255,0.1)'; mctx.fillRect(leftX-15, y-h/2-40, leftW+30, h+80);
+  mctx.strokeStyle='rgba(255,255,255,0.3)'; mctx.lineWidth=2; mctx.strokeRect(leftX-15, y-h/2-40, leftW+30, h+80);
+  mctx.fillStyle='#cbd2ff'; mctx.font='11px system-ui'; mctx.fillText('Voltage-Gated Channels', leftX-10, y-h/2-45);
+
+  // Right region: Pumps & exchangers
+  const rightX = x0 + leftW + 40, rightW = (x1-x0)*0.4;
+  mctx.fillStyle='rgba(255,255,255,0.1)'; mctx.fillRect(rightX-15, y-h/2-40, rightW+30, h+80);
+  mctx.strokeStyle='rgba(255,255,255,0.3)'; mctx.lineWidth=2; mctx.strokeRect(rightX-15, y-h/2-40, rightW+30, h+80);
+  mctx.fillStyle='#cbd2ff'; mctx.font='11px system-ui'; mctx.fillText('Pumps & Exchangers', rightX-10, y-h/2-45);
+
+  // Voltage-gated channels (left side) - zoomed in
+  const N_vg = 12; // fewer but larger channels
+  for(let i=0;i<N_vg;i++){
+    const t=i/(N_vg-1); const x=leftX + t*leftW;
+    // Na channels (top row)
+    const drawVgChannel=(col,p,yy,size,type)=>{ mctx.fillStyle=col; const r=size+8*p; mctx.beginPath(); mctx.arc(x,yy,r,0,Math.PI*2); mctx.fill(); if(p>0.1){ mctx.strokeStyle=col; mctx.lineWidth=2; mctx.stroke() } };
+    drawVgChannel('#70d6ff',g.PNa, y-h/2-8, 4, 'Na');
+    // Ca channels (bottom row)
+    drawVgChannel('#ffd166',g.PCa, y+h/2+8, 4, 'Ca');
+    // T-type Ca (middle)
+    drawVgChannel('#ffaa44',g.PCa*0.7, y, 3, 'CaT');
+  }
+
+  // Pumps & exchangers (right side) - zoomed in
+  const N_pump = 8;
+  for(let i=0;i<N_pump;i++){
+    const t=i/(N_pump-1); const x=rightX + t*rightW;
+    // NCX (top)
+    const drawPump=(col,yy,size,type)=>{ mctx.fillStyle=col; mctx.beginPath(); mctx.arc(x,yy,size,0,Math.PI*2); mctx.fill(); mctx.strokeStyle=col; mctx.lineWidth=1.5; mctx.stroke() };
+    drawPump('#ffe08a', y-h/2-8, 5, 'NCX');
+    // SERCA (bottom)
+    drawPump('#ff9aa0', y+h/2+8, 5, 'SERCA');
+    // PMCA (middle)
+    drawPump('#ffccaa', y, 4, 'PMCA');
+  }
+
+  // Activity indicators
+  mctx.fillStyle='#70d6ff'; mctx.font='10px system-ui'; mctx.fillText(`Na: ${(g.PNa*100).toFixed(0)}% open`, leftX, y-h/2-25);
+  mctx.fillStyle='#ffd166'; mctx.fillText(`CaL: ${(g.PCa*100).toFixed(0)}% open`, leftX, y+h/2+25);
+  mctx.fillStyle='#ffaa44'; mctx.fillText(`CaT: ${(g.PCa*70).toFixed(0)}% open`, leftX+60, y+15);
+
+  mctx.fillStyle='#ffe08a'; mctx.fillText('NCX: Active', rightX, y-h/2-25);
+  mctx.fillStyle='#ff9aa0'; mctx.fillText('SERCA: Active', rightX, y+h/2+25);
+  mctx.fillStyle='#ffccaa'; mctx.fillText('PMCA: Active', rightX+50, y+15);
+
+  // Educational ion transport visualization
+  drawIonTransportVisualization(W,H,g,y,h,x0,x1);
+}
+
+// Helper functions for educational membrane visualization
+function drawIonChannel(x, y, color, openProb, Vm, reversalPotential, ionType, channelType) {
+  // Draw channel protein structure
+  mctx.strokeStyle = color;
+  mctx.lineWidth = 2;
+  mctx.beginPath();
+  mctx.arc(x, y, 8, 0, Math.PI * 2);
+  mctx.stroke();
+
+  // Draw pore based on open probability
+  const poreRadius = 2 + 4 * openProb;
+  mctx.fillStyle = openProb > 0.1 ? color : 'rgba(100,100,100,0.3)';
+  mctx.beginPath();
+  mctx.arc(x, y, poreRadius, 0, Math.PI * 2);
+  mctx.fill();
+
+  // Show electrochemical driving force
+  const drivingForce = Vm - reversalPotential;
+  const forceColor = drivingForce > 0 ? '#ff6b6b' : '#4ecdc4';
+  mctx.strokeStyle = forceColor;
+  mctx.lineWidth = 1;
+  const arrowLength = Math.abs(drivingForce) * 0.5;
+  if (Math.abs(drivingForce) > 1) {
+    mctx.beginPath();
+    mctx.moveTo(x, y);
+    const arrowDir = drivingForce > 0 ? -1 : 1;
+    mctx.lineTo(x, y + arrowLength * arrowDir);
+    mctx.stroke();
+
+    // Arrow head
+    mctx.beginPath();
+    mctx.moveTo(x - 2, y + arrowLength * arrowDir);
+    mctx.lineTo(x, y + (arrowLength + 3) * arrowDir);
+    mctx.lineTo(x + 2, y + arrowLength * arrowDir);
+    mctx.stroke();
+  }
+
+  // Labels
+  mctx.fillStyle = '#cbd2ff';
+  mctx.font = '8px system-ui';
+  mctx.fillText(ionType, x - 8, y - 12);
+  mctx.fillText(`${(openProb*100).toFixed(0)}%`, x - 8, y + 16);
+  mctx.font = '6px system-ui';
+  mctx.fillText(channelType, x - 12, y - 18);
+}
+
+function drawActivePump(x, y, color, size, label) {
+  // Draw pump as a rotating structure
+  const time = State.t * 10; // Animation based on simulation time
+  mctx.save();
+  mctx.translate(x, y);
+  mctx.rotate(time);
+
+  // Pump body
+  mctx.fillStyle = color;
+  mctx.strokeStyle = color;
+  mctx.lineWidth = 2;
+  mctx.beginPath();
+  mctx.arc(0, 0, size, 0, Math.PI * 2);
+  mctx.fill();
+  mctx.stroke();
+
+  // ATP binding site (animated)
+  const atpAngle = time * 2;
+  mctx.fillStyle = '#ffff00';
+  mctx.beginPath();
+  mctx.arc(Math.cos(atpAngle) * size * 0.7, Math.sin(atpAngle) * size * 0.7, 2, 0, Math.PI * 2);
+  mctx.fill();
+
+  mctx.restore();
+
+  // Label
+  mctx.fillStyle = '#cbd2ff';
+  mctx.font = '6px system-ui';
+  const lines = label.split('\n');
+  lines.forEach((line, i) => {
+    mctx.fillText(line, x - 15, y + 18 + i * 6);
+  });
+}
+
+function drawIonTransportVisualization(W,H,g,y,h,x0,x1){
+  const Vm = State.Vm;
+  const Cai = State.Cai * 1000; // Convert to µM for display
+  const time = State.t;
+
+  // Clear and set up
+  mctx.fillStyle = '#cbd2ff';
+  mctx.font = '9px system-ui';
+  mctx.fillText('Real-time Membrane Activity', x0 + 10, y - h/2 - 50);
+
+  // Dynamic concentration gradients that respond to channel activity
+  const gradientHeight = 40;
+
+  // Na+ gradient - shows actual flux based on channel activity
+  const naFlux = g.PNa * (Vm - 50); // Driving force for Na+
+  const naIntensity = Math.max(0.1, Math.abs(naFlux) / 100);
+  const naGradient = mctx.createLinearGradient(x0, y-h/2-20, x0, y+h/2+20);
+  naGradient.addColorStop(0, `rgba(112,214,255,${0.2 + naIntensity * 0.6})`); // ECF - brighter when active
+  naGradient.addColorStop(0.5, 'rgba(112,214,255,0.1)'); // Membrane
+  naGradient.addColorStop(1, `rgba(112,214,255,${0.02 + naIntensity * 0.1})`); // ICF
+  mctx.fillStyle = naGradient;
+  mctx.fillRect(x0+10, y-h/2-20, 15, gradientHeight);
+  mctx.strokeStyle = naFlux > 0 ? '#ff6b6b' : '#4ecdc4'; // Red for influx, blue for efflux
+  mctx.lineWidth = 2; mctx.strokeRect(x0+10, y-h/2-20, 15, gradientHeight);
+
+  // K+ gradient
+  const kFlux = g.PK * (Vm - (-90)); // Driving force for K+
+  const kIntensity = Math.max(0.1, Math.abs(kFlux) / 100);
+  const kGradient = mctx.createLinearGradient(x0, y-h/2-20, x0, y+h/2+20);
+  kGradient.addColorStop(0, `rgba(170,246,131,${0.02 + kIntensity * 0.1})`); // ECF
+  kGradient.addColorStop(0.5, 'rgba(170,246,131,0.1)'); // Membrane
+  kGradient.addColorStop(1, `rgba(170,246,131,${0.2 + kIntensity * 0.6})`); // ICF - brighter when active
+  mctx.fillStyle = kGradient;
+  mctx.fillRect(x0+30, y-h/2-20, 15, gradientHeight);
+  mctx.strokeStyle = kFlux > 0 ? '#ff6b6b' : '#4ecdc4';
+  mctx.lineWidth = 2; mctx.strokeRect(x0+30, y-h/2-20, 15, gradientHeight);
+
+  // Ca2+ gradient - shows actual calcium levels
+  const caFlux = g.PCa * (Vm - (-10)); // Driving force for Ca2+
+  const caIntensity = Math.max(0.1, Math.abs(caFlux) / 100 + Cai / 1000);
+  const caGradient = mctx.createLinearGradient(x0, y-h/2-20, x0, y+h/2+20);
+  caGradient.addColorStop(0, `rgba(255,209,102,${0.15 + caIntensity * 0.4})`); // ECF
+  caGradient.addColorStop(0.5, 'rgba(255,209,102,0.1)'); // Membrane
+  caGradient.addColorStop(1, `rgba(255,209,102,${0.01 + Cai/2000})`); // ICF - brighter with Ca elevation
+  mctx.fillStyle = caGradient;
+  mctx.fillRect(x0+50, y-h/2-20, 15, gradientHeight);
+  mctx.strokeStyle = caFlux > 0 ? '#ff6b6b' : '#4ecdc4';
+  mctx.lineWidth = 2; mctx.strokeRect(x0+50, y-h/2-20, 15, gradientHeight);
+
+  // Dynamic channel representations
+  const channelX = x0 + 80;
+
+  // Na+ channel - shows real activation during action potentials
+  drawIonChannel(channelX, y-h/2-5, '#70d6ff', g.PNa, Vm, 50, 'Na⁺', 'Fast');
+
+  // Ca2+ channel - L-type
+  drawIonChannel(channelX + 40, y-h/2-5, '#ffd166', g.PCa, Vm, -10, 'Ca²⁺', 'L-type');
+
+  // K+ channel - delayed rectifier
+  drawIonChannel(channelX + 80, y-h/2-5, '#aaf683', g.PK, Vm, -90, 'K⁺', 'Delayed');
+
+  // K1 channel - inward rectifier
+  drawIonChannel(channelX + 120, y-h/2-5, '#9aa4ff', g.PK1, Vm, -90, 'K⁺', 'Inward');
+
+  // Active pumps and exchangers
+  const pumpX = x0 + 220;
+
+  // Na+/K+ ATPase - always active
+  drawActivePump(pumpX, y - 10, '#ff9aa0', 8, 'Na⁺/K⁺ ATPase\n3Na⁺→2K⁺');
+
+  // NCX - activity based on Ca levels
+  const ncxActivity = Math.min(1, Cai / 500); // More active with high Ca
+  drawActivePump(pumpX + 50, y - 10, '#ffe08a', 6 + ncxActivity * 4, 'NCX\n3Na⁺↔Ca²⁺');
+
+  // SERCA - activity based on SR load and temperature
+  const sercaActivity = Env.scales.SERCA * Math.pow(Env.temp, 2);
+  drawActivePump(pumpX + 100, y - 10, '#ffccaa', 5 + sercaActivity * 3, 'SERCA\nCa²⁺→SR');
+
+  // Real-time status display
+  mctx.fillStyle = '#cbd2ff';
+  mctx.font = '10px system-ui';
+  mctx.fillText(`Vm: ${Vm.toFixed(0)} mV | Time: ${(time % 1).toFixed(2)} s`, x0 + 10, y - h/2 - 30);
+  mctx.font = '8px system-ui';
+  mctx.fillText(`[Ca²⁺]ᵢ: ${Cai.toFixed(1)} µM`, x0 + 10, y + h/2 + 35);
+  mctx.fillText(`Na⁺ flux: ${naFlux > 0 ? 'In' : 'Out'}`, x0 + 80, y + h/2 + 35);
+  mctx.fillText(`K⁺ flux: ${kFlux > 0 ? 'In' : 'Out'}`, x0 + 140, y + h/2 + 35);
+  mctx.fillText(`Ca²⁺ flux: ${caFlux > 0 ? 'In' : 'Out'}`, x0 + 190, y + h/2 + 35);
+
+  // Activity indicators
+  mctx.fillStyle = Vm > -40 ? '#ff6b6b' : Vm < -60 ? '#4ecdc4' : '#cbd2ff';
+  mctx.font = '7px system-ui';
+  const phase = Vm > -40 ? 'AP' : Vm < -60 ? 'Rest' : 'Recovery';
+  mctx.fillText(`Phase: ${phase}`, x0 + 10, y + h/2 + 50);
+}
+
+// Tooltip system for explainer cards
+function setupTooltips(){
+  const tooltip = document.getElementById('explainerTooltip');
+  const tooltipTitle = document.getElementById('tooltipTitle');
+  const tooltipText = document.getElementById('tooltipText');
+
+  const tooltipData = {
+    'toggleRate': { title: 'Heart Rate Toggle', text: 'Shows the current pacing rate in beats per minute (bpm) and the corresponding cycle length. Higher rates increase cardiac workload and oxygen demand.' },
+    'toggleAP': { title: 'Action Potential Metrics', text: 'Displays action potential duration at 90% repolarization (APD90) and maximum upstroke velocity (dV/dt max). These indicate conduction speed and refractory period.' },
+    'toggleCa': { title: 'Calcium Handling', text: 'Shows peak intracellular calcium concentration and calcium transient decay time (Tau50). Calcium cycling is critical for excitation-contraction coupling.' },
+    'toggleForce': { title: 'Contractile Force', text: 'Displays peak developed force and sarcomere length. Force depends on calcium activation and sarcomere length-tension relationship (Frank-Starling mechanism).' },
+    'showChannels': { title: 'Channel Visualization', text: 'Toggles display of ion channel activity on the cell membrane. Channels appear as colored dots that grow when open, showing real-time gating.' },
+    'animateIons': { title: 'Ion Animation', text: 'Shows animated ion particles flowing through channels. Blue=Na⁺, Yellow=Ca²⁺, Green=K⁺. Demonstrates electrochemical gradients and flux.' },
+    'pause': { title: 'Simulation Pause', text: 'Freezes time in the simulation. Useful for examining specific moments or comparing steady states.' },
+    'beta': { title: 'β-Adrenergic Tone', text: 'Simulates sympathetic nervous system activation. Increases heart rate, contractility, and calcium handling via cAMP signaling.' },
+    'diseaseState': { title: 'Disease State', text: 'Applies pathophysiological changes to simulate heart failure, ischemia, or hypertrophy. Alters ion channels, calcium handling, and mechanics.' },
+    'rate': { title: 'Pacing Rate', text: 'Sets the electrical stimulation frequency. Normal resting heart rate is ~70 bpm. Higher rates increase metabolic demand.' },
+    'nablk': { title: 'Sodium Channel Block', text: 'Blocks voltage-gated Na⁺ channels. Reduces upstroke velocity and conduction speed. Used to simulate class I antiarrhythmics.' },
+    'cablk': { title: 'L-type Ca²⁺ Block', text: 'Blocks L-type calcium channels in the sarcolemma. Reduces calcium influx and contractility. Represents calcium channel blockers.' },
+    'catblk': { title: 'T-type Ca²⁺ Block', text: 'Blocks T-type calcium channels. Affects pacemaker activity and vascular smooth muscle. Less common therapeutic target.' },
+    'kblk': { title: 'Potassium Channel Block', text: 'Blocks voltage-gated K⁺ channels. Prolongs action potential duration. Used to simulate class III antiarrhythmics.' },
+    'clcablk': { title: 'Ca²⁺-activated Cl⁻ Block', text: 'Blocks chloride channels activated by calcium. Affects repolarization and automaticity in some tissues.' },
+    'ncx': { title: 'Na⁺/Ca²⁺ Exchanger', text: 'Scales activity of the sodium-calcium exchanger. Major calcium extrusion mechanism. Can work in forward (Ca²⁺ out) or reverse (Ca²⁺ in) mode.' },
+    'serca': { title: 'SERCA Pump', text: 'Scales sarcoplasmic reticulum Ca²⁺-ATPase activity. Pumps calcium into SR stores during relaxation. Critical for calcium resequestration.' },
+    'pmca': { title: 'PMCA Pump', text: 'Scales plasma membrane Ca²⁺-ATPase activity. Minor calcium extrusion pathway compared to NCX.' },
+    'sl0': { title: 'Sarcomere Length', text: 'Sets preload (end-diastolic sarcomere length). Affects force development via Frank-Starling mechanism. Normal ~1.9 µm.' },
+    'afterload': { title: 'Afterload', text: 'Sets resistance to ejection. Higher afterload reduces stroke volume but may increase wall stress.' },
+    'stiff': { title: 'Passive Stiffness', text: 'Sets myocardial stiffness. Affects diastolic filling and pressure-volume relationship.' },
+    'isometric': { title: 'Isometric Mode', text: 'Prevents length changes, measuring force at fixed length. Used to study contractility independent of preload/afterload.' }
+  };
+
+  function showTooltip(element, data){
+    tooltipTitle.textContent = data.title;
+    tooltipText.textContent = data.text;
+    tooltip.style.display = 'block';
+
+    const rect = element.getBoundingClientRect();
+    tooltip.style.left = (rect.right + 10) + 'px';
+    tooltip.style.top = (rect.top) + 'px';
+  }
+
+  function hideTooltip(){
+    tooltip.style.display = 'none';
+  }
+
+  // Add hover listeners to all toggles and controls
+  Object.keys(tooltipData).forEach(id => {
+    const element = document.getElementById(id);
+    if(element){
+      element.addEventListener('mouseenter', () => showTooltip(element, tooltipData[id]));
+      element.addEventListener('mouseleave', hideTooltip);
+    }
+  });
+
+  // Also add to labels and spans that might contain controls
+  document.querySelectorAll('label, span').forEach(el => {
+    const input = el.querySelector('input');
+    if(input && tooltipData[input.id]){
+      el.addEventListener('mouseenter', () => showTooltip(el, tooltipData[input.id]));
+      el.addEventListener('mouseleave', hideTooltip);
+    }
+  });
+}
+
+// setupTooltips is called from the main DOMContentLoaded listener above
+</script>
+
+<!-- Explainer tooltip -->
+<div id="explainerTooltip" class="explainer-card" style="position:fixed; display:none; z-index:1000; pointer-events:none; max-width:250px;">
+  <h3 id="tooltipTitle">Title</h3>
+  <p id="tooltipText">Description</p>
+</div>
+
+<div class="explainer-card">
+  <h3>About the Cardiomyocyte Simulator</h3>
+  <p>This digital twin represents cellular-level electrophysiology and mechanics. It simulates how individual heart muscle cells respond to pacing, drugs, and disease states at the molecular level, bridging the gap between ion channels and whole-heart function.</p>
+</div>
+</body>
+</html>

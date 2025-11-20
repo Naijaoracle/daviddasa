@@ -444,6 +444,20 @@
             <div class="small muted">SV <span id="svVal">--</span> mL • SVR <span id="svrVal">--</span></div>
           </div>
         </div>
+        <div style="margin-top:12px; border-top:1px solid #232845; padding-top:12px;">
+          <div class="row"><span class="label">Trends (60s)</span></div>
+          <canvas id="trendGraph" width="360" height="80" style="width:100%; height:80px; background:#10152a; border-radius:6px;"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Clinical Scenarios</h2>
+      <div class="content grid cols-2">
+        <button class="btn" onclick="applyScenario('normal')">Normal Sinus</button>
+        <button class="btn warn" onclick="applyScenario('shock')">Hypovolemic Shock</button>
+        <button class="btn warn" onclick="applyScenario('hypertension')">Hypertension</button>
+        <button class="btn warn" onclick="applyScenario('hf')">Heart Failure</button>
       </div>
     </div>
 
@@ -528,22 +542,94 @@
 
   <script type="module">
     // Shared physiology model and UI hooks
-    const BASE = { HR:70, SV:70, VOL:5.0, SVR:1.0, MAP_TARGET:93, MMHG_GAIN:19 };
+    const BASE = { 
+      HR: 70, 
+      SV: 70, 
+      VOL: 5.0, 
+      SVR: 1.0, 
+      MAP_TARGET: 93, 
+      MMHG_GAIN: 19 
+    };
+    
     const PR_LEAD = 0.12; // seconds atrial lead over ventricular systole
-    const state = { t:0, paused:false, volumeL:BASE.VOL, hr:BASE.HR, contractility:0, svr:BASE.SVR, sv:BASE.SV, co:0, map:0, sbp:0, dbp:0, pulsePressure:40, med:{ adr:0, alpha:0, ccb:0, infusion_mL_per_h:0 } };
-    const clamp=(x,a,b)=>Math.max(a,Math.min(b,x)); const lerp=(a,b,t)=>a+(b-a)*t;
+    
+    const state = { 
+      t: 0, 
+      paused: false, 
+      volumeL: BASE.VOL, 
+      hr: BASE.HR, 
+      contractility: 0, 
+      svr: BASE.SVR, 
+      sv: BASE.SV, 
+      co: 0, 
+      map: 0, 
+      sbp: 0, 
+      dbp: 0, 
+      pulsePressure: 40, 
+      med: { 
+        adr: 0, 
+        alpha: 0, 
+        ccb: 0, 
+        infusion_mL_per_h: 0 
+      } 
+    };
 
-    function updateModel(dt){
-      const dV=(state.med.infusion_mL_per_h/3600)*dt/1000; state.volumeL=clamp(state.volumeL+dV,2.0,9.0);
-      const adr=state.med.adr, alp=state.med.alpha, ccb=state.med.ccb;
-      const dHR_med=30*adr+10*alp-15*ccb; const dInot_med=0.5*adr-0.3*ccb; const svr_med_mult=(1+0.4*adr)*(1-0.45*alp)*(1-0.12*ccb);
-      state.contractility=clamp(lerp(state.contractility,dInot_med,0.5*dt),-0.6,0.8);
-      state.svr=clamp(lerp(state.svr,BASE.SVR*svr_med_mult,0.8*dt),0.4,2.2);
-      const preload=clamp(0.6+0.4*Math.sqrt(state.volumeL/BASE.VOL),0.5,1.5); const afterload=1/(1+0.35*(state.svr-1));
-      const sv_unclamped=BASE.SV*preload*(1+state.contractility)*afterload; state.sv=clamp(sv_unclamped,30,130);
-      const co_now=(state.hr*state.sv)/1000; state.map=clamp(co_now*state.svr*BASE.MMHG_GAIN,30,160);
-      const reflex=0.18*(BASE.MAP_TARGET-state.map); const targetHR=clamp(BASE.HR+dHR_med+reflex,35,160); state.hr=lerp(state.hr,targetHR,0.8*dt);
-      state.co=(state.hr*state.sv)/1000; const pp=clamp(40*(state.sv/BASE.SV)*Math.pow(1/state.svr,0.5),20,90); state.pulsePressure=pp; state.sbp=clamp(state.map+0.5*pp,60,220); state.dbp=clamp(state.map-0.5*pp,30,130); state.t+=dt;
+    const clamp = (x, a, b) => Math.max(a, Math.min(b, x)); 
+    const lerp = (a, b, t) => a + (b - a) * t;
+
+    function updateModel(dt) {
+      // 1. Volume Status
+      const dV = (state.med.infusion_mL_per_h / 3600) * dt / 1000; 
+      state.volumeL = clamp(state.volumeL + dV, 2.0, 9.0);
+
+      // 2. Medication Effects
+      const { adr, alpha: alp, ccb } = state.med;
+      
+      // Heart Rate effects
+      const dHR_med = 30 * adr + 10 * alp - 15 * ccb; 
+      
+      // Inotropy (Contractility) effects
+      const dInot_med = 0.5 * adr - 0.3 * ccb; 
+      
+      // SVR effects: Adr increases, Alpha blockers decrease, CCB mild decrease
+      const svr_med_mult = (1 + 0.4 * adr) * (1 - 0.45 * alp) * (1 - 0.12 * ccb);
+
+      // Apply pharmacodynamics with inertia (lerp)
+      state.contractility = clamp(lerp(state.contractility, dInot_med, 0.5 * dt), -0.6, 0.8);
+      state.svr = clamp(lerp(state.svr, BASE.SVR * svr_med_mult, 0.8 * dt), 0.4, 2.2);
+
+      // 3. Hemodynamics
+      // Frank-Starling curve (Preload)
+      // Use square relation for steeper drop-off in hypovolemia
+      const preload = clamp(Math.pow(state.volumeL / BASE.VOL, 2), 0.3, 1.5); 
+      
+      // Afterload effect on Stroke Volume
+      const afterload = 1 / (1 + 0.35 * (state.svr - 1));
+      
+      // Calculate Stroke Volume
+      const sv_unclamped = BASE.SV * preload * (1 + state.contractility) * afterload; 
+      state.sv = clamp(sv_unclamped, 30, 130);
+
+      // Calculate MAP (Mean Arterial Pressure)
+      // CO = HR * SV
+      const co_now = (state.hr * state.sv) / 1000; 
+      state.map = clamp(co_now * state.svr * BASE.MMHG_GAIN, 30, 160);
+
+      // Baroreceptor Reflex (Autonomic control)
+      const reflex = 0.18 * (BASE.MAP_TARGET - state.map); 
+      const targetHR = clamp(BASE.HR + dHR_med + reflex, 35, 160); 
+      state.hr = lerp(state.hr, targetHR, 0.8 * dt);
+
+      // Derived values
+      state.co = (state.hr * state.sv) / 1000; 
+      
+      // Pulse Pressure (widens with SV, narrows with damping/SVR)
+      const pp = clamp(40 * (state.sv / BASE.SV) * Math.pow(1 / state.svr, 0.5), 20, 90); 
+      state.pulsePressure = pp; 
+      state.sbp = clamp(state.map + 0.5 * pp, 60, 220); 
+      state.dbp = clamp(state.map - 0.5 * pp, 30, 130); 
+      
+      state.t += dt;
     }
 
     // Geometry spec shared by WebGL and 2D
@@ -590,11 +676,134 @@
     const hrVal=el('#hrVal'); const bpVal=el('#bpVal'); const mapVal=el('#mapVal'); const volVal=el('#volVal'); const coVal=el('#coVal'); const svVal=el('#svVal'); const svrVal=el('#svrVal'); const infRateVal=el('#infRateVal');
     const adr=el('#adr'); const alpha=el('#alpha'); const ccb=el('#ccb'); const adrVal=el('#adrVal'); const alphaVal=el('#alphaVal'); const ccbVal=el('#ccbVal');
     const infusion=el('#infusion'); const infusionLabel=el('#infusionLabel'); const bolus250=el('#bolus250'); const bolus500=el('#bolus500'); const diurese=el('#diurese');
-    const resetBtn=el('#reset'); const pause=el('#pause'); const toggleHR=el('#toggleHR'); const toggleBP=el('#toggleBP'); const toggleVOL=el('#toggleVOL');
+    const resetBtn=el('#reset');     const pause=el('#pause'); const toggleHR=el('#toggleHR'); const toggleBP=el('#toggleBP'); const toggleVOL=el('#toggleVOL');
     const kpiHR=document.querySelector('[data-kpi="hr"]'); const kpiBP=document.querySelector('[data-kpi="bp"]'); const kpiVOL=document.querySelector('[data-kpi="vol"]');
     function refreshToggles(){ kpiHR.style.display=toggleHR.checked?'':'none'; kpiBP.style.display=toggleBP.checked?'':'none'; kpiVOL.style.display=toggleVOL.checked?'':'none' }
     toggleHR.addEventListener('change',refreshToggles); toggleBP.addEventListener('change',refreshToggles); toggleVOL.addEventListener('change',refreshToggles);
-    function updateUI(){ hrVal.textContent=`${state.hr.toFixed(0)} bpm`; bpVal.textContent=`${state.sbp.toFixed(0)} / ${state.dbp.toFixed(0)} mmHg`; mapVal.textContent=`MAP ${state.map.toFixed(0)} mmHg`; volVal.textContent=`${state.volumeL.toFixed(2)} L`; coVal.textContent=`${state.co.toFixed(2)} L/min`; svVal.textContent=state.sv.toFixed(0); svrVal.textContent=state.svr.toFixed(2); infRateVal.textContent=state.med.infusion_mL_per_h.toFixed(0); adrVal.textContent=Number(adr.value).toFixed(2); alphaVal.textContent=Number(alpha.value).toFixed(2); ccbVal.textContent=Number(ccb.value).toFixed(2); infusionLabel.textContent=`${infusion.value} mL/h`; el('#flowHud').textContent=`${(state.co/5).toFixed(2)} x baseline`; el('#radHud').textContent=`${(1/state.svr).toFixed(2)} relative` }
+
+    // --- Trend Graph System ---
+    const trendCanvas = document.getElementById('trendGraph');
+    const trendCtx = trendCanvas.getContext('2d');
+    const history = { hr: [], sbp: [], dbp: [], t: [] };
+    const MAX_POINTS = 300; // 60s at 5fps update for graph
+
+    function updateTrends(dt) {
+      if (state.paused) return;
+      // Push data every ~200ms to avoid noise
+      if (!history.lastT || state.t - history.lastT > 0.2) {
+        history.hr.push(state.hr);
+        history.sbp.push(state.sbp);
+        history.dbp.push(state.dbp);
+        history.t.push(state.t);
+        if (history.hr.length > MAX_POINTS) {
+          history.hr.shift(); history.sbp.shift(); history.dbp.shift(); history.t.shift();
+        }
+        history.lastT = state.t;
+      }
+    }
+
+    function drawTrends() {
+      const w = trendCanvas.width, h = trendCanvas.height;
+      trendCtx.clearRect(0, 0, w, h);
+      
+      if (history.hr.length < 2) return;
+
+      // Helper to map values
+      const mapY = (val, min, max) => h - ((val - min) / (max - min) * h);
+      const stepX = w / MAX_POINTS;
+
+      // Draw HR (Green)
+      trendCtx.strokeStyle = '#43d17b';
+      trendCtx.lineWidth = 1.5;
+      trendCtx.beginPath();
+      for (let i = 0; i < history.hr.length; i++) {
+        const x = w - (history.hr.length - i) * stepX;
+        const y = mapY(history.hr[i], 30, 180); // HR range 30-180
+        if (i===0) trendCtx.moveTo(x, y); else trendCtx.lineTo(x, y);
+      }
+      trendCtx.stroke();
+
+      // Draw BP Area (Yellow/Orange)
+      trendCtx.fillStyle = 'rgba(255, 189, 46, 0.15)';
+      trendCtx.beginPath();
+      for (let i = 0; i < history.sbp.length; i++) {
+        const x = w - (history.sbp.length - i) * stepX;
+        const yTop = mapY(history.sbp[i], 0, 250);
+        if (i===0) trendCtx.moveTo(x, yTop); else trendCtx.lineTo(x, yTop);
+      }
+      for (let i = history.dbp.length - 1; i >= 0; i--) {
+        const x = w - (history.dbp.length - i) * stepX;
+        const yBot = mapY(history.dbp[i], 0, 250);
+        trendCtx.lineTo(x, yBot);
+      }
+      trendCtx.closePath();
+      trendCtx.fill();
+      
+      // Draw BP Lines
+      trendCtx.strokeStyle = '#ffbd2e';
+      trendCtx.lineWidth = 1;
+      trendCtx.beginPath(); // SBP
+      for (let i = 0; i < history.sbp.length; i++) {
+        const x = w - (history.sbp.length - i) * stepX;
+        const y = mapY(history.sbp[i], 0, 250);
+        if (i===0) trendCtx.moveTo(x, y); else trendCtx.lineTo(x, y);
+      }
+      trendCtx.stroke();
+      
+      trendCtx.beginPath(); // DBP
+      for (let i = 0; i < history.dbp.length; i++) {
+        const x = w - (history.dbp.length - i) * stepX;
+        const y = mapY(history.dbp[i], 0, 250);
+        if (i===0) trendCtx.moveTo(x, y); else trendCtx.lineTo(x, y);
+      }
+      trendCtx.stroke();
+    }
+
+    // --- Scenarios ---
+    window.applyScenario = (type) => {
+      // Reset first
+      state.med.adr = 0; state.med.alpha = 0; state.med.ccb = 0; state.med.infusion_mL_per_h = 0;
+      adr.value=0; alpha.value=0; ccb.value=0; infusion.value=0;
+      
+      switch(type) {
+        case 'normal':
+          state.volumeL = 5.0;
+          break;
+        case 'shock':
+          state.volumeL = 3.2; // Hypovolemia
+          // Compensatory reaction will happen automatically by the model (reflex HR)
+          break;
+        case 'hypertension':
+          state.volumeL = 6.5;
+          state.med.adr = 0.3; // Increase SVR/HR
+          adr.value = 0.3;
+          break;
+        case 'hf':
+          state.volumeL = 6.0; // Fluid overload
+          state.med.ccb = 0.6; // Reduced contractility
+          ccb.value = 0.6;
+          break;
+      }
+    };
+
+    function updateUI(){ 
+      hrVal.textContent=`${state.hr.toFixed(0)} bpm`; 
+      bpVal.textContent=`${state.sbp.toFixed(0)} / ${state.dbp.toFixed(0)} mmHg`; 
+      mapVal.textContent=`MAP ${state.map.toFixed(0)} mmHg`; 
+      volVal.textContent=`${state.volumeL.toFixed(2)} L`; 
+      coVal.textContent=`${state.co.toFixed(2)} L/min`; 
+      svVal.textContent=state.sv.toFixed(0); 
+      svrVal.textContent=state.svr.toFixed(2); 
+      infRateVal.textContent=state.med.infusion_mL_per_h.toFixed(0); 
+      adrVal.textContent=Number(adr.value).toFixed(2); 
+      alphaVal.textContent=Number(alpha.value).toFixed(2); 
+      ccbVal.textContent=Number(ccb.value).toFixed(2); 
+      infusionLabel.textContent=`${infusion.value} mL/h`; 
+      el('#flowHud').textContent=`${(state.co/5).toFixed(2)} x baseline`; 
+      el('#radHud').textContent=`${(1/state.svr).toFixed(2)} relative`;
+      
+      drawTrends();
+    }
     adr.addEventListener('input',()=>state.med.adr=Number(adr.value)); alpha.addEventListener('input',()=>state.med.alpha=Number(alpha.value)); ccb.addEventListener('input',()=>state.med.ccb=Number(ccb.value)); infusion.addEventListener('input',()=>{ state.med.infusion_mL_per_h=Number(infusion.value) });
     bolus250.addEventListener('click',()=>{ state.volumeL=clamp(state.volumeL+0.25,2.0,9.0) }); bolus500.addEventListener('click',()=>{ state.volumeL=clamp(state.volumeL+0.50,2.0,9.0) }); diurese.addEventListener('click',()=>{ state.volumeL=clamp(state.volumeL-0.25,2.0,9.0) });
     resetBtn.addEventListener('click',()=>{ Object.assign(state,{ volumeL:BASE.VOL, hr:BASE.HR, contractility:0, svr:BASE.SVR, sv:BASE.SV, med:{ adr:0, alpha:0, ccb:0, infusion_mL_per_h:0 } }); adr.value=0; alpha.value=0; ccb.value=0; infusion.value=0; runTests() });
@@ -663,13 +872,35 @@
       const paLabel=makeLabel('Pulmonary artery'); paLabel.position.set(-2.2, 2.15, 0); paLabel.scale.multiplyScalar(0.8); scene.add(paLabel);
       const pvLabel=makeLabel('Pulmonary vein'); pvLabel.position.set( 2.2, 2.15, 0); pvLabel.scale.multiplyScalar(0.8); scene.add(pvLabel);
 
+      function getGlowSprite(){ 
+        const c=document.createElement('canvas'); c.width=32; c.height=32; 
+        const ctx=c.getContext('2d'); 
+        const g=ctx.createRadialGradient(16,16,0, 16,16,16); 
+        g.addColorStop(0,'rgba(255,255,255,1)'); 
+        g.addColorStop(0.5,'rgba(255,255,255,0.2)'); 
+        g.addColorStop(1,'rgba(0,0,0,0)'); 
+        ctx.fillStyle=g; ctx.fillRect(0,0,32,32); 
+        return new THREE.CanvasTexture(c); 
+      }
+      const glowTex = getGlowSprite();
+
       const C=THREE.CatmullRomCurve3; const segments=[];
       function validPoint(p){ return p && Number.isFinite(p.x) && Number.isFinite(p.y) }
       function addSeg(a,b,c,systemic=false, oxySet=null, radius=0.10, isArtery=false){
         if(!validPoint(a)||!validPoint(b)||!validPoint(c)) throw new Error('Invalid segment point');
         const curve=new C([ new THREE.Vector3(a.x,a.y,0), new THREE.Vector3(b.x,b.y,0), new THREE.Vector3(c.x,c.y,0) ], false, 'centripetal');
         const geom=new THREE.TubeGeometry(curve, 80, radius, 20, false);
-        const mat=new THREE.MeshStandardMaterial({color:0x333333, metalness:0.2, roughness:0.6});
+        // Glassy material: Transparent, shiny, allows seeing blood inside
+        const mat=new THREE.MeshPhysicalMaterial({
+          color:0x888888, 
+          metalness:0.1, 
+          roughness:0.1, 
+          transmission: 0.6, // Glass-like transmission
+          transparent:true, 
+          opacity:0.3,
+          depthWrite: false, // Prevents occlusion issues with internal particles
+          side: THREE.DoubleSide
+        });
         const mesh=new THREE.Mesh(geom, mat); scene.add(mesh);
         segments.push({curve, mesh, systemic, oxySet, isArtery, baseRadius: radius});
       }
@@ -678,7 +909,12 @@
       for(const s of spec){ addSeg(s[0],s[1],s[2],s[3],s[4],s[5],s[6]) }
 
       const oxyAtSeg=[]; { let oxy=false; for(let i=0;i<segments.length;i++){ oxyAtSeg[i]=oxy; if(segments[i].oxySet!==null) oxy=segments[i].oxySet } }
-      for(let i=0;i<segments.length;i++){ segments[i].mesh.material.color.copy(oxyAtSeg[i]?RED:BLUE) }
+      // Tint the glass tubes slightly based on oxygenation
+      for(let i=0;i<segments.length;i++){ 
+        const c = oxyAtSeg[i] ? RED : BLUE;
+        segments[i].mesh.material.color.setHSL(c.getHSL({}).h, 0.5, 0.1); // Keep it dark/subtle
+        segments[i].mesh.material.emissive.copy(c).multiplyScalar(0.1); // Slight inner glow
+      }
 
       const path=segments.map(s=>({ curve:s.curve, len:s.curve.getLength() }));
       const totalLen=path.reduce((a,b)=>a+b.len,0); const cum=[]; let acc=0; for(const p of path){ cum.push(acc); acc+=p.len }
@@ -690,14 +926,32 @@
       }
       function getPointByU(u){ const d=u*totalLen; let i=0; while(i<path.length-1 && d>=cum[i+1]) i++; const local=(d-cum[i])/path[i].len; return { pos:path[i].curve.getPoint(local), seg:i } }
 
-      const N=1400; const positions=new Float32Array(N*3); const progress=new Float32Array(N); const colors=new Float32Array(N*3); const bloodGeom=new THREE.BufferGeometry(); const bloodMat=new THREE.PointsMaterial({size:0.035,sizeAttenuation:true,vertexColors:true});
+      const N=1400; const positions=new Float32Array(N*3); const progress=new Float32Array(N); const colors=new Float32Array(N*3); 
+      const bloodGeom=new THREE.BufferGeometry(); 
+      // Glowing blood particles
+      const bloodMat=new THREE.PointsMaterial({
+        size:0.15, // Larger because of soft glow
+        map: glowTex, 
+        transparent: true,
+        opacity: 0.8,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        vertexColors:true
+      });
       for(let i=0;i<N;i++){ progress[i]=Math.random(); const {pos,seg}=getPointByU(progress[i]); positions[i*3]=pos.x; positions[i*3+1]=pos.y; positions[i*3+2]=pos.z; const c=oxyAtSeg[seg]?RED:BLUE; colors[i*3]=c.r; colors[i*3+1]=c.g; colors[i*3+2]=c.b }
       bloodGeom.setAttribute('position',new THREE.BufferAttribute(positions,3)); bloodGeom.setAttribute('progress',new THREE.BufferAttribute(progress,1)); bloodGeom.setAttribute('color',new THREE.BufferAttribute(colors,3)); const blood=new THREE.Points(bloodGeom,bloodMat); scene.add(blood);
 
       function onResize(){ const rect=view.getBoundingClientRect(); renderer.setSize(rect.width,rect.height); camera.aspect=rect.width/rect.height; camera.updateProjectionMatrix() } window.addEventListener('resize',onResize); onResize();
 
       let last=performance.now();
-      function animate(now){ requestAnimationFrame(animate); const dt=Math.min(0.05,(now-last)/1000); last=now; if(!state.paused){ updateModel(dt) }
+      function animate(now){ 
+        requestAnimationFrame(animate); 
+        const dt=Math.min(0.05,(now-last)/1000); 
+        last=now; 
+        if(!state.paused){ 
+          updateModel(dt);
+          updateTrends(dt);
+        }
         const beatHz=state.hr/60;
         const vBeat=Math.max(0, Math.sin(2*Math.PI*beatHz*state.t));
         const vAmp=clamp(0.04+0.004*(state.sv-BASE.SV),0.02,0.10);
@@ -855,6 +1109,20 @@
           const oxy=oxyAtSeg[i]; ctx.strokeStyle=oxy?RED:BLUE; ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.quadraticCurveTo(B.x,B.y,C.x,C.y); ctx.stroke();
           drawArrow(i,0.22, ctx.strokeStyle); drawArrow(i,0.55, ctx.strokeStyle); drawArrow(i,0.84, ctx.strokeStyle);
         }
+        // 2D Particle Animation
+        const speed=Math.max(0.05, Math.min(0.36, 0.16 + 0.10*(state.co-4.9)));
+        // Update particles
+        for(let i=0;i<N;i++){
+          let u=parts[i]+speed*dt; 
+          if(u>1) u-=1; 
+          parts[i]=u;
+          
+          const {x,y,seg}=getPointByU(u);
+          const oxy = oxyAtSeg[seg];
+          ctx.fillStyle = oxy ? RED : BLUE;
+          ctx.beginPath(); ctx.arc(x,y, 2, 0, Math.PI*2); ctx.fill();
+        }
+
         circle(P.RA,16*aScale,'#4aa8ff'); circle(P.RV,16*vScale*0.98,'#4aa8ff'); circle(P.LA,16*aScale,'#ff6677'); circle(P.LV,18*vScale,'#ff6677');
         // RA/RV/LA/LV labels in fallback
         ctx.fillStyle='#ffffff'; ctx.font='12px system-ui, sans-serif'; ctx.textAlign='center';
@@ -868,13 +1136,57 @@
       }
 
       let last=performance.now();
-      function loop(now){ requestAnimationFrame(loop); const dt=Math.min(0.05,(now-last)/1000); last=now; if(!state.paused){ updateModel(dt) } updateUI(); draw() }
+      function loop(now){ 
+        requestAnimationFrame(loop); 
+        const dt=Math.min(0.05,(now-last)/1000); 
+        last=now; 
+        if(!state.paused){ 
+          updateModel(dt);
+          updateTrends(dt);
+        } 
+        updateUI(); 
+        draw(); 
+      }
       requestAnimationFrame(loop)
     }
 
     // ---------- Tests ----------
     const testsOut=el('#tests'); el('#runTests').addEventListener('click',runTests);
-    function modelStep(s,dt){ const clamp=(x,a,b)=>Math.max(a,Math.min(b,x)); const lerp=(a,b,t)=>a+(b-a)*t; const dV=(s.med.infusion_mL_per_h/3600)*dt/1000; s.volumeL=clamp(s.volumeL+dV,2.0,9.0); const adr=s.med.adr, alp=s.med.alpha, ccb=s.med.ccb; const dHR_med=30*adr+10*alp-15*ccb; const dInot_med=0.5*adr-0.3*ccb; const svr_med_mult=(1+0.4*adr)*(1-0.45*alp)*(1-0.12*ccb); s.contractility=clamp(lerp(s.contractility,dInot_med,0.5*dt),-0.6,0.8); s.svr=clamp(lerp(s.svr,BASE.SVR*svr_med_mult,0.8*dt),0.4,2.2); const preload=clamp(0.6+0.4*Math.sqrt(s.volumeL/BASE.VOL),0.5,1.5); const afterload=1/(1+0.35*(s.svr-1)); const sv_unclamped=BASE.SV*preload*(1+s.contractility)*afterload; s.sv=clamp(sv_unclamped,30,130); const co_now=(s.hr*s.sv)/1000; s.map=clamp(co_now*s.svr*BASE.MMHG_GAIN,30,160); const reflex=0.18*(BASE.MAP_TARGET-s.map); const targetHR=clamp(BASE.HR+dHR_med+reflex,35,160); s.hr=lerp(s.hr,targetHR,0.8*dt); s.co=(s.hr*s.sv)/1000; const pp=clamp(40*(s.sv/BASE.SV)*Math.pow(1/s.svr,0.5),20,90); s.sbp=clamp(s.map+0.5*pp,60,220); s.dbp=clamp(s.map-0.5*pp,30,130); s.t+=dt; return s }
+    function modelStep(s, dt) {
+      const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+      const lerp = (a, b, t) => a + (b - a) * t;
+      
+      const dV = (s.med.infusion_mL_per_h / 3600) * dt / 1000;
+      s.volumeL = clamp(s.volumeL + dV, 2.0, 9.0);
+
+      const { adr, alpha: alp, ccb } = s.med;
+      const dHR_med = 30 * adr + 10 * alp - 15 * ccb;
+      const dInot_med = 0.5 * adr - 0.3 * ccb;
+      const svr_med_mult = (1 + 0.4 * adr) * (1 - 0.45 * alp) * (1 - 0.12 * ccb);
+
+      s.contractility = clamp(lerp(s.contractility, dInot_med, 0.5 * dt), -0.6, 0.8);
+      s.svr = clamp(lerp(s.svr, BASE.SVR * svr_med_mult, 0.8 * dt), 0.4, 2.2);
+
+      const preload = clamp(Math.pow(s.volumeL / BASE.VOL, 2), 0.3, 1.5);
+      const afterload = 1 / (1 + 0.35 * (s.svr - 1));
+      const sv_unclamped = BASE.SV * preload * (1 + s.contractility) * afterload;
+      s.sv = clamp(sv_unclamped, 30, 130);
+
+      const co_now = (s.hr * s.sv) / 1000;
+      s.map = clamp(co_now * s.svr * BASE.MMHG_GAIN, 30, 160);
+
+      const reflex = 0.18 * (BASE.MAP_TARGET - s.map);
+      const targetHR = clamp(BASE.HR + dHR_med + reflex, 35, 160);
+      s.hr = lerp(s.hr, targetHR, 0.8 * dt);
+
+      s.co = (s.hr * s.sv) / 1000;
+      const pp = clamp(40 * (s.sv / BASE.SV) * Math.pow(1 / s.svr, 0.5), 20, 90);
+      s.sbp = clamp(s.map + 0.5 * pp, 60, 220);
+      s.dbp = clamp(s.map - 0.5 * pp, 30, 130);
+      
+      s.t += dt;
+      return s;
+    }
     function runTests(){ const lines=[]; const tol=(a,b,t)=>Math.abs(a-b)<=t; function sim(seconds,prep){ let s={ t:0, paused:false, volumeL:BASE.VOL, hr:BASE.HR, contractility:0, svr:BASE.SVR, sv:BASE.SV, co:0, map:0, sbp:0, dbp:0, pulsePressure:40, med:{ adr:0, alpha:0, ccb:0, infusion_mL_per_h:0 } }; if(prep) prep(s); let dt=0.02; for(let t=0;t<seconds;t+=dt){ s=modelStep(s,dt) } return s } function ok(name,cond,detail=""){ lines.push(`${cond?'PASS':'FAIL'} - ${name}${detail?` - ${detail}`:''}`) }
       let s0=sim(8); ok('Baseline HR near 70 bpm', tol(s0.hr,70,5), `got ${s0.hr.toFixed(1)}`); ok('Baseline CO near 4.9 L/min', tol(s0.co,4.9,0.8), `got ${s0.co.toFixed(2)}`); ok('Baseline MAP plausible', s0.map>70 && s0.map<110, `got ${s0.map.toFixed(1)}`);
       let sAdr=sim(8, s=>{ s.med.adr=0.8 }); ok('Adrenaline raises HR', sAdr.hr>s0.hr, `base ${s0.hr.toFixed(1)} now ${sAdr.hr.toFixed(1)}`); ok('Adrenaline raises MAP', sAdr.map>=s0.map, `base ${s0.map.toFixed(1)} now ${sAdr.map.toFixed(1)}`);
