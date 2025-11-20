@@ -458,14 +458,19 @@
       const rail2 = rail.clone(); rail2.position.z = 0.42; g.add(rail, rail2);
       const patient = new THREE.Group();
       const gown = 0x1e88e5;
+      // Skin material that can change color
+      const skinMat = new THREE.MeshStandardMaterial({ color: 0xd1b290, roughness: 0.6 });
+      patient.userData.skinMat = skinMat;
+      
       const pBody = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.25, 0.45), new THREE.MeshStandardMaterial({ color: gown })); pBody.name = 'patientBody'; pBody.position.set(0.1, 0.86, 0);
-      const pHead = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.26, 0.26), new THREE.MeshStandardMaterial({ color: 0xd1b290 })); pHead.position.set(0.95, 0.95, 0);
-      const pArmL = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.12, 0.12), new THREE.MeshStandardMaterial({ color: gown })); pArmL.position.set(0.2, 0.86, -0.33);
+      const pHead = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.26, 0.26), skinMat); pHead.position.set(0.95, 0.95, 0);
+      const pArmL = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.12, 0.12), skinMat); pArmL.position.set(0.2, 0.86, -0.33);
       const pArmR = pArmL.clone(); pArmR.position.z = 0.33;
-      const pLegL = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.16, 0.16), new THREE.MeshStandardMaterial({ color: gown })); pLegL.position.set(-0.35, 0.78, -0.12);
+      const pLegL = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.16, 0.16), skinMat); pLegL.position.set(-0.35, 0.78, -0.12);
       const pLegR = pLegL.clone(); pLegR.position.z = 0.12;
       const blanket = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.06, 0.6), new THREE.MeshStandardMaterial({ color: 0x6aa7c8, transparent: true, opacity: 0.9 })); blanket.position.set(-0.15, 0.92, 0);
       patient.add(pBody, pHead, pArmL, pArmR, pLegL, pLegR, blanket); g.add(patient);
+      patient.userData.limbs = { pHead, pArmL, pArmR, pLegL, pLegR }; // Store for color updates
       const patientLabelDiv = document.createElement('div'); patientLabelDiv.className = 'label'; patientLabelDiv.textContent = 'Patient 001'; const patientLabel = new CSS2DObject(patientLabelDiv); patientLabel.position.set(0.95, 1.1, 0); g.add(patientLabel);
       g.position.set(x, 0, z); return g;
     }
@@ -693,6 +698,49 @@
     }
 
     // UI and recording
+    // Scenario Logic
+    function applyScenario(name) {
+      // Reset baselines
+      phys.bloodVol = 1.0; phys.SVR = 1.0; phys.contractility = 1.0;
+      phys.airwayR = 1.0; phys.lungC = 1.0; phys.shunt = 0.05;
+      phys.metabolic = 1.0; phys.catechol = 0.0; phys.sedation = 0.0;
+      phys.tempSet = 37.0; phys.o2Device = 'air';
+      
+      switch(name) {
+        case 'Sepsis':
+          phys.SVR = 0.6; // Vasodilation
+          phys.tempSet = 39.2; // Fever
+          phys.metabolic = 1.4; // High demand
+          phys.bloodVol = 0.9; // Relative hypovolemia
+          logEvent('scenario', { name: 'Sepsis' });
+          setStatus('Scenario: Sepsis loaded', '#ffb74d');
+          break;
+        case 'Anaphylaxis':
+          phys.SVR = 0.5; // Shock
+          phys.airwayR = 3.5; // Bronchospasm
+          phys.bloodVol = 0.85; // Leakage
+          phys.catechol = 0.8; // Panic
+          logEvent('scenario', { name: 'Anaphylaxis' });
+          setStatus('Scenario: Anaphylaxis loaded', '#e57373');
+          break;
+        case 'Opioid Overdose':
+          phys.sedation = 0.8; // CNS depression
+          phys.airwayR = 1.5; // Obstruction risk
+          phys.metabolic = 0.8;
+          logEvent('scenario', { name: 'Opioid Overdose' });
+          setStatus('Scenario: Opioid Overdose loaded', '#ba68c8');
+          break;
+        case 'Asthma':
+          phys.airwayR = 4.0; // Severe bronchospasm
+          phys.catechol = 0.5;
+          logEvent('scenario', { name: 'Asthma' });
+          setStatus('Scenario: Asthma loaded', '#64b5f6');
+          break;
+        default: // Stable
+          setStatus('Scenario: Stable', '#9ccc65');
+      }
+    }
+
     const log = document.getElementById('log'); const tray = document.getElementById('tray');
     const nurseUI = document.createElement('div'); nurseUI.innerHTML = `
       <div style="margin-top:10px; font-size:12px; opacity:0.9;">Nurse control</div>
@@ -701,7 +749,16 @@
         <button id="resetNurseBtn">Reset nurse</button>
       </div>
       <div style="font-size:11px; opacity:0.8; margin-top:6px;">Move nurse with I J K L or arrow keys. Rotate with U and O.</div>
+      <div style="margin-top:10px; font-size:12px; opacity:0.9;">Scenarios</div>
+      <div class="btns" style="margin-top:6px; grid-template-columns: 1fr 1fr;">
+        <button class="ghost" onclick="window.applyScenario('Sepsis')">Sepsis</button>
+        <button class="ghost" onclick="window.applyScenario('Anaphylaxis')">Anaphylaxis</button>
+        <button class="ghost" onclick="window.applyScenario('Opioid Overdose')">Overdose</button>
+        <button class="ghost" onclick="window.applyScenario('Asthma')">Asthma</button>
+      </div>
     `; tray.appendChild(nurseUI);
+    window.applyScenario = applyScenario; // Expose globally
+    
     const followBtn = document.getElementById('followBtn'); const resetNurseBtn = document.getElementById('resetNurseBtn');
 
     const kitUI = document.createElement('div');
@@ -855,6 +912,79 @@
       if (v.onO2) score += 2;
       return score;
     }
+    // --- Waveform Monitor ---
+    const monitorCanvas = document.createElement('canvas');
+    monitorCanvas.width = 256; monitorCanvas.height = 128;
+    monitorCanvas.style.cssText = 'width:100%; height:100px; background:#000; border-radius:4px; margin-top:4px;';
+    const ctx = monitorCanvas.getContext('2d');
+    
+    // Waveform state
+    const waveState = { t: 0, bufECG: new Array(256).fill(64), bufSPO: new Array(256).fill(96), ptr: 0 };
+    
+    function updateWaveforms(dt, hr, spo2) {
+      // Speed based on HR (beats per sec)
+      const beatDur = 60 / Math.max(20, hr);
+      waveState.t += dt;
+      
+      // ECG Synthesis (P-QRS-T)
+      const phase = (waveState.t % beatDur) / beatDur;
+      let val = 64; // Baseline
+      // P wave
+      if (phase > 0.1 && phase < 0.2) val -= 4 * Math.sin((phase-0.1)*Math.PI*10);
+      // QRS
+      else if (phase > 0.2 && phase < 0.22) val += 8; // Q
+      else if (phase >= 0.22 && phase < 0.26) val -= 50 * Math.sin((phase-0.22)*Math.PI*25); // R
+      else if (phase >= 0.26 && phase < 0.28) val += 10; // S
+      // T wave
+      else if (phase > 0.4 && phase < 0.6) val -= 8 * Math.sin((phase-0.4)*Math.PI*5);
+      
+      // SpO2 pleth synthesis (dicrotic notch)
+      let pleth = 96;
+      const spAmp = 20 * (spo2 / 100);
+      // Simple pulse shape
+      const p2 = (waveState.t - 0.15) % beatDur / beatDur; // Lag slightly behind ECG
+      if (p2 >= 0) {
+        const x = p2 * Math.PI * 2;
+        pleth -= spAmp * (Math.sin(x) + 0.5*Math.sin(2*x + 0.5)); 
+      }
+
+      // Write to circular buffer
+      const steps = Math.ceil(dt * 60); // Draw pixels per frame
+      for(let i=0; i<steps; i++){
+        waveState.bufECG[waveState.ptr] = val + (Math.random()-0.5)*2; // Noise
+        waveState.bufSPO[waveState.ptr] = pleth + (Math.random()-0.5)*1;
+        waveState.ptr = (waveState.ptr + 1) % 256;
+      }
+    }
+
+    function drawMonitor() {
+      ctx.fillStyle = '#000'; ctx.fillRect(0,0,256,128);
+      
+      // Draw ECG (Green)
+      ctx.strokeStyle = '#0f0'; ctx.lineWidth = 1.5; ctx.beginPath();
+      for(let i=0; i<256; i++){
+        const idx = (waveState.ptr + i) % 256;
+        if (i===0) ctx.moveTo(i, waveState.bufECG[idx]);
+        else ctx.lineTo(i, waveState.bufECG[idx]);
+      }
+      ctx.stroke();
+
+      // Draw SpO2 (Cyan)
+      ctx.strokeStyle = '#0ff'; ctx.lineWidth = 1.5; ctx.beginPath();
+      for(let i=0; i<256; i++){
+        const idx = (waveState.ptr + i) % 256;
+        const y = waveState.bufSPO[idx] + 20; // Offset down
+        if (i===0) ctx.moveTo(i, y);
+        else ctx.lineTo(i, y);
+      }
+      ctx.stroke();
+      
+      // Draw scan bar
+      ctx.fillStyle = 'rgba(0,0,0,0.8)';
+      const bx = (waveState.ptr - 10 + 256) % 256;
+      ctx.fillRect(bx, 0, 10, 128);
+    }
+
     function vitalsSummary(){
       const o2Text = vitals.onO2 ? 'on oxygen' : 'on air';
       return [
@@ -871,9 +1001,48 @@
       const score = news2Score(vitals);
       const rows = vitalsSummary().map(r=>`<div class="row"><span>${r.k}</span><b>${r.v}</b></div>`).join('');
       vitalsDiv.innerHTML = `<div class="title">NEWS2: ${score}</div>${rows}`;
+      if(!vitalsDiv.contains(monitorCanvas)) vitalsDiv.appendChild(monitorCanvas);
+      updateWaveforms(0.05, vitals.hr, vitals.spo2); // Hacky dt update
+      drawMonitor();
     }
     renderVitals();
-    const vitalsLabel = new CSS2DObject(vitalsDiv); vitalsLabel.position.set(-0.3, 1.55, 0); bed.add(vitalsLabel);
+    const vitalsLabel = new CSS2DObject(vitalsDiv); vitalsLabel.position.set(-0.3, 1.85, 0); bed.add(vitalsLabel);
+
+    // Update patient appearance (Cyanosis / Pallor)
+    const baseSkin = new THREE.Color(0xd1b290);
+    const cyanotic = new THREE.Color(0x708090); // Blue-ish grey
+    const pale = new THREE.Color(0xe0e0d0); // Pale
+    
+    function updatePatientVisuals() {
+      // Find patient in scene graph (traversing bed -> group -> patient)
+      // Or better, access via closed variable 'bed'
+      // We need to find the skin material.
+      // Since I stored it in userData during creation:
+      // Traverse scene to find the patient group if needed, or loop over bed children.
+      let pGroup = null;
+      bed.traverse(c => { if (c.userData.skinMat) pGroup = c; });
+      
+      if (pGroup && pGroup.userData.skinMat) {
+        const mat = pGroup.userData.skinMat;
+        
+        // Mix color based on SpO2 (cyanosis) and perfusion/SVR (pallor)
+        const c = baseSkin.clone();
+        
+        // Cyanosis factor (SpO2 < 90 starts turning blue)
+        if (vitals.spo2 < 92) {
+          const f = clamp((92 - vitals.spo2) / 20, 0, 1);
+          c.lerp(cyanotic, f * 0.7);
+        }
+        
+        // Pallor (Shock / High SVR / Low CO)
+        if (phys.SVR > 1.5 || phys.bloodVol < 0.8) {
+          const f = clamp((phys.SVR - 1.0), 0, 1);
+          c.lerp(pale, f * 0.5);
+        }
+        
+        mat.color.copy(c);
+      }
+    }
 
     // Dynamics core
     function updatePhys(dt) {
@@ -961,13 +1130,18 @@
         vitals.mapEst = lerp1(vitals.mapEst, MAP, 30, dt);
       }
       vitals.avpu = avpuNow;
+      
+      updatePatientVisuals(); // Add visual update here
+      
       // Refresh HUD each update cycle
       renderVitals();
     }
 
     // --- Item/Intervention Application ---
     function applyItemEffects(items) {
+      const successful = [];
       items.forEach(item => {
+        let success = true;
         switch(item){
           case 'Oropharyngeal airway':
             phys.airwayR = clamp(phys.airwayR - 0.3, 0.6, 4.0);
@@ -994,16 +1168,17 @@
             break;
           case '500 ml crystalloid':
             if (!hasIVAccess) {
-              // Block action; show notice and exit
+              // Block action; show notice
               appliedDiv.textContent = 'Needs IV access';
               appliedDiv.style.display = 'block';
               if (appliedTimeout) clearTimeout(appliedTimeout);
               appliedTimeout = setTimeout(()=>{ appliedDiv.style.display = 'none'; }, 1500);
               logEvent('notice', { reason: 'Needs IV access' });
-              return; // do not apply fluids
+              success = false; 
+            } else {
+              phys.fluidPool = clamp(phys.fluidPool + 500, 0, 3000);
+              phys.bloodVol  = clamp(phys.bloodVol + 0.05, 0.2, 1.4);
             }
-            phys.fluidPool = clamp(phys.fluidPool + 500, 0, 3000);
-            phys.bloodVol  = clamp(phys.bloodVol + 0.05, 0.2, 1.4);
             break;
           case 'Non invasive BP':
             nibpTimer = 1000; // force immediate reading
@@ -1018,7 +1193,9 @@
             scheduleIntervention(() => phys.epiLevel = clamp(phys.epiLevel+0.02,0,1), 1000, true, 'epi');
             break;
         }
+        if(success) successful.push(item);
       });
+      return successful;
     }
 
     function renderQueue(){
@@ -1043,18 +1220,22 @@
     function applyPlanIfNear(){
       const d = distXZ(avatar.position, bed.position);
       if (patientPlan.length > 0 && d < PROX_APPLY) {
-        const applied = patientPlan.slice();
+        const pending = patientPlan.slice();
         patientPlan.length = 0;
         renderQueue();
-        applyItemEffects(applied);
-        clampVitals();
-        renderVitals();
-        addAppliedHistory(applied);
-        logEvent('apply', { items: applied });
-        appliedDiv.textContent = 'Applied: ' + applied.join(', ');
-        appliedDiv.style.display = 'block';
-        if (appliedTimeout) clearTimeout(appliedTimeout);
-        appliedTimeout = setTimeout(()=>{ appliedDiv.style.display = 'none'; }, 2000);
+        
+        const applied = applyItemEffects(pending);
+        
+        if (applied.length > 0) {
+          clampVitals();
+          renderVitals();
+          addAppliedHistory(applied);
+          logEvent('apply', { items: applied });
+          appliedDiv.textContent = 'Applied: ' + applied.join(', ');
+          appliedDiv.style.display = 'block';
+          if (appliedTimeout) clearTimeout(appliedTimeout);
+          appliedTimeout = setTimeout(()=>{ appliedDiv.style.display = 'none'; }, 2000);
+        }
       }
     }
 

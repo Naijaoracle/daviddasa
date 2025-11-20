@@ -56,10 +56,57 @@
   #tests{white-space:pre-wrap; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; background:#10152a; border:1px solid #232845; border-radius:10px; padding:8px}
 
   .explainer-card { position: fixed; right: 12px; bottom: 12px; background: var(--panel); border: 1px solid #232845; border-radius: 14px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.25); max-width: 280px; z-index: 100; transform: translateX(-20%); }
+
+  .nav-buttons { position: fixed; left: 12px; top: 12px; display: flex; gap: 8px; z-index: 100; }
+  .home-button, .scoring-link, .cv-link { height: 44px; background: #ffffff; border: 2px solid #2ecc71; border-radius: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 3px 12px rgba(0,0,0,0.3); }
+  .home-button { width: 44px; }
+  .scoring-link, .cv-link { font-size: 12px; font-weight: 600; color: #2ecc71; padding: 0 14px; white-space: nowrap; display: flex; align-items: center; }
+  .home-button:hover, .scoring-link:hover, .cv-link:hover { background: #2ecc71; transform: translateY(-1px); box-shadow: 0 5px 16px rgba(46,204,113,0.4); }
+  .home-button:hover svg { fill: white; }
+  .scoring-link svg, .cv-link svg { width: 18px; height: 18px; fill: #2ecc71; margin-right: 6px; }
+  .scoring-link:hover svg, .cv-link:hover svg { fill: white; }
+  .scoring-link:hover, .cv-link:hover { color: white; background: #2ecc71; }
+  .home-button svg { width: 20px; height: 20px; fill: #2ecc71; }
+
+  @media (max-width: 768px) {
+    .nav-buttons { flex-wrap: wrap; gap: 6px; left: 8px; top: 8px; }
+    .home-button, .scoring-link, .cv-link { height: 36px; font-size: 11px; }
+    .home-button { width: 36px; }
+    .scoring-link, .cv-link { padding: 0 10px; }
+    .scoring-link svg, .cv-link svg { width: 14px; height: 14px; margin-right: 4px; }
+  }
+  @media (max-width: 480px) {
+    .nav-buttons { gap: 4px; left: 6px; top: 6px; }
+    .home-button, .scoring-link, .cv-link { height: 32px; font-size: 10px; }
+    .home-button { width: 32px; }
+    .scoring-link, .cv-link { padding: 0 8px; }
+    .scoring-link svg, .cv-link svg { width: 12px; height: 12px; margin-right: 3px; }
+  }
 </style>
 
 </head>
 <body>
+  <div class="nav-buttons">
+    <a href="/" class="home-button" aria-label="Home" title="Return to homepage">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+      </svg>
+    </a>
+    <a href="/xr-npc-ward-simulator.html" class="scoring-link" aria-label="Ward Simulator" title="Ward Simulator">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      Ward Simulator
+    </a>
+    <a href="/circulation-twin.html" class="cv-link" aria-label="Circulation Digital Twin" title="Circulation Digital Twin">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+      </svg>
+      Cardiology Twin
+    </a>
+  </div>
+
   <header>
     <h1>Cardiomyocyte Simulator</h1>
     <div class="small">Teaching model. Not a device.</div>
