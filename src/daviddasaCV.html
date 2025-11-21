@@ -485,10 +485,12 @@
           // Check title first (higher priority)
           if (titleLower.includes('uk') || titleLower.includes('bournemouth') || titleLower.includes('dorset') || titleLower.includes('nhs') || titleLower.includes('international, uk')) return '\uD83C\uDDEC\uD83C\uDDE7';
           if (titleLower.includes('nigeria') || titleLower.includes('kebbi') || titleLower.includes('sokoto')) return '\uD83C\uDDF3\uD83C\uDDEC';
+          if (titleLower.includes('scale ai') || titleLower.includes('us') || titleLower.includes('united states') || titleLower.includes('america')) return '\uD83C\uDDFA\uD83C\uDDF8';
           
           // Fallback to bullets if title doesn't specify location
           if (bulletsLower.includes('nigeria') || bulletsLower.includes('kebbi') || bulletsLower.includes('sokoto')) return '\uD83C\uDDF3\uD83C\uDDEC';
           if (bulletsLower.includes('uk') || bulletsLower.includes('bournemouth') || bulletsLower.includes('dorset') || bulletsLower.includes('nhs') || bulletsLower.includes('international, uk')) return '\uD83C\uDDEC\uD83C\uDDE7';
+          if (bulletsLower.includes('scale ai') || bulletsLower.includes('us') || bulletsLower.includes('united states') || bulletsLower.includes('america')) return '\uD83C\uDDFA\uD83C\uDDF8';
           
           return '';
         })();

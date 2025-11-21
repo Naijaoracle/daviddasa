@@ -89,11 +89,11 @@
         <h2>Research Insights</h2>
         <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin: 1rem 0;">
           <div class="stat-item" style="background: rgba(46, 204, 113, 0.1); padding: 1.5rem; border-radius: 1rem; text-align: center;">
-            <h3 style="margin: 0; color: #092917; font-size: 2rem;" id="total-notes">4</h3>
+            <h3 style="margin: 0; color: #092917; font-size: 2rem;" id="total-notes">5</h3>
             <p style="margin: 0.5rem 0 0; color: #4a4a4a;">Research Notes</p>
           </div>
           <div class="stat-item" style="background: rgba(46, 204, 113, 0.1); padding: 1.5rem; border-radius: 1rem; text-align: center;">
-            <h3 style="margin: 0; color: #092917; font-size: 2rem;" id="paper-count">2</h3>
+            <h3 style="margin: 0; color: #092917; font-size: 2rem;" id="paper-count">3</h3>
             <p style="margin: 0.5rem 0 0; color: #4a4a4a;">Papers Analyzed</p>
           </div>
           <div class="stat-item" style="background: rgba(46, 204, 113, 0.1); padding: 1.5rem; border-radius: 1rem; text-align: center;">
@@ -163,6 +163,15 @@
 
       // Sample data structure (in practice, this would come from a database or API)
       const researchNotes = [
+        {
+          date: '2025-11-21',
+          type: 'Paper Series Review',
+          title: 'The Segment Anything Model Series: Transforming Medical Image Analysis and Healthcare AI',
+          description: 'A comprehensive review of SAM, SAM 2, and SAM 3, examining their evolution and transformative potential in medical imaging, clinical workflows, and healthcare applications.',
+          tags: ['Computer Vision', 'Medical Imaging', 'Healthcare AI', 'Foundation Models', 'Segmentation'],
+          link: 'sam-models-healthcare-ai-review.html',
+          dataTags: 'paper ai-ml digital-health'
+        },
         {
           date: '2025-11-01',
           type: 'Paper',
@@ -265,7 +274,7 @@
       // Update statistics
       function updateStats(filteredNotes) {
         document.getElementById('total-notes').textContent = filteredNotes.length;
-        document.getElementById('paper-count').textContent = filteredNotes.filter(note => note.type === 'Paper').length;
+        document.getElementById('paper-count').textContent = filteredNotes.filter(note => note.type === 'Paper' || note.type === 'Paper Series Review').length;
         document.getElementById('project-count').textContent = filteredNotes.filter(note => note.type === 'Project').length;
         document.getElementById('repo-count').textContent = filteredNotes.filter(note => note.type === 'Repository').length;
       }
