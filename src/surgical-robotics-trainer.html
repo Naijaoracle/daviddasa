@@ -456,6 +456,9 @@
     let fieldOffset = { x: 0, y: 0 };
     let fieldVelocity = { x: 0.5, y: 0.3 };
     let time = 0; // Frame time for physics
+    
+    // Mobile Detection
+    const isMobile = window.innerWidth < 900; // Treat tablets as mobile for this complex UI
 
     // Init
     function init() {
@@ -484,6 +487,15 @@
       
       fieldOffset = { x: 0, y: 0 };
       time = 0;
+      
+      if (isMobile) {
+          setMode('ai');
+          // Add explainer notice
+          const explainer = document.createElement('div');
+          explainer.style.cssText = 'background: #e8f6f3; color: #0e6251; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem; border-left: 4px solid #2ecc71;';
+          explainer.innerHTML = '<strong>📱 Mobile Detected:</strong> AI Autonomy Mode enabled. Manual teleoperation requires Keyboard (WASD) & Mouse.';
+          document.querySelector('.controls').insertBefore(explainer, document.querySelector('.control-group'));
+      }
       
       resetGameStats();
       loop();
@@ -1126,6 +1138,12 @@
     });
 
     function setMode(newMode) {
+      if (newMode === 'human' && isMobile) {
+          if (!confirm("⚠️ Experimental Feature\n\nManual Teleoperation is designed for Desktop (Keyboard & Mouse). It may be difficult or impossible to control on touch devices.\n\nSwitch anyway?")) {
+              return;
+          }
+      }
+    
       mode = newMode;
       const btnHuman = document.getElementById('btn-human');
       const btnAi = document.getElementById('btn-ai');

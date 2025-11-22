@@ -7,6 +7,7 @@
   <title>Medical Image Intelligence Viewer - David Dasa</title>
   <link rel="icon" type="image/svg+xml" href="/src/favicon-DD-monogram.svg">
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
 
   <!-- Fabric.js for canvas based viewer -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
@@ -19,8 +20,19 @@
 
     body {
       margin: 0;
-      background: #f4f6f8;
+      background: linear-gradient(135deg, #2ecc71 0%, #092917 100%);
       color: #1f2933;
+      min-height: 100vh;
+    }
+    
+    #particles-js {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      pointer-events: none;
     }
 
     nav {
@@ -58,6 +70,8 @@
       max-width: 1440px;
       margin: 1.75rem auto 2.5rem;
       padding: 0 1.5rem;
+      position: relative;
+      z-index: 1;
     }
 
     .article-header h1 {
@@ -596,6 +610,9 @@
     </ul>
   </nav>
 
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
   <div class="container">
     <div class="article-header">
       <h1>Medical Image Intelligence Viewer</h1>
@@ -635,16 +652,16 @@
 
         <!-- Image Adjustments -->
         <div class="tool-group">
-          <h3>Window and level</h3>
+          <h3>Brightness and contrast</h3>
           <div class="control-row">
-            <label for="brightness">Level</label>
+            <label for="brightness">Brightness</label>
             <div class="range-wrapper">
               <input type="range" id="brightness" min="-1" max="1" step="0.1" value="0">
               <span class="value-pill" id="brightness-value">0</span>
             </div>
           </div>
           <div class="control-row">
-            <label for="contrast">Window</label>
+            <label for="contrast">Contrast</label>
             <div class="range-wrapper">
               <input type="range" id="contrast" min="-1" max="1" step="0.1" value="0">
               <span class="value-pill" id="contrast-value">0</span>
@@ -1046,7 +1063,7 @@
       loadImage("img/CXR00020948_000.png");
     }
 
-    // Window and level
+    // Brightness and contrast
 
     function applyFilters() {
       if (!currentImage) return;
@@ -1361,6 +1378,44 @@
     initCanvas();
     loadDemoImage();
     togglePan(); // ensure pan button state
+    
+    // Initialize particles background
+    if (typeof particlesJS !== 'undefined') {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 60, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.4, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.2,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 1.5,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+    }
   </script>
 </body>
 </html>
