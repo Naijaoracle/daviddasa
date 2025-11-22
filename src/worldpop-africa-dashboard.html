@@ -336,16 +336,10 @@
         <span class="stat-change positive" id="density-change">+1.8% YoY</span>
       </div>
       <div class="stat-card">
-        <h3>Urban Population</h3>
-        <div class="stat-value" id="urban-pop">-</div>
-        <p class="stat-label">Percentage urbanized</p>
-        <span class="stat-change positive" id="urban-change">+0.9% YoY</span>
-      </div>
-      <div class="stat-card">
         <h3>Healthcare Access</h3>
         <div class="stat-value" id="healthcare-access">-</div>
-        <p class="stat-label">Within 5km of facility</p>
-        <span class="stat-change positive" id="healthcare-change">+3.2% YoY</span>
+        <p class="stat-label">Estimated coverage (sample states)</p>
+        <span class="stat-change" style="background: rgba(148,163,184,0.15); color: #64748b;">Estimated</span>
       </div>
     </div>
 
@@ -394,24 +388,28 @@
     <div class="charts-grid">
       <div class="chart-container">
         <h3>Population Growth Trend</h3>
+        <p style="font-size: 0.8rem; color: #666; margin: 0 0 0.5rem 0;">Estimated based on 2.6% annual growth rate</p>
         <div class="chart-wrapper">
           <canvas id="growth-chart"></canvas>
         </div>
       </div>
       <div class="chart-container">
         <h3>Regional Distribution</h3>
+        <p style="font-size: 0.8rem; color: #666; margin: 0 0 0.5rem 0;">Sample states with estimated populations</p>
         <div class="chart-wrapper">
           <canvas id="regional-chart"></canvas>
         </div>
       </div>
       <div class="chart-container">
         <h3>Age Structure</h3>
+        <p style="font-size: 0.8rem; color: #666; margin: 0 0 0.5rem 0;">Estimated age distribution</p>
         <div class="chart-wrapper">
           <canvas id="age-chart"></canvas>
         </div>
       </div>
       <div class="chart-container">
         <h3>Healthcare Infrastructure</h3>
+        <p style="font-size: 0.8rem; color: #666; margin: 0 0 0.5rem 0;">Estimated access percentages (sample states)</p>
         <div class="chart-wrapper">
           <canvas id="healthcare-chart"></canvas>
         </div>
@@ -496,43 +494,6 @@
         </div>
       </div>
 
-      <div class="insight-item">
-        <h3>4. Telemedicine Deployment Strategy</h3>
-        <p>Population density analysis reveals three distinct deployment tiers for digital health interventions: <strong>Tier 1 (Urban Hubs)</strong>: High-density areas (>1000/km²) suitable for comprehensive telemedicine platforms with video consultations. <strong>Tier 2 (Semi-Urban)</strong>: Medium-density areas (200-1000/km²) ideal for mobile health apps and SMS-based interventions. <strong>Tier 3 (Rural)</strong>: Low-density areas (<200/km²) requiring hybrid models combining community health workers with periodic telemedicine support.</p>
-        <div class="insight-metrics">
-          <div class="insight-metric">
-            <span class="insight-metric-label">Tier 1 Coverage</span>
-            <span class="insight-metric-value">23%</span>
-          </div>
-          <div class="insight-metric">
-            <span class="insight-metric-label">Tier 2 Coverage</span>
-            <span class="insight-metric-value">31%</span>
-          </div>
-          <div class="insight-metric">
-            <span class="insight-metric-label">Tier 3 Coverage</span>
-            <span class="insight-metric-value">46%</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="insight-item">
-        <h3>5. AI-Enhanced Healthcare Delivery Potential</h3>
-        <p>Population concentration patterns indicate where AI-powered diagnostic tools could have maximum impact. High-density urban areas with established healthcare infrastructure are prime candidates for AI-assisted radiology and pathology services, potentially serving <strong>45 million people</strong> in major urban centers. Meanwhile, low-density rural areas could benefit from AI-powered mobile health units and community health worker decision support systems, reaching an additional 38 million people in underserved regions.</p>
-        <div class="insight-metrics">
-          <div class="insight-metric">
-            <span class="insight-metric-label">Urban AI Potential</span>
-            <span class="insight-metric-value">45M</span>
-          </div>
-          <div class="insight-metric">
-            <span class="insight-metric-label">Rural AI Potential</span>
-            <span class="insight-metric-value">38M</span>
-          </div>
-          <div class="insight-metric">
-            <span class="insight-metric-label">Total Reach</span>
-            <span class="insight-metric-value">83M</span>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -732,18 +693,18 @@
       }).addTo(map);
 
       // Nigeria states data with coordinates (for mapping)
-      // Population data will be fetched from WorldPop API
+      // Population data will be fetched from WorldPop API, but we have fallback estimates
       const nigeriaStates = {
-        'Lagos': { lat: 6.5244, lng: 3.3792, healthcare: 87 },
-        'Kano': { lat: 12.0022, lng: 8.5919, healthcare: 72 },
-        'Abuja': { lat: 9.0765, lng: 7.3986, healthcare: 85 },
-        'Rivers': { lat: 4.8396, lng: 7.0025, healthcare: 68 },
-        'Kaduna': { lat: 10.5264, lng: 7.4388, healthcare: 61 },
-        'Oyo': { lat: 7.3775, lng: 3.9470, healthcare: 65 },
-        'Kebbi': { lat: 12.4500, lng: 4.1994, healthcare: 45 },
-        'Sokoto': { lat: 13.0058, lng: 5.2476, healthcare: 48 },
-        'Borno': { lat: 11.8333, lng: 13.1500, healthcare: 52 },
-        'Bauchi': { lat: 10.3103, lng: 9.8439, healthcare: 55 }
+        'Lagos': { lat: 6.5244, lng: 3.3792, healthcare: 87, density: 6871, pop: 15000000 },
+        'Kano': { lat: 12.0022, lng: 8.5919, healthcare: 72, density: 1205, pop: 4500000 },
+        'Abuja': { lat: 9.0765, lng: 7.3986, healthcare: 85, density: 1456, pop: 3200000 },
+        'Rivers': { lat: 4.8396, lng: 7.0025, healthcare: 68, density: 892, pop: 7200000 },
+        'Kaduna': { lat: 10.5264, lng: 7.4388, healthcare: 61, density: 456, pop: 8200000 },
+        'Oyo': { lat: 7.3775, lng: 3.9470, healthcare: 65, density: 523, pop: 7800000 },
+        'Kebbi': { lat: 12.4500, lng: 4.1994, healthcare: 45, density: 78, pop: 4500000 },
+        'Sokoto': { lat: 13.0058, lng: 5.2476, healthcare: 48, density: 95, pop: 5200000 },
+        'Borno': { lat: 11.8333, lng: 13.1500, healthcare: 52, density: 112, pop: 5800000 },
+        'Bauchi': { lat: 10.3103, lng: 9.8439, healthcare: 55, density: 134, pop: 6500000 }
       };
 
       
@@ -1163,27 +1124,31 @@
         densityLayer.clearLayers();
         
         Object.entries(nigeriaStates).forEach(([state, data]) => {
-          if (!data.density || !data.pop) return;
+          // Use fallback values if data not loaded
+          const density = data.density || 200;
+          const pop = data.pop || 5000000;
+          
+          if (!density) return;
           
           let color, radius, popupContent;
 
           if (currentMapMode === 'density') {
-            radius = Math.sqrt(data.density) * 2;
-            color = data.density > 1000 ? '#d32f2f' : 
-                   data.density > 500 ? '#f57c00' : 
-                   data.density > 200 ? '#fbc02d' : 
-                   data.density > 100 ? '#689f38' : '#388e3c';
+            radius = Math.sqrt(density) * 2;
+            color = density > 1000 ? '#d32f2f' : 
+                   density > 500 ? '#f57c00' : 
+                   density > 200 ? '#fbc02d' : 
+                   density > 100 ? '#689f38' : '#388e3c';
                    
             popupContent = `
               <strong>${state}</strong><br>
-              Population: ${(data.pop / 1000000).toFixed(1)}M<br>
-              Density: ${data.density.toLocaleString()}/km²<br>
+              Population: ${(pop / 1000000).toFixed(1)}M<br>
+              Density: ${density.toLocaleString()}/km²<br>
               Healthcare Access: ${data.healthcare}%
             `;
           } else {
             // RISK MODE: Calculate Vulnerability Index
             // Formula: (Normalized Density * 0.4) + ((100 - Healthcare) * 0.6)
-            const normDensity = Math.min(data.density / 2000, 1); // Cap at 2000 for normalization
+            const normDensity = Math.min(density / 2000, 1); // Cap at 2000 for normalization
             const invHealthcare = (100 - data.healthcare) / 100;
             const riskScore = (normDensity * 0.4) + (invHealthcare * 0.6);
             
@@ -1198,7 +1163,7 @@
               <strong>${state}</strong><br>
               <span style="color:${color}">● Vulnerability Score: ${riskScore.toFixed(2)}</span><br>
               Healthcare Gap: ${100 - data.healthcare}%<br>
-              Pop. Pressure: ${data.density > 1000 ? 'High' : 'Moderate'}
+              Pop. Pressure: ${density > 1000 ? 'High' : 'Moderate'}
             `;
           }
           
@@ -1261,14 +1226,12 @@
 
       // Update statistics
       function updateStatistics() {
-        let totalPop, avgDensity, avgHealthcare, urbanPercent;
+        let totalPop, avgDensity, avgHealthcare;
         
         if (currentRegion === 'nigeria') {
             totalPop = worldPopData.totalPop || Object.values(nigeriaStates).reduce((sum, s) => sum + (s.pop || 0), 0);
             avgDensity = Object.values(nigeriaStates).filter(s => s.density).reduce((sum, s) => sum + s.density, 0) / Object.values(nigeriaStates).filter(s => s.density).length;
             avgHealthcare = Object.values(nigeriaStates).reduce((sum, s) => sum + s.healthcare, 0) / Object.keys(nigeriaStates).length;
-            const urbanPop = Object.values(nigeriaStates).filter(s => s.density && s.density > 500).reduce((sum, s) => sum + (s.pop || 0), 0);
-            urbanPercent = totalPop > 0 ? (urbanPop / totalPop * 100).toFixed(1) : '0';
         } else {
             // Use region config values for other regions if WorldPop data isn't granular
             const config = REGIONS[currentRegion];
@@ -1277,14 +1240,12 @@
             
             // Estimates for Africa region (WHO AFR region averages)
             if (currentRegion === 'africa') {
-                avgHealthcare = 48; 
-                urbanPercent = '43.8';
+                avgHealthcare = 48;
             }
         }
 
         document.getElementById('total-population').textContent = (totalPop / 1000000).toFixed(1) + 'M';
         document.getElementById('density-value').textContent = Math.round(avgDensity || 0).toLocaleString();
-        document.getElementById('urban-pop').textContent = urbanPercent + '%';
         document.getElementById('healthcare-access').textContent = Math.round(avgHealthcare) + '%';
         
         updateLegend(); 
@@ -1464,6 +1425,9 @@
         const year = document.getElementById('year-select').value;
         await fetchWorldPopData(year);
       }
+      
+      // Initialize map with default markers (before data loads)
+      updateMapLayer();
       
       // Initialize: Fetch data for default year (2023)
       fetchWorldPopData('2023');

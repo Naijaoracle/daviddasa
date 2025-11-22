@@ -50,6 +50,21 @@
       height: 500px;
       min-height: 500px;
     }
+
+    @media (max-width: 900px) {
+      .viz-layout {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+      #mynetwork {
+        height: 450px;
+        order: -1;
+      }
+      .controls {
+        max-height: 400px;
+        overflow-y: auto;
+      }
+    }
     
     .controls {
       padding: 1.5rem;
