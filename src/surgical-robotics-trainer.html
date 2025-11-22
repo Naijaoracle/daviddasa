@@ -438,11 +438,13 @@
       hemoTool.x = width - 100;
       hemoTool.y = height - 100;
       
-      // Init Checkpoints (25%, 50%, 75%)
+      // Init Checkpoints (5 points: ~16%, 33%, 50%, 66%, 83%)
       checkpoints = [
-        Math.floor(path.length * 0.25),
+        Math.floor(path.length * 0.16),
+        Math.floor(path.length * 0.33),
         Math.floor(path.length * 0.50),
-        Math.floor(path.length * 0.75)
+        Math.floor(path.length * 0.66),
+        Math.floor(path.length * 0.83)
       ];
       nextCheckpointIndex = 0;
       
@@ -461,8 +463,22 @@
       isGameActive = true;
       particles = [];
       sparks = [];
+      nextCheckpointIndex = 0; // Reset checkpoints progress
       document.getElementById('result-modal').style.display = 'none';
       document.getElementById('progress-bar').style.width = '0%';
+      document.getElementById('progress-bar').style.background = '#2ecc71';
+      
+      // Reset Robot Position to Start
+      if (path.length > 0) {
+          robot.x = path[0].x;
+          robot.y = path[0].y;
+          robot.targetX = path[0].x;
+          robot.targetY = path[0].y;
+      }
+      
+      // Reset Hemo Tool
+      hemoTool.x = width - 100;
+      hemoTool.y = height - 100;
       
       if (mode === 'ai') aiProgress = 0;
     }
@@ -693,17 +709,14 @@
       // Display Progress based on checkpoints to avoid jumping 0 -> 100
       // 4 segments: 0-25, 25-50, 50-75, 75-100
       // Base progress on passed checkpoints + proximity to next
-      let basePct = nextCheckpointIndex * 25;
-      // Add some fine-grained progress if between checkpoints? 
-      // Simplified: Use the checkpoint progress for the bar to show "valid" progress
-      // Or stick to the raw calculation but validate at the end.
-      // Let's stick to raw calculation for the bar but color it orange if checkpoints missed?
+      let basePct = nextCheckpointIndex * 20; // 5 checkpoints = 20% chunks
+      
       const rawPct = Math.min(100, Math.round((closestIndex / (path.length - 1)) * 100));
       document.getElementById('progress-bar').style.width = rawPct + '%';
       
       // Color bar based on validity
-      const expectedCheckpoint = Math.floor(rawPct / 25); 
-      if (nextCheckpointIndex < expectedCheckpoint && rawPct > 25) {
+      // If raw progress is significantly ahead of checkpoint progress (e.g. > 20%)
+      if (rawPct > (nextCheckpointIndex + 1) * 20 + 5) {
           document.getElementById('progress-bar').style.background = '#f39c12'; // Warning color
       } else {
           document.getElementById('progress-bar').style.background = '#2ecc71';
@@ -774,7 +787,8 @@
         
         // Haemostasis Logic (WASD Tool)
         const distHemo = Math.hypot(hemoTool.x - critX, hemoTool.y - critY);
-        if (crit.bleeding && distHemo < crit.radius + 10 && keys.space) {
+        // Stricter cauterization radius (must be inside vessel)
+        if (crit.bleeding && distHemo < crit.radius && keys.space) {
           crit.bleeding = false; // Cauterized
           crit.isCauterized = true;
           crit.bleedIntensity = 0;
@@ -990,15 +1004,7 @@
       ctx.lineWidth = 2;
       ctx.stroke();
       
-      // Draw Checkpoints (Debug/Visual Guide)
-      // Optionally show checkpoints to user so they know where they must pass
-      checkpoints.forEach((idx, i) => {
-         if(i >= nextCheckpointIndex) { // Only show unreached
-             const p = path[idx];
-             ctx.fillStyle = 'rgba(241, 196, 15, 0.5)';
-             ctx.beginPath(); ctx.arc(p.x, p.y, 8, 0, Math.PI*2); ctx.fill();
-         }
-      });
+      // Checkpoints hidden to prevent gaming
       
       // Draw Start/End markers
       if(path.length > 0) {

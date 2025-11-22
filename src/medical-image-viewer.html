@@ -3,30 +3,134 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Interactive Medical Image Viewer with AI Overlay Simulation">
+  <meta name="description" content="Interactive Medical Image Viewer with AI overlay simulation and reading copilot">
   <title>Medical Image Intelligence Viewer - David Dasa</title>
   <link rel="icon" type="image/svg+xml" href="/src/favicon-DD-monogram.svg">
   <link rel="stylesheet" href="styles.css">
+
+  <!-- Fabric.js for canvas based viewer -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+
   <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: light;
+    }
+
+    body {
+      margin: 0;
+      background: #f4f6f8;
+      color: #1f2933;
+    }
+
+    nav {
+      background: white;
+      border-bottom: 1px solid rgba(15,23,42,0.06);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    nav ul {
+      margin: 0;
+      padding: 0.75rem 1.75rem;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #111827;
+      font-size: 0.9rem;
+    }
+
+    nav a:hover {
+      color: #16a34a;
+    }
+
+    .logo img {
+      border-radius: 999px;
+    }
+
+    .container {
+      max-width: 1440px;
+      margin: 1.75rem auto 2.5rem;
+      padding: 0 1.5rem;
+    }
+
+    .article-header h1 {
+      margin: 0 0 0.6rem 0;
+      font-size: 1.8rem;
+      letter-spacing: 0.02em;
+    }
+
+    .article-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .article-type {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #064e3b;
+      background: rgba(16,185,129,0.1);
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(16,185,129,0.25);
+    }
+
+    .article-tags {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.04);
+      color: #4b5563;
+    }
+
+    .article-header p {
+      max-width: 680px;
+      font-size: 0.95rem;
+      color: #4b5563;
+    }
+
+    /* Viewer layout */
+
     .viewer-layout {
       display: grid;
-      grid-template-columns: 300px 1fr;
-      gap: 2rem;
-      margin-top: 2rem;
-      height: calc(100vh - 200px);
-      min-height: 600px;
+      grid-template-columns: 320px minmax(0, 1.7fr) minmax(320px, 0.9fr);
+      gap: 1.5rem;
+      margin-top: 1.75rem;
+      height: calc(100vh - 210px);
+      min-height: 640px;
+    }
+
+    .tools-panel,
+    .copilot-panel {
+      background: rgba(255,255,255,0.94);
+      border: 1px solid rgba(15,23,42,0.06);
+      border-radius: 1rem;
+      padding: 1.25rem 1.5rem;
+      box-shadow: 0 14px 30px rgba(15,23,42,0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      overflow: hidden;
     }
 
     .tools-panel {
-      background: rgba(255,255,255,0.82);
-      border: 1px solid rgba(0,0,0,0.06);
-      border-radius: 1rem;
-      padding: 1.5rem;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.04);
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
       overflow-y: auto;
     }
 
@@ -35,32 +139,137 @@
       border-radius: 1rem;
       overflow: hidden;
       position: relative;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      box-shadow: 0 18px 40px rgba(15,23,42,0.45);
+      display: flex;
+      align-items: stretch;
+      justify-content: stretch;
+    }
+
+    .viewport-inner-frame {
+      position: relative;
+      flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
+    .viewport-top-bar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1rem;
+      background: linear-gradient(to bottom, rgba(15,23,42,0.85), transparent);
+      color: rgba(255,255,255,0.8);
+      font-size: 0.78rem;
+      pointer-events: none;
+      z-index: 15;
+    }
+
+    .viewport-top-bar span + span {
+      margin-left: 1rem;
+    }
+
+    .viewport-bottom-bar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1rem;
+      background: linear-gradient(to top, rgba(15,23,42,0.9), transparent);
+      color: rgba(255,255,255,0.85);
+      font-size: 0.78rem;
+      z-index: 15;
+    }
+
+    .viewport-bottom-bar span + span {
+      margin-left: 1.5rem;
+    }
+
+    .viewport-markers {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 14;
+    }
+
+    .viewport-marker {
+      position: absolute;
+      font-family: "Courier New", monospace;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.8);
+      text-shadow: 0 0 6px rgba(0,0,0,0.9);
+    }
+
+    .viewport-marker.left {
+      left: 1.2rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .viewport-marker.right {
+      right: 1.2rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    canvas {
+      display: block;
+      outline: none;
+    }
+
     .dicom-overlay {
       position: absolute;
-      top: 1rem;
+      top: 50px;
       left: 1rem;
-      color: rgba(255,255,255,0.7);
-      font-family: 'Courier New', monospace;
-      font-size: 0.8rem;
+      color: rgba(255,255,255,0.8);
+      font-family: "Courier New", monospace;
+      font-size: 0.78rem;
       pointer-events: none;
       z-index: 10;
-      text-shadow: 1px 1px 2px black;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+      line-height: 1.3;
+    }
+
+    .dicom-overlay-right {
+      position: absolute;
+      top: 50px;
+      right: 1rem;
+      color: rgba(255,255,255,0.8);
+      font-family: "Courier New", monospace;
+      font-size: 0.78rem;
+      pointer-events: none;
+      z-index: 10;
+      text-align: right;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+      line-height: 1.3;
     }
 
     .tool-group h3 {
       font-size: 0.9rem;
-      color: #092917;
-      margin: 0 0 0.8rem 0;
+      color: #082f49;
+      margin: 0 0 0.6rem 0;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border-bottom: 1px solid rgba(0,0,0,0.1);
-      padding-bottom: 0.5rem;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid rgba(15,23,42,0.08);
+      padding-bottom: 0.45rem;
+    }
+
+    .tool-group {
+      font-size: 0.86rem;
+    }
+
+    .tool-group + .tool-group {
+      margin-top: 0.25rem;
     }
 
     .control-row {
@@ -68,130 +277,320 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 0.8rem;
+      gap: 0.5rem;
     }
 
     .control-row label {
-      font-size: 0.85rem;
-      color: #4a4a4a;
+      font-size: 0.83rem;
+      color: #4b5563;
+      white-space: nowrap;
+    }
+
+    .control-row .range-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .control-row span.value-pill {
+      font-size: 0.75rem;
+      background: rgba(148,163,184,0.15);
+      color: #1f2937;
+      padding: 0.05rem 0.55rem;
+      border-radius: 999px;
+      min-width: 38px;
+      text-align: center;
     }
 
     input[type="range"] {
-      width: 60%;
-      accent-color: #2ecc71;
+      width: 100%;
+      accent-color: #10b981;
     }
 
     .btn-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0.5rem;
+      gap: 0.55rem;
+      margin-top: 0.25rem;
     }
 
     .tool-btn {
       background: white;
-      border: 1px solid #ddd;
-      padding: 0.5rem;
-      border-radius: 6px;
-      font-size: 0.85rem;
+      border: 1px solid rgba(148,163,184,0.6);
+      padding: 0.4rem 0.35rem;
+      border-radius: 0.55rem;
+      font-size: 0.83rem;
       cursor: pointer;
-      transition: all 0.2s;
-      color: #4a4a4a;
-      display: flex;
+      transition: all 0.18s ease;
+      color: #111827;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.4rem;
+      gap: 0.35rem;
+      white-space: nowrap;
     }
 
     .tool-btn:hover {
-      background: #f8f9fa;
-      border-color: #2ecc71;
-      color: #2ecc71;
+      background: #f9fafb;
+      border-color: #10b981;
+      color: #047857;
     }
 
     .tool-btn.active {
-      background: #2ecc71;
-      border-color: #2ecc71;
+      background: #10b981;
+      border-color: #10b981;
       color: white;
+      box-shadow: 0 0 0 1px rgba(16,185,129,0.3);
     }
 
     .ai-toggle {
-      background: rgba(46, 204, 113, 0.1);
-      border: 1px solid #2ecc71;
-      color: #092917;
+      background: rgba(16,185,129,0.08);
+      border-color: rgba(16,185,129,0.6);
+      color: #064e3b;
     }
 
     .ai-toggle.active {
-      background: #2ecc71;
+      background: #059669;
       color: white;
     }
 
-    .file-upload {
-      position: relative;
-      overflow: hidden;
-      margin-bottom: 1rem;
+    .zoom-panel {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.4rem;
+      font-size: 0.8rem;
     }
 
-    .file-upload input[type="file"] {
-      position: absolute;
-      font-size: 100px;
-      right: 0;
-      top: 0;
-      opacity: 0;
-      cursor: pointer;
+    .zoom-panel button {
+      padding-inline: 0.7rem;
     }
 
-    .upload-btn {
-      background: #092917;
-      color: white;
-      padding: 0.8rem;
-      border-radius: 8px;
-      text-align: center;
-      cursor: pointer;
-      font-weight: 500;
-      display: block;
-      transition: background 0.2s;
-    }
-
-    .upload-btn:hover {
-      background: #2ecc71;
+    .zoom-label {
+      font-size: 0.8rem;
+      color: #4b5563;
     }
 
     .findings-list {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       margin: 0;
       padding: 0;
       list-style: none;
     }
 
     .finding-item {
-      background: rgba(255,255,255,0.5);
-      border-left: 3px solid #e74c3c;
-      padding: 0.5rem;
-      margin-bottom: 0.5rem;
-      border-radius: 0 4px 4px 0;
+      background: rgba(249,250,251,0.9);
+      border-left: 3px solid #10b981;
+      padding: 0.45rem 0.5rem;
+      margin-bottom: 0.45rem;
+      border-radius: 0 6px 6px 0;
       display: flex;
       justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .finding-label {
+      font-weight: 500;
+      color: #111827;
+    }
+
+    .finding-meta {
+      font-size: 0.74rem;
+      color: #6b7280;
     }
 
     .confidence {
       font-weight: 600;
-      color: #e74c3c;
+      color: #059669;
     }
 
-    @media (max-width: 768px) {
+    .measurement-note {
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    /* Copilot panel */
+
+    .copilot-header h2 {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #082f49;
+    }
+
+    .copilot-header p {
+      margin: 0.25rem 0 0;
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    .copilot-mode-switch {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.4rem;
+      margin-top: 0.9rem;
+    }
+
+    .copilot-mode-btn {
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.7);
+      background: white;
+      padding: 0.35rem 0.35rem;
+      font-size: 0.78rem;
+      cursor: pointer;
+      color: #374151;
+      transition: all 0.16s ease;
+      white-space: nowrap;
+    }
+
+    .copilot-mode-btn span {
+      opacity: 0.75;
+    }
+
+    .copilot-mode-btn.active {
+      background: #0f766e;
+      border-color: #0f766e;
+      color: white;
+    }
+
+    .copilot-mode-btn.active span {
+      opacity: 1;
+    }
+
+    .copilot-body {
+      margin-top: 0.9rem;
+      padding: 0.85rem 0.75rem;
+      border-radius: 0.75rem;
+      background: radial-gradient(circle at top left, rgba(16,185,129,0.12), rgba(15,23,42,0.03));
+      border: 1px solid rgba(148,163,184,0.5);
+      font-size: 0.85rem;
+      line-height: 1.45;
+      color: #111827;
+      height: 220px;
+      overflow-y: auto;
+    }
+
+    .copilot-body h4 {
+      margin: 0 0 0.4rem 0;
+      font-size: 0.83rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #0f766e;
+    }
+
+    .copilot-body p {
+      margin: 0.3rem 0;
+    }
+
+    .copilot-body ul {
+      padding-left: 1.1rem;
+      margin: 0.3rem 0;
+    }
+
+    .copilot-body li {
+      margin-bottom: 0.2rem;
+    }
+
+    .copilot-events {
+      margin-top: 0.75rem;
+      padding-top: 0.6rem;
+      border-top: 1px solid rgba(148,163,184,0.45);
+      font-size: 0.78rem;
+      color: #4b5563;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .copilot-event {
+      padding: 0.28rem 0.35rem;
+      border-radius: 0.5rem;
+      background: rgba(249,250,251,0.9);
+      margin-bottom: 0.25rem;
+    }
+
+    .copilot-event strong {
+      color: #0f766e;
+      font-weight: 600;
+    }
+
+    .copilot-footer-note {
+      font-size: 0.72rem;
+      color: #9ca3af;
+      margin-top: 0.25rem;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #6b7280;
+      padding: 1.25rem 1.5rem 1.75rem;
+    }
+
+    footer p {
+      margin: 0.2rem 0;
+    }
+
+    @media (max-width: 1120px) {
       .viewer-layout {
-        grid-template-columns: 1fr;
+        grid-template-columns: 280px minmax(0, 1.4fr);
+        grid-template-rows: auto 260px;
+        grid-template-areas:
+          "tools viewer"
+          "copilot viewer";
         height: auto;
+        min-height: 0;
       }
+
+      .tools-panel {
+        grid-area: tools;
+        min-height: 0;
+      }
+
       .viewport-container {
-        height: 400px;
+        grid-area: viewer;
+        min-height: 520px;
+      }
+
+      .copilot-panel {
+        grid-area: copilot;
+        min-height: 0;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .viewer-layout {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto auto auto;
+        grid-template-areas:
+          "viewer"
+          "tools"
+          "copilot";
+      }
+
+      .viewport-container {
+        min-height: 420px;
+        height: 420px;
+      }
+
+      .tools-panel,
+      .copilot-panel {
+        box-shadow: 0 8px 20px rgba(15,23,42,0.06);
       }
     }
   </style>
 </head>
+
 <body>
   <nav>
     <ul>
-      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="logo">
+        <a href="https://www.daviddasa.com">
+          <img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="40" height="40">
+        </a>
+      </li>
       <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
       <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
     </ul>
@@ -201,59 +600,101 @@
     <div class="article-header">
       <h1>Medical Image Intelligence Viewer</h1>
       <div class="article-meta">
-        <span class="article-type">Interactive Tool</span>
+        <span class="article-type">Interactive prototype</span>
         <div class="article-tags">
-          <span class="tag">Computer Vision</span>
-          <span class="tag">X-ray Analysis</span>
-          <span class="tag">AI Simulation</span>
+          <span class="tag">Chest imaging</span>
+          <span class="tag">Computer vision</span>
+          <span class="tag">Reading copilot</span>
         </div>
       </div>
-      <p>A browser-based DICOM/Image viewer demonstrating AI-assisted diagnostic workflows. Upload an X-ray to simulate lesion detection, adjust image parameters, and perform measurements.</p>
+      <p>
+        This viewer loads a sample frontal chest radiograph, simulates common tools in diagnostic workstations,
+        and shows how an AI copilot could summarize the case, surface findings, and assemble a report.
+        All content is synthetic and for demonstration only.
+      </p>
     </div>
 
     <div class="viewer-layout">
       <!-- Tools Panel -->
       <aside class="tools-panel">
-        <!-- Image Source (Hidden for Demo) -->
-        <!-- <div class="tool-group">
-          <h3>Image Source</h3>
-          ...
-        </div> -->
+        <div class="tool-group">
+          <h3>Case</h3>
+          <p style="margin:0 0 0.4rem 0;font-size:0.84rem;color:#6b7280;">
+            Demo case: adult with mild cough. No prior images. Frontal chest projection.
+          </p>
+          <ul class="findings-list">
+            <li class="finding-item">
+              <div>
+                <div class="finding-label">Study: Chest PA</div>
+                <div class="finding-meta">Pixel matrix: 2048 × 2048</div>
+              </div>
+              <span class="confidence">AI ready</span>
+            </li>
+          </ul>
+        </div>
 
         <!-- Image Adjustments -->
         <div class="tool-group">
-          <h3>Adjustments</h3>
+          <h3>Window and level</h3>
           <div class="control-row">
-            <label>Brightness</label>
-            <input type="range" id="brightness" min="-1" max="1" step="0.1" value="0">
+            <label for="brightness">Level</label>
+            <div class="range-wrapper">
+              <input type="range" id="brightness" min="-1" max="1" step="0.1" value="0">
+              <span class="value-pill" id="brightness-value">0</span>
+            </div>
           </div>
           <div class="control-row">
-            <label>Contrast</label>
-            <input type="range" id="contrast" min="-1" max="1" step="0.1" value="0">
+            <label for="contrast">Window</label>
+            <div class="range-wrapper">
+              <input type="range" id="contrast" min="-1" max="1" step="0.1" value="0">
+              <span class="value-pill" id="contrast-value">0</span>
+            </div>
           </div>
-          <div class="btn-grid">
-            <button class="tool-btn" onclick="resetImage()">↺ Reset</button>
-            <button class="tool-btn" onclick="invertImage()">◑ Invert</button>
+
+          <div class="zoom-panel">
+            <span class="zoom-label">Zoom</span>
+            <button class="tool-btn" id="zoom-out-btn" type="button">−</button>
+            <button class="tool-btn" id="zoom-reset-btn" type="button">Fit</button>
+            <button class="tool-btn" id="zoom-in-btn" type="button">+</button>
+            <span class="zoom-label" id="zoom-label-text">100%</span>
+          </div>
+
+          <div class="btn-grid" style="margin-top:0.7rem;">
+            <button class="tool-btn" type="button" onclick="resetImage()">Reset view</button>
+            <button class="tool-btn" type="button" onclick="invertImage()">Invert</button>
           </div>
         </div>
 
-        <!-- AI Analysis -->
+        <!-- AI tools -->
         <div class="tool-group">
-          <h3>AI Assistance</h3>
+          <h3>AI analysis</h3>
           <div class="btn-grid">
-            <button class="tool-btn ai-toggle" id="btn-detect" onclick="toggleAIDetection()">🎯 Detect Lesions</button>
-            <button class="tool-btn ai-toggle" id="btn-heatmap" onclick="toggleHeatmap()">🔥 Heatmap</button>
+            <button class="tool-btn ai-toggle" id="btn-detect" type="button" onclick="toggleAIDetection()">Confidence map</button>
+            <button class="tool-btn ai-toggle" id="btn-heatmap" type="button" onclick="toggleHeatmap()">Attention overlay</button>
           </div>
-          <div id="findings-panel" style="display:none; margin-top: 1rem;">
-            <h4 style="font-size: 0.8rem; margin-bottom: 0.5rem;">Detected Findings:</h4>
+          <div id="findings-panel" style="display:none; margin-top: 0.8rem;">
+            <h4 style="font-size:0.8rem;margin:0 0 0.4rem 0;color:#374151;">AI summary for this frame</h4>
             <ul class="findings-list">
               <li class="finding-item">
-                <span>Nodule (R. Upper Lobe)</span>
-                <span class="confidence">94%</span>
+                <div>
+                  <div class="finding-label">No acute consolidation</div>
+                  <div class="finding-meta">Lungs are clear and well aerated</div>
+                </div>
+                <span class="confidence">> 99%</span>
               </li>
-              <li class="finding-item" style="border-color: #f39c12;">
-                <span>Infiltration</span>
-                <span class="confidence" style="color: #f39c12;">82%</span>
+              <li class="finding-item">
+                <div>
+                  <div class="finding-label">Normal cardiomediastinal size</div>
+                  <div class="finding-meta">Heart size within expected range</div>
+                </div>
+                <span class="confidence">> 98%</span>
+              </li>
+              <li class="finding-item">
+                <div>
+                  <div class="finding-label">No visible pleural effusion</div>
+                  <div class="finding-meta">Costophrenic angles are sharp</div>
+                </div>
+                <span class="confidence">> 97%</span>
               </li>
             </ul>
           </div>
@@ -261,312 +702,665 @@
 
         <!-- Measurements -->
         <div class="tool-group">
-          <h3>Tools</h3>
+          <h3>Annotations</h3>
           <div class="btn-grid">
-            <button class="tool-btn" onclick="startDrawing('rect')">⬜ Box</button>
-            <button class="tool-btn" onclick="startDrawing('circle')">⭕ Circle</button>
-            <button class="tool-btn" onclick="enablePan()">✋ Pan</button>
-            <button class="tool-btn" onclick="clearAnnotations()">❌ Clear</button>
+            <button class="tool-btn" type="button" id="btn-rect" onclick="startDrawing('rect')">Box</button>
+            <button class="tool-btn" type="button" id="btn-circle" onclick="startDrawing('circle')">Circle</button>
+            <button class="tool-btn" type="button" id="btn-line" onclick="startDrawing('line')">Distance</button>
+            <button class="tool-btn" type="button" id="btn-pan" onclick="togglePan()">Pan</button>
           </div>
+          <p class="measurement-note">
+            Use the Distance tool to sketch a rough cardiothoracic ratio or rib spacing.
+            Double click an object to remove it.
+          </p>
+          <button class="tool-btn" type="button" style="margin-top:0.25rem;" onclick="clearAnnotations()">Clear annotations</button>
         </div>
       </aside>
 
       <!-- Viewer Canvas -->
-      <div class="viewport-container" id="canvas-container">
-        <div class="dicom-overlay">
-          <div>ID: ANONYMIZED</div>
-          <div>SEX: M | AGE: 45Y</div>
-          <div>MODALITY: CR</div>
-          <div>STUDY: CHEST PA</div>
-          <div>DATE: 2025-11-22</div>
+      <section class="viewport-container" id="canvas-container">
+        <div class="viewport-inner-frame">
+          <div class="viewport-top-bar">
+            <div>
+              <span>CHEST PA</span>
+              <span>Study 1 / Series 1 / Image 1</span>
+            </div>
+            <div>
+              <span>WW/WL: <span id="ww-wl-label">Standard lung</span></span>
+            </div>
+          </div>
+
+          <div class="viewport-markers">
+            <div class="viewport-marker left">L</div>
+            <div class="viewport-marker right">R</div>
+          </div>
+
+          <div class="dicom-overlay">
+            <div>ID: DEMO_001</div>
+            <div>Patient: SAMPLE, A</div>
+            <div>Sex: M    Age: 32 years</div>
+            <div>Projection: PA</div>
+            <div>kVp: 120    mAs: 2.5</div>
+          </div>
+
+          <div class="dicom-overlay-right">
+            <div>Institution: Demo Health</div>
+            <div>Accession: 2025CXR0001</div>
+            <div>Study date: 2025 11 22</div>
+            <div>Referring: Synthetic, R</div>
+          </div>
+
+          <canvas id="c"></canvas>
+
+          <div class="viewport-bottom-bar">
+            <div>
+              <span id="status-coords">x: -, y: -</span>
+              <span id="status-zoom">Zoom: 100%</span>
+            </div>
+            <div>
+              <span id="status-tool">Tool: Pan</span>
+            </div>
+          </div>
         </div>
-        <canvas id="c"></canvas>
-      </div>
+      </section>
+
+      <!-- Copilot Panel -->
+      <aside class="copilot-panel">
+        <div class="copilot-header">
+          <h2>Reading copilot</h2>
+          <p>
+            Hard coded output that illustrates how a reporting assistant could respond to this image.
+            Nothing here is clinical advice.
+          </p>
+        </div>
+
+        <div class="copilot-mode-switch">
+          <button type="button" class="copilot-mode-btn active" data-mode="overview"><span>Overview</span></button>
+          <button type="button" class="copilot-mode-btn" data-mode="findings"><span>Findings</span></button>
+          <button type="button" class="copilot-mode-btn" data-mode="report"><span>Report draft</span></button>
+          <button type="button" class="copilot-mode-btn" data-mode="qa"><span>Quality</span></button>
+        </div>
+
+        <div class="copilot-body" id="copilot-body"></div>
+
+        <div class="copilot-events" id="copilot-events"></div>
+
+        <div class="copilot-footer-note">
+          Copilot messages are scripted for this static case and do not change any real patient data.
+        </div>
+      </aside>
     </div>
   </div>
+
+  <footer>
+    <p><strong>Disclaimer:</strong> This tool is a technical demonstration. It does not provide medical diagnosis, treatment, or clinical decision support and must not be used for patient care.</p>
+    <p>&copy; 2025 David Dasa</p>
+  </footer>
 
   <script>
     let canvas;
     let currentImage;
-    let isDrawing = false;
     let aiLayerGroup = null;
     let heatmapLayer = null;
+    let panMode = true;
+    let isPanning = false;
+    let lastPosX = 0;
+    let lastPosY = 0;
 
-    // Initialize Fabric Canvas
-    function initCanvas() {
-      const container = document.getElementById('canvas-container');
-      canvas = new fabric.Canvas('c', {
-        width: container.clientWidth,
-        height: container.clientHeight,
-        backgroundColor: '#000',
-        selection: false
+    let activeShapeMode = null;
+    let activeLine = null;
+
+    const zoomLabel = document.getElementById("zoom-label-text");
+    const statusZoom = document.getElementById("status-zoom");
+    const statusCoords = document.getElementById("status-coords");
+    const statusTool = document.getElementById("status-tool");
+
+    const brightnessSlider = document.getElementById("brightness");
+    const contrastSlider = document.getElementById("contrast");
+    const brightnessValue = document.getElementById("brightness-value");
+    const contrastValue = document.getElementById("contrast-value");
+    const wwWlLabel = document.getElementById("ww-wl-label");
+
+    function setZoomLabel() {
+      const zoom = canvas ? canvas.getZoom() : 1;
+      const percent = Math.round(zoom * 100);
+      zoomLabel.textContent = percent + "%";
+      statusZoom.textContent = "Zoom: " + percent + "%";
+    }
+
+    // Copilot content
+
+    const copilotBody = document.getElementById("copilot-body");
+    const copilotEvents = document.getElementById("copilot-events");
+
+    const copilotText = {
+      overview: `
+        <h4>Case overview</h4>
+        <p>
+          Frontal chest radiograph of a young adult. Lungs are clear, with symmetric volume and vascularity.
+          Heart and mediastinum are normal for size and contour. No obvious pleural effusion or pneumothorax.
+        </p>
+        <p>
+          Bony thorax appears intact and symmetric. Diaphragms are smooth with sharp costophrenic angles.
+          No foreign body or support device is present.
+        </p>
+      `,
+      findings: `
+        <h4>Structured findings</h4>
+        <ul>
+          <li><strong>Lungs:</strong> No focal consolidation, mass, or reticular pattern detected by the model.</li>
+          <li><strong>Pleura:</strong> No sizable effusion. Apices are clear. No visible pneumothorax.</li>
+          <li><strong>Heart and mediastinum:</strong> Normal cardiac silhouette, no widening of the mediastinum.</li>
+          <li><strong>Diaphragm and abdomen:</strong> Diaphragmatic contours are smooth. Visualized upper abdomen is unremarkable.</li>
+          <li><strong>Bones and soft tissue:</strong> Ribs, clavicles, and visible spine have no modeled fractures.</li>
+        </ul>
+        <p>
+          Overall AI impression: appearance most consistent with a normal chest radiograph in this setting.
+        </p>
+      `,
+      report: `
+        <h4>Report style draft</h4>
+        <p><strong>Indication:</strong> Cough and mild chest discomfort. Evaluate for pneumonia.</p>
+        <p><strong>Comparison:</strong> None available.</p>
+        <p><strong>Technique:</strong> Single frontal chest radiograph, posteroanterior projection.</p>
+        <p><strong>Findings:</strong> Lungs are clear without focal consolidation, pulmonary edema, or visible mass.
+        Cardiothoracic ratio is within normal limits. Mediastinal contours are unremarkable. No pleural effusion or pneumothorax.
+        Bony thorax is intact. Upper abdomen is within normal limits in the field of view.</p>
+        <p><strong>Impression:</strong> No acute cardiopulmonary process identified by this simulated model.</p>
+      `,
+      qa: `
+        <h4>Image quality checklist</h4>
+        <ul>
+          <li><strong>Patient rotation:</strong> Clavicles and spinous processes are symmetric. Rotation: minimal.</li>
+          <li><strong>Inspiration:</strong> Approximately nine visible posterior ribs above the right hemidiaphragm. Inspiratory effort: adequate.</li>
+          <li><strong>Exposure:</strong> Vertebral bodies faintly visible behind the heart. Exposure: within preferred range.</li>
+          <li><strong>Field of view:</strong> Apices and costophrenic angles are fully included.</li>
+        </ul>
+        <p>
+          Quality flag: acceptable for diagnostic review for lungs, pleura, heart size, and mediastinum.
+        </p>
+      `
+    };
+
+    function setCopilotMode(mode) {
+      const html = copilotText[mode] || "";
+      copilotBody.innerHTML = html;
+
+      document.querySelectorAll(".copilot-mode-btn").forEach(btn => {
+        const isActive = btn.getAttribute("data-mode") === mode;
+        btn.classList.toggle("active", isActive);
       });
 
-      // Handle resize
-      window.addEventListener('resize', () => {
-        canvas.setWidth(container.clientWidth);
-        canvas.setHeight(container.clientHeight);
-        if(currentImage) centerImage();
+      copilotEvent("Mode changed to " + mode);
+    }
+
+    function copilotEvent(text) {
+      const time = new Date();
+      const timeLabel = time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+      const div = document.createElement("div");
+      div.className = "copilot-event";
+      div.innerHTML = "<strong>" + timeLabel + "</strong> " + text;
+
+      copilotEvents.prepend(div);
+    }
+
+    document.querySelectorAll(".copilot-mode-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const mode = btn.getAttribute("data-mode");
+        setCopilotMode(mode);
+      });
+    });
+
+    setCopilotMode("overview");
+
+    // Canvas setup
+
+    function initCanvas() {
+      const container = document.getElementById("canvas-container");
+      const canvasEl = document.getElementById("c");
+
+      canvas = new fabric.Canvas(canvasEl, {
+        width: container.clientWidth,
+        height: container.clientHeight,
+        backgroundColor: "#000",
+        selection: true,
+        fireRightClick: true,
+        stopContextMenu: true
+      });
+
+      canvas.on("mouse:move", function (opt) {
+        const pointer = canvas.getPointer(opt.e);
+        statusCoords.textContent = "x: " + Math.round(pointer.x) + ", y: " + Math.round(pointer.y);
+      });
+
+      canvas.on("mouse:wheel", function (opt) {
+        let delta = opt.e.deltaY;
+        let zoom = canvas.getZoom();
+        zoom *= Math.pow(0.999, delta);
+
+        if (zoom > 3) zoom = 3;
+        if (zoom < 0.4) zoom = 0.4;
+
+        const point = new fabric.Point(opt.e.offsetX, opt.e.offsetY);
+        canvas.zoomToPoint(point, zoom);
+
+        setZoomLabel();
+
+        opt.e.preventDefault();
+        opt.e.stopPropagation();
+      });
+
+      canvas.on("mouse:down", function (opt) {
+        const evt = opt.e;
+        if (panMode && !activeShapeMode) {
+          isPanning = true;
+          lastPosX = evt.clientX;
+          lastPosY = evt.clientY;
+          canvas.setCursor("grab");
+        } else if (activeShapeMode) {
+          handleShapeMouseDown(opt);
+        }
+      });
+
+      canvas.on("mouse:move", function (opt) {
+        if (isPanning) {
+          const e = opt.e;
+          const vpt = canvas.viewportTransform;
+          vpt[4] += e.clientX - lastPosX;
+          vpt[5] += e.clientY - lastPosY;
+          canvas.requestRenderAll();
+          lastPosX = e.clientX;
+          lastPosY = e.clientY;
+        } else if (activeShapeMode === "line" && activeLine) {
+          const pointer = canvas.getPointer(opt.e);
+          activeLine.set({ x2: pointer.x, y2: pointer.y });
+          canvas.requestRenderAll();
+        }
+      });
+
+      canvas.on("mouse:up", function () {
+        isPanning = false;
+        canvas.setCursor(panMode ? "grab" : "default");
+        activeLine = null;
+      });
+
+      canvas.on("mouse:dblclick", function (opt) {
+        if (opt.target && opt.target !== currentImage) {
+          canvas.remove(opt.target);
+          canvas.requestRenderAll();
+        }
+      });
+
+      window.addEventListener("resize", () => {
+        const rect = container.getBoundingClientRect();
+        canvas.setWidth(rect.width);
+        canvas.setHeight(rect.height);
+        centerImage();
+        canvas.requestRenderAll();
       });
     }
 
-    // Load Image
     function loadImage(url) {
-      fabric.Image.fromURL(url, function(img) {
-        if(currentImage) canvas.remove(currentImage);
-        
-        // Scale image to fit
-        const scale = Math.min(
-          canvas.width / img.width,
-          canvas.height / img.height
-        ) * 0.9;
-        
+      fabric.Image.fromURL(url, function (img) {
+        if (currentImage) {
+          canvas.remove(currentImage);
+        }
+
+        const container = document.getElementById("canvas-container");
+        const maxWidth = container.clientWidth * 0.95;
+        const maxHeight = container.clientHeight * 0.95;
+
+        const scale = Math.min(maxWidth / img.width, maxHeight / img.height);
+
         img.set({
           scaleX: scale,
           scaleY: scale,
-          originX: 'center',
-          originY: 'center',
+          originX: "center",
+          originY: "center",
           left: canvas.width / 2,
-          top: canvas.height / 2
+          top: canvas.height / 2,
+          selectable: false,
+          evented: false
         });
 
         currentImage = img;
-        canvas.add(img);
-        canvas.sendToBack(img);
-        
-        // Reset filters
-        document.getElementById('brightness').value = 0;
-        document.getElementById('contrast').value = 0;
-        
-        canvas.renderAll();
-      }, { crossOrigin: 'anonymous' });
+        canvas.add(currentImage);
+        canvas.sendToBack(currentImage);
+
+        brightnessSlider.value = 0;
+        contrastSlider.value = 0;
+        brightnessValue.textContent = "0";
+        contrastValue.textContent = "0";
+        wwWlLabel.textContent = "Standard lung";
+        canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+        setZoomLabel();
+
+        canvas.requestRenderAll();
+        copilotEvent("Loaded demo chest radiograph.");
+      }, { crossOrigin: "anonymous" });
     }
 
     function loadDemoImage() {
-      // Using the local demonstrator image
-      loadImage('img/CXR00020948_000.png');
+      // Image path in this environment
+      loadImage("img/CXR00020948_000.png");
     }
 
-    // Image Adjustments
+    // Window and level
+
     function applyFilters() {
-      if(!currentImage) return;
-      
-      const brightness = parseFloat(document.getElementById('brightness').value);
-      const contrast = parseFloat(document.getElementById('contrast').value);
-      
+      if (!currentImage) return;
+
+      const brightness = parseFloat(brightnessSlider.value);
+      const contrast = parseFloat(contrastSlider.value);
+
+      brightnessValue.textContent = brightness.toFixed(1);
+      contrastValue.textContent = contrast.toFixed(1);
+
+      const preset = (brightness === 0 && contrast === 0)
+        ? "Standard lung"
+        : "Custom";
+
+      wwWlLabel.textContent = preset;
+
       currentImage.filters = [
         new fabric.Image.filters.Brightness({ brightness: brightness }),
         new fabric.Image.filters.Contrast({ contrast: contrast })
       ];
-      
+
       currentImage.applyFilters();
-      canvas.renderAll();
+      canvas.requestRenderAll();
     }
 
-    document.getElementById('brightness').addEventListener('input', applyFilters);
-    document.getElementById('contrast').addEventListener('input', applyFilters);
+    brightnessSlider.addEventListener("input", applyFilters);
+    contrastSlider.addEventListener("input", applyFilters);
 
     function invertImage() {
-      if(!currentImage) return;
-      currentImage.filters.push(new fabric.Image.filters.Invert());
+      if (!currentImage) return;
+
+      const hasInvert = currentImage.filters.some(f => f.type === "Invert");
+      if (hasInvert) {
+        currentImage.filters = currentImage.filters.filter(f => f.type !== "Invert");
+      } else {
+        currentImage.filters.push(new fabric.Image.filters.Invert());
+      }
+
       currentImage.applyFilters();
-      canvas.renderAll();
+      canvas.requestRenderAll();
+      copilotEvent("Inversion toggled for current frame.");
     }
 
     function resetImage() {
-      if(!currentImage) return;
+      if (!currentImage) return;
+
       currentImage.filters = [];
       currentImage.applyFilters();
-      document.getElementById('brightness').value = 0;
-      document.getElementById('contrast').value = 0;
-      
-      // Reset Zoom/Pan
-      canvas.setViewportTransform([1,0,0,1,0,0]);
+      brightnessSlider.value = 0;
+      contrastSlider.value = 0;
+      brightnessValue.textContent = "0";
+      contrastValue.textContent = "0";
+      wwWlLabel.textContent = "Standard lung";
+
+      canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
       centerImage();
-      canvas.renderAll();
+      canvas.requestRenderAll();
+      setZoomLabel();
+      copilotEvent("View reset to default lung window.");
     }
 
     function centerImage() {
-      if(currentImage) {
-        currentImage.center();
-        currentImage.setCoords();
-      }
+      if (!currentImage) return;
+      currentImage.center();
+      currentImage.setCoords();
+      canvas.requestRenderAll();
     }
 
-    // AI Simulation
+    // AI overlays
+
     function toggleAIDetection() {
-      const btn = document.getElementById('btn-detect');
-      const panel = document.getElementById('findings-panel');
-      
-      if(aiLayerGroup) {
-        // Turn off
+      const btn = document.getElementById("btn-detect");
+      const panel = document.getElementById("findings-panel");
+
+      if (aiLayerGroup) {
         canvas.remove(aiLayerGroup);
         aiLayerGroup = null;
-        btn.classList.remove('active');
-        panel.style.display = 'none';
+        btn.classList.remove("active");
+        panel.style.display = "none";
+        copilotEvent("Confidence map removed.");
       } else {
-        // Simulate AI detection
-        if(!currentImage) return alert('Please load an image first');
-        
+        if (!currentImage) {
+          alert("Load an image first.");
+          return;
+        }
+
         const imgCenter = currentImage.getCenterPoint();
-        const scale = currentImage.scaleX; // Assuming uniform scale
-        
-        // Bounding Box 1 (Right Upper Lobe)
-        const box1 = new fabric.Rect({
-          left: imgCenter.x - (50 * scale),
-          top: imgCenter.y - (80 * scale),
-          width: 60 * scale,
-          height: 60 * scale,
-          fill: 'transparent',
-          stroke: '#e74c3c',
+        const scale = currentImage.scaleX;
+
+        const heartOutline = new fabric.Rect({
+          left: imgCenter.x - (60 * scale),
+          top: imgCenter.y + (20 * scale),
+          width: 120 * scale,
+          height: 120 * scale,
+          stroke: "#10b981",
           strokeWidth: 3,
-          strokeDashArray: [5, 5]
-        });
-        
-        // Label 1
-        const text1 = new fabric.Text('Nodule (94%)', {
-          left: imgCenter.x - (50 * scale),
-          top: imgCenter.y - (100 * scale),
-          fontSize: 16,
-          fill: '#e74c3c',
-          backgroundColor: 'rgba(0,0,0,0.7)'
+          strokeDashArray: [6, 4],
+          fill: "rgba(16,185,129,0.03)"
         });
 
-        // Bounding Box 2 (Infiltration)
-        const box2 = new fabric.Rect({
-          left: imgCenter.x + (20 * scale),
-          top: imgCenter.y + (10 * scale),
-          width: 80 * scale,
-          height: 100 * scale,
-          fill: 'rgba(243, 156, 18, 0.2)',
-          stroke: '#f39c12',
-          strokeWidth: 2
+        const lungSpan = new fabric.Rect({
+          left: imgCenter.x - (140 * scale),
+          top: imgCenter.y - (120 * scale),
+          width: 280 * scale,
+          height: 260 * scale,
+          stroke: "#3b82f6",
+          strokeWidth: 2,
+          strokeDashArray: [3, 4],
+          fill: "rgba(59,130,246,0.02)"
         });
 
-        aiLayerGroup = new fabric.Group([box1, text1, box2], {
+        const labelHeart = new fabric.Text("Heart region: normal size", {
+          left: heartOutline.left,
+          top: heartOutline.top - (18 * scale),
+          fontSize: 14,
+          fill: "#ecfdf5",
+          backgroundColor: "rgba(15,118,110,0.75)",
+          padding: 4
+        });
+
+        const labelLungs = new fabric.Text("Lung fields: clear", {
+          left: lungSpan.left,
+          top: lungSpan.top - (18 * scale),
+          fontSize: 14,
+          fill: "#e0f2fe",
+          backgroundColor: "rgba(30,64,175,0.8)",
+          padding: 4
+        });
+
+        aiLayerGroup = new fabric.Group([heartOutline, lungSpan, labelHeart, labelLungs], {
           selectable: false,
           evented: false
         });
 
         canvas.add(aiLayerGroup);
-        btn.classList.add('active');
-        panel.style.display = 'block';
+        btn.classList.add("active");
+        panel.style.display = "block";
+        copilotEvent("Confidence map added. AI sees no acute abnormality.");
       }
-      canvas.renderAll();
+
+      canvas.requestRenderAll();
     }
 
     function toggleHeatmap() {
-        const btn = document.getElementById('btn-heatmap');
-        
-        if(heatmapLayer) {
-            canvas.remove(heatmapLayer);
-            heatmapLayer = null;
-            btn.classList.remove('active');
-        } else {
-            if(!currentImage) return;
-            
-            // Create a radial gradient circle to simulate CAM (Class Activation Map)
-            heatmapLayer = new fabric.Circle({
-                radius: 100 * currentImage.scaleX,
-                left: currentImage.left - (30 * currentImage.scaleX),
-                top: currentImage.top - (60 * currentImage.scaleX),
-                originX: 'center',
-                originY: 'center',
-                opacity: 0.6
-            });
+      const btn = document.getElementById("btn-heatmap");
 
-            // Apply gradient
-            heatmapLayer.set('fill', new fabric.Gradient({
-                type: 'radial',
-                coords: {
-                    r1: heatmapLayer.radius,
-                    r2: 0,
-                    x1: heatmapLayer.width / 2,
-                    y1: heatmapLayer.height / 2,
-                    x2: heatmapLayer.width / 2,
-                    y2: heatmapLayer.height / 2
-                },
-                colorStops: [
-                    { offset: 0, color: 'rgba(255,0,0,0)' },
-                    { offset: 0.5, color: 'rgba(255,0,0,0.3)' },
-                    { offset: 1, color: 'rgba(255,255,0,0.8)' }
-                ]
-            }));
+      if (heatmapLayer) {
+        canvas.remove(heatmapLayer);
+        heatmapLayer = null;
+        btn.classList.remove("active");
+        copilotEvent("Attention overlay removed.");
+      } else {
+        if (!currentImage) return;
 
-            canvas.add(heatmapLayer);
-            btn.classList.add('active');
-        }
-        canvas.renderAll();
+        const imgCenter = currentImage.getCenterPoint();
+        const scale = currentImage.scaleX;
+
+        heatmapLayer = new fabric.Circle({
+          radius: 110 * scale,
+          left: imgCenter.x + (10 * scale),
+          top: imgCenter.y - (20 * scale),
+          originX: "center",
+          originY: "center",
+          opacity: 0.65,
+          selectable: false,
+          evented: false
+        });
+
+        heatmapLayer.set("fill", new fabric.Gradient({
+          type: "radial",
+          coords: {
+            r1: heatmapLayer.radius,
+            r2: 0,
+            x1: heatmapLayer.width / 2,
+            y1: heatmapLayer.height / 2,
+            x2: heatmapLayer.width / 2,
+            y2: heatmapLayer.height / 2
+          },
+          colorStops: [
+            { offset: 0, color: "rgba(0,0,0,0)" },
+            { offset: 0.4, color: "rgba(59,130,246,0.25)" },
+            { offset: 0.75, color: "rgba(22,163,74,0.6)" },
+            { offset: 1, color: "rgba(250,204,21,0.95)" }
+          ]
+        }));
+
+        canvas.add(heatmapLayer);
+        canvas.bringToFront(heatmapLayer);
+        btn.classList.add("active");
+        copilotEvent("Attention overlay added over central lungs and heart.");
+      }
+
+      canvas.requestRenderAll();
     }
 
-    // Tools
-    function enablePan() {
-        canvas.isDrawingMode = false;
-        canvas.selection = false;
-        canvas.defaultCursor = 'grab';
-        
-        // Simple pan toggle logic (for demo simplicity, relying on fabric's default object moving)
-        // A full implementation would handle mouse down/move events for viewport transform
-        alert('Click and drag to move objects. Use mouse wheel to zoom (if implemented).');
+    // Annotation tools
+
+    function togglePan() {
+      panMode = !panMode;
+      activeShapeMode = null;
+      updateToolButtons();
+      statusTool.textContent = "Tool: " + (panMode ? "Pan" : "Select");
+      canvas.setCursor(panMode ? "grab" : "default");
+      copilotEvent(panMode ? "Pan tool active." : "Selection tool active.");
+    }
+
+    function updateToolButtons() {
+      document.getElementById("btn-pan").classList.toggle("active", panMode);
+      document.getElementById("btn-rect").classList.toggle("active", activeShapeMode === "rect");
+      document.getElementById("btn-circle").classList.toggle("active", activeShapeMode === "circle");
+      document.getElementById("btn-line").classList.toggle("active", activeShapeMode === "line");
     }
 
     function startDrawing(shape) {
-        canvas.isDrawingMode = false;
-        
-        const center = canvas.getCenter();
-        let obj;
-        
-        if(shape === 'rect') {
-            obj = new fabric.Rect({
-                left: center.left,
-                top: center.top,
-                width: 100,
-                height: 100,
-                fill: 'transparent',
-                stroke: '#2ecc71',
-                strokeWidth: 2
-            });
-        } else {
-            obj = new fabric.Circle({
-                left: center.left,
-                top: center.top,
-                radius: 50,
-                fill: 'transparent',
-                stroke: '#2ecc71',
-                strokeWidth: 2
-            });
-        }
-        
-        canvas.add(obj);
-        canvas.setActiveObject(obj);
+      activeShapeMode = shape;
+      panMode = false;
+      updateToolButtons();
+      statusTool.textContent = "Tool: " + shape.charAt(0).toUpperCase() + shape.slice(1);
+      canvas.setCursor("crosshair");
+      copilotEvent("Annotation tool selected: " + shape + ".");
+    }
+
+    function handleShapeMouseDown(opt) {
+      const pointer = canvas.getPointer(opt.e);
+
+      if (activeShapeMode === "rect") {
+        const rect = new fabric.Rect({
+          left: pointer.x - 50,
+          top: pointer.y - 50,
+          width: 100,
+          height: 100,
+          fill: "transparent",
+          stroke: "#10b981",
+          strokeWidth: 2
+        });
+        canvas.add(rect);
+        canvas.setActiveObject(rect);
+        activeShapeMode = null;
+        updateToolButtons();
+        canvas.setCursor("default");
+        copilotEvent("Box annotation placed.");
+      } else if (activeShapeMode === "circle") {
+        const circle = new fabric.Circle({
+          left: pointer.x - 40,
+          top: pointer.y - 40,
+          radius: 40,
+          fill: "transparent",
+          stroke: "#10b981",
+          strokeWidth: 2
+        });
+        canvas.add(circle);
+        canvas.setActiveObject(circle);
+        activeShapeMode = null;
+        updateToolButtons();
+        canvas.setCursor("default");
+        copilotEvent("Circle annotation placed.");
+      } else if (activeShapeMode === "line") {
+        const line = new fabric.Line([pointer.x, pointer.y, pointer.x + 1, pointer.y + 1], {
+          stroke: "#f97316",
+          strokeWidth: 2
+        });
+        activeLine = line;
+        canvas.add(line);
+        canvas.setActiveObject(line);
+        copilotEvent("Distance measurement started.");
+      }
     }
 
     function clearAnnotations() {
-        // Remove everything except the main image
-        canvas.getObjects().forEach(obj => {
-            if(obj !== currentImage) {
-                canvas.remove(obj);
-            }
-        });
-        aiLayerGroup = null;
-        heatmapLayer = null;
-        
-        // Reset buttons
-        document.querySelectorAll('.ai-toggle').forEach(b => b.classList.remove('active'));
-        document.getElementById('findings-panel').style.display = 'none';
+      canvas.getObjects().forEach(obj => {
+        if (obj !== currentImage) {
+          canvas.remove(obj);
+        }
+      });
+
+      aiLayerGroup = null;
+      heatmapLayer = null;
+      activeShapeMode = null;
+      updateToolButtons();
+      document.getElementById("findings-panel").style.display = "none";
+      document.querySelectorAll(".ai-toggle").forEach(b => b.classList.remove("active"));
+      copilotEvent("All overlays and annotations cleared.");
+      canvas.requestRenderAll();
     }
 
-    // Init
+    // Zoom buttons
+
+    document.getElementById("zoom-in-btn").addEventListener("click", function () {
+      let zoom = canvas.getZoom();
+      zoom = Math.min(zoom * 1.2, 3);
+      const center = new fabric.Point(canvas.width / 2, canvas.height / 2);
+      canvas.zoomToPoint(center, zoom);
+      setZoomLabel();
+    });
+
+    document.getElementById("zoom-out-btn").addEventListener("click", function () {
+      let zoom = canvas.getZoom();
+      zoom = Math.max(zoom / 1.2, 0.4);
+      const center = new fabric.Point(canvas.width / 2, canvas.height / 2);
+      canvas.zoomToPoint(center, zoom);
+      setZoomLabel();
+    });
+
+    document.getElementById("zoom-reset-btn").addEventListener("click", function () {
+      canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+      setZoomLabel();
+      centerImage();
+    });
+
+    // Entry
+
     initCanvas();
-    loadDemoImage(); // Auto-load on start
-
+    loadDemoImage();
+    togglePan(); // ensure pan button state
   </script>
-
-  <!-- Footer -->
-  <footer>
-    <p><strong>Disclaimer:</strong> This tool is for demonstration purposes only. It does not provide medical diagnosis, treatment, or clinical decision support. Not intended for clinical use.</p>
-    <p>&copy; 2025 David Dasa</p>
-  </footer>
 </body>
 </html>
-
