@@ -820,6 +820,14 @@
           <button data-item="IV cannula 18G">IV cannula 18G</button>
           <button data-item="500 ml crystalloid">500 ml crystalloid</button>
         </div>
+        <div class="menu-section" data-section="D"><b>Drugs</b>
+          <button data-item="Adrenaline IM 1:1000">Adrenaline IM 1:1000</button>
+          <button data-item="Naloxone 400mcg">Naloxone 400mcg</button>
+          <button data-item="IV Antibiotics">IV Antibiotics</button>
+          <button data-item="IV Hydrocortisone">IV Hydrocortisone</button>
+          <button data-item="IV Magnesium">IV Magnesium</button>
+          <button data-item="IV Chlorphenamine">IV Chlorphenamine</button>
+        </div>
         <div class="menu-section" data-section="E"><b>Misc</b>
           <button data-item="Warm blanket">Warm blanket</button>
           <button data-item="Glucose gel">Glucose gel</button>
@@ -1006,7 +1014,10 @@
       drawMonitor();
     }
     renderVitals();
-    const vitalsLabel = new CSS2DObject(vitalsDiv); vitalsLabel.position.set(-0.3, 1.85, 0); bed.add(vitalsLabel);
+    const vitalsLabel = new CSS2DObject(vitalsDiv); 
+    // Move monitor higher and slightly to the side (local coords relative to bed center)
+    vitalsLabel.position.set(0, 2.4, -0.5); 
+    bed.add(vitalsLabel);
 
     // Update patient appearance (Cyanosis / Pallor)
     const baseSkin = new THREE.Color(0xd1b290);
@@ -1192,6 +1203,41 @@
           case 'Adrenaline IM 1:1000':
             scheduleIntervention(() => phys.epiLevel = clamp(phys.epiLevel+0.02,0,1), 1000, true, 'epi');
             break;
+          case 'Naloxone 400mcg':
+            scheduleIntervention(() => phys.sedation = clamp(phys.sedation-0.05, 0, 1), 2000, true, 'nalox');
+            phys.airwayR = clamp(phys.airwayR - 0.5, 0.8, 4.0); // Improves airway tone
+            logEvent('action', { action: 'Naloxone administered' });
+            break;
+          case 'IV Antibiotics':
+             if (!hasIVAccess) {
+              appliedDiv.textContent = 'Needs IV access'; appliedDiv.style.display='block'; success=false;
+            } else {
+              phys.metabolic = clamp(phys.metabolic - 0.2, 0.8, 1.5); // Sepsis improvement (slow)
+              phys.tempSet = clamp(phys.tempSet - 0.4, 37, 40);
+            }
+            break;
+          case 'IV Hydrocortisone':
+            if (!hasIVAccess) {
+              appliedDiv.textContent = 'Needs IV access'; appliedDiv.style.display='block'; success=false;
+            } else {
+              phys.airwayR = clamp(phys.airwayR - 0.4, 0.8, 4.0); // Asthma/Anaphylaxis
+              phys.SVR = clamp(phys.SVR + 0.2, 0.5, 2.0); // Stabilize shock
+            }
+            break;
+          case 'IV Magnesium':
+             if (!hasIVAccess) {
+              appliedDiv.textContent = 'Needs IV access'; appliedDiv.style.display='block'; success=false;
+            } else {
+              phys.airwayR = clamp(phys.airwayR - 0.8, 0.6, 4.0); // Severe asthma bronchodilation
+            }
+            break;
+          case 'IV Chlorphenamine':
+             if (!hasIVAccess) {
+              appliedDiv.textContent = 'Needs IV access'; appliedDiv.style.display='block'; success=false;
+            } else {
+               phys.SVR = clamp(phys.SVR + 0.1, 0.5, 1.5); // Histamine blockade
+            }
+            break;
         }
         if(success) successful.push(item);
       });
@@ -1242,6 +1288,164 @@
     // Simple walk cycle for nurse
     let prevPos = avatar.position.clone();
     let walkPhase = 0;
+    
+    // --- NPC AI System (Dr James) ---
+    const npcAI = {
+      active: true,
+      state: 'IDLE', // IDLE, TO_TROLLEY, AT_TROLLEY, TO_PATIENT, APPLYING
+      targetItem: null,
+      timer: 0,
+      decisionTimer: 0
+    };
+
+    function getNextClinicalAction() {
+      // ABCDE prioritization
+      // A - Airway
+      if (phys.airwayR > 2.0) return 'Oropharyngeal airway'; 
+      
+      // B - Breathing
+      if (vitals.spo2 < 85) return 'Bag valve mask';
+      if (vitals.spo2 < 92 && phys.o2Device === 'air') return 'Oxygen mask 15 L';
+      
+      // Bronchospasm / Asthma
+      if (phys.airwayR > 2.5) {
+         if (phys.bronchoLevel < 0.1) return 'Nebuliser salbutamol';
+         if (hasIVAccess) return 'IV Magnesium'; // Escalation
+         return 'IV Hydrocortisone'; // If no IV, this will fail, but he will try to get IV next loop
+      }
+
+      // C - Circulation
+      // Anaphylaxis check (Low BP + High Airway R + Tachycardia) -> Adrenaline priority over fluids
+      if (phys.airwayR > 1.5 && vitals.sbp < 90 && vitals.hr > 100) return 'Adrenaline IM 1:1000';
+      
+      // Sepsis check (Fever + Low BP + Tachycardia) -> Antibiotics + Fluids
+      if (vitals.temp > 38.5 && vitals.sbp < 100) {
+        if (!hasIVAccess) return 'IV cannula 18G';
+        // Priority: Fluids then Antibiotics
+        if (phys.bloodVol < 0.9) return '500 ml crystalloid';
+        return 'IV Antibiotics';
+      }
+
+      // General Hypotension
+      if (vitals.sbp < 90) {
+        if (!hasIVAccess) return 'IV cannula 18G';
+        return '500 ml crystalloid';
+      }
+      
+      // D - Disability (Opioid OD)
+      if (vitals.rr < 10 && vitals.avpu !== 'A') return 'Naloxone 400mcg';
+      
+      return null; // Nothing urgent
+    }
+
+    function updateNPCLogic(dt) {
+      if (!npcAI.active) return;
+      
+      // Only decide if Idle
+      if (npcAI.state === 'IDLE') {
+        npcAI.decisionTimer += dt;
+        if (npcAI.decisionTimer > 15) { // Check every 15s
+          npcAI.decisionTimer = 0;
+          const action = getNextClinicalAction();
+          if (action) {
+            npcAI.targetItem = action;
+            npcAI.state = 'TO_TROLLEY';
+            logEvent('npc', { msg: `Dr James deciding to get ${action}` });
+          }
+        }
+        return;
+      }
+
+      const trolleyPos = trolley.position; // 3.0, 0, 1.6
+      const patientPos = new THREE.Vector3(-1.2, 0, -0.6); // Doctor side of bed
+
+      const walkSpeed = 1.6;
+      const reachDist = 1.2;
+
+      if (npcAI.state === 'TO_TROLLEY') {
+        if (moveCharacter(doctor, trolleyPos, dt, walkSpeed, reachDist)) {
+          npcAI.state = 'AT_TROLLEY';
+          npcAI.timer = 2.0; // Rummage time
+        }
+      } else if (npcAI.state === 'AT_TROLLEY') {
+        npcAI.timer -= dt;
+        if (npcAI.timer <= 0) {
+          logEvent('npc', { msg: `Picked up ${npcAI.targetItem}` });
+          npcAI.state = 'TO_PATIENT';
+        }
+      } else if (npcAI.state === 'TO_PATIENT') {
+        if (moveCharacter(doctor, patientPos, dt, walkSpeed, reachDist)) {
+          npcAI.state = 'APPLYING';
+          npcAI.timer = 3.0; // Application time
+        }
+      } else if (npcAI.state === 'APPLYING') {
+        npcAI.timer -= dt;
+        if (npcAI.timer <= 0) {
+          // Apply item
+          logEvent('npc', { msg: `Applying ${npcAI.targetItem}` });
+          applyItemEffects([npcAI.targetItem]);
+          clampVitals(); renderVitals(); 
+          addAppliedHistory([npcAI.targetItem + ' (Dr James)']);
+          
+          npcAI.targetItem = null;
+          npcAI.state = 'IDLE';
+          npcAI.decisionTimer = -5; // Cooldown
+        }
+      }
+      
+      updateCharacterAnimation(doctor, dt);
+    }
+
+    function moveCharacter(charObj, target, dt, speed, stopDist) {
+      const d = distXZ(charObj.position, target);
+      if (d < stopDist) return true;
+
+      const dx = target.x - charObj.position.x;
+      const dz = target.z - charObj.position.z;
+      const angle = Math.atan2(dx, dz);
+      
+      // Smooth rotation
+      let rotDiff = angle - charObj.rotation.y;
+      while (rotDiff > Math.PI) rotDiff -= Math.PI*2;
+      while (rotDiff < -Math.PI) rotDiff += Math.PI*2;
+      charObj.rotation.y += rotDiff * 5.0 * dt;
+
+      const forward = new THREE.Vector3(Math.sin(charObj.rotation.y), 0, Math.cos(charObj.rotation.y));
+      charObj.position.add(forward.multiplyScalar(speed * dt));
+      return false;
+    }
+
+    // Generalized animation function
+    function updateCharacterAnimation(charObj, dt) {
+      const limbs = charObj.userData.limbs;
+      if (!limbs) return;
+      
+      // Init previous position if needed
+      if (!charObj.userData.prevPos) charObj.userData.prevPos = charObj.position.clone();
+      if (charObj.userData.walkPhase === undefined) charObj.userData.walkPhase = 0;
+
+      const d = charObj.position.distanceTo(charObj.userData.prevPos);
+      charObj.userData.prevPos.copy(charObj.position);
+      
+      const speedNow = d / Math.max(1e-6, dt);
+      const moving = Math.min(speedNow / 1.2, 1.0);
+      
+      charObj.userData.walkPhase += speedNow * 4.0 * dt;
+      const wp = charObj.userData.walkPhase;
+
+      const swing = Math.sin(wp) * 0.6 * moving;
+      const counter = Math.sin(wp + Math.PI) * 0.6 * moving;
+
+      limbs.shoulderL.rotation.x = swing * 0.6;
+      limbs.shoulderR.rotation.x = counter * 0.6;
+      limbs.hipL.rotation.x = -swing * 0.7;
+      limbs.hipR.rotation.x = -counter * 0.7;
+
+      limbs.torso.position.y = 1.05 + Math.sin(wp * 2.0) * 0.02 * moving;
+      charObj.rotation.z = Math.sin(wp) * 0.03 * moving;
+      limbs.head.rotation.set(0, 0, 0);
+    }
+
     function updateNurseAnimation(dt){
       const limbs = avatar.userData.limbs;
       if (!limbs) return;
@@ -1275,7 +1479,9 @@
 
       move(dt);
       moveNurse(dt);
-      updateNurseAnimation(dt);
+      updateCharacterAnimation(avatar, dt); // Use generic animator for user too
+      updateNPCLogic(dt); // Updates Doctor
+      if (followNurse) updateCameraFollow();
       if (followNurse) updateCameraFollow();
 
       if (shouldShowTrolleyMenu()) showMenu(); else hideMenu();
