@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive Medical Image Viewer with AI Overlay Simulation">
+  <title>Medical Image Intelligence Viewer - David Dasa</title>
+  <link rel="icon" type="image/svg+xml" href="/src/favicon-DD-monogram.svg">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+  <style>
+    .viewer-layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 2rem;
+      margin-top: 2rem;
+      height: calc(100vh - 200px);
+      min-height: 600px;
+    }
+
+    .tools-panel {
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      overflow-y: auto;
+    }
+
+    .viewport-container {
+      background: #000;
+      border-radius: 1rem;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dicom-overlay {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      color: rgba(255,255,255,0.7);
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+      pointer-events: none;
+      z-index: 10;
+      text-shadow: 1px 1px 2px black;
+    }
+
+    .tool-group h3 {
+      font-size: 0.9rem;
+      color: #092917;
+      margin: 0 0 0.8rem 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+      padding-bottom: 0.5rem;
+    }
+
+    .control-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.8rem;
+    }
+
+    .control-row label {
+      font-size: 0.85rem;
+      color: #4a4a4a;
+    }
+
+    input[type="range"] {
+      width: 60%;
+      accent-color: #2ecc71;
+    }
+
+    .btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    .tool-btn {
+      background: white;
+      border: 1px solid #ddd;
+      padding: 0.5rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #4a4a4a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+
+    .tool-btn:hover {
+      background: #f8f9fa;
+      border-color: #2ecc71;
+      color: #2ecc71;
+    }
+
+    .tool-btn.active {
+      background: #2ecc71;
+      border-color: #2ecc71;
+      color: white;
+    }
+
+    .ai-toggle {
+      background: rgba(46, 204, 113, 0.1);
+      border: 1px solid #2ecc71;
+      color: #092917;
+    }
+
+    .ai-toggle.active {
+      background: #2ecc71;
+      color: white;
+    }
+
+    .file-upload {
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+
+    .file-upload input[type="file"] {
+      position: absolute;
+      font-size: 100px;
+      right: 0;
+      top: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .upload-btn {
+      background: #092917;
+      color: white;
+      padding: 0.8rem;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      font-weight: 500;
+      display: block;
+      transition: background 0.2s;
+    }
+
+    .upload-btn:hover {
+      background: #2ecc71;
+    }
+
+    .findings-list {
+      font-size: 0.85rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .finding-item {
+      background: rgba(255,255,255,0.5);
+      border-left: 3px solid #e74c3c;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+      border-radius: 0 4px 4px 0;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .confidence {
+      font-weight: 600;
+      color: #e74c3c;
+    }
+
+    @media (max-width: 768px) {
+      .viewer-layout {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+      .viewport-container {
+        height: 400px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <ul>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+      <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <div class="article-header">
+      <h1>Medical Image Intelligence Viewer</h1>
+      <div class="article-meta">
+        <span class="article-type">Interactive Tool</span>
+        <div class="article-tags">
+          <span class="tag">Computer Vision</span>
+          <span class="tag">X-ray Analysis</span>
+          <span class="tag">AI Simulation</span>
+        </div>
+      </div>
+      <p>A browser-based DICOM/Image viewer demonstrating AI-assisted diagnostic workflows. Upload an X-ray to simulate lesion detection, adjust image parameters, and perform measurements.</p>
+    </div>
+
+    <div class="viewer-layout">
+      <!-- Tools Panel -->
+      <aside class="tools-panel">
+        <!-- Image Source (Hidden for Demo) -->
+        <!-- <div class="tool-group">
+          <h3>Image Source</h3>
+          ...
+        </div> -->
+
+        <!-- Image Adjustments -->
+        <div class="tool-group">
+          <h3>Adjustments</h3>
+          <div class="control-row">
+            <label>Brightness</label>
+            <input type="range" id="brightness" min="-1" max="1" step="0.1" value="0">
+          </div>
+          <div class="control-row">
+            <label>Contrast</label>
+            <input type="range" id="contrast" min="-1" max="1" step="0.1" value="0">
+          </div>
+          <div class="btn-grid">
+            <button class="tool-btn" onclick="resetImage()">↺ Reset</button>
+            <button class="tool-btn" onclick="invertImage()">◑ Invert</button>
+          </div>
+        </div>
+
+        <!-- AI Analysis -->
+        <div class="tool-group">
+          <h3>AI Assistance</h3>
+          <div class="btn-grid">
+            <button class="tool-btn ai-toggle" id="btn-detect" onclick="toggleAIDetection()">🎯 Detect Lesions</button>
+            <button class="tool-btn ai-toggle" id="btn-heatmap" onclick="toggleHeatmap()">🔥 Heatmap</button>
+          </div>
+          <div id="findings-panel" style="display:none; margin-top: 1rem;">
+            <h4 style="font-size: 0.8rem; margin-bottom: 0.5rem;">Detected Findings:</h4>
+            <ul class="findings-list">
+              <li class="finding-item">
+                <span>Nodule (R. Upper Lobe)</span>
+                <span class="confidence">94%</span>
+              </li>
+              <li class="finding-item" style="border-color: #f39c12;">
+                <span>Infiltration</span>
+                <span class="confidence" style="color: #f39c12;">82%</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Measurements -->
+        <div class="tool-group">
+          <h3>Tools</h3>
+          <div class="btn-grid">
+            <button class="tool-btn" onclick="startDrawing('rect')">⬜ Box</button>
+            <button class="tool-btn" onclick="startDrawing('circle')">⭕ Circle</button>
+            <button class="tool-btn" onclick="enablePan()">✋ Pan</button>
+            <button class="tool-btn" onclick="clearAnnotations()">❌ Clear</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Viewer Canvas -->
+      <div class="viewport-container" id="canvas-container">
+        <div class="dicom-overlay">
+          <div>ID: ANONYMIZED</div>
+          <div>SEX: M | AGE: 45Y</div>
+          <div>MODALITY: CR</div>
+          <div>STUDY: CHEST PA</div>
+          <div>DATE: 2025-11-22</div>
+        </div>
+        <canvas id="c"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let canvas;
+    let currentImage;
+    let isDrawing = false;
+    let aiLayerGroup = null;
+    let heatmapLayer = null;
+
+    // Initialize Fabric Canvas
+    function initCanvas() {
+      const container = document.getElementById('canvas-container');
+      canvas = new fabric.Canvas('c', {
+        width: container.clientWidth,
+        height: container.clientHeight,
+        backgroundColor: '#000',
+        selection: false
+      });
+
+      // Handle resize
+      window.addEventListener('resize', () => {
+        canvas.setWidth(container.clientWidth);
+        canvas.setHeight(container.clientHeight);
+        if(currentImage) centerImage();
+      });
+    }
+
+    // Load Image
+    function loadImage(url) {
+      fabric.Image.fromURL(url, function(img) {
+        if(currentImage) canvas.remove(currentImage);
+        
+        // Scale image to fit
+        const scale = Math.min(
+          canvas.width / img.width,
+          canvas.height / img.height
+        ) * 0.9;
+        
+        img.set({
+          scaleX: scale,
+          scaleY: scale,
+          originX: 'center',
+          originY: 'center',
+          left: canvas.width / 2,
+          top: canvas.height / 2
+        });
+
+        currentImage = img;
+        canvas.add(img);
+        canvas.sendToBack(img);
+        
+        // Reset filters
+        document.getElementById('brightness').value = 0;
+        document.getElementById('contrast').value = 0;
+        
+        canvas.renderAll();
+      }, { crossOrigin: 'anonymous' });
+    }
+
+    function loadDemoImage() {
+      // Using the local demonstrator image
+      loadImage('img/CXR00020948_000.png');
+    }
+
+    // Image Adjustments
+    function applyFilters() {
+      if(!currentImage) return;
+      
+      const brightness = parseFloat(document.getElementById('brightness').value);
+      const contrast = parseFloat(document.getElementById('contrast').value);
+      
+      currentImage.filters = [
+        new fabric.Image.filters.Brightness({ brightness: brightness }),
+        new fabric.Image.filters.Contrast({ contrast: contrast })
+      ];
+      
+      currentImage.applyFilters();
+      canvas.renderAll();
+    }
+
+    document.getElementById('brightness').addEventListener('input', applyFilters);
+    document.getElementById('contrast').addEventListener('input', applyFilters);
+
+    function invertImage() {
+      if(!currentImage) return;
+      currentImage.filters.push(new fabric.Image.filters.Invert());
+      currentImage.applyFilters();
+      canvas.renderAll();
+    }
+
+    function resetImage() {
+      if(!currentImage) return;
+      currentImage.filters = [];
+      currentImage.applyFilters();
+      document.getElementById('brightness').value = 0;
+      document.getElementById('contrast').value = 0;
+      
+      // Reset Zoom/Pan
+      canvas.setViewportTransform([1,0,0,1,0,0]);
+      centerImage();
+      canvas.renderAll();
+    }
+
+    function centerImage() {
+      if(currentImage) {
+        currentImage.center();
+        currentImage.setCoords();
+      }
+    }
+
+    // AI Simulation
+    function toggleAIDetection() {
+      const btn = document.getElementById('btn-detect');
+      const panel = document.getElementById('findings-panel');
+      
+      if(aiLayerGroup) {
+        // Turn off
+        canvas.remove(aiLayerGroup);
+        aiLayerGroup = null;
+        btn.classList.remove('active');
+        panel.style.display = 'none';
+      } else {
+        // Simulate AI detection
+        if(!currentImage) return alert('Please load an image first');
+        
+        const imgCenter = currentImage.getCenterPoint();
+        const scale = currentImage.scaleX; // Assuming uniform scale
+        
+        // Bounding Box 1 (Right Upper Lobe)
+        const box1 = new fabric.Rect({
+          left: imgCenter.x - (50 * scale),
+          top: imgCenter.y - (80 * scale),
+          width: 60 * scale,
+          height: 60 * scale,
+          fill: 'transparent',
+          stroke: '#e74c3c',
+          strokeWidth: 3,
+          strokeDashArray: [5, 5]
+        });
+        
+        // Label 1
+        const text1 = new fabric.Text('Nodule (94%)', {
+          left: imgCenter.x - (50 * scale),
+          top: imgCenter.y - (100 * scale),
+          fontSize: 16,
+          fill: '#e74c3c',
+          backgroundColor: 'rgba(0,0,0,0.7)'
+        });
+
+        // Bounding Box 2 (Infiltration)
+        const box2 = new fabric.Rect({
+          left: imgCenter.x + (20 * scale),
+          top: imgCenter.y + (10 * scale),
+          width: 80 * scale,
+          height: 100 * scale,
+          fill: 'rgba(243, 156, 18, 0.2)',
+          stroke: '#f39c12',
+          strokeWidth: 2
+        });
+
+        aiLayerGroup = new fabric.Group([box1, text1, box2], {
+          selectable: false,
+          evented: false
+        });
+
+        canvas.add(aiLayerGroup);
+        btn.classList.add('active');
+        panel.style.display = 'block';
+      }
+      canvas.renderAll();
+    }
+
+    function toggleHeatmap() {
+        const btn = document.getElementById('btn-heatmap');
+        
+        if(heatmapLayer) {
+            canvas.remove(heatmapLayer);
+            heatmapLayer = null;
+            btn.classList.remove('active');
+        } else {
+            if(!currentImage) return;
+            
+            // Create a radial gradient circle to simulate CAM (Class Activation Map)
+            heatmapLayer = new fabric.Circle({
+                radius: 100 * currentImage.scaleX,
+                left: currentImage.left - (30 * currentImage.scaleX),
+                top: currentImage.top - (60 * currentImage.scaleX),
+                originX: 'center',
+                originY: 'center',
+                opacity: 0.6
+            });
+
+            // Apply gradient
+            heatmapLayer.setGradient('fill', {
+                type: 'radial',
+                r1: heatmapLayer.radius,
+                r2: 0,
+                x1: heatmapLayer.width / 2,
+                y1: heatmapLayer.height / 2,
+                x2: heatmapLayer.width / 2,
+                y2: heatmapLayer.height / 2,
+                colorStops: {
+                    0: 'rgba(255,0,0,0)',
+                    0.5: 'rgba(255,0,0,0.3)',
+                    1: 'rgba(255,255,0,0.8)'
+                }
+            });
+
+            canvas.add(heatmapLayer);
+            btn.classList.add('active');
+        }
+        canvas.renderAll();
+    }
+
+    // Tools
+    function enablePan() {
+        canvas.isDrawingMode = false;
+        canvas.selection = false;
+        canvas.defaultCursor = 'grab';
+        
+        // Simple pan toggle logic (for demo simplicity, relying on fabric's default object moving)
+        // A full implementation would handle mouse down/move events for viewport transform
+        alert('Click and drag to move objects. Use mouse wheel to zoom (if implemented).');
+    }
+
+    function startDrawing(shape) {
+        canvas.isDrawingMode = false;
+        
+        const center = canvas.getCenter();
+        let obj;
+        
+        if(shape === 'rect') {
+            obj = new fabric.Rect({
+                left: center.left,
+                top: center.top,
+                width: 100,
+                height: 100,
+                fill: 'transparent',
+                stroke: '#2ecc71',
+                strokeWidth: 2
+            });
+        } else {
+            obj = new fabric.Circle({
+                left: center.left,
+                top: center.top,
+                radius: 50,
+                fill: 'transparent',
+                stroke: '#2ecc71',
+                strokeWidth: 2
+            });
+        }
+        
+        canvas.add(obj);
+        canvas.setActiveObject(obj);
+    }
+
+    function clearAnnotations() {
+        // Remove everything except the main image
+        canvas.getObjects().forEach(obj => {
+            if(obj !== currentImage) {
+                canvas.remove(obj);
+            }
+        });
+        aiLayerGroup = null;
+        heatmapLayer = null;
+        
+        // Reset buttons
+        document.querySelectorAll('.ai-toggle').forEach(b => b.classList.remove('active'));
+        document.getElementById('findings-panel').style.display = 'none';
+    }
+
+    // Init
+    initCanvas();
+    loadDemoImage(); // Auto-load on start
+
+  </script>
+</body>
+</html>
+

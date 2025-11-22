@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Robotic Surgery AI Simulator - Precision Training & Autonomous Control">
+  <title>Surgical Robotics AI Trainer - David Dasa</title>
+  <link rel="icon" type="image/svg+xml" href="/src/favicon-DD-monogram.svg">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+  <style>
+    .sim-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      background: rgba(255,255,255,0.82);
+      border-radius: 1rem;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+      border: 1px solid rgba(0,0,0,0.06);
+      padding: 1.5rem;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 1.5rem;
+      height: calc(100vh - 150px);
+      min-height: 600px;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      border-right: 1px solid rgba(0,0,0,0.1);
+      padding-right: 1.5rem;
+    }
+
+    .control-group h3 {
+      font-size: 0.9rem;
+      color: #092917;
+      text-transform: uppercase;
+      margin-bottom: 0.8rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary { background: #2ecc71; color: white; }
+    .btn-primary:hover { background: #27ae60; }
+    
+    .btn-ai { background: #3498db; color: white; }
+    .btn-ai:hover { background: #2980b9; }
+
+    .btn.active {
+      box-shadow: inset 0 3px 5px rgba(0,0,0,0.2);
+      transform: translateY(1px);
+    }
+
+    .stats-panel {
+      background: white;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      border: 1px solid #eee;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .score-val { font-weight: 700; color: #2ecc71; }
+    .danger-val { font-weight: 700; color: #e74c3c; }
+
+    .canvas-wrapper {
+      position: relative;
+      background: #1a1a1a;
+      border-radius: 1rem;
+      overflow: hidden;
+      cursor: crosshair;
+    }
+
+    #surgery-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .status-overlay {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.85rem;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #e74c3c;
+    }
+    .status-dot.active { background: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
+
+    /* Toggle Switch */
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 20px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider { background-color: #2ecc71; }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+  </style>
+</head>
+<body>
+  <nav>
+    <ul>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+      <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
+    </ul>
+  </nav>
+
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
+  <div class="container">
+    <div class="article-header" style="margin-top: 2rem;">
+      <h1>🤖 Surgical Robotics AI Trainer</h1>
+      <p>Demonstrating the synergy between robotic precision and AI safety. Control a virtual surgical arm with tremor filtration, or watch the AI perform autonomous tasks with perfect precision.</p>
+    </div>
+
+    <div class="sim-container">
+      <div class="controls">
+        <div class="control-group">
+          <h3>Mode Selection</h3>
+          <button class="btn btn-primary active" id="btn-human" onclick="setMode('human')">🎮 Human Control (Teleop)</button>
+          <button class="btn btn-ai" id="btn-ai" onclick="setMode('ai')">🧠 AI Autonomy Mode</button>
+        </div>
+
+        <div class="control-group">
+          <h3>Robotic Systems</h3>
+          <div class="toggle-row">
+            <label>Tremor Filtration</label>
+            <label class="switch">
+              <input type="checkbox" id="tremor-filter" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <label>Motion Scaling (3:1)</label>
+            <label class="switch">
+              <input type="checkbox" id="motion-scaling" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <h3>AI Safety Monitor</h3>
+          <div class="toggle-row">
+            <label>Path Deviation Alert</label>
+            <label class="switch">
+              <input type="checkbox" id="path-alert" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <label>Critical Zone Lock</label>
+            <label class="switch">
+              <input type="checkbox" id="zone-lock" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="stats-panel">
+          <div class="stat-row">
+            <span>Precision Score:</span>
+            <span class="score-val" id="score">100%</span>
+          </div>
+          <div class="stat-row">
+            <span>Tremor Level:</span>
+            <span id="tremor-val">Low</span>
+          </div>
+          <div class="stat-row">
+            <span>Safety Violations:</span>
+            <span class="danger-val" id="violations">0</span>
+          </div>
+        </div>
+        
+        <button class="btn" style="background:#95a5a6; color:white;" onclick="resetSim()">↺ Reset Task</button>
+      </div>
+
+      <div class="canvas-wrapper" id="canvas-wrap">
+        <div class="status-overlay">
+          <div class="status-dot active" id="sys-status"></div>
+          <span id="status-text">System Active: Master-Slave Engaged</span>
+        </div>
+        <canvas id="surgery-canvas"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Setup
+    const canvas = document.getElementById('surgery-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    
+    // State
+    let mouse = { x: 0, y: 0 };
+    let robot = { x: 0, y: 0, targetX: 0, targetY: 0 };
+    let mode = 'human'; // 'human' or 'ai'
+    let path = [];
+    let score = 100;
+    let violations = 0;
+    let isDrawing = false;
+    let animationId;
+    
+    // AI Autonomy State
+    let aiProgress = 0;
+    let aiSpeed = 2;
+
+    // Init
+    function init() {
+      resize();
+      generatePath();
+      robot.x = path[0].x;
+      robot.y = path[0].y;
+      robot.targetX = robot.x;
+      robot.targetY = robot.y;
+      loop();
+    }
+
+    function resize() {
+      const wrap = document.getElementById('canvas-wrap');
+      width = canvas.width = wrap.clientWidth;
+      height = canvas.height = wrap.clientHeight;
+    }
+
+    function generatePath() {
+      // Create a curvy surgical path (Suture line)
+      path = [];
+      const points = 100;
+      const amplitude = 60;
+      const frequency = 0.02;
+      const startX = 50;
+      const endX = width - 50;
+      const centerY = height / 2;
+
+      for (let i = 0; i <= points; i++) {
+        const x = startX + (endX - startX) * (i / points);
+        const y = centerY + Math.sin(x * frequency) * amplitude;
+        path.push({ x, y });
+      }
+    }
+
+    // Main Loop
+    function loop() {
+      update();
+      draw();
+      animationId = requestAnimationFrame(loop);
+    }
+
+    function update() {
+      // 1. Input Handling (Human vs AI)
+      if (mode === 'human') {
+        let targetX = mouse.x;
+        let targetY = mouse.y;
+
+        // Motion Scaling (Precision Mode)
+        if (document.getElementById('motion-scaling').checked) {
+          // Only move robot 1/3rd of mouse distance relative to center
+          // Simplified for demo: damped following
+        }
+        
+        robot.targetX = targetX;
+        robot.targetY = targetY;
+      } else {
+        // AI Mode: Follow path perfectly
+        if (aiProgress < path.length - 1) {
+          const p1 = path[Math.floor(aiProgress)];
+          const p2 = path[Math.floor(aiProgress) + 1];
+          const t = aiProgress % 1;
+          
+          robot.targetX = p1.x + (p2.x - p1.x) * t;
+          robot.targetY = p1.y + (p2.y - p1.y) * t;
+          
+          aiProgress += 0.02 * aiSpeed;
+        }
+      }
+
+      // 2. Robotics Physics (Smoothing / Tremor Filter)
+      const smoothing = document.getElementById('tremor-filter').checked ? 0.08 : 0.3;
+      
+      // Lerp for damping
+      robot.x += (robot.targetX - robot.x) * smoothing;
+      robot.y += (robot.targetY - robot.y) * smoothing;
+
+      // 3. Safety & Scoring
+      checkSafety();
+    }
+
+    function checkSafety() {
+      // Find distance to nearest path point
+      let minDist = Infinity;
+      path.forEach(p => {
+        const d = Math.hypot(p.x - robot.x, p.y - robot.y);
+        if (d < minDist) minDist = d;
+      });
+
+      // Scoring
+      if (minDist > 20 && mode === 'human') {
+        score -= 0.1;
+        if(score < 0) score = 0;
+        
+        // Alert
+        if(document.getElementById('path-alert').checked) {
+            ctx.strokeStyle = 'rgba(231, 76, 60, 0.5)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(robot.x, robot.y, 30, 0, Math.PI*2);
+            ctx.stroke();
+        }
+      }
+
+      // Critical Zone (Red areas)
+      // Simulated Critical Structure at bottom center
+      const critX = width/2;
+      const critY = height - 80;
+      const distCrit = Math.hypot(robot.x - critX, robot.y - critY);
+      
+      if (distCrit < 60) {
+        if (document.getElementById('zone-lock').checked) {
+            // Active constraint (Haptic Feedback Simulation)
+            // Push robot back
+            const angle = Math.atan2(robot.y - critY, robot.x - critX);
+            robot.x = critX + Math.cos(angle) * 60;
+            robot.y = critY + Math.sin(angle) * 60;
+        } else {
+            violations += 0.05; // Accumulate float to slow down counter
+        }
+      }
+
+      // Update DOM
+      document.getElementById('score').textContent = Math.round(score) + '%';
+      document.getElementById('violations').textContent = Math.floor(violations);
+      
+      // Calculate Tremor (Distance between target and actual)
+      const lag = Math.hypot(robot.targetX - robot.x, robot.targetY - robot.y);
+      let tremorText = 'Low';
+      if(lag > 50) tremorText = 'High';
+      else if(lag > 20) tremorText = 'Medium';
+      document.getElementById('tremor-val').textContent = tremorText;
+    }
+
+    function draw() {
+      // Clear
+      ctx.fillStyle = '#1a1a1a'; // Dark background
+      ctx.fillRect(0, 0, width, height);
+
+      // Draw Tissue / Background
+      ctx.fillStyle = '#2c2c2c';
+      ctx.beginPath();
+      ctx.arc(width/2, height/2, 300, 0, Math.PI*2);
+      ctx.fill();
+
+      // Draw Critical Structure (Artery/Nerve) - Danger Zone
+      ctx.fillStyle = 'rgba(231, 76, 60, 0.2)';
+      ctx.strokeStyle = '#c0392b';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.arc(width/2, height - 80, 60, 0, Math.PI*2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.setLineDash([]);
+      
+      // Label
+      ctx.fillStyle = '#c0392b';
+      ctx.font = '12px sans-serif';
+      ctx.fillText('CRITICAL STRUCTURE (NO-FLY ZONE)', width/2 - 100, height - 30);
+
+      // Draw Target Path
+      ctx.strokeStyle = 'rgba(46, 204, 113, 0.3)';
+      ctx.lineWidth = 15; // Path width tolerance
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      path.forEach((p, i) => {
+        if (i === 0) ctx.moveTo(p.x, p.y);
+        else ctx.lineTo(p.x, p.y);
+      });
+      ctx.stroke();
+
+      // Draw Center Line
+      ctx.strokeStyle = 'rgba(46, 204, 113, 0.8)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Draw Robot Arm (Visuals)
+      // Shadow
+      ctx.shadowBlur = 15;
+      ctx.shadowColor = 'rgba(52, 152, 219, 0.5)';
+      
+      // Tool Tip
+      ctx.fillStyle = '#3498db'; // Robotic Blue
+      ctx.beginPath();
+      // Triangle shape for tool
+      ctx.moveTo(robot.x, robot.y);
+      ctx.lineTo(robot.x - 10, robot.y - 20);
+      ctx.lineTo(robot.x + 10, robot.y - 20);
+      ctx.closePath();
+      ctx.fill();
+
+      // Shaft (goes off screen)
+      ctx.strokeStyle = '#7f8c8d'; // Metal
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(robot.x, robot.y - 20);
+      ctx.lineTo(robot.x + (robot.x - width/2) * 0.1, -50); // Parallax effect
+      ctx.stroke();
+      
+      ctx.shadowBlur = 0;
+
+      // Mouse Target (Ghost cursor for human mode)
+      if (mode === 'human') {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(mouse.x, mouse.y, 5, 0, Math.PI*2);
+        ctx.stroke();
+      }
+    }
+
+    // Interaction
+    canvas.addEventListener('mousemove', e => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+    });
+
+    function setMode(newMode) {
+      mode = newMode;
+      const btnHuman = document.getElementById('btn-human');
+      const btnAi = document.getElementById('btn-ai');
+      const statusText = document.getElementById('status-text');
+      const sysStatus = document.getElementById('sys-status');
+
+      if (mode === 'human') {
+        btnHuman.classList.add('active');
+        btnAi.classList.remove('active');
+        statusText.textContent = "System Active: Master-Slave Engaged";
+        sysStatus.classList.add('active');
+        sysStatus.style.background = '#2ecc71';
+        sysStatus.style.boxShadow = '0 0 8px #2ecc71';
+        canvas.style.cursor = 'crosshair';
+      } else {
+        btnHuman.classList.remove('active');
+        btnAi.classList.add('active');
+        statusText.textContent = "AUTONOMOUS MODE: AI Control Active";
+        sysStatus.classList.add('active');
+        sysStatus.style.background = '#3498db';
+        sysStatus.style.boxShadow = '0 0 8px #3498db';
+        canvas.style.cursor = 'wait';
+        
+        // Reset AI position
+        aiProgress = 0;
+        robot.x = path[0].x;
+        robot.y = path[0].y;
+      }
+      resetSim();
+    }
+
+    function resetSim() {
+      score = 100;
+      violations = 0;
+      if (mode === 'ai') aiProgress = 0;
+    }
+
+    // Particle Init
+    window.addEventListener('load', () => {
+      init();
+      if (window.particlesJS) {
+        particlesJS('particles-js', {
+          particles: {
+            number: { value: 60, density: { enable: true, value_area: 800 } },
+            color: { value: '#2ecc71' },
+            opacity: { value: 0.4, random: false },
+            size: { value: 3, random: true },
+            line_linked: { enable: true, distance: 150, color: '#2ecc71', opacity: 0.2 },
+            move: { enable: true, speed: 1.5 }
+          }
+        });
+      }
+    });
+    
+    window.addEventListener('resize', resize);
+
+  </script>
+</body>
+</html>

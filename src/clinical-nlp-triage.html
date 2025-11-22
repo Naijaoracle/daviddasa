@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Clinical NLP Triage Demonstrator - AI Symptom Analysis">
+  <title>Clinical NLP Triage - David Dasa</title>
+  <link rel="icon" type="image/svg+xml" href="/src/favicon-DD-monogram.svg">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+  <style>
+    .chat-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      background: rgba(255,255,255,0.82);
+      border-radius: 1rem;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      height: 70vh;
+      min-height: 500px;
+    }
+
+    .chat-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      background: rgba(255,255,255,0.5);
+    }
+
+    .chat-header h1 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: #092917;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 1rem;
+      border-radius: 1rem;
+      line-height: 1.5;
+      font-size: 0.95rem;
+      position: relative;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background: #092917;
+      color: white;
+      border-bottom-right-radius: 0.2rem;
+    }
+
+    .message.bot {
+      align-self: flex-start;
+      background: white;
+      border: 1px solid #e0e0e0;
+      color: #333;
+      border-bottom-left-radius: 0.2rem;
+    }
+
+    .highlight {
+      background: rgba(231, 76, 60, 0.15);
+      color: #c0392b;
+      padding: 0 4px;
+      border-radius: 4px;
+      font-weight: 600;
+      border-bottom: 2px solid #e74c3c;
+    }
+
+    .triage-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-top: 0.5rem;
+      text-transform: uppercase;
+    }
+
+    .triage-emergency { background: #fadbd8; color: #c0392b; }
+    .triage-urgent { background: #fdebd0; color: #d35400; }
+    .triage-routine { background: #d4efdf; color: #27ae60; }
+
+    .input-area {
+      padding: 1.5rem;
+      background: white;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      display: flex;
+      gap: 1rem;
+    }
+
+    textarea {
+      flex: 1;
+      padding: 1rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 0.8rem;
+      resize: none;
+      font-family: inherit;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+      height: 50px;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #2ecc71;
+    }
+
+    .send-btn {
+      background: #2ecc71;
+      color: white;
+      border: none;
+      padding: 0 1.5rem;
+      border-radius: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .send-btn:hover {
+      background: #27ae60;
+    }
+
+    .clinical-context {
+      font-size: 0.8rem;
+      color: #666;
+      margin-top: 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px dashed #ddd;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <ul>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+      <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
+    </ul>
+  </nav>
+
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
+  <div class="container" style="padding-top: 100px;">
+    <div class="chat-container">
+      <div class="chat-header">
+        <h1>🏥 Clinical NLP Triage Bot</h1>
+        <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #666;">
+          A demonstration of rule-based NLP for identifying clinical red flags in patient complaints.
+        </p>
+      </div>
+      
+      <div class="chat-messages" id="chat-messages">
+        <div class="message bot">
+          Hello. I am a clinical triage demonstrator. Please describe the patient's chief complaint and history.
+          <br><br>
+          <em>Try: "70 year old male with crushing chest pain radiating to the left arm."</em>
+        </div>
+      </div>
+
+      <div class="input-area">
+        <textarea id="user-input" placeholder="Type clinical presentation..." onkeydown="if(event.keyCode === 13 && !event.shiftKey) { event.preventDefault(); sendMessage(); }"></textarea>
+        <button class="send-btn" onclick="sendMessage()">Analyze</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Knowledge Base
+    const RED_FLAGS = [
+      'chest pain', 'shortness of breath', 'crushing', 'radiating', 'left arm',
+      'sweating', 'nausea', 'tearing', 'thunderclap headache', 'slurred speech',
+      'facial droop', 'weakness', 'unconscious', 'seizure', 'severe bleeding'
+    ];
+
+    const URGENT_TERMS = [
+      'fever', 'vomiting', 'dizziness', 'abdominal pain', 'cut', 'injury',
+      'fracture', 'swelling', 'rash', 'migraine'
+    ];
+
+    function sendMessage() {
+      const input = document.getElementById('user-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      // Add User Message
+      addMessage(text, 'user');
+      input.value = '';
+
+      // Process (Simulate NLP delay)
+      setTimeout(() => {
+        analyzeText(text);
+      }, 600);
+    }
+
+    function addMessage(text, type, isHtml = false) {
+      const div = document.createElement('div');
+      div.className = `message ${type}`;
+      if (isHtml) div.innerHTML = text;
+      else div.textContent = text;
+      
+      document.getElementById('chat-messages').appendChild(div);
+      div.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function analyzeText(text) {
+      const lowerText = text.toLowerCase();
+      let foundRedFlags = [];
+      let foundUrgent = [];
+      let annotatedText = text;
+
+      // Simple Entity Extraction
+      RED_FLAGS.forEach(flag => {
+        if (lowerText.includes(flag)) {
+          foundRedFlags.push(flag);
+          // Highlight in text (case insensitive replace)
+          const regex = new RegExp(`(${flag})`, 'gi');
+          annotatedText = annotatedText.replace(regex, '<span class="highlight">$1</span>');
+        }
+      });
+
+      if (foundRedFlags.length === 0) {
+        URGENT_TERMS.forEach(term => {
+          if (lowerText.includes(term)) {
+            foundUrgent.push(term);
+            const regex = new RegExp(`(${term})`, 'gi');
+            annotatedText = annotatedText.replace(regex, '<b>$1</b>');
+          }
+        });
+      }
+
+      // Logic
+      let responseHtml = '';
+      let triageClass = '';
+      let triageLabel = '';
+
+      if (foundRedFlags.length > 0) {
+        triageClass = 'triage-emergency';
+        triageLabel = '🚨 EMERGENCY (P1)';
+        responseHtml = `
+          Analysis identified <strong>${foundRedFlags.length} red flag(s)</strong> in the presentation.<br>
+          <div class="triage-badge ${triageClass}">${triageLabel}</div>
+          <div class="clinical-context">
+            <strong>Detected Entities:</strong> ${foundRedFlags.join(', ')}<br>
+            <strong>Recommendation:</strong> Immediate medical assessment required. Rule out ACS/CVA.
+          </div>
+        `;
+      } else if (foundUrgent.length > 0) {
+        triageClass = 'triage-urgent';
+        triageLabel = '⚠️ URGENT (P2)';
+        responseHtml = `
+          Symptoms suggest acute condition requiring timely care.<br>
+          <div class="triage-badge ${triageClass}">${triageLabel}</div>
+          <div class="clinical-context">
+            <strong>Detected Entities:</strong> ${foundUrgent.join(', ')}<br>
+            <strong>Recommendation:</strong> See provider within 2-4 hours.
+          </div>
+        `;
+      } else {
+        triageClass = 'triage-routine';
+        triageLabel = '🟢 ROUTINE (P3)';
+        responseHtml = `
+          No immediate red flags detected in description.<br>
+          <div class="triage-badge ${triageClass}">${triageLabel}</div>
+          <div class="clinical-context">
+            <strong>Recommendation:</strong> Routine appointment or self-care advice.
+          </div>
+        `;
+      }
+
+      // Show Annotated Text + Result
+      const fullResponse = `
+        <div style="margin-bottom:0.5rem; border-left:2px solid #ccc; padding-left:0.5rem; font-style:italic; color:#555;">
+          "${annotatedText}"
+        </div>
+        ${responseHtml}
+      `;
+
+      addMessage(fullResponse, 'bot', true);
+    }
+
+    // Initialize particles
+    document.addEventListener("DOMContentLoaded", () => {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 60, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.4, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.2,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 1.5,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+    });
+  </script>
+</body>
+</html>

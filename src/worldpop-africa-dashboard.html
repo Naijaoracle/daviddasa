@@ -20,12 +20,12 @@
     }
     
     .dashboard-header {
-      background: rgba(255,255,255,0.92);
-      border: 1px solid rgba(0,0,0,0.08);
-      border-radius: 12px;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 1rem;
       padding: 2rem;
       margin-bottom: 2rem;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.04);
     }
     
     .dashboard-header h1 {
@@ -41,12 +41,12 @@
     }
     
     .controls-panel {
-      background: rgba(255,255,255,0.92);
-      border: 1px solid rgba(0,0,0,0.08);
-      border-radius: 12px;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 1rem;
       padding: 1.5rem;
       margin-bottom: 2rem;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.04);
       display: flex;
       gap: 1rem;
       flex-wrap: wrap;
@@ -82,12 +82,12 @@
     }
     
     .map-container {
-      background: rgba(255,255,255,0.92);
-      border: 1px solid rgba(0,0,0,0.08);
-      border-radius: 12px;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 1rem;
       padding: 1.5rem;
       margin-bottom: 2rem;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.04);
     }
     
     #map {
@@ -105,11 +105,11 @@
     }
     
     .stat-card {
-      background: rgba(255,255,255,0.92);
-      border: 1px solid rgba(0,0,0,0.08);
-      border-radius: 12px;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 1rem;
       padding: 1.5rem;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.04);
     }
     
     .stat-card h3 {
@@ -160,11 +160,11 @@
     }
     
     .chart-container {
-      background: rgba(255,255,255,0.92);
-      border: 1px solid rgba(0,0,0,0.08);
-      border-radius: 12px;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 1rem;
       padding: 1.5rem;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.04);
     }
     
     .chart-container h3 {
@@ -179,12 +179,12 @@
     }
     
     .insights-section {
-      background: rgba(255,255,255,0.92);
-      border: 1px solid rgba(0,0,0,0.08);
-      border-radius: 12px;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 1rem;
       padding: 2rem;
       margin-bottom: 2rem;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.04);
     }
     
     .insights-section h2 {
@@ -454,6 +454,9 @@
         <li>WHO Malaria Incidence: <code>/api/MALARIA_EST_INCIDENCE</code></li>
         <li>WHO Doctor Density: <code>/api/HWF_0001</code></li>
       </ul>
+      <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">
+        <strong>Note:</strong> Live API data is accessed via CORS proxy (allorigins.win) to bypass browser security restrictions. The dashboard automatically falls back to estimated data if APIs are unavailable.
+      </p>
     </div>
 
     <!-- Insights Section -->
@@ -601,8 +604,10 @@
         retina_detect: true
       });
 
-      // WorldPop API Configuration
+      // API Configuration with CORS proxy
+      const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
       const WORLDPOP_API_BASE = 'https://www.worldpop.org/rest/data';
+      const WHO_API_BASE = 'https://ghoapi.azureedge.net/api';
       const NIGERIA_ISO3 = 'NGA';
       
       // Initialize map
@@ -628,8 +633,6 @@
         'Bauchi': { lat: 10.3103, lng: 9.8439, healthcare: 55 }
       };
 
-      // WHO GHO API Configuration
-      const WHO_API_BASE = 'https://ghoapi.azureedge.net/api';
       
       // Fetch WorldPop data
       let worldPopData = {};
@@ -640,7 +643,8 @@
       async function fetchWhoIndicator(indicatorCode) {
         try {
           // OData filter for Nigeria (SpatialDim = NGA) and recent years
-          const url = `${WHO_API_BASE}/${indicatorCode}?$filter=SpatialDim eq '${NIGERIA_ISO3}' and TimeDim ge 2015`;
+          const apiUrl = `${WHO_API_BASE}/${indicatorCode}?$filter=SpatialDim eq '${NIGERIA_ISO3}' and TimeDim ge 2015`;
+          const url = `${CORS_PROXY}${encodeURIComponent(apiUrl)}`;
           const response = await fetch(url);
           if (!response.ok) throw new Error(`WHO API error ${response.status}`);
           const data = await response.json();
@@ -659,7 +663,7 @@
         statusIndicator.textContent = '🔄 Fetching WHO & WorldPop data...';
         
         try {
-          // Fetch key indicators in parallel
+          // Fetch key indicators in parallel with delay to avoid rate limiting
           const [malaria, maternal, doctors, uhc] = await Promise.all([
             fetchWhoIndicator('MALARIA_EST_INCIDENCE'), // Incidence per 1000
             fetchWhoIndicator('MDG_0000000026'),       // Maternal mortality ratio
@@ -676,6 +680,11 @@
 
           updateHealthStats();
           console.log('WHO GHO Data loaded:', whoData);
+          
+          // Update status to show both APIs are working
+          const statusIndicator = document.getElementById('status-indicator');
+          statusIndicator.textContent = '✅ Live WorldPop & WHO Data';
+          statusIndicator.style.color = '#2ecc71';
           
         } catch (error) {
           console.error('Error loading WHO data:', error);
@@ -736,8 +745,9 @@
           document.getElementById('total-population').textContent = 'Loading...';
           document.getElementById('density-value').textContent = '...';
           
-          // Fetch Nigeria population data from WorldPop API
-          const response = await fetch(`${WORLDPOP_API_BASE}/pop/wpgp?iso3=${NIGERIA_ISO3}`, {
+          // Fetch Nigeria population data from WorldPop API via CORS proxy
+          const apiUrl = `${WORLDPOP_API_BASE}/pop/wpgp?iso3=${NIGERIA_ISO3}`;
+          const response = await fetch(`${CORS_PROXY}${encodeURIComponent(apiUrl)}`, {
             method: 'GET',
             headers: {
               'Accept': 'application/json'
@@ -793,7 +803,7 @@
               });
               
               const statusIndicator = document.getElementById('status-indicator');
-              statusIndicator.textContent = '✅ Connected to WorldPop API';
+              statusIndicator.textContent = '✅ Live WorldPop & WHO Data';
               statusIndicator.style.color = '#2ecc71';
             }
           } else {
@@ -833,7 +843,8 @@
       async function fetchHealthData() {
         try {
           // Fetch births data for Nigeria
-          const birthsResponse = await fetch(`${WORLDPOP_API_BASE}/births/pic?iso3=${NIGERIA_ISO3}`);
+          const birthsUrl = `${CORS_PROXY}${encodeURIComponent(`${WORLDPOP_API_BASE}/births/pic?iso3=${NIGERIA_ISO3}`)}`;
+          const birthsResponse = await fetch(birthsUrl);
           if (birthsResponse.ok) {
             const birthsData = await birthsResponse.json();
             if (birthsData.data && birthsData.data.length > 0) {
@@ -843,7 +854,8 @@
           }
           
           // Fetch pregnancies data for Nigeria
-          const pregnanciesResponse = await fetch(`${WORLDPOP_API_BASE}/pregnancies/pic?iso3=${NIGERIA_ISO3}`);
+          const pregnanciesUrl = `${CORS_PROXY}${encodeURIComponent(`${WORLDPOP_API_BASE}/pregnancies/pic?iso3=${NIGERIA_ISO3}`)}`;
+          const pregnanciesResponse = await fetch(pregnanciesUrl);
           if (pregnanciesResponse.ok) {
             const pregnanciesData = await pregnanciesResponse.json();
             if (pregnanciesData.data && pregnanciesData.data.length > 0) {
