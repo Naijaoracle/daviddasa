@@ -476,20 +476,22 @@
             });
 
             // Apply gradient
-            heatmapLayer.setGradient('fill', {
+            heatmapLayer.set('fill', new fabric.Gradient({
                 type: 'radial',
-                r1: heatmapLayer.radius,
-                r2: 0,
-                x1: heatmapLayer.width / 2,
-                y1: heatmapLayer.height / 2,
-                x2: heatmapLayer.width / 2,
-                y2: heatmapLayer.height / 2,
-                colorStops: {
-                    0: 'rgba(255,0,0,0)',
-                    0.5: 'rgba(255,0,0,0.3)',
-                    1: 'rgba(255,255,0,0.8)'
-                }
-            });
+                coords: {
+                    r1: heatmapLayer.radius,
+                    r2: 0,
+                    x1: heatmapLayer.width / 2,
+                    y1: heatmapLayer.height / 2,
+                    x2: heatmapLayer.width / 2,
+                    y2: heatmapLayer.height / 2
+                },
+                colorStops: [
+                    { offset: 0, color: 'rgba(255,0,0,0)' },
+                    { offset: 0.5, color: 'rgba(255,0,0,0.3)' },
+                    { offset: 1, color: 'rgba(255,255,0,0.8)' }
+                ]
+            }));
 
             canvas.add(heatmapLayer);
             btn.classList.add('active');
@@ -559,6 +561,12 @@
     loadDemoImage(); // Auto-load on start
 
   </script>
+
+  <!-- Footer -->
+  <footer>
+    <p><strong>Disclaimer:</strong> This tool is for demonstration purposes only. It does not provide medical diagnosis, treatment, or clinical decision support. Not intended for clinical use.</p>
+    <p>&copy; 2025 David Dasa</p>
+  </footer>
 </body>
 </html>
 

@@ -62,6 +62,15 @@
     .btn-ai { background: #3498db; color: white; }
     .btn-ai:hover { background: #2980b9; }
 
+    .btn-difficulty { 
+      background: #9b59b6; 
+      color: white; 
+      font-size: 0.85rem;
+      padding: 0.6rem;
+    }
+    .btn-difficulty:hover { background: #8e44ad; }
+    .btn-difficulty.active { background: #7d3c98; }
+
     .btn.active {
       box-shadow: inset 0 3px 5px rgba(0,0,0,0.2);
       transform: translateY(1px);
@@ -83,6 +92,51 @@
 
     .score-val { font-weight: 700; color: #2ecc71; }
     .danger-val { font-weight: 700; color: #e74c3c; }
+    .blood-val { font-weight: 700; color: #c0392b; }
+    
+    /* Results Modal */
+    .modal-overlay {
+      display: none;
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      border-radius: 1rem;
+    }
+    
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    }
+    
+    .result-title { font-size: 2rem; margin-bottom: 1rem; font-weight: 800; }
+    .pass { color: #2ecc71; }
+    .fail { color: #e74c3c; }
+    
+    .result-stat {
+      display: flex; 
+      justify-content: space-between;
+      margin: 0.5rem 0;
+      padding: 0.5rem;
+      background: #f8f9fa;
+      border-radius: 0.25rem;
+    }
+    
+    .key-badge {
+      background: #eee;
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.25rem;
+      font-family: monospace;
+      font-weight: bold;
+      border: 1px solid #ccc;
+      font-size: 0.8rem;
+    }
 
     .canvas-wrapper {
       position: relative;
@@ -176,6 +230,24 @@
     <div class="article-header" style="margin-top: 2rem;">
       <h1>🤖 Surgical Robotics AI Trainer</h1>
       <p>Demonstrating the synergy between robotic precision and AI safety. Control a virtual surgical arm with tremor filtration, or watch the AI perform autonomous tasks with perfect precision.</p>
+      
+      <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(46, 204, 113, 0.1); border-left: 4px solid #2ecc71; border-radius: 0.5rem;">
+        <h3 style="color: #092917; margin-top: 0; margin-bottom: 1rem;">📚 Related Datasets & Resources</h3>
+        <p style="color: #4a4a4a; line-height: 1.7; margin-bottom: 1rem;">
+          This demonstrator is inspired by real-world surgical robotics research. Explore these open datasets that enable AI-driven surgical tool detection, pose estimation, and action recognition:
+        </p>
+        <ul style="color: #4a4a4a; line-height: 1.8; margin: 0; padding-left: 1.5rem;">
+          <li>
+            <strong><a href="https://saras-mesad.grand-challenge.org/dataset/" target="_blank" rel="noopener" style="color: #2ecc71;">SARAS-MESAD Dataset</a></strong> — Digital recordings from da Vinci Xi robotic system with 21 action classes (MESAD-Real) and 14 action classes (MESAD-Phantom) for prostatectomy procedures. Contains ~23K training images from real patient procedures and phantom training sessions.
+          </li>
+          <li>
+            <strong><a href="https://surgpose.github.io/" target="_blank" rel="noopener" style="color: #2ecc71;">SurgPose Dataset</a></strong> — ~120K surgical instrument instances (6 categories) with 7 semantic keypoints each, enabling 3D pose estimation and tracking for robotic surgical tools. Collected using UV-reactive paint for precise annotation.
+          </li>
+          <li>
+            <strong><a href="https://github.com/luiscarlosgph/list-of-surgical-tool-datasets" target="_blank" rel="noopener" style="color: #2ecc71;">Surgical Tool Datasets Repository</a></strong> — Comprehensive curated list of surgical tool datasets organized by task (tool classification, segmentation, action detection, skill assessment) including Cholec80, EndoVis, JIGSAWS, and more.
+          </li>
+        </ul>
+      </div>
     </div>
 
     <div class="sim-container">
@@ -184,6 +256,13 @@
           <h3>Mode Selection</h3>
           <button class="btn btn-primary active" id="btn-human" onclick="setMode('human')">🎮 Human Control (Teleop)</button>
           <button class="btn btn-ai" id="btn-ai" onclick="setMode('ai')">🧠 AI Autonomy Mode</button>
+        </div>
+
+        <div class="control-group">
+          <h3>Difficulty Level</h3>
+          <button class="btn btn-difficulty active" id="btn-easy" onclick="setDifficulty('easy')">🟢 Easy</button>
+          <button class="btn btn-difficulty" id="btn-medium" onclick="setDifficulty('medium')">🟡 Medium</button>
+          <button class="btn btn-difficulty" id="btn-hard" onclick="setDifficulty('hard')">🔴 Hard</button>
         </div>
 
         <div class="control-group">
@@ -228,6 +307,20 @@
             <span class="score-val" id="score">100%</span>
           </div>
           <div class="stat-row">
+            <span>Blood Loss:</span>
+            <span class="blood-val" id="blood-loss">0 ml</span>
+          </div>
+          <div class="stat-row">
+            <span>Progress:</span>
+            <div style="width: 100px; background: #eee; height: 10px; border-radius: 5px; overflow: hidden;">
+              <div id="progress-bar" style="width: 0%; height: 100%; background: #2ecc71; transition: width 0.2s;"></div>
+            </div>
+          </div>
+          <div class="stat-row">
+            <span>Time Elapsed:</span>
+            <span id="timer">00:00</span>
+          </div>
+          <div class="stat-row">
             <span>Tremor Level:</span>
             <span id="tremor-val">Low</span>
           </div>
@@ -237,7 +330,15 @@
           </div>
         </div>
         
-        <button class="btn" style="background:#95a5a6; color:white;" onclick="resetSim()">↺ Reset Task</button>
+        <div style="margin-top: 1rem; font-size: 0.8rem; color: #666; background: #f8f9fa; padding: 0.8rem; border-radius: 0.5rem; border: 1px solid #eee;">
+          <strong>🏥 Controls:</strong><br>
+          <span class="key-badge">Mouse</span> Move Surgical Arm<br>
+          <span class="key-badge">W</span><span class="key-badge">A</span><span class="key-badge">S</span><span class="key-badge">D</span> Move Coagulator<br>
+          <span class="key-badge">Space</span> Cauterize Bleeding<br>
+          <span class="key-badge">Enter</span> Finish Task
+        </div>
+
+        <button class="btn" style="background:#95a5a6; color:white; margin-top: 1rem;" onclick="resetSim()">↺ Reset Task</button>
       </div>
 
       <div class="canvas-wrapper" id="canvas-wrap">
@@ -245,6 +346,29 @@
           <div class="status-dot active" id="sys-status"></div>
           <span id="status-text">System Active: Master-Slave Engaged</span>
         </div>
+        
+        <!-- Results Modal -->
+        <div class="modal-overlay" id="result-modal">
+          <div class="modal-content">
+            <div id="result-title" class="result-title">TASK COMPLETED</div>
+            <div class="result-stat">
+              <span>Final Precision:</span>
+              <strong id="final-score">--</strong>
+            </div>
+            <div class="result-stat">
+              <span>Blood Loss:</span>
+              <strong id="final-blood">--</strong>
+            </div>
+            <div class="result-stat">
+              <span>Time:</span>
+              <strong id="final-time">--</strong>
+            </div>
+            <div style="margin-top: 1.5rem;">
+              <button class="btn btn-primary" onclick="resetSim()">Start New Procedure</button>
+            </div>
+          </div>
+        </div>
+
         <canvas id="surgery-canvas"></canvas>
       </div>
     </div>
@@ -259,32 +383,76 @@
     // State
     let mouse = { x: 0, y: 0 };
     let robot = { x: 0, y: 0, targetX: 0, targetY: 0 };
+    let hemoTool = { x: 100, y: 100, vx: 0, vy: 0 }; // Haemostasis Tool (WASD)
     let mode = 'human'; // 'human' or 'ai'
+    let difficulty = 'easy'; 
     let path = [];
+    let criticalStructures = []; // Array of {x, y, radius, bleeding, bleedIntensity}
     let score = 100;
     let violations = 0;
-    let isDrawing = false;
+    let bloodLoss = 0;
+    let startTime = 0;
+    let elapsedTime = 0;
+    let isGameActive = false;
+    let keys = { w: false, a: false, s: false, d: false, space: false };
+    
+    // Animation
     let animationId;
+    let particles = []; // Blood particles
+    let sparks = []; // Cautery sparks
     
     // AI Autonomy State
     let aiProgress = 0;
     let aiSpeed = 2;
+    
+    // Hard mode: Moving field
+    let fieldOffset = { x: 0, y: 0 };
+    let fieldVelocity = { x: 0.5, y: 0.3 };
+    let time = 0; // Frame time for physics
 
     // Init
     function init() {
       resize();
       generatePath();
+      generateCriticalStructures();
+      
       robot.x = path[0].x;
       robot.y = path[0].y;
       robot.targetX = robot.x;
       robot.targetY = robot.y;
+      
+      // Reset Hemo Tool
+      hemoTool.x = width - 100;
+      hemoTool.y = height - 100;
+      
+      fieldOffset = { x: 0, y: 0 };
+      time = 0;
+      
+      resetGameStats();
       loop();
+    }
+    
+    function resetGameStats() {
+      score = 100;
+      violations = 0;
+      bloodLoss = 0;
+      startTime = Date.now();
+      isGameActive = true;
+      particles = [];
+      sparks = [];
+      document.getElementById('result-modal').style.display = 'none';
+      document.getElementById('progress-bar').style.width = '0%';
+      
+      if (mode === 'ai') aiProgress = 0;
     }
 
     function resize() {
       const wrap = document.getElementById('canvas-wrap');
       width = canvas.width = wrap.clientWidth;
       height = canvas.height = wrap.clientHeight;
+      // Regenerate path and structures when resizing
+      generatePath();
+      generateCriticalStructures();
     }
 
     function generatePath() {
@@ -304,6 +472,65 @@
       }
     }
 
+    function generateCriticalStructures() {
+      criticalStructures = [];
+      
+      const createStructure = (x, y, r) => ({
+        x, y, radius: r,
+        bleeding: false,
+        bleedIntensity: 0,
+        bleedTimer: 0, // For clotting
+        maxBleedTime: 300 + Math.random() * 200, // 5-8 seconds approx (at 60fps)
+        isCauterized: false,
+        poolSize: 0 // For blood pooling visual
+      });
+      
+      if (difficulty === 'easy') {
+        criticalStructures.push(createStructure(width / 2, height - 80, 60));
+      } else if (difficulty === 'medium') {
+        // Medium: Multiple blood vessels closer to the path
+        const centerY = height / 2;
+        const pathAmplitude = 60;
+        
+        // Generate 4-5 critical structures positioned near the path
+        const numStructures = 5;
+        for (let i = 0; i < numStructures; i++) {
+          const t = (i + 1) / (numStructures + 1);
+          const x = 50 + (width - 100) * t;
+          const y = centerY + Math.sin(x * 0.02) * pathAmplitude;
+          
+          const offsetAngle = (i % 2 === 0 ? 1 : -1) * Math.PI / 2;
+          const offsetDist = 40 + Math.random() * 30;
+          
+          criticalStructures.push(createStructure(
+            x + Math.cos(offsetAngle) * offsetDist,
+            y + Math.sin(offsetAngle) * offsetDist,
+            35 + Math.random() * 15
+          ));
+        }
+      } else if (difficulty === 'hard') {
+        // Hard: More structures, even closer to path
+        const centerY = height / 2;
+        const pathAmplitude = 60;
+        
+        const numStructures = 7;
+        for (let i = 0; i < numStructures; i++) {
+          const t = (i + 1) / (numStructures + 1);
+          const x = 50 + (width - 100) * t;
+          const y = centerY + Math.sin(x * 0.02) * pathAmplitude;
+          
+          const offsetAngle = (i % 2 === 0 ? 1 : -1) * Math.PI / 2;
+          const offsetDist = 25 + Math.random() * 20;
+          
+          criticalStructures.push(createStructure(
+            x + Math.cos(offsetAngle) * offsetDist,
+            y + Math.sin(offsetAngle) * offsetDist,
+            30 + Math.random() * 20
+          ));
+        }
+      }
+    }
+
     // Main Loop
     function loop() {
       update();
@@ -312,6 +539,29 @@
     }
 
     function update() {
+      if (!isGameActive) return;
+
+      // 0. Hard mode: Update moving field
+      if (difficulty === 'hard') {
+        time += 0.02;
+        // Create smooth circular/elliptical motion
+        fieldOffset.x = Math.sin(time * 0.5) * 30;
+        fieldOffset.y = Math.cos(time * 0.7) * 25;
+      } else {
+        fieldOffset = { x: 0, y: 0 };
+      }
+      
+      // Hemo Tool Movement (WASD)
+      const hemoSpeed = 5;
+      if (keys.w) hemoTool.y -= hemoSpeed;
+      if (keys.s) hemoTool.y += hemoSpeed;
+      if (keys.a) hemoTool.x -= hemoSpeed;
+      if (keys.d) hemoTool.x += hemoSpeed;
+      
+      // Clamp Hemo Tool to screen
+      hemoTool.x = Math.max(0, Math.min(width, hemoTool.x));
+      hemoTool.y = Math.max(0, Math.min(height, hemoTool.y));
+
       // 1. Input Handling (Human vs AI)
       if (mode === 'human') {
         let targetX = mouse.x;
@@ -326,16 +576,19 @@
         robot.targetX = targetX;
         robot.targetY = targetY;
       } else {
-        // AI Mode: Follow path perfectly
+        // AI Mode: Follow path perfectly (accounting for field movement)
         if (aiProgress < path.length - 1) {
           const p1 = path[Math.floor(aiProgress)];
           const p2 = path[Math.floor(aiProgress) + 1];
           const t = aiProgress % 1;
           
-          robot.targetX = p1.x + (p2.x - p1.x) * t;
-          robot.targetY = p1.y + (p2.y - p1.y) * t;
+          robot.targetX = p1.x + (p2.x - p1.x) * t + fieldOffset.x;
+          robot.targetY = p1.y + (p2.y - p1.y) * t + fieldOffset.y;
           
           aiProgress += 0.02 * aiSpeed;
+        } else {
+           // AI finished
+           finishGame();
         }
       }
 
@@ -345,20 +598,47 @@
       // Lerp for damping
       robot.x += (robot.targetX - robot.x) * smoothing;
       robot.y += (robot.targetY - robot.y) * smoothing;
+      
+      // Update Time
+      elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+      const mins = Math.floor(elapsedTime / 60).toString().padStart(2, '0');
+      const secs = (elapsedTime % 60).toString().padStart(2, '0');
+      document.getElementById('timer').textContent = `${mins}:${secs}`;
+
+      // Calculate Progress (Project robot onto path)
+      let closestIndex = 0;
+      let minD = Infinity;
+      path.forEach((p, i) => {
+        // Simple check: find closest point
+        // In a real app, we'd track "furthest point reached" to avoid backtracking progress
+        const pd = Math.hypot((p.x + fieldOffset.x) - robot.x, (p.y + fieldOffset.y) - robot.y);
+        if (pd < minD) { minD = pd; closestIndex = i; }
+      });
+      const progressPct = Math.min(100, Math.round((closestIndex / (path.length - 1)) * 100));
+      document.getElementById('progress-bar').style.width = progressPct + '%';
 
       // 3. Safety & Scoring
       checkSafety();
+      
+      // 4. Finish Condition (End of path)
+      const lastP = path[path.length-1];
+      const distToEnd = Math.hypot(robot.x - (lastP.x + fieldOffset.x), robot.y - (lastP.y + fieldOffset.y));
+      if (distToEnd < 20) {
+        finishGame();
+      }
     }
 
     function checkSafety() {
-      // Find distance to nearest path point
+      // Find distance to nearest path point (accounting for field movement)
       let minDist = Infinity;
       path.forEach(p => {
-        const d = Math.hypot(p.x - robot.x, p.y - robot.y);
+        const pathX = p.x + fieldOffset.x;
+        const pathY = p.y + fieldOffset.y;
+        const d = Math.hypot(pathX - robot.x, pathY - robot.y);
         if (d < minDist) minDist = d;
       });
 
-      // Scoring
+      // Scoring (Precision)
       if (minDist > 20 && mode === 'human') {
         score -= 0.1;
         if(score < 0) score = 0;
@@ -373,34 +653,140 @@
         }
       }
 
-      // Critical Zone (Red areas)
-      // Simulated Critical Structure at bottom center
-      const critX = width/2;
-      const critY = height - 80;
-      const distCrit = Math.hypot(robot.x - critX, robot.y - critY);
-      
-      if (distCrit < 60) {
-        if (document.getElementById('zone-lock').checked) {
-            // Active constraint (Haptic Feedback Simulation)
-            // Push robot back
+      // Check all Critical Zones (blood vessels)
+      criticalStructures.forEach(crit => {
+        const critX = crit.x + fieldOffset.x;
+        const critY = crit.y + fieldOffset.y;
+        const distCrit = Math.hypot(robot.x - critX, robot.y - critY);
+        
+        // Collision Logic
+        if (distCrit < crit.radius && !crit.isCauterized) {
+          if (document.getElementById('zone-lock').checked) {
+            // Active constraint: push back
             const angle = Math.atan2(robot.y - critY, robot.x - critX);
-            robot.x = critX + Math.cos(angle) * 60;
-            robot.y = critY + Math.sin(angle) * 60;
-        } else {
-            violations += 0.05; // Accumulate float to slow down counter
+            robot.x = critX + Math.cos(angle) * crit.radius;
+            robot.y = critY + Math.sin(angle) * crit.radius;
+          } else {
+            violations += 0.05;
+            // CUT THE VESSEL -> BLEEDING
+            if (!crit.bleeding) {
+                crit.bleeding = true;
+                crit.bleedIntensity = crit.radius / 30; // Larger vessels bleed more
+                crit.bleedTimer = 0;
+                // Initial Burst
+                for(let i=0; i<10; i++) {
+                    particles.push(createBloodParticle(critX, critY, 4));
+                }
+            }
+          }
         }
-      }
+        
+        // Haemostasis Logic (WASD Tool)
+        const distHemo = Math.hypot(hemoTool.x - critX, hemoTool.y - critY);
+        if (crit.bleeding && distHemo < crit.radius + 10 && keys.space) {
+          crit.bleeding = false; // Cauterized
+          crit.isCauterized = true;
+          crit.bleedIntensity = 0;
+          
+          // Spark Effect
+          for(let i=0; i<15; i++) {
+            sparks.push({
+                x: critX + (Math.random()-0.5)*20,
+                y: critY + (Math.random()-0.5)*20,
+                vx: (Math.random()-0.5)*5,
+                vy: (Math.random()-0.5)*5,
+                life: 1.0,
+                color: '#f1c40f' // Gold/Yellow sparks
+            });
+          }
+        }
+        
+        // Bleeding Effects
+        if (crit.bleeding) {
+          crit.bleedTimer++;
+          // Auto-clotting logic
+          if (crit.bleedTimer > crit.maxBleedTime) {
+            crit.bleeding = false; // Clotted
+            // Maybe allow it to re-bleed if cut again?
+            // For now, it stops bleeding but isn't "cauterized" (so no points for fixing it, but blood loss stops)
+          }
+        
+          bloodLoss += 0.2 * crit.bleedIntensity; 
+          crit.poolSize = Math.min(crit.poolSize + 0.1, crit.radius * 1.5); // Pooling
+          
+          // Spawn particles
+          if (Math.random() < 0.4 * crit.bleedIntensity) {
+             particles.push(createBloodParticle(critX, critY, 2));
+          }
+        }
+      });
+      
+      // Update Particles
+      particles.forEach((p, i) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.02;
+        if(p.life <= 0) particles.splice(i, 1);
+      });
+      
+      // Update Sparks
+      sparks.forEach((p, i) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.05; // Sparks die faster
+        if(p.life <= 0) sparks.splice(i, 1);
+      });
 
       // Update DOM
       document.getElementById('score').textContent = Math.round(score) + '%';
       document.getElementById('violations').textContent = Math.floor(violations);
+      document.getElementById('blood-loss').textContent = Math.floor(bloodLoss) + ' ml';
       
-      // Calculate Tremor (Distance between target and actual)
+      // Calculate Tremor
       const lag = Math.hypot(robot.targetX - robot.x, robot.targetY - robot.y);
       let tremorText = 'Low';
       if(lag > 50) tremorText = 'High';
       else if(lag > 20) tremorText = 'Medium';
       document.getElementById('tremor-val').textContent = tremorText;
+    }
+    
+    function createBloodParticle(x, y, speedMult) {
+        return {
+           x: x + (Math.random() - 0.5) * 20,
+           y: y + (Math.random() - 0.5) * 20,
+           vx: (Math.random() - 0.5) * speedMult,
+           vy: (Math.random() * speedMult) + 1, 
+           life: 1.0,
+           color: `rgba(192, 57, 43, ${0.5 + Math.random()*0.5})`
+        };
+    }
+
+    function finishGame() {
+      isGameActive = false;
+      const modal = document.getElementById('result-modal');
+      const title = document.getElementById('result-title');
+      
+      // Pass/Fail Criteria
+      // Pass if Score > 70% AND Blood Loss < 500ml
+      const passed = score > 70 && bloodLoss < 500;
+      
+      if (passed) {
+        title.textContent = "PROCEDURE SUCCESSFUL";
+        title.className = "result-title pass";
+      } else {
+        title.textContent = "PROCEDURE FAILED";
+        title.className = "result-title fail";
+      }
+      
+      document.getElementById('final-score').textContent = Math.round(score) + '%';
+      document.getElementById('final-score').style.color = score > 70 ? '#2ecc71' : '#e74c3c';
+      
+      document.getElementById('final-blood').textContent = Math.floor(bloodLoss) + ' ml';
+      document.getElementById('final-blood').style.color = bloodLoss < 500 ? '#2ecc71' : '#e74c3c';
+      
+      document.getElementById('final-time').textContent = document.getElementById('timer').textContent;
+      
+      modal.style.display = 'flex';
     }
 
     function draw() {
@@ -408,29 +794,73 @@
       ctx.fillStyle = '#1a1a1a'; // Dark background
       ctx.fillRect(0, 0, width, height);
 
-      // Draw Tissue / Background
+      // Draw Tissue / Background (with movement offset in hard mode)
+      ctx.save();
+      ctx.translate(fieldOffset.x, fieldOffset.y);
+      
       ctx.fillStyle = '#2c2c2c';
       ctx.beginPath();
       ctx.arc(width/2, height/2, 300, 0, Math.PI*2);
       ctx.fill();
 
-      // Draw Critical Structure (Artery/Nerve) - Danger Zone
-      ctx.fillStyle = 'rgba(231, 76, 60, 0.2)';
-      ctx.strokeStyle = '#c0392b';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([5, 5]);
-      ctx.beginPath();
-      ctx.arc(width/2, height - 80, 60, 0, Math.PI*2);
-      ctx.fill();
-      ctx.stroke();
-      ctx.setLineDash([]);
+      // Draw all Critical Structures (Blood Vessels)
+      criticalStructures.forEach((crit, index) => {
+        // Draw Blood Pool (if any)
+        if (crit.poolSize > 0) {
+            ctx.fillStyle = 'rgba(150, 20, 20, 0.4)';
+            ctx.beginPath();
+            ctx.arc(crit.x, crit.y, crit.radius + crit.poolSize, 0, Math.PI*2);
+            ctx.fill();
+        }
       
-      // Label
-      ctx.fillStyle = '#c0392b';
-      ctx.font = '12px sans-serif';
-      ctx.fillText('CRITICAL STRUCTURE (NO-FLY ZONE)', width/2 - 100, height - 30);
+        // Main Vessel Body
+        if (crit.isCauterized) {
+            // Charred / Cauterized Look
+            ctx.fillStyle = '#555'; 
+            ctx.strokeStyle = '#333';
+        } else if (crit.bleeding) {
+            // Bleeding Pulse
+            ctx.fillStyle = `rgba(192, 57, 43, ${0.4 + Math.sin(Date.now()/200)*0.2})`;
+            ctx.strokeStyle = '#c0392b';
+        } else {
+            // Normal
+            ctx.fillStyle = 'rgba(231, 76, 60, 0.2)';
+            ctx.strokeStyle = '#c0392b';
+        }
+        
+        ctx.lineWidth = 2;
+        ctx.setLineDash(crit.isCauterized ? [] : [5, 5]); // Solid line if cauterized
+        ctx.beginPath();
+        ctx.arc(crit.x, crit.y, crit.radius, 0, Math.PI*2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.setLineDash([]);
+        
+        // Label for first structure only
+        if (index === 0 && criticalStructures.length === 1) {
+          ctx.fillStyle = '#c0392b';
+          ctx.font = '12px sans-serif';
+          ctx.fillText('CRITICAL STRUCTURE (NO-FLY ZONE)', crit.x - 100, crit.y + crit.radius + 20);
+        }
+      });
 
-      // Draw Target Path
+      // Draw Particles (Blood)
+      particles.forEach(p => {
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3 * p.life, 0, Math.PI*2);
+        ctx.fill();
+      });
+      
+      // Draw Sparks
+      sparks.forEach(p => {
+        ctx.fillStyle = `rgba(241, 196, 15, ${p.life})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 2, 0, Math.PI*2);
+        ctx.fill();
+      });
+
+      // Draw Target Path (with movement offset)
       ctx.strokeStyle = 'rgba(46, 204, 113, 0.3)';
       ctx.lineWidth = 15; // Path width tolerance
       ctx.lineCap = 'round';
@@ -445,8 +875,51 @@
       ctx.strokeStyle = 'rgba(46, 204, 113, 0.8)';
       ctx.lineWidth = 2;
       ctx.stroke();
+      
+      // Draw Start/End markers
+      if(path.length > 0) {
+         // Start
+         ctx.fillStyle = '#2ecc71';
+         ctx.beginPath(); ctx.arc(path[0].x, path[0].y, 5, 0, Math.PI*2); ctx.fill();
+         ctx.fillText('START', path[0].x - 15, path[0].y - 15);
+         
+         // End
+         ctx.fillStyle = '#e74c3c';
+         ctx.beginPath(); ctx.arc(path[path.length-1].x, path[path.length-1].y, 5, 0, Math.PI*2); ctx.fill();
+         ctx.fillText('FINISH', path[path.length-1].x - 15, path[path.length-1].y - 15);
+      }
+      
+      ctx.restore(); // End of moving field context
+      
+      // --- Fixed Elements (Robot & Hemo Tool) ---
+      
+      // Draw Hemo Tool (WASD)
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = 'rgba(241, 196, 15, 0.5)';
+      ctx.strokeStyle = '#f1c40f'; // Yellow for cautery
+      ctx.lineWidth = 2;
+      
+      // Crosshair shape
+      const hx = hemoTool.x;
+      const hy = hemoTool.y;
+      ctx.beginPath();
+      ctx.moveTo(hx - 10, hy); ctx.lineTo(hx + 10, hy);
+      ctx.moveTo(hx, hy - 10); ctx.lineTo(hx, hy + 10);
+      ctx.stroke();
+      
+      // Ring
+      ctx.beginPath();
+      ctx.arc(hx, hy, 15, 0, Math.PI*2);
+      ctx.stroke();
+      
+      // Active State (Cauterizing)
+      if (keys.space) {
+        ctx.fillStyle = 'rgba(241, 196, 15, 0.5)';
+        ctx.fill();
+        ctx.shadowBlur = 20;
+      }
 
-      // Draw Robot Arm (Visuals)
+      // Draw Robot Arm
       // Shadow
       ctx.shadowBlur = 15;
       ctx.shadowColor = 'rgba(52, 152, 219, 0.5)';
@@ -520,10 +993,32 @@
       resetSim();
     }
 
+    function setDifficulty(newDifficulty) {
+      difficulty = newDifficulty;
+      const btnEasy = document.getElementById('btn-easy');
+      const btnMedium = document.getElementById('btn-medium');
+      const btnHard = document.getElementById('btn-hard');
+      
+      // Update button states
+      btnEasy.classList.remove('active');
+      btnMedium.classList.remove('active');
+      btnHard.classList.remove('active');
+      
+      if (difficulty === 'easy') {
+        btnEasy.classList.add('active');
+      } else if (difficulty === 'medium') {
+        btnMedium.classList.add('active');
+      } else if (difficulty === 'hard') {
+        btnHard.classList.add('active');
+      }
+      
+      // Regenerate critical structures and reset
+      generateCriticalStructures();
+      resetSim();
+    }
+
     function resetSim() {
-      score = 100;
-      violations = 0;
-      if (mode === 'ai') aiProgress = 0;
+      resetGameStats();
     }
 
     // Particle Init
@@ -544,7 +1039,31 @@
     });
     
     window.addEventListener('resize', resize);
+    
+    // Keyboard Controls
+    window.addEventListener('keydown', e => {
+      if(e.key === 'w' || e.key === 'W') keys.w = true;
+      if(e.key === 'a' || e.key === 'A') keys.a = true;
+      if(e.key === 's' || e.key === 'S') keys.s = true;
+      if(e.key === 'd' || e.key === 'D') keys.d = true;
+      if(e.key === ' ' || e.code === 'Space') keys.space = true;
+      if(e.key === 'Enter') finishGame();
+    });
+    
+    window.addEventListener('keyup', e => {
+      if(e.key === 'w' || e.key === 'W') keys.w = false;
+      if(e.key === 'a' || e.key === 'A') keys.a = false;
+      if(e.key === 's' || e.key === 'S') keys.s = false;
+      if(e.key === 'd' || e.key === 'D') keys.d = false;
+      if(e.key === ' ' || e.code === 'Space') keys.space = false;
+    });
 
   </script>
+
+  <!-- Footer -->
+  <footer>
+    <p><strong>Disclaimer:</strong> This tool is for demonstration purposes only. It does not provide medical diagnosis, treatment, or clinical decision support. The simulation is a simplified model and should not be used for surgical training or clinical decision-making. Not intended for clinical use.</p>
+    <p>&copy; 2025 David Dasa</p>
+  </footer>
 </body>
 </html>

@@ -13,19 +13,19 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
   <style>
-    .dashboard-container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 2rem;
+    .container {
+       max-width: 1400px;
+       margin-top: 2rem;
     }
     
-    .dashboard-header {
+    /* Match the exact card styling from research notes */
+    .dashboard-header, .controls-panel, .map-container, .stat-card, .chart-container, .insights-section {
       background: rgba(255,255,255,0.82);
       border: 1px solid rgba(0,0,0,0.06);
       border-radius: 1rem;
-      padding: 2rem;
-      margin-bottom: 2rem;
       box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+      padding: 2rem; /* Consistent padding like project-card */
+      margin-bottom: 2rem; /* Consistent spacing */
     }
     
     .dashboard-header h1 {
@@ -41,12 +41,7 @@
     }
     
     .controls-panel {
-      background: rgba(255,255,255,0.82);
-      border: 1px solid rgba(0,0,0,0.06);
-      border-radius: 1rem;
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+      padding: 1.5rem; /* Slightly less padding for controls */
       display: flex;
       gap: 1rem;
       flex-wrap: wrap;
@@ -82,12 +77,7 @@
     }
     
     .map-container {
-      background: rgba(255,255,255,0.82);
-      border: 1px solid rgba(0,0,0,0.06);
-      border-radius: 1rem;
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+      padding: 1.5rem; /* Map container uses 1.5rem for internal spacing */
     }
     
     #map {
@@ -105,11 +95,8 @@
     }
     
     .stat-card {
-      background: rgba(255,255,255,0.82);
-      border: 1px solid rgba(0,0,0,0.06);
-      border-radius: 1rem;
-      padding: 1.5rem;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+      padding: 1.5rem; /* Stats cards use 1.5rem */
+      margin-bottom: 0; /* Override the general margin-bottom since grid handles spacing */
     }
     
     .stat-card h3 {
@@ -160,11 +147,7 @@
     }
     
     .chart-container {
-      background: rgba(255,255,255,0.82);
-      border: 1px solid rgba(0,0,0,0.06);
-      border-radius: 1rem;
-      padding: 1.5rem;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+      padding: 1.5rem; /* Chart containers use 1.5rem */
     }
     
     .chart-container h3 {
@@ -179,12 +162,7 @@
     }
     
     .insights-section {
-      background: rgba(255,255,255,0.82);
-      border: 1px solid rgba(0,0,0,0.06);
-      border-radius: 1rem;
-      padding: 2rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+      padding: 2rem; /* Insights section uses 2rem like main sections */
     }
     
     .insights-section h2 {
@@ -303,7 +281,7 @@
   <!-- Particles Background -->
   <div id="particles-js"></div>
 
-  <div class="dashboard-container">
+  <div class="container">
     <!-- Header -->
     <div class="dashboard-header">
       <h1>🌍 Africa & Nigeria Population Health Dashboard</h1>
@@ -562,7 +540,8 @@
 
   <!-- Footer -->
   <footer>
-    <p>&copy; 2025 David Dasa | Data Source: WorldPop.org | Analysis by David Dasa, MD, MSc Digital Health & AI</p>
+    <p><strong>Disclaimer:</strong> This dashboard is for demonstration purposes only. It does not provide medical diagnosis, treatment, or clinical decision support. Data visualizations are based on publicly available datasets and should not be used for public health planning or policy decisions without additional validation. Not intended for clinical use.</p>
+    <p>&copy; 2025 David Dasa | Data Source: WorldPop.org</p>
   </footer>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -692,47 +671,39 @@
       }
 
       function updateHealthStats() {
-        // Create or update the WHO section in stats grid
-        // We'll inject this into the DOM dynamically or update specific elements
-        // For now, let's add a new section in the insights or create a specific WHO card
-        
-        // Update the existing insight text with real data
-        const insightText = `
-          Latest WHO data (${whoData.malaria.year}) indicates a malaria incidence of <strong>${whoData.malaria.value} per 1,000</strong> population at risk. 
-          With only <strong>${whoData.doctors.value} doctors per 10,000</strong> people (${whoData.doctors.year}), 
-          high-density regions identified by WorldPop face significant strain on primary care resources.
-        `;
-        
-        // Find the insight item regarding healthcare and update it if possible, 
-        // or append a new WHO specific card
         const statsGrid = document.querySelector('.stats-grid');
-        if (!document.getElementById('who-card-malaria')) {
-          const card = document.createElement('div');
-          card.className = 'stat-card';
-          card.id = 'who-card-malaria';
-          card.style.borderLeft = '4px solid #3498db';
-          card.innerHTML = `
+        
+        // Remove placeholders if they exist
+        const existingMalaria = document.getElementById('who-card-malaria');
+        if (existingMalaria) existingMalaria.remove();
+        const existingDoctors = document.getElementById('who-card-doctors');
+        if (existingDoctors) existingDoctors.remove();
+
+        // Create Malaria Card
+        const malariaCard = document.createElement('div');
+        malariaCard.className = 'stat-card';
+        malariaCard.id = 'who-card-malaria';
+        malariaCard.style.borderLeft = '4px solid #3498db';
+        malariaCard.innerHTML = `
             <h3>Malaria Incidence (WHO)</h3>
             <div class="stat-value" style="color: #3498db">${whoData.malaria.value}</div>
             <p class="stat-label">Per 1,000 population (${whoData.malaria.year})</p>
             <span class="stat-change negative">High Burden</span>
-          `;
-          statsGrid.appendChild(card);
-        }
-        
-        if (!document.getElementById('who-card-doctors')) {
-           const card = document.createElement('div');
-           card.className = 'stat-card';
-           card.id = 'who-card-doctors';
-           card.style.borderLeft = '4px solid #9b59b6';
-           card.innerHTML = `
-             <h3>Doctor Density (WHO)</h3>
-             <div class="stat-value" style="color: #9b59b6">${whoData.doctors.value}</div>
-             <p class="stat-label">Per 10,000 people (${whoData.doctors.year})</p>
-             <span class="stat-change negative">Critical Shortage</span>
-           `;
-           statsGrid.appendChild(card);
-        }
+        `;
+        statsGrid.appendChild(malariaCard);
+
+        // Create Doctor Density Card
+        const doctorCard = document.createElement('div');
+        doctorCard.className = 'stat-card';
+        doctorCard.id = 'who-card-doctors';
+        doctorCard.style.borderLeft = '4px solid #9b59b6';
+        doctorCard.innerHTML = `
+            <h3>Doctor Density (WHO)</h3>
+            <div class="stat-value" style="color: #9b59b6">${whoData.doctors.value}</div>
+            <p class="stat-label">Per 10,000 people (${whoData.doctors.year})</p>
+            <span class="stat-change negative">Critical Shortage</span>
+        `;
+        statsGrid.appendChild(doctorCard);
       }
 
       async function fetchWorldPopData(year = '2020') {
