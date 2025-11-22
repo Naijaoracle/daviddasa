@@ -11,25 +11,28 @@
   <style>
     .sim-container {
       max-width: 1200px;
-      margin: 2rem auto;
+      margin: 1rem auto; /* Reduced margin */
       background: rgba(255,255,255,0.82);
       border-radius: 1rem;
       box-shadow: 0 6px 18px rgba(0,0,0,0.04);
       border: 1px solid rgba(0,0,0,0.06);
-      padding: 1.5rem;
+      padding: 1rem; /* Reduced padding */
       display: grid;
       grid-template-columns: 300px 1fr;
       gap: 1.5rem;
-      height: calc(100vh - 150px);
-      min-height: 600px;
+      height: calc(100vh - 100px); /* Adjusted height */
+      min-height: 500px; /* Reduced min-height */
+      overflow: hidden; /* Prevent container expansion */
     }
 
     .controls {
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 1rem; /* Reduced gap */
       border-right: 1px solid rgba(0,0,0,0.1);
-      padding-right: 1.5rem;
+      padding-right: 1rem;
+      overflow-y: auto; /* Allow scrolling for controls */
+      max-height: 100%;
     }
 
     .control-group h3 {
@@ -411,6 +414,10 @@
     let aiProgress = 0;
     let aiSpeed = 2;
     
+    // Path Tracking
+    let checkpoints = []; // Indices of path points to visit
+    let nextCheckpointIndex = 0;
+    
     // Hard mode: Moving field
     let fieldOffset = { x: 0, y: 0 };
     let fieldVelocity = { x: 0.5, y: 0.3 };
@@ -430,6 +437,14 @@
       // Reset Hemo Tool
       hemoTool.x = width - 100;
       hemoTool.y = height - 100;
+      
+      // Init Checkpoints (25%, 50%, 75%)
+      checkpoints = [
+        Math.floor(path.length * 0.25),
+        Math.floor(path.length * 0.50),
+        Math.floor(path.length * 0.75)
+      ];
+      nextCheckpointIndex = 0;
       
       fieldOffset = { x: 0, y: 0 };
       time = 0;
@@ -657,17 +672,42 @@
       const secs = (elapsedTime % 60).toString().padStart(2, '0');
       document.getElementById('timer').textContent = `${mins}:${secs}`;
 
-      // Calculate Progress (Project robot onto path)
+      // Calculate Progress & Checkpoints
       let closestIndex = 0;
       let minD = Infinity;
       path.forEach((p, i) => {
-        // Simple check: find closest point
-        // In a real app, we'd track "furthest point reached" to avoid backtracking progress
         const pd = Math.hypot((p.x + fieldOffset.x) - robot.x, (p.y + fieldOffset.y) - robot.y);
         if (pd < minD) { minD = pd; closestIndex = i; }
       });
-      const progressPct = Math.min(100, Math.round((closestIndex / (path.length - 1)) * 100));
-      document.getElementById('progress-bar').style.width = progressPct + '%';
+      
+      // Checkpoint Logic
+      if (nextCheckpointIndex < checkpoints.length) {
+        const targetIdx = checkpoints[nextCheckpointIndex];
+        // If we are close to the checkpoint index AND physically close to the point
+        // Allow some slack in index (e.g. +/- 5 points) to account for cutting corners slightly
+        if (Math.abs(closestIndex - targetIdx) < 10 && minD < 40) {
+            nextCheckpointIndex++;
+        }
+      }
+      
+      // Display Progress based on checkpoints to avoid jumping 0 -> 100
+      // 4 segments: 0-25, 25-50, 50-75, 75-100
+      // Base progress on passed checkpoints + proximity to next
+      let basePct = nextCheckpointIndex * 25;
+      // Add some fine-grained progress if between checkpoints? 
+      // Simplified: Use the checkpoint progress for the bar to show "valid" progress
+      // Or stick to the raw calculation but validate at the end.
+      // Let's stick to raw calculation for the bar but color it orange if checkpoints missed?
+      const rawPct = Math.min(100, Math.round((closestIndex / (path.length - 1)) * 100));
+      document.getElementById('progress-bar').style.width = rawPct + '%';
+      
+      // Color bar based on validity
+      const expectedCheckpoint = Math.floor(rawPct / 25); 
+      if (nextCheckpointIndex < expectedCheckpoint && rawPct > 25) {
+          document.getElementById('progress-bar').style.background = '#f39c12'; // Warning color
+      } else {
+          document.getElementById('progress-bar').style.background = '#2ecc71';
+      }
 
       // 3. Safety & Scoring
       checkSafety();
@@ -821,11 +861,14 @@
       // Check for unresolved issues
       const activeBleeding = criticalStructures.filter(c => c.bleeding).length;
       const uncauterizedCuts = criticalStructures.filter(c => !c.isCauterized && c.bleedTimer > 0).length;
+      const missedCheckpoints = checkpoints.length - nextCheckpointIndex;
       
       let passed = false;
       let failReason = "";
       
-      if (activeBleeding > 0) {
+      if (missedCheckpoints > 0) {
+          failReason = "FAILURE: Procedure incomplete. Path checkpoints skipped.";
+      } else if (activeBleeding > 0) {
           failReason = "CRITICAL FAILURE: Patient left with active bleeding.";
       } else if (uncauterizedCuts > 0) {
           failReason = "FAILURE: Injured vessels were not properly cauterized.";
@@ -946,6 +989,16 @@
       ctx.strokeStyle = 'rgba(46, 204, 113, 0.8)';
       ctx.lineWidth = 2;
       ctx.stroke();
+      
+      // Draw Checkpoints (Debug/Visual Guide)
+      // Optionally show checkpoints to user so they know where they must pass
+      checkpoints.forEach((idx, i) => {
+         if(i >= nextCheckpointIndex) { // Only show unreached
+             const p = path[idx];
+             ctx.fillStyle = 'rgba(241, 196, 15, 0.5)';
+             ctx.beginPath(); ctx.arc(p.x, p.y, 8, 0, Math.PI*2); ctx.fill();
+         }
+      });
       
       // Draw Start/End markers
       if(path.length > 0) {

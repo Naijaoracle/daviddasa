@@ -1298,8 +1298,9 @@
     let walkPhase = 0;
     
     // --- NPC AI System (Dr James) ---
+    // TEMPORARILY DISABLED: Set active to false to freeze Dr James in place
     const npcAI = {
-      active: true,
+      active: false, // DISABLED: Frozen until NPC logic is fixed
       state: 'IDLE', // IDLE, TO_TROLLEY, AT_TROLLEY, TO_PATIENT, APPLYING
       targetItem: null,
       timer: 0,
