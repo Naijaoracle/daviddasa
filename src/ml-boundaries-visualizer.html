@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Machine Learning Decision Boundaries Visualizer">
+  <title>ML Boundaries Visualizer - David Dasa</title>
+  <link rel="icon" type="image/svg+xml" href="/src/favicon-DD-monogram.svg">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+  <style>
+    .sim-layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 2rem;
+      margin: 2rem auto;
+      max-width: 1200px;
+    }
+
+    .controls {
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+    }
+
+    .canvas-container {
+      background: #f8f9fa;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+      position: relative;
+      height: 600px;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .control-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #092917;
+      font-size: 0.9rem;
+    }
+
+    select, button {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .btn-primary { background: #2ecc71; color: white; border: none; font-weight: 600; cursor: pointer; }
+    .btn-primary:hover { opacity: 0.9; }
+
+    .description {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 1rem;
+      line-height: 1.4;
+    }
+
+    .legend {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+      justify-content: center;
+    }
+    .legend-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+  </style>
+</head>
+<body>
+  <nav>
+    <ul>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+      <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
+    </ul>
+  </nav>
+
+  <div id="particles-js"></div>
+
+  <div class="container" style="margin-top: 2rem;">
+    <div class="article-header">
+      <h1>🧠 ML Decision Boundaries</h1>
+      <p>Visualize how different Machine Learning algorithms separate data. See where linear models fail and non-linear models succeed.</p>
+    </div>
+
+    <div class="sim-layout">
+      <div class="controls">
+        <div class="control-group">
+          <label>Dataset</label>
+          <select id="dataset-select" onchange="changeDataset()">
+            <option value="linear">Linearly Separable</option>
+            <option value="xor">XOR (Cross)</option>
+            <option value="circles">Concentric Circles</option>
+            <option value="moons">Interleaved Moons</option>
+          </select>
+          <p class="description" id="dataset-desc">Two distinct clusters that can be separated by a straight line.</p>
+        </div>
+
+        <div class="control-group">
+          <label>Algorithm</label>
+          <select id="algo-select" onchange="trainAndDraw()">
+            <option value="logistic">Logistic Regression (Linear)</option>
+            <option value="knn">K-Nearest Neighbors (k=3)</option>
+            <option value="svm_poly">SVM (Polynomial Kernel)</option>
+            <option value="rf">Random Forest (Approx)</option>
+          </select>
+          <p class="description" id="algo-desc">Fits a linear decision boundary. Fails on non-linear data.</p>
+        </div>
+        
+        <button class="btn-primary" onclick="trainAndDraw()">⚡ Train & Visualize</button>
+        <button style="background: #eee; border: none; cursor: pointer; color: #333;" onclick="generateData()">🎲 Regenerate Data</button>
+
+        <div class="legend">
+          <div class="legend-item"><div class="dot" style="background: #e74c3c"></div> Class A</div>
+          <div class="legend-item"><div class="dot" style="background: #3498db"></div> Class B</div>
+        </div>
+      </div>
+
+      <div class="canvas-container" id="canvas-wrap">
+        <canvas id="viz-canvas"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Explainer Section -->
+  <div class="container" style="margin-top: 3rem;">
+    <section class="project-card">
+      <h2>Understanding Machine Learning Decision Boundaries</h2>
+      
+      <h3>What Are Decision Boundaries?</h3>
+      <p>A decision boundary is the line, curve, or surface that separates different classes in a machine learning model. It represents the threshold where the model switches its prediction from one class to another. Understanding these boundaries helps us visualize how different algorithms approach the fundamental challenge of classification.</p>
+      
+      <h3>The Datasets Explained</h3>
+      
+      <h4>Linearly Separable Data</h4>
+      <p>This represents the ideal scenario for linear classifiers. The two classes can be perfectly separated by a straight line (or hyperplane in higher dimensions). Real-world examples include simple medical diagnoses where a single biomarker clearly distinguishes between healthy and diseased patients.</p>
+      
+      <h4>XOR (Cross) Pattern</h4>
+      <p>The classic example of non-linear separability. Named after the exclusive OR logical operation, this pattern requires the model to learn that similarity in one feature doesn't guarantee the same class label. No straight line can separate these four clusters, demonstrating why linear models fail on certain problems.</p>
+      
+      <h4>Concentric Circles</h4>
+      <p>This pattern shows radial separability where one class completely surrounds another. Common in medical imaging where abnormal tissue might surround normal tissue, or in geographic data where urban areas are surrounded by rural regions. Linear models cannot capture this circular relationship.</p>
+      
+      <h4>Interleaved Moons</h4>
+      <p>Two crescent shapes that interlock, representing complex non-linear relationships. This pattern mimics real-world scenarios where classes have curved boundaries and partial overlap, requiring sophisticated models to achieve good separation.</p>
+      
+      <h3>The Algorithms Compared</h3>
+      
+      <h4>Logistic Regression (Linear)</h4>
+      <p><strong>How it works:</strong> Fits a straight line (hyperplane) that best separates the classes using a linear combination of features. The decision boundary is defined by the equation w₁x + w₂y + b = 0.</p>
+      <p><strong>Strengths:</strong> Simple, interpretable, fast training, works well on linearly separable data, provides probability estimates.</p>
+      <p><strong>Limitations:</strong> Cannot capture non-linear relationships, fails completely on XOR and circular patterns, assumes linear relationship between features and log-odds.</p>
+      <p><strong>Real-world use:</strong> Medical diagnosis with clear biomarker thresholds, spam detection, basic risk assessment models.</p>
+      
+      <h4>K-Nearest Neighbors (KNN)</h4>
+      <p><strong>How it works:</strong> Classifies points based on the majority vote of their k nearest neighbors. Creates complex, irregular decision boundaries that adapt to local data patterns.</p>
+      <p><strong>Strengths:</strong> No assumptions about data distribution, handles non-linear patterns naturally, simple concept, works well with sufficient data.</p>
+      <p><strong>Limitations:</strong> Sensitive to noise and irrelevant features, computationally expensive for large datasets, requires careful choice of k, poor performance in high dimensions.</p>
+      <p><strong>Real-world use:</strong> Recommendation systems, pattern recognition, anomaly detection, image classification.</p>
+      
+      <h4>SVM with Polynomial Kernel</h4>
+      <p><strong>How it works:</strong> Maps data to higher dimensions using polynomial features (x², y², xy) where linear separation becomes possible. The decision boundary appears curved in the original space.</p>
+      <p><strong>Strengths:</strong> Handles non-linear patterns, memory efficient, effective in high dimensions, robust to overfitting with proper regularization.</p>
+      <p><strong>Limitations:</strong> Sensitive to feature scaling, no probability estimates, choice of kernel and parameters crucial, can be slow on large datasets.</p>
+      <p><strong>Real-world use:</strong> Text classification, image recognition, bioinformatics, financial modeling.</p>
+      
+      <h4>Random Forest (Decision Trees)</h4>
+      <p><strong>How it works:</strong> Creates rectangular decision regions by recursively splitting the feature space. Each split creates a boundary parallel to the feature axes.</p>
+      <p><strong>Strengths:</strong> Handles non-linear patterns, provides feature importance, robust to outliers, works with mixed data types, interpretable individual trees.</p>
+      <p><strong>Limitations:</strong> Can overfit with deep trees, biased toward features with more levels, rectangular boundaries may not match natural patterns, less effective on linear relationships.</p>
+      <p><strong>Real-world use:</strong> Medical diagnosis, fraud detection, feature selection, ecological modeling.</p>
+      
+      <h3>Key Insights</h3>
+      
+      <h4>The Bias-Variance Tradeoff</h4>
+      <p>Linear models have high bias but low variance—they make strong assumptions but are consistent. Non-linear models like KNN have low bias but high variance—they're flexible but can be unstable. The optimal choice depends on your data's true underlying pattern.</p>
+      
+      <h4>No Free Lunch Theorem</h4>
+      <p>No single algorithm works best for all problems. The "best" model depends on your specific dataset, noise level, sample size, and the true underlying relationship between features and classes.</p>
+      
+      <h4>Practical Considerations</h4>
+      <p>In real applications, consider interpretability requirements, training time constraints, prediction speed needs, and the cost of different types of errors. Sometimes a simple linear model that you can explain to stakeholders is more valuable than a complex model with slightly better accuracy.</p>
+      
+      <h3>Interactive Learning</h3>
+      <p>Use this visualizer to develop intuition about when different algorithms succeed or fail. Try each dataset with each algorithm and observe:</p>
+      <ul>
+        <li>How linear models create straight boundaries regardless of data shape</li>
+        <li>How KNN creates irregular, locally-adaptive boundaries</li>
+        <li>How polynomial SVM can create curved boundaries</li>
+        <li>How decision trees create rectangular regions</li>
+      </ul>
+      
+      <p>Understanding these patterns will help you choose appropriate algorithms for your own machine learning projects and recognize when you need more sophisticated approaches.</p>
+    </section>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('viz-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    let points = [];
+    let gridState = []; // Cache for decision boundary
+    
+    // Initialize
+    function resize() {
+      const wrap = document.getElementById('canvas-wrap');
+      width = canvas.width = wrap.clientWidth;
+      height = canvas.height = wrap.clientHeight;
+      trainAndDraw();
+    }
+    window.addEventListener('resize', resize);
+    window.addEventListener('load', () => {
+      generateData();
+      resize();
+    });
+
+    // Data Generation
+    function generateData() {
+      points = [];
+      const type = document.getElementById('dataset-select').value;
+      const n = 200;
+      const margin = 50;
+      
+      // Helper random range
+      const rand = (min, max) => Math.random() * (max - min) + min;
+      const randG = () => (Math.random() + Math.random() + Math.random() + Math.random() + Math.random() + Math.random() - 3) / 3; // Gaussian approx
+
+      if (type === 'linear') {
+        // Two blobs
+        for(let i=0; i<n/2; i++) {
+          points.push({x: width*0.25 + randG()*width*0.1, y: height*0.25 + randG()*height*0.1, label: 0});
+          points.push({x: width*0.75 + randG()*width*0.1, y: height*0.75 + randG()*height*0.1, label: 1});
+        }
+        document.getElementById('dataset-desc').innerText = "Two distinct clusters that can be separated by a straight line.";
+      } 
+      else if (type === 'xor') {
+        // 4 quadrants
+        for(let i=0; i<n; i++) {
+          const x = rand(margin, width-margin);
+          const y = rand(margin, height-margin);
+          const label = ((x < width/2 && y < height/2) || (x > width/2 && y > height/2)) ? 0 : 1;
+          points.push({x, y, label});
+        }
+        document.getElementById('dataset-desc').innerText = "The classic XOR problem. Requires a non-linear boundary.";
+      }
+      else if (type === 'circles') {
+        // Concentric
+        for(let i=0; i<n; i++) {
+          const angle = rand(0, Math.PI*2);
+          const r1 = rand(0, height*0.2);
+          const r2 = rand(height*0.25, height*0.4);
+          
+          // Inner
+          points.push({
+            x: width/2 + Math.cos(angle) * r1,
+            y: height/2 + Math.sin(angle) * r1,
+            label: 0
+          });
+          // Outer
+          points.push({
+            x: width/2 + Math.cos(angle) * r2,
+            y: height/2 + Math.sin(angle) * r2,
+            label: 1
+          });
+        }
+        document.getElementById('dataset-desc').innerText = "One class surrounds the other. Impossible for linear classifiers.";
+      }
+      else if (type === 'moons') {
+        // Interleaved half-circles
+        for(let i=0; i<n/2; i++) {
+            const a = rand(0, Math.PI);
+            points.push({ x: width*0.35 + Math.cos(a)*100 + randG()*10, y: height*0.5 - Math.sin(a)*100 + randG()*10, label: 0 });
+            points.push({ x: width*0.65 + Math.cos(a + Math.PI)*100 + randG()*10, y: height*0.5 - Math.sin(a + Math.PI)*100 + randG()*10, label: 1 });
+        }
+        document.getElementById('dataset-desc').innerText = "Two interlocking shapes. Requires a complex non-linear boundary.";
+      }
+    }
+
+    function changeDataset() {
+      generateData();
+      trainAndDraw();
+    }
+
+    // Algorithms (Simplified Implementations)
+    function predict(x, y, algo) {
+      if (algo === 'logistic') {
+        // Simple logistic regression trained via GD
+        // We'll use the model stored in global state 'linearModel'
+        const z = linearModel.w1 * x + linearModel.w2 * y + linearModel.b;
+        return z > 0 ? 1 : 0;
+      }
+      else if (algo === 'knn') {
+        // 3-NN
+        const k = 3;
+        // Find distances
+        const dists = points.map(p => ({
+          d: (p.x - x)**2 + (p.y - y)**2,
+          label: p.label
+        }));
+        dists.sort((a, b) => a.d - b.d);
+        // Vote
+        let vote = 0;
+        for(let i=0; i<k; i++) vote += (dists[i].label === 1 ? 1 : -1);
+        return vote > 0 ? 1 : 0;
+      }
+      else if (algo === 'svm_poly') {
+        // Polynomial Feature expansion (x, y, x^2, y^2, xy) + Linear
+        // Using the trained 'polyModel'
+        const x_n = (x - width/2) / 100; // Normalize roughly
+        const y_n = (y - height/2) / 100;
+        const z = polyModel.w[0]*x_n + polyModel.w[1]*y_n + 
+                  polyModel.w[2]*x_n*x_n + polyModel.w[3]*y_n*y_n + 
+                  polyModel.w[4]*x_n*y_n + polyModel.b;
+        return z > 0 ? 1 : 0;
+      }
+      else if (algo === 'rf') {
+         // Random Forest approximation (Rectangular regions)
+         // We'll just use 1-NN which looks like RF/Voronoi for dense data, 
+         // or actually implement a simple decision tree logic?
+         // Let's simulate a Decision Tree (recursive partitioning)
+         return predictTree(treeModel, x, y);
+      }
+      return 0;
+    }
+
+    // Global Models
+    let linearModel = { w1: 0, w2: 0, b: 0 };
+    let polyModel = { w: [0,0,0,0,0], b: 0 };
+    let treeModel = null;
+
+    function train(algo) {
+      const desc = document.getElementById('algo-desc');
+      if (algo === 'logistic') {
+        desc.innerText = "Fits a straight line (hyperplane). Fails completely on Circles and XOR.";
+        // Train Logic (Gradient Descent)
+        let w1 = Math.random() - 0.5, w2 = Math.random() - 0.5, b = 0;
+        const lr = 0.01; // Learning rate
+        
+        // Normalize data for training
+        const normPoints = points.map(p => ({
+            x: (p.x - width/2)/100,
+            y: (p.y - height/2)/100,
+            l: p.label
+        }));
+
+        for(let iter=0; iter<1000; iter++) {
+            for(let p of normPoints) {
+                const z = w1*p.x + w2*p.y + b;
+                const pred = 1 / (1 + Math.exp(-z));
+                const err = pred - p.l;
+                w1 -= lr * err * p.x;
+                w2 -= lr * err * p.y;
+                b -= lr * err;
+            }
+        }
+        linearModel = { w1, w2, b };
+      }
+      else if (algo === 'knn') {
+        desc.innerText = "K-Nearest Neighbors. Classifies based on local neighborhood. Adapts well to complex shapes but sensitive to noise.";
+        // No training needed, lazy learning
+      }
+      else if (algo === 'svm_poly') {
+        desc.innerText = "SVM with Polynomial features (x², y², xy). Can solve Circles and some curves, but maybe not complex XOR/Spirals.";
+         // Train Logic (Gradient Descent on Poly Features)
+        let w = [0,0,0,0,0].map(() => Math.random()-0.5);
+        let b = 0;
+        const lr = 0.01;
+        
+        const normPoints = points.map(p => {
+            const x = (p.x - width/2)/100;
+            const y = (p.y - height/2)/100;
+            return { f: [x, y, x*x, y*y, x*y], l: p.label };
+        });
+
+        for(let iter=0; iter<2000; iter++) {
+            for(let p of normPoints) {
+                let z = b;
+                for(let i=0; i<5; i++) z += w[i]*p.f[i];
+                const pred = 1 / (1 + Math.exp(-z)); // Using sigmoid as proxy for SVM soft margin
+                const err = pred - p.l;
+                for(let i=0; i<5; i++) w[i] -= lr * err * p.f[i];
+                b -= lr * err;
+            }
+        }
+        polyModel = { w, b };
+      }
+      else if (algo === 'rf') {
+        desc.innerText = "Decision Tree/Random Forest style. Cuts space into rectangles. Handles non-linear data well.";
+        // Build a simple Decision Tree
+        treeModel = buildTree(points, 0, 5);
+      }
+    }
+
+    // Simple Decision Tree Construction
+    function buildTree(subset, depth, maxDepth) {
+        // Base cases
+        if (depth >= maxDepth || subset.length < 5) {
+            const c0 = subset.filter(p=>p.label===0).length;
+            const c1 = subset.filter(p=>p.label===1).length;
+            return { leaf: true, val: c1 > c0 ? 1 : 0 };
+        }
+        
+        // Find best split (random search for simplicity in viz)
+        let bestSplit = null;
+        let bestImpurity = 1; // Gini
+
+        for(let i=0; i<20; i++) {
+            const axis = Math.random() > 0.5 ? 'x' : 'y';
+            // Pick a random split point from data range
+            const vals = subset.map(p => p[axis]);
+            const min = Math.min(...vals);
+            const max = Math.max(...vals);
+            const splitVal = min + Math.random()*(max-min);
+
+            const left = subset.filter(p => p[axis] < splitVal);
+            const right = subset.filter(p => p[axis] >= splitVal);
+
+            if(left.length === 0 || right.length === 0) continue;
+
+            // Gini
+            const gini = (s) => {
+                if(s.length===0) return 0;
+                const p = s.filter(x=>x.label===1).length / s.length;
+                return 2 * p * (1-p);
+            };
+            const impurity = (left.length*gini(left) + right.length*gini(right)) / subset.length;
+
+            if (impurity < bestImpurity) {
+                bestImpurity = impurity;
+                bestSplit = { axis, val: splitVal, left, right };
+            }
+        }
+
+        if (!bestSplit) return { leaf: true, val: subset.filter(p=>p.label===1).length > subset.length/2 ? 1 : 0 };
+
+        return {
+            leaf: false,
+            axis: bestSplit.axis,
+            splitVal: bestSplit.val,
+            left: buildTree(bestSplit.left, depth+1, maxDepth),
+            right: buildTree(bestSplit.right, depth+1, maxDepth)
+        };
+    }
+
+    function predictTree(node, x, y) {
+        if (node.leaf) return node.val;
+        const val = node.axis === 'x' ? x : y;
+        return val < node.splitVal ? predictTree(node.left, x, y) : predictTree(node.right, x, y);
+    }
+
+    function drawLinearBoundary() {
+      // Draw the actual linear decision boundary line
+      const { w1, w2, b } = linearModel;
+      if (Math.abs(w1) < 0.001 && Math.abs(w2) < 0.001) return; // Skip if no meaningful weights
+      
+      ctx.strokeStyle = '#34495e';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      
+      // Calculate line endpoints: w1*x + w2*y + b = 0 => y = -(w1*x + b)/w2
+      if (Math.abs(w2) > 0.001) {
+        // Draw horizontal line across canvas
+        const x1 = 0, x2 = width;
+        const y1 = -(w1*(x1-width/2)/100 + b) * 100 + height/2;
+        const y2 = -(w1*(x2-width/2)/100 + b) * 100 + height/2;
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+      } else {
+        // Vertical line
+        const x = -b * 100 / w1 + width/2;
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+      }
+      
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+
+    function trainAndDraw() {
+      const algo = document.getElementById('algo-select').value;
+      train(algo);
+      
+      // Draw Background (Decision Boundary)
+      // Use a coarse grid for speed, then upscale
+      const resolution = 6; // Evaluate every 6th pixel for better boundary visibility
+      const cols = Math.ceil(width / resolution);
+      const rows = Math.ceil(height / resolution);
+      
+      ctx.clearRect(0, 0, width, height);
+      
+      // Normalize coordinate system in predict function to match train
+      const normalize = (v, size) => (v - size/2)/100;
+
+      for (let i = 0; i < cols; i++) {
+        for (let j = 0; j < rows; j++) {
+          const x = i * resolution;
+          const y = j * resolution;
+          const p = predict(x, y, algo);
+          
+          ctx.fillStyle = p === 0 ? 'rgba(231, 76, 60, 0.15)' : 'rgba(52, 152, 219, 0.15)';
+          ctx.fillRect(x, y, resolution, resolution);
+        }
+      }
+      
+      // Draw decision boundary line for linear methods
+      if (algo === 'logistic') {
+        drawLinearBoundary();
+      }
+      
+      // Draw Points
+      for(let p of points) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 5, 0, Math.PI*2);
+        ctx.fillStyle = p.label === 0 ? '#e74c3c' : '#3498db'; // Red vs Blue
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2;
+        ctx.fill();
+        ctx.stroke();
+      }
+    }
+
+    // Particle JS Init
+    document.addEventListener("DOMContentLoaded", () => {
+      if(window.particlesJS) {
+          particlesJS('particles-js', {
+            particles: {
+              number: { value: 30 },
+              color: { value: '#aaa' },
+              shape: { type: 'circle' },
+              opacity: { value: 0.2 },
+              size: { value: 3 },
+              move: { enable: true, speed: 1 }
+            }
+          });
+      }
+    });
+  </script>
+</body>
+</html>
+

@@ -930,7 +930,22 @@
         segments[i].pathStart = cum[i] / totalLen; // normalized start position in circuit
         segments[i].pathLen = path[i].len / totalLen; // normalized segment length
       }
-      function getPointByU(u){ const d=u*totalLen; let i=0; while(i<path.length-1 && d>=cum[i+1]) i++; const local=(d-cum[i])/path[i].len; return { pos:path[i].curve.getPoint(local), seg:i } }
+      function getPointByU(u){ 
+        if(!path || path.length === 0) return { pos: new THREE.Vector3(0,0,0), seg: 0 };
+        const d=u*totalLen; 
+        let i=0; 
+        while(i<path.length-1 && d>=cum[i+1]) i++; 
+        if(i >= path.length) i = path.length - 1;
+        if(!path[i] || !path[i].curve || path[i].len <= 0) return { pos: new THREE.Vector3(0,0,0), seg: 0 };
+        const local=Math.max(0, Math.min(1, (d-cum[i])/path[i].len)); 
+        try {
+          const pos = path[i].curve.getPoint(local);
+          if(!pos || !pos.isVector3) return { pos: new THREE.Vector3(0,0,0), seg: i };
+          return { pos, seg:i };
+        } catch(e) {
+          return { pos: new THREE.Vector3(0,0,0), seg: i };
+        }
+      }
 
       const N=1400; const positions=new Float32Array(N*3); const progress=new Float32Array(N); const colors=new Float32Array(N*3); 
       const bloodGeom=new THREE.BufferGeometry(); 

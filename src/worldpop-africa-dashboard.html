@@ -583,14 +583,102 @@
         retina_detect: true
       });
 
-      // API Configuration with CORS proxy
-      const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+      // API Configuration with multiple CORS proxy fallbacks
+      const CORS_PROXIES = [
+        'https://api.allorigins.win/raw?url=',
+        'https://corsproxy.io/?',
+        'https://api.codetabs.com/v1/proxy?quest='
+      ];
       const WORLDPOP_API_BASE = 'https://www.worldpop.org/rest/data';
       const WHO_API_BASE = 'https://ghoapi.azureedge.net/api';
-      const NIGERIA_ISO3 = 'NGA';
+      
+      // Region Configuration
+      const REGIONS = {
+        'nigeria': { 
+          code: 'NGA', 
+          whoCode: 'NGA', 
+          name: 'Nigeria', 
+          center: [9.0820, 8.6753], 
+          zoom: 6 
+        },
+        'africa': { 
+          code: 'NGA', // Fallback for WorldPop as it requires country ISO
+          whoCode: 'AFR', // WHO Africa Region
+          name: 'Africa (WHO Region)', 
+          center: [8.7832, 20.5083], 
+          zoom: 3 
+        },
+        'west-africa': { 
+          code: 'GHA', // Ghana as representative
+          whoCode: 'GHA', 
+          name: 'West Africa (Ref: Ghana)', 
+          center: [7.9465, -1.0232], 
+          zoom: 5 
+        },
+        'east-africa': { 
+          code: 'KEN', // Kenya as representative
+          whoCode: 'KEN', 
+          name: 'East Africa (Ref: Kenya)', 
+          center: [0.0236, 37.9062], 
+          zoom: 5 
+        }
+      };
+
+      let currentRegion = 'nigeria';
+      
+      // Generic fetch function with proxy fallback
+      async function fetchWithProxyFallback(url, options = {}, retries = 3) {
+        let lastError = null;
+        
+        for (let attempt = 0; attempt < retries; attempt++) {
+          for (const proxy of CORS_PROXIES) {
+            try {
+              let proxyUrl;
+              if (proxy.includes('codetabs')) {
+                proxyUrl = `${proxy}${encodeURIComponent(url)}`;
+              } else if (proxy.includes('corsproxy.io')) {
+                proxyUrl = `${proxy}${url}`;
+              } else {
+                proxyUrl = `${proxy}${encodeURIComponent(url)}`;
+              }
+              
+              // Create timeout controller for better browser compatibility
+              const controller = new AbortController();
+              const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+              
+              const response = await fetch(proxyUrl, {
+                ...options,
+                signal: controller.signal
+              });
+              
+              clearTimeout(timeoutId);
+              
+              if (response.ok) {
+                return response;
+              }
+              
+              // If response is not ok but not a network error, throw
+              if (response.status >= 400 && response.status < 500) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+              }
+            } catch (error) {
+              lastError = error;
+              // Continue to next proxy
+              continue;
+            }
+          }
+          
+          // Wait before retry (exponential backoff)
+          if (attempt < retries - 1) {
+            await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+          }
+        }
+        
+        throw lastError || new Error('All proxy attempts failed');
+      }
       
       // Initialize map
-      const map = L.map('map').setView([9.0820, 8.6753], 6); // Center on Nigeria
+      const map = L.map('map').setView(REGIONS[currentRegion].center, REGIONS[currentRegion].zoom);
       
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors | WorldPop Data Analysis',
@@ -621,18 +709,23 @@
       // Helper to fetch WHO data
       async function fetchWhoIndicator(indicatorCode) {
         try {
-          // OData filter for Nigeria (SpatialDim = NGA) and recent years
-          const apiUrl = `${WHO_API_BASE}/${indicatorCode}?$filter=SpatialDim eq '${NIGERIA_ISO3}' and TimeDim ge 2015`;
-          const url = `${CORS_PROXY}${encodeURIComponent(apiUrl)}`;
-          const response = await fetch(url);
-          if (!response.ok) throw new Error(`WHO API error ${response.status}`);
+          const regionConfig = REGIONS[currentRegion];
+          // OData filter for selected region/country and recent years
+          const apiUrl = `${WHO_API_BASE}/${indicatorCode}?$filter=SpatialDim eq '${regionConfig.whoCode}' and TimeDim ge 2015`;
+          const response = await fetchWithProxyFallback(apiUrl, {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json'
+            }
+          });
+          
           const data = await response.json();
           
           // Sort by year descending and get latest
           const sorted = data.value.sort((a, b) => b.TimeDim - a.TimeDim);
           return sorted.length > 0 ? sorted[0] : null;
         } catch (e) {
-          console.warn(`Failed to fetch WHO indicator ${indicatorCode}:`, e);
+          console.warn(`Failed to fetch WHO indicator ${indicatorCode}:`, e.message);
           return null;
         }
       }
@@ -642,16 +735,24 @@
         statusIndicator.textContent = '🔄 Fetching WHO & WorldPop data...';
         
         try {
-          // Fetch key indicators in parallel with delay to avoid rate limiting
-          const [malaria, maternal, doctors, uhc] = await Promise.all([
-            fetchWhoIndicator('MALARIA_EST_INCIDENCE'), // Incidence per 1000
-            fetchWhoIndicator('MDG_0000000026'),       // Maternal mortality ratio
-            fetchWhoIndicator('HWF_0001'),             // Medical doctors per 10,000
-            fetchWhoIndicator('UHC_INDEX_REPORTED')    // UHC Service Coverage Index
-          ]);
+          // Fetch key indicators sequentially with small delays to avoid rate limiting
+          // Using sequential instead of parallel to reduce load on proxies
+          const malaria = await fetchWhoIndicator('MALARIA_EST_INCIDENCE');
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          const maternal = await fetchWhoIndicator('MDG_0000000026');
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          const doctors = await fetchWhoIndicator('HWF_0001');
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          const uhc = await fetchWhoIndicator('UHC_INDEX_REPORTED');
 
+          // Count successful fetches
+          const successCount = [malaria, maternal, doctors, uhc].filter(x => x !== null).length;
+          
           whoData = {
-            malaria: malaria ? { value: parseFloat(malaria.NumericValue).toFixed(1), year: malaria.TimeDim } : { value: '389.5', year: '2021' },
+            malaria: malaria ? { value: parseFloat(malaria.NumericValue).toFixed(1), year: malaria.TimeDim } : { value: '299.0', year: '2023' },
             maternal: maternal ? { value: parseFloat(maternal.NumericValue).toFixed(0), year: maternal.TimeDim } : { value: '1047', year: '2020' },
             doctors: doctors ? { value: parseFloat(doctors.NumericValue).toFixed(2), year: doctors.TimeDim } : { value: '3.81', year: '2018' },
             uhc: uhc ? { value: parseFloat(uhc.NumericValue).toFixed(0), year: uhc.TimeDim } : { value: '42', year: '2021' }
@@ -660,13 +761,22 @@
           updateHealthStats();
           console.log('WHO GHO Data loaded:', whoData);
           
-          // Update status to show both APIs are working
-          const statusIndicator = document.getElementById('status-indicator');
-          statusIndicator.textContent = '✅ Live WorldPop & WHO Data';
-          statusIndicator.style.color = '#2ecc71';
+          // Update status based on success rate
+          if (successCount === 4) {
+            statusIndicator.textContent = '✅ Live WorldPop & WHO Data';
+            statusIndicator.style.color = '#2ecc71';
+          } else if (successCount > 0) {
+            statusIndicator.textContent = `⚠️ Partial data loaded (${successCount}/4 indicators)`;
+            statusIndicator.style.color = '#f57c00';
+          } else {
+            statusIndicator.textContent = '⚠️ Using estimated data (API unavailable)';
+            statusIndicator.style.color = '#f57c00';
+          }
           
         } catch (error) {
           console.error('Error loading WHO data:', error);
+          statusIndicator.textContent = '⚠️ Using estimated data (API unavailable)';
+          statusIndicator.style.color = '#f57c00';
         }
       }
 
@@ -709,25 +819,22 @@
       async function fetchWorldPopData(year = '2020') {
         try {
           isLoading = true;
+          const regionConfig = REGIONS[currentRegion];
           const statusIndicator = document.getElementById('status-indicator');
-          statusIndicator.textContent = '🔄 Fetching data from WorldPop API...';
+          statusIndicator.textContent = `🔄 Fetching ${regionConfig.name} data...`;
           statusIndicator.style.color = '#2ecc71';
           
           document.getElementById('total-population').textContent = 'Loading...';
           document.getElementById('density-value').textContent = '...';
           
-          // Fetch Nigeria population data from WorldPop API via CORS proxy
-          const apiUrl = `${WORLDPOP_API_BASE}/pop/wpgp?iso3=${NIGERIA_ISO3}`;
-          const response = await fetch(`${CORS_PROXY}${encodeURIComponent(apiUrl)}`, {
+          // Fetch population data from WorldPop API via CORS proxy
+          const apiUrl = `${WORLDPOP_API_BASE}/pop/wpgp?iso3=${regionConfig.code}`;
+          const response = await fetchWithProxyFallback(apiUrl, {
             method: 'GET',
             headers: {
               'Accept': 'application/json'
             }
           });
-          
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
           
           const data = await response.json();
           
@@ -738,11 +845,10 @@
                            data.data[0];
             
             if (yearData) {
-              // Extract population estimate from metadata or use known values
-              // WorldPop provides GeoTIFF files; total population is typically calculated from the raster
+              // Extract population estimate
               const yearNum = parseInt(yearData.popyear || year);
-              const basePop2020 = 206139589; // Nigeria 2020 census
-              const estimatedPop = basePop2020 * Math.pow(1.026, yearNum - 2020);
+              const basePop = regionConfig.population; 
+              const estimatedPop = basePop * Math.pow(1.026, yearNum - 2020);
               
               worldPopData = {
                 totalPop: estimatedPop,
@@ -754,23 +860,22 @@
                 title: yearData.title || ''
               };
               
-              // Calculate estimated density and update states
-              // Note: Actual density would require processing the GeoTIFF file
-              // For now, we'll use proportional estimates based on known patterns
-              const baseDensity = 235; // Nigeria average
-              Object.keys(nigeriaStates).forEach((state, index) => {
-                const densityMultiplier = [29.2, 5.1, 6.2, 3.8, 1.9, 2.2, 0.33, 0.40, 0.48, 0.57][index] || 1;
-                nigeriaStates[state].density = Math.round(baseDensity * densityMultiplier);
-                nigeriaStates[state].pop = Math.round(nigeriaStates[state].density * 2184); // Approximate area-based calculation
-              });
+              // Update stats
+              if (currentRegion === 'nigeria') {
+                  const baseDensity = 235; // Nigeria average
+                  Object.keys(nigeriaStates).forEach((state, index) => {
+                    const densityMultiplier = [29.2, 5.1, 6.2, 3.8, 1.9, 2.2, 0.33, 0.40, 0.48, 0.57][index] || 1;
+                    nigeriaStates[state].density = Math.round(baseDensity * densityMultiplier);
+                    nigeriaStates[state].pop = Math.round(nigeriaStates[state].density * 2184); 
+                  });
+              }
               
               updateDashboard();
               
-              // Log API success
               console.log('WorldPop API data loaded:', {
+                region: currentRegion,
                 year: worldPopData.year,
-                title: worldPopData.title,
-                doi: worldPopData.doi
+                title: worldPopData.title
               });
               
               const statusIndicator = document.getElementById('status-indicator');
@@ -788,22 +893,26 @@
           statusIndicator.textContent = '⚠️ Using estimated data (API unavailable)';
           statusIndicator.style.color = '#f57c00';
           
-          // Fallback to sample data if API fails (CORS, network issues, etc.)
+          // Fallback to sample data
           const yearNum = parseInt(year);
-          const basePop2020 = 206139589;
+          const regionConfig = REGIONS[currentRegion];
+          const basePop = regionConfig.population;
+          
           worldPopData = {
-            totalPop: basePop2020 * Math.pow(1.026, yearNum - 2020),
+            totalPop: basePop * Math.pow(1.026, yearNum - 2020),
             year: year,
             citation: 'WorldPop (www.worldpop.org)',
             note: 'Using estimated data due to API connectivity'
           };
           
-          Object.keys(nigeriaStates).forEach((state, index) => {
-            const densities = [6871, 1205, 1456, 892, 456, 523, 78, 95, 112, 134];
-            const pops = [15000000, 4500000, 3200000, 7200000, 8200000, 7800000, 4500000, 5200000, 5800000, 6500000];
-            nigeriaStates[state].density = densities[index] || 200;
-            nigeriaStates[state].pop = pops[index] || 5000000;
-          });
+          if (currentRegion === 'nigeria') {
+             Object.keys(nigeriaStates).forEach((state, index) => {
+                const densities = [6871, 1205, 1456, 892, 456, 523, 78, 95, 112, 134];
+                const pops = [15000000, 4500000, 3200000, 7200000, 8200000, 7800000, 4500000, 5200000, 5800000, 6500000];
+                nigeriaStates[state].density = densities[index] || 200;
+                nigeriaStates[state].pop = pops[index] || 5000000;
+             });
+          }
           updateDashboard();
         } finally {
           isLoading = false;
@@ -813,26 +922,37 @@
       // Fetch additional datasets (births, pregnancies) for health insights
       async function fetchHealthData() {
         try {
-          // Fetch births data for Nigeria
-          const birthsUrl = `${CORS_PROXY}${encodeURIComponent(`${WORLDPOP_API_BASE}/births/pic?iso3=${NIGERIA_ISO3}`)}`;
-          const birthsResponse = await fetch(birthsUrl);
-          if (birthsResponse.ok) {
+          const regionConfig = REGIONS[currentRegion];
+          // Fetch births data
+          const birthsUrl = `${WORLDPOP_API_BASE}/births/pic?iso3=${regionConfig.code}`;
+          try {
+            const birthsResponse = await fetchWithProxyFallback(birthsUrl, {
+              method: 'GET',
+              headers: { 'Accept': 'application/json' }
+            });
             const birthsData = await birthsResponse.json();
             if (birthsData.data && birthsData.data.length > 0) {
               worldPopData.births = birthsData.data[0];
               console.log('Births data loaded from WorldPop API');
             }
+          } catch (e) {
+            console.warn('Failed to fetch births data:', e.message);
           }
           
-          // Fetch pregnancies data for Nigeria
-          const pregnanciesUrl = `${CORS_PROXY}${encodeURIComponent(`${WORLDPOP_API_BASE}/pregnancies/pic?iso3=${NIGERIA_ISO3}`)}`;
-          const pregnanciesResponse = await fetch(pregnanciesUrl);
-          if (pregnanciesResponse.ok) {
+          // Fetch pregnancies data
+          const pregnanciesUrl = `${WORLDPOP_API_BASE}/pregnancies/pic?iso3=${regionConfig.code}`;
+          try {
+            const pregnanciesResponse = await fetchWithProxyFallback(pregnanciesUrl, {
+              method: 'GET',
+              headers: { 'Accept': 'application/json' }
+            });
             const pregnanciesData = await pregnanciesResponse.json();
             if (pregnanciesData.data && pregnanciesData.data.length > 0) {
               worldPopData.pregnancies = pregnanciesData.data[0];
               console.log('Pregnancies data loaded from WorldPop API');
             }
+          } catch (e) {
+            console.warn('Failed to fetch pregnancies data:', e.message);
           }
         } catch (error) {
           console.error('Error fetching health data:', error);
@@ -1028,18 +1148,39 @@
 
       // Update statistics
       function updateStatistics() {
-        const totalPop = worldPopData.totalPop || Object.values(nigeriaStates).reduce((sum, s) => sum + (s.pop || 0), 0);
-        const avgDensity = Object.values(nigeriaStates).filter(s => s.density).reduce((sum, s) => sum + s.density, 0) / Object.values(nigeriaStates).filter(s => s.density).length;
-        const avgHealthcare = Object.values(nigeriaStates).reduce((sum, s) => sum + s.healthcare, 0) / Object.keys(nigeriaStates).length;
-        const urbanPop = Object.values(nigeriaStates).filter(s => s.density && s.density > 500).reduce((sum, s) => sum + (s.pop || 0), 0);
-        const urbanPercent = totalPop > 0 ? (urbanPop / totalPop * 100).toFixed(1) : '0';
+        let totalPop, avgDensity, avgHealthcare, urbanPercent;
+        
+        if (currentRegion === 'nigeria') {
+            totalPop = worldPopData.totalPop || Object.values(nigeriaStates).reduce((sum, s) => sum + (s.pop || 0), 0);
+            avgDensity = Object.values(nigeriaStates).filter(s => s.density).reduce((sum, s) => sum + s.density, 0) / Object.values(nigeriaStates).filter(s => s.density).length;
+            avgHealthcare = Object.values(nigeriaStates).reduce((sum, s) => sum + s.healthcare, 0) / Object.keys(nigeriaStates).length;
+            const urbanPop = Object.values(nigeriaStates).filter(s => s.density && s.density > 500).reduce((sum, s) => sum + (s.pop || 0), 0);
+            urbanPercent = totalPop > 0 ? (urbanPop / totalPop * 100).toFixed(1) : '0';
+        } else {
+            // Use region config values for other regions if WorldPop data isn't granular
+            const config = REGIONS[currentRegion];
+            totalPop = worldPopData.totalPop || config.population;
+            avgDensity = config.density; // Use configured density for region
+            
+            // Estimates for regions (hardcoded/demo values as we don't have granular state data for whole Africa yet)
+            if (currentRegion === 'africa') {
+                avgHealthcare = 48; 
+                urbanPercent = '43.8';
+            } else if (currentRegion === 'west-africa') {
+                avgHealthcare = 55;
+                urbanPercent = '47.0';
+            } else { // East Africa
+                avgHealthcare = 52;
+                urbanPercent = '29.0';
+            }
+        }
 
         document.getElementById('total-population').textContent = (totalPop / 1000000).toFixed(1) + 'M';
         document.getElementById('density-value').textContent = Math.round(avgDensity || 0).toLocaleString();
         document.getElementById('urban-pop').textContent = urbanPercent + '%';
         document.getElementById('healthcare-access').textContent = Math.round(avgHealthcare) + '%';
         
-        updateLegend(); // Ensure legend is correct on load
+        updateLegend(); 
       }
       
       function updateDashboard() {
@@ -1184,18 +1325,31 @@
       document.getElementById('metric-select').addEventListener('change', handleControlChange);
       document.getElementById('year-select').addEventListener('change', handleYearChange);
 
-      function handleControlChange() {
-        const region = document.getElementById('region-select').value;
+      async function handleControlChange() {
+        const newRegion = document.getElementById('region-select').value;
+        const year = document.getElementById('year-select').value;
         
-        // Update map based on selection
-        if (region === 'nigeria') {
-          map.setView([9.0820, 8.6753], 6);
-        } else if (region === 'africa') {
-          map.setView([8.7832, 20.5083], 4);
-        } else if (region === 'west-africa') {
-          map.setView([10.0, -5.0], 5);
+        if (newRegion !== currentRegion) {
+            currentRegion = newRegion;
+            const config = REGIONS[currentRegion];
+            
+            // Update map view
+            map.setView(config.center, config.zoom);
+            
+            // Clear existing layers if necessary or update them
+            // (The current implementation draws nigeriaStates, we might want to clear them for other regions)
+            // For now, we just update the data fetching
+            
+            // Trigger data reload
+            await Promise.all([
+                fetchWorldPopData(year),
+                fetchHealthData(),
+                fetchWhoHealthData()
+            ]);
         } else {
-          map.setView([1.0, 38.0], 5);
+            // Just metric change, handled by updateMapLayer/Charts usually
+            // But here we might just update the map layer visualization
+            updateMapLayer();
         }
       }
       

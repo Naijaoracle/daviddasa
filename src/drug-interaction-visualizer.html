@@ -47,8 +47,8 @@
       grid-template-columns: 300px 1fr;
       gap: 1.5rem;
       margin-top: 2rem;
-      height: calc(100vh - 250px);
-      min-height: 600px;
+      height: 500px;
+      min-height: 500px;
     }
     
     .controls {
@@ -108,6 +108,7 @@
       border: 1px solid #eee;
       border-radius: 0.5rem;
       background: #fcfcfc;
+      min-height: 480px;
     }
 
     .interaction-alert {
@@ -146,7 +147,7 @@
     <div class="viz-layout">
       <div class="controls">
         <div class="search-box">
-          <input type="text" class="search-input" id="drug-search" placeholder="Add medication (e.g. Warfarin)..." list="drug-options">
+          <input type="text" class="search-input" id="drug-search" placeholder="Add medication (e.g. Warfarin)..." list="drug-options" onkeypress="if(event.key==='Enter') addDrugFromInput()">
           <datalist id="drug-options">
             <!-- Top 30 Common Drugs -->
             <option value="Atorvastatin">
@@ -364,6 +365,13 @@
 
     // Initialize everything after DOM is ready
     document.addEventListener("DOMContentLoaded", () => {
+      // Check if vis is loaded
+      if (typeof vis === 'undefined') {
+        console.error('Vis.js library not loaded!');
+        document.getElementById('mynetwork').innerHTML = '<div style="padding: 2rem; text-align: center; color: #666;">Network visualization library failed to load. Please refresh the page.</div>';
+        return;
+      }
+      
       // Initialize Network
       const container = document.getElementById('mynetwork');
       if (!container) {
@@ -391,11 +399,19 @@
         }
       };
       
-      network = new vis.Network(container, data, options);
-      
-      // Initial Demo Data (after network is initialized)
-      addDrug('Warfarin');
-      addDrug('Aspirin');
+      try {
+        network = new vis.Network(container, data, options);
+        console.log('Network initialized successfully');
+        
+        // Initial Demo Data (after network is initialized)
+        setTimeout(() => {
+          addDrug('Warfarin');
+          addDrug('Aspirin');
+        }, 100);
+      } catch (error) {
+        console.error('Failed to initialize network:', error);
+        container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666;">Failed to initialize network visualization. Please refresh the page.</div>';
+      }
 
       // Initialize particles
       if (typeof particlesJS !== 'undefined') {

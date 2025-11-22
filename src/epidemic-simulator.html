@@ -79,6 +79,7 @@
     .color-s { color: #3498db; } /* Susceptible */
     .color-i { color: #e74c3c; } /* Infected */
     .color-r { color: #27ae60; } /* Recovered */
+    .color-v { color: #9b59b6; } /* Vaccinated */
 
     .btn {
       width: 100%;
@@ -137,6 +138,10 @@
             <div class="stat-val color-r" id="count-r">0</div>
             <div class="stat-label">Recovered</div>
           </div>
+          <div class="stat-item">
+            <div class="stat-val color-v" id="count-v">0</div>
+            <div class="stat-label">Vaccinated</div>
+          </div>
         </div>
 
         <div class="chart-container">
@@ -151,6 +156,11 @@
         <div class="control-group">
           <label>Social Distancing (% Stationary)</label>
           <input type="range" id="distancing" min="0" max="95" value="0">
+        </div>
+
+        <div class="control-group">
+          <label>Vaccination Rate (%)</label>
+          <input type="range" id="vaccination" min="0" max="90" value="0">
         </div>
 
         <button class="btn btn-primary" onclick="restartSim()">↺ Restart Simulation</button>
@@ -214,8 +224,14 @@
       draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, 4, 0, Math.PI * 2);
-        ctx.fillStyle = this.status === 'S' ? '#3498db' : 
-                       this.status === 'I' ? '#e74c3c' : '#27ae60';
+        
+        let color;
+        if (this.status === 'S') color = '#3498db';
+        else if (this.status === 'I') color = '#e74c3c';
+        else if (this.status === 'R') color = '#27ae60';
+        else if (this.status === 'V') color = '#9b59b6';
+        
+        ctx.fillStyle = color;
         ctx.fill();
       }
     }
@@ -228,10 +244,19 @@
       ctx = canvas.getContext('2d');
 
       agents = [];
+      const vaccRate = parseInt(document.getElementById('vaccination').value);
+      
       // Init Agents
       for (let i = 0; i < POPULATION; i++) {
-        // Start with 3 infected
-        agents.push(new Agent(i < 3 ? 'I' : 'S'));
+        let status = 'S';
+        if (i < 3) {
+          status = 'I'; // Ensure at least 3 infected to start
+        } else {
+          if (Math.random() * 100 < vaccRate) {
+            status = 'V';
+          }
+        }
+        agents.push(new Agent(status));
       }
 
       historyS = []; historyI = []; historyR = [];
@@ -286,10 +311,12 @@
       const s = agents.filter(a => a.status === 'S').length;
       const i = agents.filter(a => a.status === 'I').length;
       const r = agents.filter(a => a.status === 'R').length;
+      const v = agents.filter(a => a.status === 'V').length;
 
       document.getElementById('count-s').textContent = s;
       document.getElementById('count-i').textContent = i;
       document.getElementById('count-r').textContent = r;
+      document.getElementById('count-v').textContent = v;
 
       // Update Chart every 10 frames
       if (animationId % 10 === 0) {

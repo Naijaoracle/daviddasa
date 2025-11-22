@@ -1305,6 +1305,15 @@
       timer: 0,
       decisionTimer: 0
     };
+    
+    // Debug function to manually trigger NPC (for testing)
+    window.debugNPC = function(action = 'Oxygen mask 15 L') {
+      console.log(`Debug: Manually triggering Dr James to get ${action}`);
+      npcAI.targetItem = action;
+      npcAI.state = 'TO_TROLLEY';
+      npcAI.decisionTimer = 0;
+      logEvent('debug', { msg: `Manual NPC trigger: ${action}` });
+    };
 
     function getNextClinicalAction() {
       // ABCDE prioritization
@@ -1349,6 +1358,18 @@
     function updateNPCLogic(dt) {
       if (!npcAI.active) return;
       
+      // Safety check - ensure doctor exists and is in scene
+      if (!doctor || !doctor.parent) {
+        console.warn('Dr James missing from scene, resetting...');
+        if (doctor) {
+          doctor.position.set(-2.6, 0, -0.6);
+          doctor.rotation.set(0, 0, 0);
+          if (!doctor.parent) scene.add(doctor);
+        }
+        npcAI.state = 'IDLE';
+        return;
+      }
+      
       // Only decide if Idle
       if (npcAI.state === 'IDLE') {
         npcAI.decisionTimer += dt;
@@ -1359,6 +1380,7 @@
             npcAI.targetItem = action;
             npcAI.state = 'TO_TROLLEY';
             logEvent('npc', { msg: `Dr James deciding to get ${action}` });
+            console.log(`NPC AI: Dr James going to trolley for ${action}`);
           }
         }
         return;
@@ -1371,20 +1393,25 @@
       const reachDist = 1.2;
 
       if (npcAI.state === 'TO_TROLLEY') {
+        console.log(`Dr James walking to trolley: ${doctor.position.x.toFixed(1)}, ${doctor.position.z.toFixed(1)} -> ${trolleyPos.x}, ${trolleyPos.z}`);
         if (moveCharacter(doctor, trolleyPos, dt, walkSpeed, reachDist)) {
           npcAI.state = 'AT_TROLLEY';
           npcAI.timer = 2.0; // Rummage time
+          console.log('Dr James reached trolley');
         }
       } else if (npcAI.state === 'AT_TROLLEY') {
         npcAI.timer -= dt;
         if (npcAI.timer <= 0) {
           logEvent('npc', { msg: `Picked up ${npcAI.targetItem}` });
           npcAI.state = 'TO_PATIENT';
+          console.log(`Dr James picked up ${npcAI.targetItem}, going to patient`);
         }
       } else if (npcAI.state === 'TO_PATIENT') {
+        console.log(`Dr James walking to patient: ${doctor.position.x.toFixed(1)}, ${doctor.position.z.toFixed(1)} -> ${patientPos.x}, ${patientPos.z}`);
         if (moveCharacter(doctor, patientPos, dt, walkSpeed, reachDist)) {
           npcAI.state = 'APPLYING';
           npcAI.timer = 3.0; // Application time
+          console.log('Dr James reached patient');
         }
       } else if (npcAI.state === 'APPLYING') {
         npcAI.timer -= dt;
@@ -1398,6 +1425,7 @@
           npcAI.targetItem = null;
           npcAI.state = 'IDLE';
           npcAI.decisionTimer = -5; // Cooldown
+          console.log('Dr James finished applying item, returning to idle');
         }
       }
       
@@ -1405,6 +1433,12 @@
     }
 
     function moveCharacter(charObj, target, dt, speed, stopDist) {
+      // Safety checks
+      if (!charObj || !target) {
+        console.warn('moveCharacter: Invalid character or target');
+        return true;
+      }
+      
       const d = distXZ(charObj.position, target);
       if (d < stopDist) return true;
 
@@ -1419,16 +1453,33 @@
       charObj.rotation.y += rotDiff * 5.0 * dt;
 
       const forward = new THREE.Vector3(Math.sin(charObj.rotation.y), 0, Math.cos(charObj.rotation.y));
+      const oldPos = charObj.position.clone();
       charObj.position.add(forward.multiplyScalar(speed * dt));
 
       // Clamp position to room bounds
-      charObj.position.x = Math.max(bounds.minX+0.25, Math.min(bounds.maxX-0.25, charObj.position.x));
-      charObj.position.z = Math.max(bounds.minZ+0.25, Math.min(bounds.maxZ-0.25, charObj.position.z));
+      const newX = Math.max(bounds.minX+0.25, Math.min(bounds.maxX-0.25, charObj.position.x));
+      const newZ = Math.max(bounds.minZ+0.25, Math.min(bounds.maxZ-0.25, charObj.position.z));
+      
+      // Check if we hit bounds and got clamped
+      if (Math.abs(newX - charObj.position.x) > 0.01 || Math.abs(newZ - charObj.position.z) > 0.01) {
+        console.warn(`Dr James hit bounds: (${charObj.position.x.toFixed(2)}, ${charObj.position.z.toFixed(2)}) clamped to (${newX.toFixed(2)}, ${newZ.toFixed(2)})`);
+      }
+      
+      charObj.position.x = newX;
+      charObj.position.z = newZ;
 
       // Safety check for NaN
-      if (isNaN(charObj.position.x) || isNaN(charObj.position.z)) {
+      if (isNaN(charObj.position.x) || isNaN(charObj.position.z) || isNaN(charObj.position.y)) {
+        console.error('Dr James position became NaN, resetting to home');
         charObj.position.set(-2.6, 0, -0.6); // Reset to home
+        charObj.rotation.set(0, 0, 0);
         return true; // Stop movement
+      }
+      
+      // Check if we're stuck (not moving despite trying)
+      const moved = distXZ(oldPos, charObj.position);
+      if (moved < 0.01 && d > stopDist) {
+        console.warn(`Dr James seems stuck at (${charObj.position.x.toFixed(2)}, ${charObj.position.z.toFixed(2)}), distance to target: ${d.toFixed(2)}`);
       }
       
       return false;

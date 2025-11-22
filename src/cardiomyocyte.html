@@ -487,10 +487,11 @@ let head=0;
 
 // Pre-fill trace buffers with realistic baseline values for immediate display
 function initializeTraceBuffers(){
-  const now = performance.now() / 1000; // current time in seconds
+  // Use simulation time, not real time - start from negative values so we have history
+  const startTime = -10.0; // Start 10 seconds in the past
   for(let i=0; i<BUFSZ; i++){
     const timeOffset = (i - BUFSZ + 1) * 0.001; // 1ms intervals, most recent at end
-    trace.t[i] = now + timeOffset;
+    trace.t[i] = startTime + timeOffset;
     trace.V[i] = -86.0 + Math.sin(i * 0.1) * 2; // slight variation to show activity
     trace.Cai[i] = 100 + Math.sin(i * 0.05) * 10; // baseline calcium with variation
     trace.F[i] = 0.1 + Math.sin(i * 0.08) * 0.05; // baseline force with variation
@@ -636,15 +637,16 @@ function drawPlots(){
   function drawScrollingTrace(arr,ax,color,timeWindow=10.0){
     ctx.strokeStyle=color; ctx.lineWidth=2; ctx.beginPath();
     let firstPoint = true;
+    const currentTime = State.t;
 
     for(let i=0; i<BUFSZ; i++){
       const idx = (head - i + BUFSZ) % BUFSZ;
       const dataTime = trace.t[idx];
-      const currentTime = State.t;
-
-      // Only show data within the time window
-      if(currentTime - dataTime <= timeWindow){
-        const timeFraction = (currentTime - dataTime) / timeWindow;
+      
+      // Only show data within the time window (allow negative times for initial buffer)
+      const timeDiff = currentTime - dataTime;
+      if(timeDiff >= 0 && timeDiff <= timeWindow){
+        const timeFraction = timeDiff / timeWindow;
         const x = right - timeFraction * (right - left); // Most recent on the right
         const y = ymap(arr[idx], ax);
 
@@ -656,7 +658,7 @@ function drawPlots(){
         }
       }
     }
-    ctx.stroke();
+    if(!firstPoint) ctx.stroke(); // Only stroke if we drew at least one point
   }
 
   drawScrollingTrace(trace.V,ax1,'#70d6ff');

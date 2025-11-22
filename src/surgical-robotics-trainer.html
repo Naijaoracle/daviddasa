@@ -292,13 +292,6 @@
               <span class="slider"></span>
             </label>
           </div>
-          <div class="toggle-row">
-            <label>Critical Zone Lock</label>
-            <label class="switch">
-              <input type="checkbox" id="zone-lock" checked>
-              <span class="slider"></span>
-            </label>
-          </div>
         </div>
 
         <div class="stats-panel">
@@ -330,12 +323,23 @@
           </div>
         </div>
         
-        <div style="margin-top: 1rem; font-size: 0.8rem; color: #666; background: #f8f9fa; padding: 0.8rem; border-radius: 0.5rem; border: 1px solid #eee;">
+        <div style="margin-top: 1rem; font-size: 0.8rem; color: #666; background: #f8f9fa; padding: 1rem; border-radius: 0.5rem; border: 1px solid #eee; line-height: 1.8;">
           <strong>🏥 Controls:</strong><br>
-          <span class="key-badge">Mouse</span> Move Surgical Arm<br>
-          <span class="key-badge">W</span><span class="key-badge">A</span><span class="key-badge">S</span><span class="key-badge">D</span> Move Coagulator<br>
-          <span class="key-badge">Space</span> Cauterize Bleeding<br>
-          <span class="key-badge">Enter</span> Finish Task
+          <div style="display: flex; align-items: center; margin-bottom: 0.3rem;">
+            <span class="key-badge" style="margin-right: 0.5rem;">Mouse</span> Move Surgical Arm
+          </div>
+          <div style="display: flex; align-items: center; margin-bottom: 0.3rem;">
+            <span class="key-badge" style="margin-right: 0.5rem;">W</span>
+            <span class="key-badge" style="margin-right: 0.5rem;">A</span>
+            <span class="key-badge" style="margin-right: 0.5rem;">S</span>
+            <span class="key-badge" style="margin-right: 0.5rem;">D</span> Move Coagulator
+          </div>
+          <div style="display: flex; align-items: center; margin-bottom: 0.3rem;">
+            <span class="key-badge" style="margin-right: 0.5rem;">Space</span> Cauterize Bleeding
+          </div>
+          <div style="display: flex; align-items: center;">
+            <span class="key-badge" style="margin-right: 0.5rem;">Enter</span> Finish Task
+          </div>
         </div>
 
         <button class="btn" style="background:#95a5a6; color:white; margin-top: 1rem;" onclick="resetSim()">↺ Reset Task</button>
@@ -351,6 +355,8 @@
         <div class="modal-overlay" id="result-modal">
           <div class="modal-content">
             <div id="result-title" class="result-title">TASK COMPLETED</div>
+            <p id="result-reason" style="margin-bottom: 1.5rem; color: #666; font-size: 1.1rem;">Assessment complete.</p>
+            
             <div class="result-stat">
               <span>Final Precision:</span>
               <strong id="final-score">--</strong>
@@ -551,16 +557,62 @@
         fieldOffset = { x: 0, y: 0 };
       }
       
-      // Hemo Tool Movement (WASD)
-      const hemoSpeed = 5;
-      if (keys.w) hemoTool.y -= hemoSpeed;
-      if (keys.s) hemoTool.y += hemoSpeed;
-      if (keys.a) hemoTool.x -= hemoSpeed;
-      if (keys.d) hemoTool.x += hemoSpeed;
-      
-      // Clamp Hemo Tool to screen
-      hemoTool.x = Math.max(0, Math.min(width, hemoTool.x));
-      hemoTool.y = Math.max(0, Math.min(height, hemoTool.y));
+      // Hemo Tool Movement (WASD) or AI
+      if (mode === 'human') {
+          const hemoSpeed = 5;
+          if (keys.w) hemoTool.y -= hemoSpeed;
+          if (keys.s) hemoTool.y += hemoSpeed;
+          if (keys.a) hemoTool.x -= hemoSpeed;
+          if (keys.d) hemoTool.x += hemoSpeed;
+          
+          // Clamp Hemo Tool to screen
+          hemoTool.x = Math.max(0, Math.min(width, hemoTool.x));
+          hemoTool.y = Math.max(0, Math.min(height, hemoTool.y));
+      } else {
+          // AI Control for Hemo Tool
+          // Find nearest bleeding, non-cauterized vessel
+          let targetVessel = null;
+          let minDist = Infinity;
+          
+          criticalStructures.forEach(crit => {
+              if (crit.bleeding && !crit.isCauterized) {
+                  const d = Math.hypot(crit.x + fieldOffset.x - hemoTool.x, crit.y + fieldOffset.y - hemoTool.y);
+                  if (d < minDist) {
+                      minDist = d;
+                      targetVessel = crit;
+                  }
+              }
+          });
+          
+          if (targetVessel) {
+              const tx = targetVessel.x + fieldOffset.x;
+              const ty = targetVessel.y + fieldOffset.y;
+              
+              // Move towards it
+              const dx = tx - hemoTool.x;
+              const dy = ty - hemoTool.y;
+              const angle = Math.atan2(dy, dx);
+              const speed = 6; // Slightly faster than human
+              
+              hemoTool.x += Math.cos(angle) * speed;
+              hemoTool.y += Math.sin(angle) * speed;
+              
+              // Cauterize if close
+              if (minDist < 20) {
+                  keys.space = true;
+              } else {
+                  keys.space = false;
+              }
+          } else {
+              // Park the tool if nothing to do
+              keys.space = false;
+              // Slowly return to rest position or hover near robot
+              const dx = (robot.x + 50) - hemoTool.x;
+              const dy = (robot.y + 50) - hemoTool.y;
+              hemoTool.x += dx * 0.05;
+              hemoTool.y += dy * 0.05;
+          }
+      }
 
       // 1. Input Handling (Human vs AI)
       if (mode === 'human') {
@@ -661,23 +713,22 @@
         
         // Collision Logic
         if (distCrit < crit.radius && !crit.isCauterized) {
-          if (document.getElementById('zone-lock').checked) {
-            // Active constraint: push back
-            const angle = Math.atan2(robot.y - critY, robot.x - critX);
-            robot.x = critX + Math.cos(angle) * crit.radius;
-            robot.y = critY + Math.sin(angle) * crit.radius;
+          // Check if locked (Feature Removed, but collision still registers)
+          // Original locking logic removed per request
+          
+          // CUT THE VESSEL -> BLEEDING
+          if (!crit.bleeding) {
+              violations += 0.05; // Only count initial cut as violation
+              crit.bleeding = true;
+              crit.bleedIntensity = crit.radius / 30; // Larger vessels bleed more
+              crit.bleedTimer = 0;
+              // Initial Burst
+              for(let i=0; i<10; i++) {
+                  particles.push(createBloodParticle(critX, critY, 4));
+              }
           } else {
-            violations += 0.05;
-            // CUT THE VESSEL -> BLEEDING
-            if (!crit.bleeding) {
-                crit.bleeding = true;
-                crit.bleedIntensity = crit.radius / 30; // Larger vessels bleed more
-                crit.bleedTimer = 0;
-                // Initial Burst
-                for(let i=0; i<10; i++) {
-                    particles.push(createBloodParticle(critX, critY, 4));
-                }
-            }
+              // If already bleeding and we are still inside, maybe add more violations?
+              // Or just leave it as is.
           }
         }
         
@@ -765,17 +816,37 @@
       isGameActive = false;
       const modal = document.getElementById('result-modal');
       const title = document.getElementById('result-title');
+      const reason = document.getElementById('result-reason');
       
-      // Pass/Fail Criteria
-      // Pass if Score > 70% AND Blood Loss < 500ml
-      const passed = score > 70 && bloodLoss < 500;
+      // Check for unresolved issues
+      const activeBleeding = criticalStructures.filter(c => c.bleeding).length;
+      const uncauterizedCuts = criticalStructures.filter(c => !c.isCauterized && c.bleedTimer > 0).length;
+      
+      let passed = false;
+      let failReason = "";
+      
+      if (activeBleeding > 0) {
+          failReason = "CRITICAL FAILURE: Patient left with active bleeding.";
+      } else if (uncauterizedCuts > 0) {
+          failReason = "FAILURE: Injured vessels were not properly cauterized.";
+      } else if (bloodLoss >= 500) {
+          failReason = "FAILURE: Excessive blood loss (>500ml).";
+      } else if (score <= 70) {
+          failReason = "FAILURE: Precision score below acceptable threshold (70%).";
+      } else {
+          passed = true;
+      }
       
       if (passed) {
         title.textContent = "PROCEDURE SUCCESSFUL";
         title.className = "result-title pass";
+        reason.textContent = "Excellent work. Hemostasis achieved and precision maintained.";
+        reason.style.color = "#27ae60";
       } else {
         title.textContent = "PROCEDURE FAILED";
         title.className = "result-title fail";
+        reason.textContent = failReason;
+        reason.style.color = "#c0392b";
       }
       
       document.getElementById('final-score').textContent = Math.round(score) + '%';
