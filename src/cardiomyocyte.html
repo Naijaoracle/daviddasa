@@ -485,18 +485,18 @@ const BUFSZ = 4096;
 const trace = { t:new Float32Array(BUFSZ), V:new Float32Array(BUFSZ), Cai:new Float32Array(BUFSZ), F:new Float32Array(BUFSZ) };
 let head=0;
 
-// Pre-fill trace buffers with realistic baseline values for immediate display
+// Pre-fill trace buffers with baseline values - timestamps go back from 0
 function initializeTraceBuffers(){
-  // Use simulation time, not real time - start from negative values so we have history
-  const startTime = -10.0; // Start 10 seconds in the past
+  // Fill buffer with data from t=-2s to t=0 (matching the 2-second window)
   for(let i=0; i<BUFSZ; i++){
-    const timeOffset = (i - BUFSZ + 1) * 0.001; // 1ms intervals, most recent at end
-    trace.t[i] = startTime + timeOffset;
-    trace.V[i] = -86.0 + Math.sin(i * 0.1) * 2; // slight variation to show activity
-    trace.Cai[i] = 100 + Math.sin(i * 0.05) * 10; // baseline calcium with variation
-    trace.F[i] = 0.1 + Math.sin(i * 0.08) * 0.05; // baseline force with variation
+    // Oldest data at index 0, newest at BUFSZ-1
+    const timeOffset = (i - BUFSZ + 1) * dt; // dt intervals going backward from 0
+    trace.t[i] = timeOffset; // Will be negative, approaching 0 at the end
+    trace.V[i] = -86.0; // Resting potential
+    trace.Cai[i] = 100; // Baseline calcium in nM
+    trace.F[i] = 0.1; // Baseline force
   }
-  head = BUFSZ - 1; // Start with most recent data at the end
+  head = BUFSZ - 1; // Most recent data at the end
 }
 initializeTraceBuffers();
 
@@ -634,17 +634,21 @@ function drawPlots(){
   function ymap(v,ax){ return ax.y0 + paneH - (v-ax.ymin)/(ax.ymax-ax.ymin)*paneH }
 
   // Continuous scrolling traces - show time-based data
-  function drawScrollingTrace(arr,ax,color,timeWindow=10.0){
+  // Buffer holds BUFSZ * dt seconds of data = 4096 * 0.0005 = ~2 seconds
+  const timeWindow = 2.0; // Match buffer capacity
+  
+  function drawScrollingTrace(arr, ax, color){
     ctx.strokeStyle=color; ctx.lineWidth=2; ctx.beginPath();
     let firstPoint = true;
     const currentTime = State.t;
 
+    // Draw all points in buffer that fall within time window
     for(let i=0; i<BUFSZ; i++){
       const idx = (head - i + BUFSZ) % BUFSZ;
       const dataTime = trace.t[idx];
-      
-      // Only show data within the time window (allow negative times for initial buffer)
       const timeDiff = currentTime - dataTime;
+      
+      // Only show data within the time window
       if(timeDiff >= 0 && timeDiff <= timeWindow){
         const timeFraction = timeDiff / timeWindow;
         const x = right - timeFraction * (right - left); // Most recent on the right
@@ -658,12 +662,12 @@ function drawPlots(){
         }
       }
     }
-    if(!firstPoint) ctx.stroke(); // Only stroke if we drew at least one point
+    if(!firstPoint) ctx.stroke();
   }
 
-  drawScrollingTrace(trace.V,ax1,'#70d6ff');
-  drawScrollingTrace(trace.Cai,ax2,'#ffd166');
-  drawScrollingTrace(trace.F,ax3,'#aaf683');
+  drawScrollingTrace(trace.V, ax1, '#70d6ff');
+  drawScrollingTrace(trace.Cai, ax2, '#ffd166');
+  drawScrollingTrace(trace.F, ax3, '#aaf683');
 
   // Time scale indicator
   ctx.fillStyle='#99a1c2'; ctx.font='10px system-ui';
