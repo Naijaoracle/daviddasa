@@ -684,7 +684,7 @@ function step(){
   const I = currents(s,p);
   const Iion = I.INa + I.ICaL + I.ICaT + I.IK + I.IK1 + I.IClCa + I.Ib;
   const Istim = I_stim(s.t);
-  const dV = -(Iion + Istim)/p.Cm + (Env.noise*(Math.random()-0.5));
+  const dV = (-Iion + Istim)/p.Cm + (Env.noise*(Math.random()-0.5));
   const prevV = s.Vm; s.Vm += dV*dt*Env.temp; s.t += dt*Env.temp;
 
   // Make temperature effects more visible - also slow down calcium handling

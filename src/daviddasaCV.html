@@ -230,8 +230,8 @@
         { key:'2023-2024_education_msc', title:'MSc Digital Health & AI - Bournemouth University', years:'2023 - 2024', sortDate:'2023-09-01', bullets:['Distinction 79.9%','Dissertation: contactless BP screening (rPPG) in Nigeria, equity and deployment constraints','Projects: PyTorch chest X ray classifier, TensorFlow skin disease model, Blockchain Go Quorum security for remote monitoring'] },
         { key:'2023-present_experience_uhd', title:'Medical Bank Doctor - University Hospitals Dorset NHS FT', years:'2023 - present', sortDate:'2023-11-01', bullets:['Acute ward work across surgical specialties, VTE assessments, safe prescribing'] },
         { key:'2024-present_education_phd', title:'PhD Researcher - Bournemouth University', years:'2024 - present', sortDate:'2024-11-01', bullets:['Unity based VR training system with AI driven NPCs','Study of teamwork, reasoning, and safe decision making in XR training'] },
-        { key:'2025-present_experience_scale', title:'Medical Fellow - Scale AI (Human Frontier Collective)', years:'2025 - present', sortDate:'2025-01-01', bullets:['Designed 100+ clinical rubric criteria and multi specialty scenarios','Built error taxonomies and collaborated with physicians, researchers, and engineers'] },
-        { key:'2025-present_experience_invisible', title:'Clinical AI Evaluator - Invisible Technologies', years:'2025 - present', sortDate:'2025-05-01', bullets:['Evaluate LLMs on clinical vignettes for safety and accuracy'] },
+        { key:'2025-present_experience_scale', title:'Medical Fellow - Scale AI (Human Frontier Collective)', years:'2025 - present', sortDate:'2025-01-01', bullets:['Designed 100+ clinical rubric criteria and multi specialty scenarios','Built error taxonomies and collaborated with physicians, researchers, and engineers'], flag:'🇺🇸' },
+        { key:'2025-present_experience_invisible', title:'Clinical AI Evaluator - Invisible Technologies', years:'2025 - present', sortDate:'2025-05-01', bullets:['Evaluate LLMs on clinical vignettes for safety and accuracy'], flag:'🇺🇸' },
         { key:'2025_publications_xr_npc', title:'Publication - AI driven characters in XR healthcare simulations', years:'2025', sortDate:'2025-07-01', bullets:['Systematic review in Artificial Intelligence in Medicine','DASEX framework and meta analysis'], link:'https://doi.org/10.1016/j.artmed.2025.103270' },
         { key:'2025_publications_rppg', title:'Preprint - Equity and feasibility of rPPG in Nigeria', years:'2025', sortDate:'2025-10-13', bullets:['Multi site field evaluation, equity benchmarks for rPPG in low resource clinics'], link:'https://doi.org/10.1101/2025.10.13.25337878' },
         { key:'awards', title:'Awards and Certificates', years:'2014 - 2024', sortDate:'2014-01-01', bullets:['XR NPC PhD Studentship 2024','GMC UK full license 2022, ALS 2022','National Merit Scholarship 2014'] }
@@ -241,7 +241,7 @@
 
     // Base data must be available before any fallback or 3D path references it
     const baseData = [
-      { key:'summary', title:'Professional Summary', years:'Profile', sortDate:'2011-01-01', bullets:[CV.summary], kind:'plaque' },
+      { key:'summary', title:'Professional Summary', years:'Profile', sortDate:'2011-01-01', bullets:[CV.summary], kind:'plaque', icon:'👤' },
       { key:'contact', title:'Contact and Links', years:CV.role, sortDate:'2011-01-02', bullets:['LinkedIn profile'], kind:'plaque' },
       ...CV.sections.map(s => ({ ...s, kind:'house' }))
     ].sort((a,b)=> new Date(a.sortDate) - new Date(b.sortDate));
@@ -478,6 +478,8 @@
           const d2 = document.createElement('div'); d2.className = 'label'; d2.textContent = entry.years; const l2 = new CSS2DObject(d2); l2.position.set(0, 1.08, 0); g.add(l2);
         }
         const country = (() => {
+          if (entry.flag) return entry.flag;
+          if (entry.icon) return entry.icon;
           // Prioritize title for location detection, then check bullets as fallback
           const titleLower = (entry.title || '').toLowerCase();
           const bulletsLower = (entry.bullets || []).join(' ').toLowerCase();

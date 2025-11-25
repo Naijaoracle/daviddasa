@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ear & Hearing Inquiries</title>
-  <!-- CSS file goes here -->
+  <meta name="description" content="Free online hearing frequency test - Check your ability to hear different sound frequencies from 125Hz to 16000Hz">
+  <title>Hearing Frequency Test | David Dasa</title>
+  <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="bmi-styles.css">
 </head>
 <body>
@@ -17,7 +18,7 @@
       <li><a href="https://www.daviddasa.com/about">About</a></li>
       <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
       <li><a href="https://www.daviddasa.com/skills">Skills</a></li>
-      <li><a href="#contact">Contact</a></li>
+      <li><a href="https://www.daviddasa.com/contact">Contact</a></li>
     </ul>
   </nav>
 
@@ -28,40 +29,43 @@
       
       <div class="test-explanation">
         <h3>How the Test Works</h3>
-        <p>This test will play a series of tones at different frequencies (from 125 Hz to 16000 Hz):</p>
+        <p>This test will play a series of tones at different frequencies (from 125 Hz to 16,000 Hz):</p>
         <ul>
-          <li>Each tone will play for 2 seconds and end with a beep</li>
-          <li>After each tone, click "Yes" if you heard it or "No" if you didn't</li>
-          <li>The test will automatically progress through all frequencies</li>
+          <li>Each tone plays for 2 seconds, followed by a short beep to signal it ended</li>
+          <li>After each tone, click <strong>"Yes"</strong> if you heard it or <strong>"No"</strong> if you didn't</li>
+          <li>The test automatically progresses through all 8 frequencies</li>
           <li>Use the volume slider to set a comfortable listening level</li>
         </ul>
         
         <h3>Understanding the Chart</h3>
-        <p>The results are displayed on a frequency chart:</p>
+        <p>Results are displayed on a frequency chart:</p>
         <ul>
-          <li>Green circles (●) show frequencies you could hear</li>
-          <li>Red X's (❌) show frequencies you couldn't hear</li>
-          <li>The horizontal axis shows frequency in Hz (logarithmic scale)</li>
-          <li>For reference: 125-250 Hz (bass), 250-2000 Hz (speech), 2000-16000 Hz (high pitch)</li>
+          <li><span class="legend-heard">●</span> Green circles show frequencies you could hear</li>
+          <li><span class="legend-not-heard">✗</span> Red X's show frequencies you couldn't hear</li>
+          <li>The vertical axis shows frequency in Hz (logarithmic scale)</li>
+          <li><strong>125-500 Hz:</strong> Low/bass sounds</li>
+          <li><strong>500-2000 Hz:</strong> Speech range (most important)</li>
+          <li><strong>2000-16000 Hz:</strong> High-pitched sounds</li>
         </ul>
       </div>
 
       <div class="test-requirements">
         <h3>Before You Begin</h3>
         <ul>
-          <li>Use headphones for better results</li>
-          <li>Find a quiet environment</li>
-          <li>Set your device volume to 50%</li>
+          <li>🎧 Use headphones for accurate results</li>
+          <li>🔇 Find a quiet environment</li>
+          <li>🔊 Set your device volume to 50%</li>
+          <li>⏱️ The test takes about 2-3 minutes</li>
         </ul>
       </div>
 
       <div class="important-notes">
         <h3>Important Notes</h3>
         <ul>
-          <li>This is a screening tool, not a diagnosis</li>
-          <li>Results may vary based on equipment</li>
-          <li>Consult a professional for concerns</li>
-          <li>Regular testing is recommended</li>
+          <li>⚠️ This is a screening tool, not a clinical diagnosis</li>
+          <li>📱 Results may vary based on your device's speakers</li>
+          <li>👨‍⚕️ Consult an audiologist for professional evaluation</li>
+          <li>🔄 Take the test regularly to monitor changes</li>
         </ul>
       </div>
     </div>
@@ -69,34 +73,52 @@
     <div class="test-container">
       <h2>Frequency Hearing Test</h2>
       
-      <div class="test-explanation">
-        <h3>Before You Begin</h3>
-        <ul>
-          <li>Use headphones for better results</li>
-          <li>Find a quiet environment</li>
-          <li>Set your device volume to 50%</li>
-        </ul>
-      </div>
+      <div id="testMessage" class="test-message" style="display: none;"></div>
 
       <div class="volume-control">
-        <label for="volumeSlider">Volume:</label>
+        <label for="volumeSlider">
+          <span class="volume-icon">🔊</span> Volume:
+        </label>
         <input type="range" id="volumeSlider" min="0" max="100" value="50">
+        <span id="volumeValue">50%</span>
+      </div>
+
+      <div id="progressIndicator" class="progress-indicator" style="display: none;">
+        <div class="progress-track">
+          <div class="progress-bar"></div>
+        </div>
+        <span class="progress-text">0 of 8 frequencies tested</span>
       </div>
 
       <div class="frequency-display">
-        <label for="frequencyInput">Current Frequency (Hz):</label>
-        <input type="number" id="frequencyInput" readonly>
+        <label for="frequencyInput">Current Frequency:</label>
+        <div class="freq-value-container">
+          <input type="text" id="frequencyInput" readonly placeholder="—">
+          <span class="freq-unit">Hz</span>
+        </div>
+        <div id="playingIndicator" class="playing-indicator" style="display: none;">
+          <div class="sound-wave">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <span>Playing tone...</span>
+        </div>
       </div>
 
       <div class="test-controls">
-        <button id="startButton" onclick="startTest()" class="primary-button">Start Test</button>
+        <button id="startButton" onclick="startTest()" class="primary-button">
+          <span class="btn-icon">▶</span> Start Test
+        </button>
       </div>
 
       <div id="responseButtons" class="response-buttons" style="display: none;">
-        <p>Did you hear the sound?</p>
+        <p class="response-prompt">Did you hear the sound?</p>
         <div class="button-group">
-          <button onclick="answer('Yes')" class="yes-button">Yes</button>
-          <button onclick="answer('No')" class="no-button">No</button>
+          <button onclick="answer('Yes')" class="yes-button">
+            <span class="btn-icon">✓</span> Yes, I heard it
+          </button>
+          <button onclick="answer('No')" class="no-button">
+            <span class="btn-icon">✗</span> No, I didn't
+          </button>
         </div>
       </div>
 
@@ -104,28 +126,269 @@
         <canvas id="responseChart"></canvas>
       </div>
 
-      <button onclick="downloadChart()" class="download-button">Download Results</button>
+      <div id="resultsSummary" class="results-summary" style="display: none;"></div>
+
+      <button onclick="downloadChart()" class="download-button">
+        <span class="btn-icon">📥</span> Download Results
+      </button>
     </div>
 
     <style>
       .test-container {
         background: white;
-        border-radius: 15px;
+        border-radius: 20px;
         padding: 2rem;
         max-width: 800px;
         margin: 2rem auto;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      }
+
+      .test-container h2 {
+        color: #092917;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        font-size: 1.8rem;
+      }
+
+      .test-message {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+
+      .test-message.error {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+      }
+
+      .test-message.info {
+        background: #e0f2fe;
+        color: #075985;
+        border: 1px solid #bae6fd;
       }
 
       .test-explanation {
-        background: #f8f9fa;
+        background: #f0fdf4;
         border-left: 4px solid #2ecc71;
+        padding: 1.25rem;
+        margin: 1rem 0;
+        border-radius: 0 8px 8px 0;
+      }
+
+      .test-explanation h3 {
+        color: #166534;
+        margin-top: 0;
+        font-size: 1.1rem;
+      }
+
+      .test-explanation ul {
+        margin: 0.5rem 0;
+        padding-left: 1.5rem;
+      }
+
+      .test-explanation li {
+        margin: 0.4rem 0;
+        color: #374151;
+      }
+
+      .legend-heard {
+        color: #2ecc71;
+        font-weight: bold;
+      }
+
+      .legend-not-heard {
+        color: #e74c3c;
+        font-weight: bold;
+      }
+
+      .test-requirements, .important-notes {
+        background: #fefce8;
+        border-left: 4px solid #eab308;
         padding: 1rem;
         margin: 1rem 0;
+        border-radius: 0 8px 8px 0;
+      }
+
+      .test-requirements h3, .important-notes h3 {
+        color: #854d0e;
+        margin-top: 0;
+        font-size: 1.1rem;
+      }
+
+      .test-requirements ul, .important-notes ul {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .test-requirements li, .important-notes li {
+        margin: 0.5rem 0;
+        color: #374151;
+      }
+
+      .volume-control {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 1.5rem 0;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 12px;
+      }
+
+      .volume-control label {
+        font-weight: 600;
+        color: #374151;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .volume-icon {
+        font-size: 1.2rem;
+      }
+
+      #volumeSlider {
+        flex: 1;
+        height: 8px;
+        border-radius: 4px;
+        background: #e2e8f0;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+
+      #volumeSlider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #2ecc71;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(46, 204, 113, 0.4);
+      }
+
+      #volumeValue {
+        font-weight: 600;
+        color: #2ecc71;
+        min-width: 40px;
+      }
+
+      .progress-indicator {
+        margin: 1.5rem 0;
+        text-align: center;
+      }
+
+      .progress-track {
+        height: 8px;
+        background: #e2e8f0;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+      }
+
+      .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #2ecc71, #27ae60);
+        width: 0%;
+        transition: width 0.3s ease;
         border-radius: 4px;
       }
 
-      .volume-control, .frequency-display {
+      .progress-text {
+        font-size: 0.9rem;
+        color: #6b7280;
+      }
+
+      .frequency-display {
+        text-align: center;
+        margin: 2rem 0;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        border-radius: 16px;
+        border: 2px solid #bbf7d0;
+        transition: all 0.3s ease;
+      }
+
+      .frequency-display.playing {
+        animation: pulse 1s ease-in-out infinite;
+        border-color: #2ecc71;
+        box-shadow: 0 0 20px rgba(46, 204, 113, 0.3);
+      }
+
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+      }
+
+      .frequency-display label {
+        display: block;
+        font-weight: 600;
+        color: #166534;
+        margin-bottom: 0.5rem;
+      }
+
+      .freq-value-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+
+      #frequencyInput {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #092917;
+        background: transparent;
+        border: none;
+        text-align: center;
+        width: 150px;
+        outline: none;
+      }
+
+      .freq-unit {
+        font-size: 1.5rem;
+        color: #6b7280;
+        font-weight: 500;
+      }
+
+      .playing-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-top: 1rem;
+        color: #2ecc71;
+        font-weight: 500;
+      }
+
+      .sound-wave {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        height: 24px;
+      }
+
+      .sound-wave span {
+        width: 4px;
+        background: #2ecc71;
+        border-radius: 2px;
+        animation: wave 1s ease-in-out infinite;
+      }
+
+      .sound-wave span:nth-child(1) { height: 8px; animation-delay: 0s; }
+      .sound-wave span:nth-child(2) { height: 16px; animation-delay: 0.1s; }
+      .sound-wave span:nth-child(3) { height: 24px; animation-delay: 0.2s; }
+      .sound-wave span:nth-child(4) { height: 16px; animation-delay: 0.3s; }
+      .sound-wave span:nth-child(5) { height: 8px; animation-delay: 0.4s; }
+
+      @keyframes wave {
+        0%, 100% { transform: scaleY(1); }
+        50% { transform: scaleY(0.5); }
+      }
+
+      .test-controls {
+        text-align: center;
         margin: 1.5rem 0;
       }
 
@@ -134,115 +397,287 @@
         gap: 1rem;
         justify-content: center;
         margin: 1rem 0;
+        flex-wrap: wrap;
       }
 
       .primary-button, .yes-button, .no-button, .download-button {
-        padding: 0.8rem 1.5rem;
+        padding: 1rem 2rem;
         border: none;
-        border-radius: 8px;
-        font-size: 1rem;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
         cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .btn-icon {
+        font-size: 1.2rem;
       }
 
       .primary-button {
-        background: #2ecc71;
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
         color: white;
+        box-shadow: 0 4px 14px rgba(46, 204, 113, 0.4);
+      }
+
+      .primary-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(46, 204, 113, 0.5);
       }
 
       .yes-button {
-        background: #2ecc71;
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
         color: white;
+        box-shadow: 0 4px 14px rgba(46, 204, 113, 0.3);
+      }
+
+      .yes-button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
       }
 
       .no-button {
-        background: #e74c3c;
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
         color: white;
+        box-shadow: 0 4px 14px rgba(231, 76, 60, 0.3);
+      }
+
+      .no-button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+      }
+
+      .yes-button:disabled, .no-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
       }
 
       .download-button {
-        background: #3498db;
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
         color: white;
-        margin-top: 1rem;
+        margin-top: 1.5rem;
+        box-shadow: 0 4px 14px rgba(52, 152, 219, 0.3);
       }
 
-      .primary-button:hover, .yes-button:hover, .no-button:hover, .download-button:hover {
+      .download-button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+      }
+
+      .response-buttons {
+        text-align: center;
+        padding: 1.5rem;
+        background: #fefce8;
+        border-radius: 12px;
+        border: 2px solid #fde047;
+      }
+
+      .response-prompt {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #854d0e;
+        margin-bottom: 1rem;
       }
 
       .chart-container {
         max-width: 100%;
-        height: 500px;
+        height: 450px;
         margin: 2rem 0;
-        padding: 1rem 2rem;
+        padding: 1rem;
+        background: #fafafa;
+        border-radius: 12px;
+      }
+
+      .results-summary {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        border: 2px solid #bbf7d0;
+      }
+
+      .results-summary h3 {
+        color: #166534;
+        margin-top: 0;
+        text-align: center;
+      }
+
+      .results-stats {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin: 1.5rem 0;
+        flex-wrap: wrap;
+      }
+
+      .stat-item {
+        text-align: center;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        min-width: 120px;
+      }
+
+      .stat-item.heard {
+        background: rgba(46, 204, 113, 0.2);
+        border: 2px solid #2ecc71;
+      }
+
+      .stat-item.not-heard {
+        background: rgba(231, 76, 60, 0.2);
+        border: 2px solid #e74c3c;
+      }
+
+      .stat-number {
+        display: block;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #092917;
+      }
+
+      .stat-label {
+        font-size: 0.9rem;
+        color: #6b7280;
+      }
+
+      .range-analysis {
+        margin-top: 1.5rem;
+      }
+
+      .range-item {
+        padding: 0.75rem 1rem;
+        margin: 0.5rem 0;
+        border-radius: 8px;
+        background: white;
+      }
+
+      .range-item.good {
+        border-left: 4px solid #2ecc71;
+      }
+
+      .range-item.partial {
+        border-left: 4px solid #f59e0b;
+      }
+
+      .range-item.concerning {
+        border-left: 4px solid #e74c3c;
+      }
+
+      .range-note {
+        display: block;
+        font-size: 0.85rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+      }
+
+      .recommendation {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        background: #fef3c7;
+        border-radius: 8px;
+        border: 1px solid #fde68a;
+      }
+
+      .recommendation p {
+        margin: 0;
+        color: #92400e;
+        font-size: 0.95rem;
       }
 
       @media (max-width: 768px) {
         .test-container {
           padding: 1rem;
           margin: 1rem;
-          width: 95%;
+        }
+
+        .test-container h2 {
+          font-size: 1.5rem;
         }
 
         .chart-container {
           height: 350px;
-          padding: 0;
-          margin: 1rem 0;
+          padding: 0.5rem;
         }
 
-        .volume-control, .frequency-display {
-          margin: 1rem 0;
+        .volume-control {
+          flex-wrap: wrap;
         }
 
-        .frequency-display input {
-          width: 100%;
-          max-width: 150px;
+        #frequencyInput {
+          font-size: 2rem;
+          width: 120px;
         }
 
         .button-group {
           flex-direction: column;
-          gap: 0.5rem;
+          align-items: center;
         }
 
         .primary-button, .yes-button, .no-button, .download-button {
           width: 100%;
-          max-width: 200px;
-          margin: 0.25rem auto;
+          max-width: 280px;
+          justify-content: center;
+        }
+
+        .results-stats {
+          gap: 1rem;
+        }
+
+        .stat-item {
+          min-width: 100px;
+          padding: 0.75rem 1rem;
+        }
+
+        .stat-number {
+          font-size: 2rem;
         }
       }
 
       @media (max-width: 480px) {
         .test-container {
-          padding: 0.5rem;
+          padding: 0.75rem;
           margin: 0.5rem;
+          border-radius: 12px;
         }
 
         .chart-container {
-          height: 300px;
-          margin: 0.5rem 0;
+          height: 280px;
         }
 
-        .test-explanation {
-          padding: 0.5rem;
-          margin: 0.5rem 0;
+        .frequency-display {
+          padding: 1rem;
+        }
+
+        #frequencyInput {
+          font-size: 1.75rem;
         }
       }
     </style>
 
     <section id="online-tools">
-      <h3>Online Hearing Tools</h3>
-      <p>Even if your hearing frequency range is normal there are othere hearing issues you may want to speak to your doctor about <a href="https://www.daviddasa.com/ent-chat">click here</a> for suggestions.</p>
-      <p>For general tips on caring for your ears click <a href="https://www.daviddasa.com/earCare-advice">here.</a></p>
-      <p>Here are some helpful online tools for testing your hearing. Please note these are NOT substitutes for tests done by your doctor.</p>
+      <h3>Additional Hearing Resources</h3>
+      <p>Even if your hearing frequency range is normal, there are other hearing issues you may want to discuss with your doctor. <a href="https://www.daviddasa.com/ent-chat">Click here</a> for suggestions.</p>
+      <p>For general tips on caring for your ears, click <a href="https://www.daviddasa.com/earCare-advice">here</a>.</p>
+      <p>Here are some helpful online tools for testing your hearing. Please note these are NOT substitutes for tests done by your doctor:</p>
       <ul>
-              <li><strong>Hearing Test</strong>: Click <a href="https://rnid.org.uk/information-and-support/take-online-hearing-check">here</a> to take a hearing test from RNID.</li>
-              <li><strong>Audiogram - Test plus graph</strong>: Visit <a href="https://www.hearingtest.online">hearingtest.online</a> for an online audiogram test and graph.</li>
+        <li><strong>Hearing Test:</strong> Take a hearing test from <a href="https://rnid.org.uk/information-and-support/take-online-hearing-check">RNID</a></li>
+        <li><strong>Audiogram:</strong> Visit <a href="https://www.hearingtest.online">hearingtest.online</a> for an online audiogram test and graph</li>
       </ul>
-</section>
+    </section>
   </div>
-    <script src="hearingScreening.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>    
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="hearingScreening.js"></script>
+  <script>
+    // Volume slider display update
+    document.getElementById('volumeSlider').addEventListener('input', function() {
+      document.getElementById('volumeValue').textContent = this.value + '%';
+    });
+  </script>
+
   <!-- Footer Section -->
   <footer>
     <p>&copy; 2025 David Dasa</p>
