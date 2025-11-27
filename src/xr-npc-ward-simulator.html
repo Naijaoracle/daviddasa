@@ -358,58 +358,87 @@
     trolley.position.set(3.0, 0, 1.6);
     room.add(trolley);
 
-    // Nurse with visible head and simple walk animation
+    // Nurse with blocky/mature style
     function buildNurse(colorMain = 0x1b5e20, colorCap = 0x2e7d32){
       const group = new THREE.Group();
       const skin = 0xf0c8a0;
       const shoes = 0x252525;
-      const accent = 0x2e7d32;
 
-      const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.24, 0.5, 12, 20), new THREE.MeshStandardMaterial({ color: colorMain, roughness: 0.95 }));
-      torso.position.y = 1.05;
+      // Improved Proportions for mature look (Unit = meters approx)
+      // Total height ~1.75m
 
-      const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.10, 16), new THREE.MeshStandardMaterial({ color: skin, roughness: 0.8 }));
-      neck.position.y = 1.33;
+      const matCloth = new THREE.MeshStandardMaterial({ color: colorMain, roughness: 0.9 });
+      const matSkin = new THREE.MeshStandardMaterial({ color: skin, roughness: 0.6 });
+      const matShoe = new THREE.MeshStandardMaterial({ color: shoes, roughness: 0.8 });
 
-      const head = new THREE.Mesh(new THREE.SphereGeometry(0.19, 28, 18), new THREE.MeshStandardMaterial({ color: skin, roughness: 0.7 }));
-      head.position.y = 1.56;
+      // Torso
+      const torsoGeo = new THREE.BoxGeometry(0.4, 0.55, 0.22);
+      const torso = new THREE.Mesh(torsoGeo, matCloth);
+      const torsoY = 1.18;
+      torso.position.y = torsoY;
+      torso.castShadow = true;
+      torso.userData.baseY = torsoY; // Store for animation
 
-      const cap = new THREE.Mesh(new THREE.SphereGeometry(0.21, 24, 16), new THREE.MeshStandardMaterial({ color: colorCap, roughness: 0.95 }));
-      cap.scale.set(1.0, 0.55, 1.0);
-      cap.position.y = 1.66;
+      // Head & Neck
+      const neck = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.1, 0.12), matSkin);
+      neck.position.y = 1.48; 
+      
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.24, 0.22), matSkin);
+      head.position.y = 1.65;
 
-      const eyeGeo = new THREE.SphereGeometry(0.012, 8, 8);
-      const eyeMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
-      const eyeL = new THREE.Mesh(eyeGeo, eyeMat); eyeL.position.set(-0.05, 1.56, 0.16);
-      const eyeR = new THREE.Mesh(eyeGeo, eyeMat); eyeR.position.set( 0.05, 1.56, 0.16);
+      // Cap (Medical)
+      const cap = new THREE.Mesh(new THREE.BoxGeometry(0.21, 0.06, 0.23), new THREE.MeshStandardMaterial({ color: colorCap, roughness: 0.9 }));
+      cap.position.y = 1.80;
 
-      const shoulderL = new THREE.Object3D(); shoulderL.position.set(-0.34, 1.22, 0);
-      const shoulderR = new THREE.Object3D(); shoulderR.position.set( 0.34, 1.22, 0);
-      const armGeo = new THREE.CapsuleGeometry(0.075, 0.34, 12, 20);
-      const armMat = new THREE.MeshStandardMaterial({ color: colorMain, roughness: 0.95 });
-      const armL = new THREE.Mesh(armGeo, armMat); armL.position.y = -0.22;
-      const armR = new THREE.Mesh(armGeo, armMat); armR.position.y = -0.22;
-      shoulderL.add(armL); shoulderR.add(armR);
+      // Eyes (Minimalist)
+      const eyeGeo = new THREE.BoxGeometry(0.03, 0.01, 0.01);
+      const eyeMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
+      const eyeL = new THREE.Mesh(eyeGeo, eyeMat); eyeL.position.set(-0.05, 1.65, 0.115);
+      const eyeR = new THREE.Mesh(eyeGeo, eyeMat); eyeR.position.set( 0.05, 1.65, 0.115);
 
-      const handGeo = new THREE.SphereGeometry(0.065, 16, 12);
-      const handMat = new THREE.MeshStandardMaterial({ color: skin, roughness: 0.8 });
-      const handL = new THREE.Mesh(handGeo, handMat); handL.position.set(0, -0.46, 0.02); shoulderL.add(handL);
-      const handR = new THREE.Mesh(handGeo, handMat); handR.position.set(0, -0.46,-0.02); shoulderR.add(handR);
+      // Shoulders/Arms
+      const shoulderL = new THREE.Object3D(); shoulderL.position.set(-0.26, 1.42, 0);
+      const shoulderR = new THREE.Object3D(); shoulderR.position.set( 0.26, 1.42, 0);
+      
+      const armW = 0.11, armLen = 0.6;
+      const armGeo = new THREE.BoxGeometry(armW, armLen, 0.11);
+      armGeo.translate(0, -armLen/2 + 0.05, 0); // Pivot near top
 
-      const hipL = new THREE.Object3D(); hipL.position.set(-0.12, 0.90, 0);
-      const hipR = new THREE.Object3D(); hipR.position.set( 0.12, 0.90, 0);
-      const legGeo = new THREE.CapsuleGeometry(0.095, 0.46, 12, 20);
-      const legMat = new THREE.MeshStandardMaterial({ color: colorMain, roughness: 0.95 });
-      const legL = new THREE.Mesh(legGeo, legMat); legL.position.y = -0.33; hipL.add(legL);
-      const legR = new THREE.Mesh(legGeo, legMat); legR.position.y = -0.33; hipR.add(legR);
+      const armL = new THREE.Mesh(armGeo, matCloth);
+      const armR = new THREE.Mesh(armGeo, matCloth);
 
-      const shoeGeo = new THREE.CapsuleGeometry(0.09, 0.06, 10, 18);
-      const shoeMat = new THREE.MeshStandardMaterial({ color: shoes, roughness: 0.9 });
-      const shoeL = new THREE.Mesh(shoeGeo, shoeMat); shoeL.rotation.x = Math.PI*0.5; shoeL.position.set(0, -0.60, 0.06); hipL.add(shoeL);
-      const shoeR = new THREE.Mesh(shoeGeo, shoeMat); shoeR.rotation.x = Math.PI*0.5; shoeR.position.set(0, -0.60, 0.06); hipR.add(shoeR);
+      // Hands
+      const handGeo = new THREE.BoxGeometry(0.08, 0.1, 0.08);
+      handGeo.translate(0, -armLen - 0.05, 0);
+      const handL = new THREE.Mesh(handGeo, matSkin);
+      const handR = new THREE.Mesh(handGeo, matSkin);
 
-      const badge = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.08, 0.005), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 }));
-      badge.position.set(0.13, 1.18, 0.23);
+      shoulderL.add(armL, handL);
+      shoulderR.add(armR, handR);
+
+      // Hips/Legs
+      const hipL = new THREE.Object3D(); hipL.position.set(-0.11, 0.90, 0);
+      const hipR = new THREE.Object3D(); hipR.position.set( 0.11, 0.90, 0);
+
+      const legW = 0.13, legLen = 0.9;
+      const legGeo = new THREE.BoxGeometry(legW, legLen, 0.14);
+      legGeo.translate(0, -legLen/2, 0);
+
+      const legL = new THREE.Mesh(legGeo, matCloth);
+      const legR = new THREE.Mesh(legGeo, matCloth);
+
+      // Shoes
+      const shoeGeo = new THREE.BoxGeometry(0.14, 0.1, 0.28);
+      shoeGeo.translate(0, -legLen, 0.06); // Bottom
+      const shoeL = new THREE.Mesh(shoeGeo, matShoe);
+      const shoeR = new THREE.Mesh(shoeGeo, matShoe);
+
+      hipL.add(legL, shoeL);
+      hipR.add(legR, shoeR);
+      
+      // Badge
+      const badge = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 0.01), new THREE.MeshStandardMaterial({ color: 0xffffff }));
+      badge.position.set(0.1, 1.35, 0.115);
 
       group.add(torso, neck, head, cap, eyeL, eyeR, shoulderL, shoulderR, hipL, hipR, badge);
       group.userData.limbs = { shoulderL, shoulderR, hipL, hipR, head, torso };
@@ -1512,7 +1541,9 @@
       limbs.hipL.rotation.x = -swing * 0.7;
       limbs.hipR.rotation.x = -counter * 0.7;
 
-      limbs.torso.position.y = 1.05 + Math.sin(wp * 2.0) * 0.02 * moving;
+      const baseY = limbs.torso.userData.baseY !== undefined ? limbs.torso.userData.baseY : 1.05;
+      limbs.torso.position.y = baseY + Math.sin(wp * 2.0) * 0.02 * moving;
+      
       charObj.rotation.z = Math.sin(wp) * 0.03 * moving;
       limbs.head.rotation.set(0, 0, 0);
     }
