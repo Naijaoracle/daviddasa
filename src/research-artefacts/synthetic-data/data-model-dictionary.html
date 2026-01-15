@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Synthetic Data Model and Data Dictionary - Research Artefact by David Dasa">
+  <title>Synthetic Data Model and Data Dictionary - Research Artefacts - David Dasa</title>
+  <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+      <li><a href="https://www.daviddasa.com/research-artefacts">Research Artefacts</a></li>
+    </ul>
+  </nav>
+
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <main>
+      <!-- Back Navigation -->
+      <div style="margin-bottom: 2rem;">
+        <a href="../index.html" style="color: #2ecc71; text-decoration: none; font-weight: 500;">← Back to Research Artefacts</a>
+      </div>
+
+      <!-- Article Header -->
+      <section class="project-card">
+        <div class="article-header">
+          <h1>Synthetic Data Model and Data Dictionary</h1>
+          <div class="article-meta">
+            <span class="article-category">Synthetic Data</span>
+            <span class="article-type">Research Artefact</span>
+          </div>
+          <div class="article-tags">
+            <span class="tag">Synthetic Data</span>
+            <span class="tag">Data Model</span>
+            <span class="tag">Clinical Simulation</span>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- Content -->
+      <section class="project-card">
+        <h2>Overview</h2>
+        <p>This document defines the conceptual entities and relationships for the synthetic health data generated to support clinical simulation and evaluation. It focuses on human-readable definitions and example values to ensure clinical face validity without providing machine-readable schemas.</p>
+        
+        <h2>Entities and Attributes</h2>
+        
+        <h3>1. Patient Profile</h3>
+        <p>Represents the demographic and baseline clinical characteristics of a synthetic individual.</p>
+        
+        <table>
+          <thead>
+            <tr>
+              <th>Attribute</th>
+              <th>Description</th>
+              <th>Constraints</th>
+              <th>Example Values</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Synthetic ID</strong></td>
+              <td>A unique non-identifiable reference for the agent.</td>
+              <td>Alphanumeric, unique within simulation scope.</td>
+              <td><code>SYN-PT-8821</code>, <code>PT-BPP-001</code></td>
+            </tr>
+            <tr>
+              <td><strong>Age Range</strong></td>
+              <td>The demographic age bracket for the scenario.</td>
+              <td>Must align with disease prevalence assumptions.</td>
+              <td><code>45-55</code>, <code>65-70</code></td>
+            </tr>
+            <tr>
+              <td><strong>Gender Identity</strong></td>
+              <td>Self-identified gender for social context modelling.</td>
+              <td>Discrete categories.</td>
+              <td><code>Male</code>, <code>Female</code>, <code>Non-binary</code></td>
+            </tr>
+            <tr>
+              <td><strong>Baseline BP</strong></td>
+              <td>The initial blood pressure state before any interventions.</td>
+              <td>Systolic (90-200), Diastolic (60-120).</td>
+              <td><code>145/95 mmHg</code></td>
+            </tr>
+            <tr>
+              <td><strong>Comorbidities</strong></td>
+              <td>Narrative description of existing conditions.</td>
+              <td>Textual list of clinical states.</td>
+              <td><code>Type 2 Diabetes, Mild Asthma</code></td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <h3>2. Clinical Encounter</h3>
+        <p>Represents a point-in-time interaction between a patient and a healthcare provider or AI agent.</p>
+        
+        <table>
+          <thead>
+            <tr>
+              <th>Attribute</th>
+              <th>Description</th>
+              <th>Constraints</th>
+              <th>Example Values</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Encounter Type</strong></td>
+              <td>The setting of the interaction.</td>
+              <td>GP visit, A&E, Virtual triage.</td>
+              <td><code>Triage Assessment</code></td>
+            </tr>
+            <tr>
+              <td><strong>Symptom Narrative</strong></td>
+              <td>A human-readable description of presenting symptoms.</td>
+              <td>Prose describing patient complaints.</td>
+              <td>"Patient reports mild chest tightness for 2 hours."</td>
+            </tr>
+            <tr>
+              <td><strong>Vital Signs</strong></td>
+              <td>Snapshot of physiological metrics at time of encounter.</td>
+              <td>Clinically plausible ranges.</td>
+              <td><code>HR: 82, SpO2: 98%</code></td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <h3>3. Medication Event</h3>
+        <p>Represents the administration or prescription of a drug within the simulation.</p>
+        
+        <table>
+          <thead>
+            <tr>
+              <th>Attribute</th>
+              <th>Description</th>
+              <th>Constraints</th>
+              <th>Example Values</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Drug Category</strong></td>
+              <td>The class of medication being simulated.</td>
+              <td>Non-proprietary generic names.</td>
+              <td><code>ACE Inhibitor</code>, <code>Beta Blocker</code></td>
+            </tr>
+            <tr>
+              <td><strong>Dosage Logic</strong></td>
+              <td>Qualitative description of the dosage level.</td>
+              <td>Low, Standard, High.</td>
+              <td><code>Standard dose (e.g., 5mg daily)</code></td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <h2>Relationship Diagrams</h2>
+        <h3>Patient Journey Concept</h3>
+        <ul>
+          <li><strong>Patient</strong> -> triggers -> <strong>Encounter</strong></li>
+          <li><strong>Encounter</strong> -> results in -> <strong>Observation</strong></li>
+          <li><strong>Observation</strong> -> leads to -> <strong>Medication Event</strong></li>
+        </ul>
+        
+        <h2>Example Data Record (Narrative)</h2>
+        <p><em>Patient SYN-PT-105 is a 52-year-old male with a baseline BP of 150/95. During a routine hypertension screening encounter, he reports occasional headaches. The AI agent recommends starting a low-dose ACE inhibitor.</em></p>
+      </section>
+
+      <section class="project-card">
+        <h2>Related Artefacts</h2>
+        <ul>
+        <li><a href="principles-disclosure.html">Synthetic Data Principles and Disclosure Statement</a> — Core principles governing this data model</li>
+        <li><a href="standards-alignment.html">Standards Alignment Narrative</a> — How entities map to healthcare standards</li>
+        <li><a href="../scenario-management/scenario-template-guide.html">Scenario Template and Authoring Guide</a> — Using data entities in scenarios</li>
+        <li><a href="../supporting-docs/glossary-terminology.html">Glossary and Terminology Standard</a> — Definitions of terms used in this model</li>
+        </ul>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Particles.js Configuration -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+    });
+  </script>
+
+  <style>
+    /* Layout refinements for cleaner reading */
+    .article-header h1 { color: #092917; margin-bottom: 1rem; font-size: 2.2rem; }
+    .article-meta { display: flex; gap: 2rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .article-category { color: #2ecc71; font-weight: 600; font-size: 1rem; }
+    .article-type { color: #1a4731; font-weight: 500; background: rgba(46, 204, 113, 0.1); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.9rem; }
+    .article-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .tag { background: rgba(46, 204, 113, 0.12); color: #092917; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.8rem; font-weight: 500; }
+    .container { max-width: 1000px; }
+    main { line-height: 1.7; }
+    p { line-height: 1.7; }
+    .project-card { background: rgba(255,255,255,0.82); border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 6px 18px rgba(0,0,0,0.04); margin-bottom: 2rem; padding: 2rem; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    table th, table td { border: 1px solid rgba(0,0,0,0.1); padding: 0.75rem; text-align: left; }
+    table th { background: rgba(46, 204, 113, 0.1); font-weight: 600; color: #092917; }
+    ul, ol { margin: 1rem 0; padding-left: 2rem; }
+    li { margin: 0.5rem 0; }
+    code { background: rgba(46, 204, 113, 0.1); padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: 'Courier New', monospace; font-size: 0.9em; }
+    pre { background: rgba(46, 204, 113, 0.1); padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
+    pre code { background: none; padding: 0; }
+    @media (max-width: 768px) {
+      .article-header h1 { font-size: 1.8rem; }
+      .article-meta { flex-direction: column; gap: 0.5rem; }
+      .project-card { padding: 1.5rem; }
+    }
+  </style>
+
+</body>
+</html>

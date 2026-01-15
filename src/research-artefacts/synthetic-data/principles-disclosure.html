@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Synthetic Data Principles and Disclosure Statement - Research Artefact by David Dasa">
+  <title>Synthetic Data Principles and Disclosure Statement - Research Artefacts - David Dasa</title>
+  <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+      <li><a href="https://www.daviddasa.com/research-artefacts">Research Artefacts</a></li>
+    </ul>
+  </nav>
+
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <main>
+      <!-- Back Navigation -->
+      <div style="margin-bottom: 2rem;">
+        <a href="../index.html" style="color: #2ecc71; text-decoration: none; font-weight: 500;">← Back to Research Artefacts</a>
+      </div>
+
+      <!-- Article Header -->
+      <section class="project-card">
+        <div class="article-header">
+          <h1>Synthetic Data Principles and Disclosure Statement</h1>
+          <div class="article-meta">
+            <span class="article-category">Synthetic Data</span>
+            <span class="article-type">Research Artefact</span>
+          </div>
+          <div class="article-tags">
+            <span class="tag">Synthetic Data</span>
+            <span class="tag">Ethics</span>
+            <span class="tag">Governance</span>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- Content -->
+      <section class="project-card">
+        <h2>1. Core Principles</h2>
+<h3>Synthetic-Only Mandate</h3>
+<p>All data used within this research framework is 100% synthetically generated. No real-world patient data (identifiable or de-identified) is used at any stage of the modelling or evaluation process. This ensures absolute privacy and eliminates the risk of re-identification.</p>
+<h3>Provenance Statement</h3>
+<p>Synthetic datasets are derived from high-level clinical guidelines, literature-based prevalence rates, and expert-defined physiological assumptions. The data does not originate from existing clinical databases or electronic health records (EHR).</p>
+<h3>Non-Clinical Use Boundary</h3>
+<p>These datasets are designed exclusively for research, simulation, and educational purposes. They must never be used for:</p>
+<ul>
+<li>Clinical decision-making for real patients.</li>
+<li>Training production-level diagnostic algorithms intended for clinical use.</li>
+<li>Validation of safety-critical medical devices in a regulatory context.</li>
+</ul>
+<h2>2. System Separation</h2>
+<h3>Logical Air-Gap</h3>
+<p>The synthetic data generation environment is logically and physically separate from any live clinical systems or hospital networks. There are no automated pipelines or data bridges between research environments and clinical operational environments.</p>
+<h3>Labelling and Metadata</h3>
+<p>Every record, file, and dashboard generated using this framework must be clearly labelled as <strong>"SYNTHETIC DATA - NOT FOR CLINICAL USE"</strong>. This metadata must persist across all downstream research artefacts and visualisations.</p>
+<h2>3. Disclosure of Limitations</h2>
+<h3>Fidelity Limits</h3>
+<p>While efforts are made to ensure clinical face validity (i.e., the data "looks" right to an expert), the synthetic data may not capture rare edge cases, complex multi-morbidities, or subtle physiological interactions not explicitly modelled in the assumptions register.</p>
+<h3>Bias Acknowledgement</h3>
+<p>Synthetic data reflects the assumptions of its designers. Bias may be present if the underlying literature or expert guidance used to define the generation rules contains demographic or clinical biases.</p>
+      </section>
+
+      <section class="project-card">
+        <h2>Related Artefacts</h2>
+        <ul>
+        <li><a href="data-model-dictionary.html">Synthetic Data Model and Data Dictionary</a> — Entities governed by these principles</li>
+        <li><a href="standards-alignment.html">Standards Alignment Narrative</a> — How principles align with standards</li>
+        <li><a href="../governance/governance-charter.html">Governance Charter</a> — Broader governance framework</li>
+        <li><a href="../governance/ethics-risk-pack.html">Ethics and Risk Management Pack</a> — Ethics considerations</li>
+        </ul>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Particles.js Configuration -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+    });
+  </script>
+
+  <style>
+    /* Layout refinements for cleaner reading */
+    .article-header h1 { color: #092917; margin-bottom: 1rem; font-size: 2.2rem; }
+    .article-meta { display: flex; gap: 2rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .article-category { color: #2ecc71; font-weight: 600; font-size: 1rem; }
+    .article-type { color: #1a4731; font-weight: 500; background: rgba(46, 204, 113, 0.1); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.9rem; }
+    .article-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .tag { background: rgba(46, 204, 113, 0.12); color: #092917; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.8rem; font-weight: 500; }
+    .container { max-width: 1000px; }
+    main { line-height: 1.7; }
+    p { line-height: 1.7; }
+    .project-card { background: rgba(255,255,255,0.82); border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 6px 18px rgba(0,0,0,0.04); margin-bottom: 2rem; padding: 2rem; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    table th, table td { border: 1px solid rgba(0,0,0,0.1); padding: 0.75rem; text-align: left; }
+    table th { background: rgba(46, 204, 113, 0.1); font-weight: 600; color: #092917; }
+    ul, ol { margin: 1rem 0; padding-left: 2rem; }
+    li { margin: 0.5rem 0; }
+    code { background: rgba(46, 204, 113, 0.1); padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: 'Courier New', monospace; font-size: 0.9em; }
+    pre { background: rgba(46, 204, 113, 0.1); padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
+    pre code { background: none; padding: 0; }
+    @media (max-width: 768px) {
+      .article-header h1 { font-size: 1.8rem; }
+      .article-meta { flex-direction: column; gap: 0.5rem; }
+      .project-card { padding: 1.5rem; }
+    }
+  </style>
+
+</body>
+</html>

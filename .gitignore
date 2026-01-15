@@ -1,3 +1,17 @@
 # Vim swap files
 *.swp
-*.swo 
+*.swo
+
+# macOS system files
+.DS_Store
+
+# Legacy WordPress content
+src/wp-content/
+
+# Research artefacts
+src/SimMethods.txt
+
+# Template files (not for public site)
+src/research-artefacts/_template.html
+src/research-notes/_template.html
+ 
