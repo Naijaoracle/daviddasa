@@ -47,57 +47,207 @@
             <span class="tag">Digital Twin</span>
             <span class="tag">Validation</span>
             <span class="tag">Fidelity</span>
-
           </div>
         </div>
-      </section>
 
-      <!-- Content -->
-
-      <section class="project-card">
         <h2>Purpose</h2>
-        <p>This plan outlines how synthetic simulations will be evaluated for face validity and conceptual alignment with clinical expectations. It does not include calibration tooling or executable methods.</p>
-      </section>
+        <p>This plan outlines how synthetic simulations will be evaluated for face validity and conceptual alignment with clinical expectations. It establishes the philosophical and methodological foundation for assessing whether XR-NPC systems produce outputs that are sufficiently realistic and educationally valuable for healthcare training contexts.</p>
 
-      <section class="project-card">
-        <h2>Construct Validity Targets</h2>
+        <p>The fidelity-validity framework addresses a fundamental challenge in simulation-based education: <em>how realistic does a simulation need to be to achieve its learning objectives?</em> This plan rejects the assumption that maximum fidelity is always desirable, instead advocating for <strong>functional fidelity</strong> — simulation accuracy calibrated to specific educational goals.</p>
+
+        <div class="key-distinction">
+          <h4>Key Distinction: Fidelity vs. Validity</h4>
+          <div class="distinction-grid">
+            <div class="distinction-item">
+              <strong>Fidelity</strong>
+              <p>The degree to which the simulation replicates real-world characteristics — physical, functional, and psychological realism.</p>
+            </div>
+            <div class="distinction-item">
+              <strong>Validity</strong>
+              <p>The degree to which the simulation measures or achieves what it claims to — whether it actually supports intended learning outcomes.</p>
+            </div>
+          </div>
+          <p style="margin-top: 1rem; font-style: italic;">High fidelity without validity is wasted effort. Low fidelity with high validity may be optimal for certain training objectives.</p>
+        </div>
+
+        <h3>Limitations and Boundaries</h3>
         <ul>
-        <li>Scenarios should reflect recognizable clinical patterns in narrative form.</li>
-        <li>Decision pathways should align with commonly taught clinical reasoning steps.</li>
+          <li>This plan does not validate against real-world clinical outcomes.</li>
+          <li>It does not provide parameter fitting, calibration procedures, or executable validation tools.</li>
+          <li>Validation is qualitative and expert-driven, not statistical or automated.</li>
+          <li>Results apply only to synthetic, non-clinical research contexts.</li>
         </ul>
       </section>
 
+      <!-- Validity Framework -->
       <section class="project-card">
-        <h2>Face Validity Approach</h2>
+        <h2>Validity Framework</h2>
+        <p>The validation approach draws on established frameworks for simulation validity while adapting them for AI-driven NPC evaluation. Three complementary validity dimensions are assessed:</p>
+
+        <h3>1. Construct Validity</h3>
+        <p>Assesses whether the simulation accurately represents the theoretical constructs it claims to model — clinical reasoning patterns, physiological responses, and workflow dynamics.</p>
+        
+        <table>
+          <thead>
+            <tr><th>Target</th><th>Validation Question</th><th>Assessment Method</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Clinical reasoning representation</td>
+              <td>Do decision pathways reflect commonly taught clinical reasoning steps?</td>
+              <td>Expert panel review against clinical guidelines and educational frameworks.</td>
+            </tr>
+            <tr>
+              <td>Physiological coherence</td>
+              <td>Do simulated patient states follow plausible physiological trajectories?</td>
+              <td>Clinical expert assessment of vital sign patterns and progression timing.</td>
+            </tr>
+            <tr>
+              <td>Role behaviour accuracy</td>
+              <td>Do NPC behaviours reflect realistic professional role boundaries?</td>
+              <td>Practitioner feedback on role-appropriate communication and actions.</td>
+            </tr>
+            <tr>
+              <td>Uncertainty representation</td>
+              <td>Does the simulation appropriately model clinical ambiguity and incomplete information?</td>
+              <td>Expert assessment of information availability and diagnostic uncertainty handling.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>2. Face Validity</h3>
+        <p>Evaluates whether the simulation "looks right" to domain experts — the intuitive assessment of realism and plausibility.</p>
+        
+        <table>
+          <thead>
+            <tr><th>Assessment Focus</th><th>Questions for Experts</th><th>Evidence Collected</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Narrative believability</td>
+              <td>Does this scenario feel like something that could happen in clinical practice?</td>
+              <td>Likert ratings, free-text comments on plausibility gaps.</td>
+            </tr>
+            <tr>
+              <td>Character authenticity</td>
+              <td>Do the NPCs behave like real colleagues, patients, or family members?</td>
+              <td>Role-specific authenticity ratings, behavioural inconsistency notes.</td>
+            </tr>
+            <tr>
+              <td>Environmental coherence</td>
+              <td>Does the clinical environment feel realistic for the scenario context?</td>
+              <td>Setting appropriateness ratings, resource availability feedback.</td>
+            </tr>
+            <tr>
+              <td>Dialogue naturalness</td>
+              <td>Does the communication feel natural and professionally appropriate?</td>
+              <td>Communication quality ratings, awkward exchange identification.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>3. Content Validity</h3>
+        <p>Examines whether the simulation covers the appropriate range of clinical content for its educational objectives.</p>
+        
+        <table>
+          <thead>
+            <tr><th>Dimension</th><th>Assessment Question</th><th>Coverage Analysis</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Clinical breadth</td>
+              <td>Does the scenario address the intended clinical competencies?</td>
+              <td>Mapping to learning objectives and competency frameworks.</td>
+            </tr>
+            <tr>
+              <td>Decision complexity</td>
+              <td>Does the scenario present appropriate decision-making challenges?</td>
+              <td>Decision point analysis, cognitive load assessment.</td>
+            </tr>
+            <tr>
+              <td>Edge case coverage</td>
+              <td>Does the scenario include appropriate exceptions and complications?</td>
+              <td>Complication inventory, exception handling review.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Validation Process -->
+      <section class="project-card">
+        <h2>Validation Process and Sensitivity Analysis</h2>
+
+        <h3>Expert Review Process</h3>
+        <p>Validation is conducted through structured expert review panels following a defined protocol:</p>
+        
+        <ol>
+          <li><strong>Panel composition:</strong> Minimum 3-5 experts with relevant clinical and/or simulation expertise. Include both domain specialists and simulation education experts.</li>
+          <li><strong>Review materials:</strong> Experts receive scenario narratives, NPC behaviour descriptions, and sample outputs without technical implementation details.</li>
+          <li><strong>Independent assessment:</strong> Each expert completes validity assessments independently before group discussion.</li>
+          <li><strong>Consensus building:</strong> Group discussion focuses on disagreements and identifies specific revision targets.</li>
+          <li><strong>Iterative refinement:</strong> Scenarios are revised based on feedback, with changes documented and re-reviewed.</li>
+        </ol>
+
+        <h3>Sensitivity Analysis Approach</h3>
+        <p>To understand how robust simulation validity is to variation, scenarios undergo conceptual sensitivity analysis:</p>
+        
+        <div class="sensitivity-grid">
+          <div class="sensitivity-item">
+            <h4>Information Availability</h4>
+            <p>Vary what clinical information is available to the learner. Does the scenario remain plausible when key data is delayed or incomplete?</p>
+            <ul>
+              <li>Baseline: Full information available</li>
+              <li>Variant A: Key lab results delayed</li>
+              <li>Variant B: Patient history incomplete</li>
+            </ul>
+          </div>
+          <div class="sensitivity-item">
+            <h4>Time Pressure</h4>
+            <p>Vary the urgency of the clinical context. Do NPC behaviours remain appropriate under different temporal constraints?</p>
+            <ul>
+              <li>Baseline: Standard pace</li>
+              <li>Variant A: Rapid deterioration</li>
+              <li>Variant B: Extended observation period</li>
+            </ul>
+          </div>
+          <div class="sensitivity-item">
+            <h4>Resource Constraints</h4>
+            <p>Vary available resources (staff, equipment, beds). Do workflow patterns adapt appropriately?</p>
+            <ul>
+              <li>Baseline: Adequate resources</li>
+              <li>Variant A: Staff shortage</li>
+              <li>Variant B: Equipment unavailable</li>
+            </ul>
+          </div>
+          <div class="sensitivity-item">
+            <h4>Patient Complexity</h4>
+            <p>Vary comorbidities and social factors. Do clinical reasoning patterns remain coherent with added complexity?</p>
+            <ul>
+              <li>Baseline: Single presenting problem</li>
+              <li>Variant A: Multiple comorbidities</li>
+              <li>Variant B: Complex social context</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>Acceptance Criteria</h3>
+        <p>Scenarios are considered validated when:</p>
         <ul>
-        <li>Expert review panels provide qualitative feedback on realism and coherence.</li>
-        <li>Revisions prioritize clarity and plausibility over precision.</li>
+          <li><strong>Construct validity:</strong> Expert panel reaches consensus that core clinical constructs are appropriately represented.</li>
+          <li><strong>Face validity:</strong> Majority of experts rate overall plausibility as "acceptable" or higher without major concerns.</li>
+          <li><strong>Content validity:</strong> Learning objectives are demonstrably addressable through the scenario content.</li>
+          <li><strong>Sensitivity robustness:</strong> Scenario remains plausible under at least 2 of 4 sensitivity variations.</li>
         </ul>
       </section>
 
-      <section class="project-card">
-        <h2>Sensitivity Analysis Plan (Conceptual)</h2>
-        <ul>
-        <li>Vary scenario stressors (information availability, time pressure, staffing context).</li>
-        <li>Observe whether narrative outcomes remain plausible under these variations.</li>
-        </ul>
-      </section>
-
-      <section class="project-card">
-        <h2>Limitations</h2>
-        <ul>
-        <li>This plan does not validate against real-world outcomes.</li>
-        <li>It does not provide parameter fitting or calibration procedures.</li>
-        </ul>
-      </section>
-
+      <!-- Related Artefacts -->
       <section class="project-card">
         <h2>Related Artefacts</h2>
         <ul>
-        <li><a href="physiological-assumptions.html">Physiological Modelling Assumptions</a> — Assumptions to validate</li>
-        <li><a href="workflow-assumptions.html">Operational Workflow Modelling Assumptions</a> — Workflow assumptions to validate</li>
-        <li><a href="../validation/expert-validation-protocol.html">Expert Validation Protocol</a> — How experts assess validity</li>
-        <li><a href="../validation/reliability-bias-plan.html">Reliability and Bias Analysis Plan</a> — Statistical validation methods</li>
+          <li><a href="physiological-assumptions.html">Physiological Modelling Assumptions</a> — Assumptions that require validation against clinical expectations</li>
+          <li><a href="workflow-assumptions.html">Operational Workflow Modelling Assumptions</a> — Workflow assumptions to validate for realistic practice patterns</li>
+          <li><a href="../validation/expert-validation-protocol.html">Expert Validation Protocol</a> — Detailed procedures for expert panel assessment</li>
+          <li><a href="../validation/reliability-bias-plan.html">Reliability and Bias Analysis Plan</a> — Statistical approaches for interrater agreement and bias detection</li>
         </ul>
       </section>
 </main>
@@ -163,10 +313,77 @@
     code { background: rgba(46, 204, 113, 0.1); padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: 'Courier New', monospace; font-size: 0.9em; }
     pre { background: rgba(46, 204, 113, 0.1); padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
     pre code { background: none; padding: 0; }
+    
+    /* Key Distinction Box */
+    .key-distinction {
+      background: linear-gradient(135deg, rgba(46, 204, 113, 0.08) 0%, rgba(46, 204, 113, 0.02) 100%);
+      border: 1px solid rgba(46, 204, 113, 0.2);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .key-distinction h4 {
+      margin: 0 0 1rem 0;
+      color: #2ecc71;
+      font-size: 1rem;
+    }
+    .distinction-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+    .distinction-item strong {
+      display: block;
+      color: #092917;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+    .distinction-item p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #4a4a4a;
+    }
+    
+    /* Sensitivity Analysis Grid */
+    .sensitivity-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .sensitivity-item {
+      background: rgba(46, 204, 113, 0.05);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      border-left: 3px solid #2ecc71;
+    }
+    .sensitivity-item h4 {
+      margin: 0 0 0.5rem 0;
+      color: #092917;
+      font-size: 0.95rem;
+    }
+    .sensitivity-item p {
+      font-size: 0.85rem;
+      color: #4a4a4a;
+      margin-bottom: 0.75rem;
+    }
+    .sensitivity-item ul {
+      margin: 0;
+      padding-left: 1.25rem;
+      font-size: 0.8rem;
+    }
+    .sensitivity-item li {
+      margin: 0.25rem 0;
+    }
+    
     @media (max-width: 768px) {
       .article-header h1 { font-size: 1.8rem; }
       .article-meta { flex-direction: column; gap: 0.5rem; }
       .project-card { padding: 1.5rem; }
+      .distinction-grid { grid-template-columns: 1fr; }
+      .sensitivity-grid { grid-template-columns: 1fr; }
+      table { font-size: 0.8rem; }
+      table th, table td { padding: 0.5rem; }
     }
   </style>
 

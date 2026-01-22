@@ -47,79 +47,175 @@
             <span class="tag">Evaluation</span>
             <span class="tag">Metrics</span>
             <span class="tag">DASEX</span>
-
           </div>
         </div>
+
+        <h2>Purpose &amp; DASEX Framework Connection</h2>
+        <p>This catalogue defines evaluation metrics in plain language for assessing AI-driven NPCs in XR healthcare simulations. The metrics are organised around the <strong>DASEX framework</strong> — a structured approach to evaluating five critical dimensions of AI behaviour in clinical training contexts:</p>
+        
+        <div class="dasex-grid">
+          <div class="dasex-item">
+            <div class="dasex-letter">D</div>
+            <div class="dasex-content">
+              <strong>Diagnosis</strong>
+              <p>Clinical reasoning quality, differential generation, and diagnostic accuracy within synthetic scenarios.</p>
+            </div>
+          </div>
+          <div class="dasex-item">
+            <div class="dasex-letter">A</div>
+            <div class="dasex-content">
+              <strong>Adaptation</strong>
+              <p>Ability to adjust recommendations based on evolving patient state, new information, and learner responses.</p>
+            </div>
+          </div>
+          <div class="dasex-item">
+            <div class="dasex-letter">S</div>
+            <div class="dasex-content">
+              <strong>Safety</strong>
+              <p>Recognition of risk, appropriate uncertainty communication, and avoidance of harmful recommendations.</p>
+            </div>
+          </div>
+          <div class="dasex-item">
+            <div class="dasex-letter">E</div>
+            <div class="dasex-content">
+              <strong>Engagement</strong>
+              <p>Quality of interaction, communication clarity, and ability to maintain productive dialogue with learners.</p>
+            </div>
+          </div>
+          <div class="dasex-item">
+            <div class="dasex-letter">X</div>
+            <div class="dasex-content">
+              <strong>eXplainability</strong>
+              <p>Transparency of reasoning, justification of recommendations, and ability to articulate decision rationale.</p>
+            </div>
+          </div>
+        </div>
+
+        <p style="margin-top: 1.5rem;">Each metric in this catalogue maps to one or more DASEX dimensions, ensuring comprehensive coverage of the evaluation framework. This catalogue does not include scoring code or automated computation rules — it is designed for human-led qualitative assessment.</p>
       </section>
 
-      <!-- Content -->
-
+      <!-- Consolidated Metrics Section -->
       <section class="project-card">
-        <h2>Purpose</h2>
-        <p>This catalogue defines evaluation metrics in plain language. It does not include any scoring code or computation rules.</p>
-      </section>
+        <h2>Core Evaluation Metrics</h2>
+        <p>The following metrics form the foundation of DASEX-aligned evaluation. Each metric specifies its intent, the evidence required to assess it, appropriate timing windows, and guidance for interpretation.</p>
 
-      <section class="project-card">
-        <h2>Metrics Overview</h2>
         <table>
-        <thead>
-        <tr>
-        <th>Metric</th>
-        <th>Intent</th>
-        <th>Evidence Required</th>
-        <th>Timing Window</th>
-        <th>Interpretation Guidance</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-        <td><strong>Clinical Plausibility</strong></td>
-        <td>Assess realism of the clinical narrative.</td>
-        <td>Expert notes and quotes.</td>
-        <td>During scenario and debrief.</td>
-        <td>Look for consistent reasoning and believable outcomes.</td>
-        </tr>
-        <tr>
-        <td><strong>Safety Awareness</strong></td>
-        <td>Identify recognition of risk and uncertainty.</td>
-        <td>Decision trace notes.</td>
-        <td>Mid-scenario and debrief.</td>
-        <td>Prefer explicit acknowledgment of uncertainty.</td>
-        </tr>
-        <tr>
-        <td><strong>Communication Clarity</strong></td>
-        <td>Evaluate clarity of AI recommendations.</td>
-        <td>Verbatim outputs and evaluator notes.</td>
-        <td>At each interaction step.</td>
-        <td>Ambiguity reduces clarity.</td>
-        </tr>
-        <tr>
-        <td><strong>Workflow Fit</strong></td>
-        <td>Assess alignment with clinical workflow.</td>
-        <td>Role feedback and scenario notes.</td>
-        <td>Debrief.</td>
-        <td>Misalignment indicates usability risk.</td>
-        </tr>
-        </tbody>
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>DASEX</th>
+              <th>Intent</th>
+              <th>Evidence Required</th>
+              <th>Timing Window</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Clinical Plausibility</strong></td>
+              <td>D, A</td>
+              <td>Assess whether the AI's clinical narrative reflects recognizable diagnostic reasoning patterns.</td>
+              <td>Expert panel notes, verbatim quotes from AI outputs, comparison against clinical guidelines.</td>
+              <td>During scenario and post-scenario debrief.</td>
+            </tr>
+            <tr>
+              <td><strong>Differential Generation</strong></td>
+              <td>D</td>
+              <td>Evaluate breadth and appropriateness of differential diagnoses considered.</td>
+              <td>List of differentials mentioned, expert assessment of completeness relative to presentation.</td>
+              <td>Mid-scenario, when diagnostic reasoning is active.</td>
+            </tr>
+            <tr>
+              <td><strong>Safety Awareness</strong></td>
+              <td>S</td>
+              <td>Identify recognition of clinical risk, red flags, and appropriate escalation behaviours.</td>
+              <td>Decision trace notes, instances of uncertainty acknowledgment, escalation recommendations.</td>
+              <td>Throughout scenario, especially at critical decision points.</td>
+            </tr>
+            <tr>
+              <td><strong>Uncertainty Communication</strong></td>
+              <td>S, X</td>
+              <td>Assess whether AI explicitly communicates confidence levels and data limitations.</td>
+              <td>Verbatim uncertainty statements, presence of hedging language, explicit confidence markers.</td>
+              <td>At each recommendation or diagnostic output.</td>
+            </tr>
+            <tr>
+              <td><strong>Communication Clarity</strong></td>
+              <td>E</td>
+              <td>Evaluate whether AI outputs are understandable, unambiguous, and appropriately structured.</td>
+              <td>Evaluator comprehension ratings, time-to-understanding, ambiguity counts.</td>
+              <td>At each interaction step.</td>
+            </tr>
+            <tr>
+              <td><strong>Adaptive Responsiveness</strong></td>
+              <td>A</td>
+              <td>Measure how well AI adjusts to new information, corrections, or evolving patient state.</td>
+              <td>Before/after comparison of recommendations following new data, response latency.</td>
+              <td>When scenario state changes are introduced.</td>
+            </tr>
+            <tr>
+              <td><strong>Workflow Fit</strong></td>
+              <td>E</td>
+              <td>Assess alignment with realistic clinical workflow patterns and handoff conventions.</td>
+              <td>Role feedback, scenario notes on workflow disruption, format compatibility assessment.</td>
+              <td>Debrief with clinical evaluators.</td>
+            </tr>
+            <tr>
+              <td><strong>Reasoning Transparency</strong></td>
+              <td>X</td>
+              <td>Evaluate whether AI provides clear justification for its recommendations.</td>
+              <td>Presence of reasoning chains, expert assessment of logic quality, traceable decision paths.</td>
+              <td>When recommendations are issued.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Interpretation Guidance</h3>
+        <p>When applying these metrics, evaluators should consider:</p>
+        <ul>
+          <li><strong>Context sensitivity:</strong> A metric score may be appropriate in one scenario context but concerning in another. Always interpret relative to scenario complexity and available information.</li>
+          <li><strong>Pattern recognition:</strong> Single instances of weak performance are less concerning than systematic patterns. Look for trends across multiple interactions.</li>
+          <li><strong>Trade-off awareness:</strong> Some metrics exist in tension (e.g., communication brevity vs. reasoning transparency). Document trade-off decisions explicitly.</li>
+          <li><strong>Synthetic boundary:</strong> These metrics evaluate performance in synthetic contexts only. Results do not predict clinical performance.</li>
+        </ul>
+
+        <h3>Rubric Anchors</h3>
+        <p>Each metric can be assessed using the following qualitative anchors:</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Level</th>
+              <th>Description</th>
+              <th>Indicators</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Strong</strong></td>
+              <td>Clear, consistent, and well-justified responses that meet or exceed clinical expectations.</td>
+              <td>Explicit reasoning, appropriate uncertainty, no safety concerns, workflow-compatible outputs.</td>
+            </tr>
+            <tr>
+              <td><strong>Moderate</strong></td>
+              <td>Mostly coherent with minor gaps, ambiguity, or missed opportunities for improvement.</td>
+              <td>Some reasoning visible, occasional uncertainty gaps, minor workflow friction.</td>
+            </tr>
+            <tr>
+              <td><strong>Weak</strong></td>
+              <td>Confusing, potentially unsafe, or inconsistent with scenario context and clinical norms.</td>
+              <td>Missing reasoning, overconfident claims, safety red flags, significant workflow disruption.</td>
+            </tr>
+          </tbody>
         </table>
       </section>
 
-      <section class="project-card">
-        <h2>Rubric Anchors (Qualitative)</h2>
-        <ul>
-        <li><strong>Strong</strong>: Clear, consistent, and justified responses.</li>
-        <li><strong>Moderate</strong>: Mostly coherent with minor gaps or ambiguity.</li>
-        <li><strong>Weak</strong>: Confusing, unsafe, or inconsistent with scenario context.</li>
-        </ul>
-      </section>
-
+      <!-- Related Artefacts -->
       <section class="project-card">
         <h2>Related Artefacts &amp; Tools</h2>
         <ul>
-        <li><a href="reporting-template.html">Reporting Template for Results</a> — Standard structure for documenting evaluation outcomes</li>
-        <li><a href="failure-mode-taxonomy.html">Failure Mode Taxonomy</a> — Categories of failures to assess during evaluation</li>
-        <li><a href="../training/assessment-rubrics.html">Assessment Rubric Definitions</a> — Detailed rubrics aligned with these metrics</li>
-        <li><a href="/xr-npc-dasex-evaluator.html">DASEX Checklist Evaluator</a> — Interactive tool for scoring against the DASEX framework</li>
+          <li><a href="reporting-template.html">Reporting Template for Results</a> — Standard structure for documenting evaluation outcomes using these metrics</li>
+          <li><a href="failure-mode-taxonomy.html">Failure Mode Taxonomy</a> — Categories of failures to assess during evaluation, linked to metric weaknesses</li>
+          <li><a href="../training/assessment-rubrics.html">Assessment Rubric Definitions</a> — Detailed rubrics aligned with DASEX metrics for training contexts</li>
+          <li><a href="/xr-npc-dasex-evaluator.html">DASEX Checklist Evaluator</a> — Interactive tool for scoring against the DASEX framework</li>
         </ul>
       </section>
 </main>
@@ -185,10 +281,48 @@
     code { background: rgba(46, 204, 113, 0.1); padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: 'Courier New', monospace; font-size: 0.9em; }
     pre { background: rgba(46, 204, 113, 0.1); padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
     pre code { background: none; padding: 0; }
+    
+    /* DASEX Framework Grid */
+    .dasex-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .dasex-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1rem;
+      background: rgba(46, 204, 113, 0.05);
+      border-radius: 0.75rem;
+      border-left: 4px solid #2ecc71;
+    }
+    .dasex-letter {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #2ecc71;
+      min-width: 2.5rem;
+      text-align: center;
+    }
+    .dasex-content strong {
+      display: block;
+      color: #092917;
+      margin-bottom: 0.25rem;
+    }
+    .dasex-content p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #4a4a4a;
+    }
+    
     @media (max-width: 768px) {
       .article-header h1 { font-size: 1.8rem; }
       .article-meta { flex-direction: column; gap: 0.5rem; }
       .project-card { padding: 1.5rem; }
+      .dasex-grid { grid-template-columns: 1fr; }
+      table { font-size: 0.85rem; }
+      table th, table td { padding: 0.5rem; }
     }
   </style>
 

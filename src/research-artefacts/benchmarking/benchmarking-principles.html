@@ -47,43 +47,239 @@
             <span class="tag">Benchmarking</span>
             <span class="tag">Research</span>
             <span class="tag">Methodology</span>
+          </div>
+        </div>
 
+        <h2>Purpose and Philosophy</h2>
+        <p>This document outlines principles for designing benchmark suites using synthetic scenarios to evaluate AI-driven NPCs in XR healthcare simulations. Benchmarking in this context serves a fundamentally different purpose than traditional machine learning benchmarks — we are not optimising for a single performance metric, but assessing <strong>multidimensional fitness for educational purpose</strong>.</p>
+
+        <p>The healthcare AI simulation domain presents unique benchmarking challenges:</p>
+        <ul>
+          <li><strong>No ground truth:</strong> Unlike diagnostic AI, there is no single "correct" NPC behaviour — appropriateness depends on educational context, learner level, and scenario objectives.</li>
+          <li><strong>Qualitative outcomes:</strong> Success is measured in learning effectiveness and clinical plausibility, not accuracy percentages.</li>
+          <li><strong>Context sensitivity:</strong> The same NPC behaviour may be appropriate in one scenario and inappropriate in another.</li>
+          <li><strong>Multistakeholder evaluation:</strong> Validity requires input from clinical experts, educators, simulation specialists, and learners.</li>
+        </ul>
+
+        <div class="principle-callout">
+          <h4>Guiding Philosophy</h4>
+          <p>Benchmarks should reveal <em>how</em> systems behave across diverse contexts, not just <em>whether</em> they pass or fail. The goal is characterisation, not certification. A well-designed benchmark illuminates strengths and weaknesses that guide iterative improvement — it does not produce a single "better/worse" ranking.</p>
+        </div>
+
+        <h3>Scope Boundaries</h3>
+        <ul>
+          <li>No benchmark packs, automated runners, or executable test suites are provided.</li>
+          <li>Benchmarks are descriptive frameworks intended for human-led evaluation.</li>
+          <li>Results apply only to synthetic, non-clinical research contexts.</li>
+          <li>Benchmark results do not predict clinical performance or real-world safety.</li>
+        </ul>
+      </section>
+
+      <!-- Core Principles -->
+      <section class="project-card">
+        <h2>Core Benchmarking Principles</h2>
+        <p>The following principles guide benchmark design for XR-NPC evaluation. Each principle addresses a specific challenge in creating meaningful, reproducible assessments.</p>
+
+        <div class="principle-grid">
+          <div class="principle-item">
+            <div class="principle-header">
+              <span class="principle-number">1</span>
+              <h3>Coverage</h3>
+            </div>
+            <p>Benchmark suites must include diverse clinical contexts and decision types to reveal system behaviour across the intended operational envelope.</p>
+            
+            <h4>Coverage Dimensions</h4>
+            <table>
+              <thead>
+                <tr><th>Dimension</th><th>Coverage Targets</th><th>Rationale</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Clinical specialty</td>
+                  <td>Emergency, acute care, primary care, specialty referral</td>
+                  <td>Different specialties have distinct reasoning patterns and workflow constraints.</td>
+                </tr>
+                <tr>
+                  <td>Acuity level</td>
+                  <td>Stable, deteriorating, critical, end-of-life</td>
+                  <td>NPC behaviour should adapt appropriately to patient acuity.</td>
+                </tr>
+                <tr>
+                  <td>Decision type</td>
+                  <td>Diagnostic, therapeutic, prognostic, procedural, handoff</td>
+                  <td>Different decision types require different reasoning and communication patterns.</td>
+                </tr>
+                <tr>
+                  <td>Uncertainty level</td>
+                  <td>Clear presentation, ambiguous, contradictory, incomplete data</td>
+                  <td>Appropriate uncertainty handling is critical for safety assessment.</td>
+                </tr>
+                <tr>
+                  <td>Team composition</td>
+                  <td>Solo practitioner, dyad, full team, cross-disciplinary</td>
+                  <td>Team dynamics affect communication patterns and role expectations.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="principle-item">
+            <div class="principle-header">
+              <span class="principle-number">2</span>
+              <h3>Variation</h3>
+            </div>
+            <p>Benchmarks must systematically vary scenario parameters to distinguish robust behaviours from context-dependent artefacts.</p>
+            
+            <h4>Variation Strategy</h4>
+            <table>
+              <thead>
+                <tr><th>Variation Type</th><th>Parameters</th><th>Purpose</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Stressor variation</td>
+                  <td>Time pressure, resource constraints, competing priorities, distractions</td>
+                  <td>Assess performance degradation under realistic clinical stress.</td>
+                </tr>
+                <tr>
+                  <td>Information variation</td>
+                  <td>Data availability, quality, timing, source reliability</td>
+                  <td>Test appropriate handling of incomplete or uncertain information.</td>
+                </tr>
+                <tr>
+                  <td>Narrative variation</td>
+                  <td>Patient demographics, presentation style, communication ability, social context</td>
+                  <td>Detect potential biases and ensure equitable performance.</td>
+                </tr>
+                <tr>
+                  <td>Interaction variation</td>
+                  <td>Learner expertise level, question types, challenge intensity</td>
+                  <td>Assess adaptive behaviour across learner capabilities.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <p style="margin-top: 1rem;"><strong>Variation principle:</strong> For each core scenario, create at least 3 systematic variations. Document which parameters are varied and the expected impact on NPC behaviour.</p>
+          </div>
+
+          <div class="principle-item">
+            <div class="principle-header">
+              <span class="principle-number">3</span>
+              <h3>Transparency</h3>
+            </div>
+            <p>All benchmark assumptions, limitations, and design decisions must be explicitly documented to enable appropriate interpretation and replication.</p>
+            
+            <h4>Transparency Requirements</h4>
+            <ul>
+              <li><strong>Assumption documentation:</strong> Every scenario must reference the relevant entries in the <a href="../digital-twin/physiological-assumptions.html">Physiological Assumptions</a> and <a href="../digital-twin/workflow-assumptions.html">Workflow Assumptions</a> registers.</li>
+              <li><strong>Synthetic boundary markers:</strong> All benchmark materials must be clearly labelled as synthetic and non-clinical.</li>
+              <li><strong>Design rationale:</strong> Document why each scenario was included, what it is intended to test, and what constitutes success or failure.</li>
+              <li><strong>Limitation acknowledgment:</strong> Explicitly state what the benchmark does not assess and what conclusions cannot be drawn from results.</li>
+              <li><strong>Expert provenance:</strong> Document which clinical experts contributed to scenario design and validation.</li>
+            </ul>
+          </div>
+
+          <div class="principle-item">
+            <div class="principle-header">
+              <span class="principle-number">4</span>
+              <h3>Comparability</h3>
+            </div>
+            <p>Benchmarks must use consistent formats and evaluation criteria to enable meaningful comparison across systems, versions, or evaluation sessions.</p>
+            
+            <h4>Comparability Standards</h4>
+            <table>
+              <thead>
+                <tr><th>Element</th><th>Standardisation Requirement</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Scenario format</td>
+                  <td>Use the <a href="../scenario-management/scenario-template-guide.html">Scenario Template</a> consistently across all benchmark scenarios.</td>
+                </tr>
+                <tr>
+                  <td>Evaluation rubrics</td>
+                  <td>Apply the <a href="../evaluation/metric-catalogue.html">Metric Catalogue</a> rubrics with documented anchor interpretations.</td>
+                </tr>
+                <tr>
+                  <td>Reporting structure</td>
+                  <td>Use the <a href="../evaluation/reporting-template.html">Reporting Template</a> for all benchmark results.</td>
+                </tr>
+                <tr>
+                  <td>Evaluator calibration</td>
+                  <td>Conduct inter-rater reliability checks; document agreement levels.</td>
+                </tr>
+                <tr>
+                  <td>Version control</td>
+                  <td>Record exact scenario versions, evaluation dates, and any protocol deviations.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="principle-item">
+            <div class="principle-header">
+              <span class="principle-number">5</span>
+              <h3>Progressivity</h3>
+            </div>
+            <p>Benchmark suites should include scenarios of graduated difficulty to characterise system capabilities across complexity levels.</p>
+            
+            <h4>Complexity Tiers</h4>
+            <table>
+              <thead>
+                <tr><th>Tier</th><th>Characteristics</th><th>Purpose</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Foundation</strong></td>
+                  <td>Clear presentation, single problem, adequate resources, minimal time pressure</td>
+                  <td>Establish baseline capability on straightforward cases.</td>
+                </tr>
+                <tr>
+                  <td><strong>Standard</strong></td>
+                  <td>Typical complexity, some ambiguity, realistic constraints, normal pace</td>
+                  <td>Assess performance on representative clinical scenarios.</td>
+                </tr>
+                <tr>
+                  <td><strong>Complex</strong></td>
+                  <td>Multiple problems, significant uncertainty, resource constraints, time pressure</td>
+                  <td>Test resilience under challenging conditions.</td>
+                </tr>
+                <tr>
+                  <td><strong>Edge</strong></td>
+                  <td>Rare presentations, conflicting information, ethical dilemmas, system boundaries</td>
+                  <td>Explore failure modes and boundary behaviours.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p style="margin-top: 1rem;"><strong>Balance principle:</strong> A benchmark suite should include approximately 40% Foundation/Standard scenarios and 60% Complex/Edge scenarios to characterise both typical and boundary performance.</p>
+          </div>
+
+          <div class="principle-item">
+            <div class="principle-header">
+              <span class="principle-number">6</span>
+              <h3>Educational Alignment</h3>
+            </div>
+            <p>Benchmarks must be designed with explicit educational objectives, ensuring that evaluation criteria reflect pedagogical value rather than just technical performance.</p>
+            
+            <h4>Alignment Considerations</h4>
+            <ul>
+              <li><strong>Learning outcome mapping:</strong> Each benchmark scenario should map to specific learning objectives from recognised clinical competency frameworks.</li>
+              <li><strong>Pedagogical appropriateness:</strong> NPC behaviours should be evaluated for their educational value, not just clinical accuracy — sometimes a "teaching moment" requires different behaviour than optimal clinical efficiency.</li>
+              <li><strong>Debriefing enablement:</strong> Benchmark scenarios should generate outputs that support meaningful post-simulation debriefing discussions.</li>
+              <li><strong>Progression support:</strong> Results should inform decisions about learner progression and targeted skill development.</li>
+            </ul>
           </div>
         </div>
       </section>
 
-      <!-- Content -->
-
-      <section class="project-card">
-        <h2>Purpose</h2>
-        <p>Outline principles for designing benchmark suites using synthetic scenarios.</p>
-      </section>
-
-      <section class="project-card">
-        <h2>Principles</h2>
-        <ul>
-        <li><strong>Coverage</strong>: Include diverse clinical contexts and decision types.</li>
-        <li><strong>Variation</strong>: Use narrative variations in stressors and information availability.</li>
-        <li><strong>Transparency</strong>: Clearly state assumptions and synthetic-only boundaries.</li>
-        <li><strong>Comparability</strong>: Use consistent scenario formats and evaluation rubrics.</li>
-        </ul>
-      </section>
-
-      <section class="project-card">
-        <h2>Scope Boundaries</h2>
-        <ul>
-        <li>No benchmark packs or automated runners are provided.</li>
-        <li>Benchmarks are descriptive and intended for human-led evaluation.</li>
-        </ul>
-      </section>
-
+      <!-- Related Artefacts -->
       <section class="project-card">
         <h2>Related Artefacts</h2>
         <ul>
-        <li><a href="reproducibility-checklist.html">Reproducibility Checklist</a> — Requirements for replicable benchmarks</li>
-        <li><a href="../scenario-management/vignette-library.html">Scenario Vignette Library</a> — Scenarios for benchmark suites</li>
-        <li><a href="../evaluation/metric-catalogue.html">Metric Catalogue</a> — Metrics for benchmark evaluation</li>
-        <li><a href="../evaluation/reporting-template.html">Reporting Template</a> — Documenting benchmark results</li>
+          <li><a href="reproducibility-checklist.html">Reproducibility Checklist</a> — Requirements for replicable benchmark execution and reporting</li>
+          <li><a href="../scenario-management/vignette-library.html">Scenario Vignette Library</a> — Example scenarios for inclusion in benchmark suites</li>
+          <li><a href="../evaluation/metric-catalogue.html">Metric Catalogue</a> — Standardised metrics for benchmark evaluation</li>
+          <li><a href="../evaluation/reporting-template.html">Reporting Template</a> — Structure for documenting benchmark results</li>
         </ul>
       </section>
 </main>
@@ -149,10 +345,74 @@
     code { background: rgba(46, 204, 113, 0.1); padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: 'Courier New', monospace; font-size: 0.9em; }
     pre { background: rgba(46, 204, 113, 0.1); padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
     pre code { background: none; padding: 0; }
+    
+    /* Principle Callout */
+    .principle-callout {
+      background: linear-gradient(135deg, rgba(46, 204, 113, 0.1) 0%, rgba(46, 204, 113, 0.03) 100%);
+      border-left: 4px solid #2ecc71;
+      padding: 1.25rem 1.5rem;
+      border-radius: 0 0.5rem 0.5rem 0;
+      margin: 1.5rem 0;
+    }
+    .principle-callout h4 {
+      margin: 0 0 0.5rem 0;
+      color: #2ecc71;
+    }
+    .principle-callout p {
+      margin: 0;
+      font-style: italic;
+    }
+    
+    /* Principle Grid */
+    .principle-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+    .principle-item {
+      padding: 1.5rem;
+      background: rgba(46, 204, 113, 0.03);
+      border-radius: 0.75rem;
+      border: 1px solid rgba(46, 204, 113, 0.1);
+    }
+    .principle-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .principle-number {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+      color: white;
+      border-radius: 50%;
+      font-weight: 700;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .principle-header h3 {
+      margin: 0;
+      color: #092917;
+      font-size: 1.3rem;
+    }
+    .principle-item h4 {
+      color: #1a4731;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+      font-size: 1rem;
+    }
+    
     @media (max-width: 768px) {
       .article-header h1 { font-size: 1.8rem; }
       .article-meta { flex-direction: column; gap: 0.5rem; }
       .project-card { padding: 1.5rem; }
+      .principle-item { padding: 1rem; }
+      table { font-size: 0.8rem; }
+      table th, table td { padding: 0.5rem; }
     }
   </style>
 
