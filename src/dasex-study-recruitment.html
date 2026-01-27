@@ -7,6 +7,7 @@
   <title>NPC Study Recruitment – AI-Driven XR Healthcare Simulation (Ethics 66081)</title>
   <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
 </head>
 <body>
 
@@ -21,14 +22,18 @@
     </ul>
   </nav>
 
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
   <div class="container">
     <main>
       <section id="about" style="margin-bottom: 2rem;">
         <div class="about-content">
+          <p class="pill" style="display:inline-block; margin:0 0 0.75rem; padding:0.35rem 0.75rem; border-radius:999px; background:rgba(46,204,113,0.15); color:#1f6b3a; font-weight:600; font-size:0.9rem;">30‑minute session</p>
           <h1>Help Shape the Future of Medical Training with AI &amp; XR</h1>
           <h2>Participant Recruitment – AI-Driven NPC Healthcare Simulation</h2>
           <p><strong>Full title:</strong> Evaluating AI-Driven XR Healthcare Simulation Using the DASEX Framework: A Pilot Validation Study</p>
-          <p><strong>Ref &amp; Version:</strong> 1 &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Ethics ID:</strong> 66081 &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Date:</strong> 14/08/2025</p>
+          <p><strong>Ref &amp; Version:</strong> 1 &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Ethics ID:</strong> 66081 &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Date:</strong> Q1 2026</p>
           <p><strong>Researcher:</strong> David Dasa (PhD Researcher) – <a href="mailto:ddasa@bournemouth.ac.uk">ddasa@bournemouth.ac.uk</a></p>
           <p><strong>Supervisor:</strong> Professor Wen Tang – <a href="mailto:wtang@bournemouth.ac.uk">wtang@bournemouth.ac.uk</a></p>
         </div>
@@ -42,7 +47,7 @@
       <section class="project-card">
         <h2>Eligibility</h2>
         <ul class="skills-list">
-          <li>Healthcare students or professionals</li>
+          <li>BU Healthcare students (Year 2 and above)</li>
           <li>Comfortable using a VR headset</li>
           <li>Able to complete the study session and a 3‑week follow‑up survey</li>
         </ul>
@@ -53,18 +58,37 @@
         <ul class="skills-list">
           <li>Orientation to the VR equipment and study overview</li>
           <li>Complete a short AI‑driven XR simulation scenario</li>
-          <li>Immediate feedback: DASEX checklist, NASA‑TLX, SUS, short open‑ended questions</li>
-          <li>Optional 3‑week follow‑up questionnaire (by email)</li>
+          <li>Immediate feedback: short checklist and quick survey</li>
+          <li>3‑week follow‑up: brief JISC survey (by email)</li>
+        </ul>
+      </section>
+
+      <section class="project-card">
+        <h2>Why participate?</h2>
+        <ul class="skills-list">
+          <li>Contribute to the next generation of AI‑driven healthcare training</li>
+          <li>Get early access to a cutting‑edge XR simulation</li>
+          <li>Your feedback directly shapes realism, usability, and learning impact</li>
         </ul>
       </section>
 
       <section class="project-card">
         <h2>Location, Dates and Duration</h2>
         <ul>
-          <li><strong>Location:</strong> [To be confirmed]</li>
-          <li><strong>Dates:</strong> [To be confirmed]</li>
-          <li><strong>Session Duration:</strong> [To be confirmed]</li>
+          <li><strong>Location:</strong> Bournemouth Gateway Building, Lansdowne Campus</li>
+          <li><strong>Dates:</strong> Q1 2026</li>
+          <li><strong>Session Duration:</strong> 30 minutes (approx.)</li>
         </ul>
+      </section>
+
+      <section class="project-card">
+        <h2>Thank‑you gift</h2>
+        <p>£5 Amazon e‑gift card after each stage (£10 total).</p>
+      </section>
+
+      <section class="project-card">
+        <h2>Ready to take part?</h2>
+        <p>Please drop a mail to <a href="mailto:ddasa@bournemouth.ac.uk">ddasa@bournemouth.ac.uk</a> if you would like to participate, and we will set up a session at your earliest convenience.</p>
       </section>
 
       <section class="project-card">
@@ -106,6 +130,46 @@
   <footer>
     <p>&copy; 2025 David Dasa</p>
   </footer>
+
+  <!-- Particles.js Configuration -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+    });
+  </script>
 
 </body>
 <!-- End of file -->
