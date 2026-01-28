@@ -92,11 +92,11 @@
         <h2>Research Insights</h2>
         <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin: 1rem 0;">
           <div class="stat-item" style="background: rgba(46, 204, 113, 0.1); padding: 1.5rem; border-radius: 1rem; text-align: center;">
-            <h3 style="margin: 0; color: #092917; font-size: 2rem;" id="total-notes">5</h3>
+            <h3 style="margin: 0; color: #092917; font-size: 2rem;" id="total-notes">6</h3>
             <p style="margin: 0.5rem 0 0; color: #4a4a4a;">Research Notes</p>
           </div>
           <div class="stat-item" style="background: rgba(46, 204, 113, 0.1); padding: 1.5rem; border-radius: 1rem; text-align: center;">
-            <h3 style="margin: 0; color: #092917; font-size: 2rem;" id="paper-count">3</h3>
+            <h3 style="margin: 0; color: #092917; font-size: 2rem;" id="paper-count">5</h3>
             <p style="margin: 0.5rem 0 0; color: #4a4a4a;">Papers Analyzed</p>
           </div>
           <div class="stat-item" style="background: rgba(46, 204, 113, 0.1); padding: 1.5rem; border-radius: 1rem; text-align: center;">
@@ -166,6 +166,24 @@
 
       // Sample data structure (in practice, this would come from a database or API)
       const researchNotes = [
+        {
+          date: '2026-01-28',
+          type: 'Paper',
+          title: 'SciPredict: Can LLMs Predict the Outcomes of Research Experiments in Natural Sciences?',
+          description: 'A benchmark of real experiments in physics, biology, and chemistry that tests outcome prediction accuracy and calibration for frontier models.',
+          tags: ['LLMs', 'Scientific Reasoning', 'Benchmarks', 'Calibration', 'Evaluation'],
+          link: 'scipredict-outcomes-of-research-experiments.html',
+          dataTags: 'paper ai-ml'
+        },
+        {
+          date: '2026-01-28',
+          type: 'Paper',
+          title: 'SAM Audio: Segment Anything in Audio',
+          description: 'A promptable foundation model for audio source separation that unifies text, visual, and temporal span prompts with a new benchmark and reference-free evaluation.',
+          tags: ['Audio', 'Source Separation', 'Multimodal AI', 'Diffusion Models', 'Evaluation'],
+          link: 'sam-audio-segment-anything-audio.html',
+          dataTags: 'paper ai-ml'
+        },
         {
           date: '2025-11-21',
           type: 'Paper Series Review',

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SAM Audio: Segment Anything in Audio - Research Note by David Dasa">
+  <title>SAM Audio: Segment Anything in Audio - Research Notes - David Dasa</title>
+  <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+      <li><a href="https://www.daviddasa.com/research-notes">Research Notes</a></li>
+    </ul>
+  </nav>
+
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <main>
+      <!-- Back Navigation -->
+      <div style="margin-bottom: 2rem;">
+        <a href="../research-notes/" style="color: #2ecc71; text-decoration: none; font-weight: 500;">← Back to Research Notes</a>
+      </div>
+
+      <!-- INTRO -->
+      <section class="project-card">
+        <div class="article-header">
+          <h1>SAM Audio: Segment Anything in Audio</h1>
+          <div class="article-meta">
+            <span class="article-date">January 28, 2026</span>
+            <span class="article-type">Paper</span>
+          </div>
+          <div class="article-tags">
+            <span class="tag">Audio</span>
+            <span class="tag">Source Separation</span>
+            <span class="tag">Multimodal AI</span>
+            <span class="tag">Diffusion Models</span>
+            <span class="tag">Evaluation</span>
+          </div>
+        </div>
+        <h2>INTRO</h2>
+        <p>SAM Audio positions itself as a foundation model for audio source separation, aiming to do for sound what Segment Anything did for images. The core idea is simple but ambitious: let users tell the model what to separate using text, visual cues, or a time span, and make that work across speech, music, and general sounds. That means no fixed list of classes and no single prompting modality. If it works as described, it moves audio separation from domain-specific tooling to a unified, promptable system that can scale with real-world use.</p>
+      </section>
+
+      <!-- TLDR -->
+      <section class="project-card">
+        <h2>TLDR</h2>
+        <p><strong>SAM Audio is a diffusion-transformer foundation model for audio separation that unifies text, visual, and temporal span prompting.</strong> It is trained with flow matching on large-scale audio mixtures spanning speech, music, and general sounds and outputs both a target stem and a residual stem. The paper reports state-of-the-art results across diverse benchmarks and introduces SAM Audio-Bench with human-labeled multimodal prompts plus a reference-free evaluation model aligned with human judgment. Focus to learn more: multimodal prompting design, span conditioning, and how reference-free metrics can replace SDR-style evaluation in real-world audio.</p>
+      </section>
+
+      <!-- CONTENT -->
+      <section class="project-card">
+        <h2>CONTENT</h2>
+
+        <h3>Why this matters</h3>
+        <p>Audio separation is a core building block for multimodal AI systems that need to understand sound. The field has strong models in narrow domains - speech enhancement, speaker separation, and music demixing - but they are typically locked to fixed taxonomies and single prompt types. The paper argues that open-domain mixtures and ambiguous sound boundaries require a more flexible interface, and that text alone is often insufficient for precise disambiguation.</p>
+
+        <h3>Unified prompting: text, visual, and span</h3>
+        <p>SAM Audio lets a user specify what to separate with natural language, where to separate using a visual mask (positive/negative clicks), and when to separate using a temporal span prompt. These prompts can be used independently or together. The span prompt is the most novel piece - a temporal conditioning signal that allows the model to focus on a time window without needing a reference clip.</p>
+
+        <h3>Model overview</h3>
+        <p>The architecture is a diffusion transformer trained with flow matching, operating in a DAC-VAE latent space. At inference, the model produces a target stem and a residual stem. This framing is practical: the user gets the sound they asked for, and the remainder stays coherent rather than being treated as noise.</p>
+
+        <h3>Performance and evaluation</h3>
+        <p>The paper reports state-of-the-art performance across speech, music, and general sound separation, including both in-the-wild and professional audio. Beyond accuracy, the authors call out a core evaluation problem in separation research: SDR-style metrics are weakly correlated with human perception, and many benchmarks rely on synthetic mixtures. To address this, they introduce SAM Audio-Bench with real-world, human-labeled prompts and a reference-free evaluation model that correlates strongly with human judgments.</p>
+
+        <h3>What I am taking forward</h3>
+        <p>For applied research, the key shift is prompt flexibility. If you can separate a target using text, visual context, or a time span, you can adapt the system to messy real-world data without rebuilding the model. The other practical takeaway is evaluation - reference-free metrics aligned with human listening could be more useful than SDR when building interactive tools or clinical workflows where perception matters most.</p>
+      </section>
+
+      <!-- CONCLUSION -->
+      <section class="project-card">
+        <h2>CONCLUSION</h2>
+        <p>SAM Audio reframes audio separation as a promptable, multimodal task rather than a fixed-class prediction problem. The combination of text, visual, and span prompts feels like the right abstraction for real-world use, and the focus on reference-free evaluation addresses a long-standing gap in how separation quality is measured. If the benchmarks and evaluation model gain traction, this could become a practical foundation for audio interaction in multimodal systems.</p>
+        <h3>References</h3>
+        <p>Original paper/source: <a href="https://doi.org/10.48550/arXiv.2512.18099" target="_blank" rel="noopener">SAM Audio: Segment Anything in Audio</a>.</p>
+        <p>Project links: <a href="https://github.com/facebookresearch/sam-audio" target="_blank" rel="noopener">Code</a> and <a href="https://ai.meta.com/samaudio/" target="_blank" rel="noopener">Project page</a>.</p>
+      </section>
+
+    </main>
+  </div>
+
+
+  <!-- Particles.js Configuration -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+    });
+  </script>
+
+  <style>
+    /* Layout refinements for cleaner reading */
+    .article-header h1 { color: #092917; margin-bottom: 1rem; font-size: 2.2rem; }
+    .article-meta { display: flex; gap: 2rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .article-date { color: #2ecc71; font-weight: 600; font-size: 1rem; }
+    .article-type { color: #1a4731; font-weight: 500; background: rgba(46, 204, 113, 0.1); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.9rem; }
+    .article-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .tag { background: rgba(46, 204, 113, 0.12); color: #092917; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.8rem; font-weight: 500; }
+    .container { max-width: 1000px; }
+    main { line-height: 1.7; }
+    p { line-height: 1.7; }
+    .project-card { background: rgba(255,255,255,0.82); border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
+    @media (max-width: 768px) {
+      .article-header h1 { font-size: 1.8rem; }
+      .article-meta { flex-direction: column; gap: 0.5rem; }
+    }
+  </style>
+
+</body>
+</html>

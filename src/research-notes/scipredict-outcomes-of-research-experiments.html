@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SciPredict: Can LLMs Predict the Outcomes of Research Experiments in Natural Sciences? - Research Note by David Dasa">
+  <title>SciPredict: Can LLMs Predict the Outcomes of Research Experiments in Natural Sciences? - Research Notes - David Dasa</title>
+  <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+      <li><a href="https://www.daviddasa.com/research-notes">Research Notes</a></li>
+    </ul>
+  </nav>
+
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <main>
+      <!-- Back Navigation -->
+      <div style="margin-bottom: 2rem;">
+        <a href="../research-notes/" style="color: #2ecc71; text-decoration: none; font-weight: 500;">← Back to Research Notes</a>
+      </div>
+
+      <!-- INTRO -->
+      <section class="project-card">
+        <div class="article-header">
+          <h1>SciPredict: Can LLMs Predict the Outcomes of Research Experiments in Natural Sciences?</h1>
+          <div class="article-meta">
+            <span class="article-date">January 28, 2026</span>
+            <span class="article-type">Paper</span>
+          </div>
+          <div class="article-tags">
+            <span class="tag">LLMs</span>
+            <span class="tag">Scientific Reasoning</span>
+            <span class="tag">Benchmarks</span>
+            <span class="tag">Calibration</span>
+            <span class="tag">Evaluation</span>
+          </div>
+        </div>
+        <h2>INTRO</h2>
+        <p>SciPredict tackles a question that sits at the heart of science planning. Can language models predict experimental outcomes well enough to guide what should be tested in the lab. The benchmark focuses on real experiments in physics, biology, and chemistry, drawn from recent papers, and asks models to predict results using only the described setup and background knowledge. The headline is sobering. Models perform about as well as human experts on raw accuracy, yet they fail at something essential for safe use, calibration of when to trust a prediction.</p>
+      </section>
+
+      <!-- TLDR -->
+      <section class="project-card">
+        <h2>TLDR</h2>
+        <p><strong>SciPredict is a benchmark of 405 real experimental questions across physics, biology, and chemistry that tests whether models can predict outcomes from experimental descriptions.</strong> Frontier model accuracy lands around the mid teens to mid twenties, similar to human experts. The critical gap is calibration. Models do not get more accurate when they claim high confidence or feasibility, while human experts do. The benchmark also shows that expert curated background knowledge helps a little, while model generated background often hurts. The main takeaway is that we need better reliability signals, not just higher accuracy, before using models to guide real world experiments.</p>
+      </section>
+
+      <!-- CONTENT -->
+      <section class="project-card">
+        <h2>CONTENT</h2>
+
+        <h3>What SciPredict measures</h3>
+        <p>The benchmark is built from recently published empirical studies after March 2025. Each item includes a structured description of the experimental system, conditions, interventions, and measured outcomes, plus optional background knowledge curated by experts. Models must predict the outcome without running the experiment. The scope is broad, covering 33 subdomains across three natural sciences.</p>
+
+        <h3>Accuracy is low and close to human level</h3>
+        <p>Frontier models reach accuracy in the mid teens to mid twenties, and human experts land around twenty percent. That means models are not yet reliable for planning experiments, even if they are at parity with expert baselines. In practice, a low but non trivial accuracy could still be useful if we can identify which answers are trustworthy.</p>
+
+        <h3>Calibration is the real problem</h3>
+        <p>SciPredict asks for two self assessments on each question. Feasibility, whether it is reasonable to predict the outcome without running the experiment, and confidence, how likely the model thinks its answer is correct. Models show weak calibration. High confidence does not mean higher accuracy. Human experts show strong calibration, with accuracy rising sharply on questions they judge feasible and falling on questions they judge infeasible.</p>
+
+        <h3>Background knowledge helps, but only when curated</h3>
+        <p>Expert curated background knowledge provides modest gains. When models attempt to generate their own background knowledge, performance often drops. Even combining model generated and expert curated context can reduce accuracy. The paper suggests that models struggle to decide what context is useful and may introduce misleading assumptions.</p>
+
+        <h3>Implications for science support tools</h3>
+        <p>The benchmark frames a core requirement for lab facing tools. It is not enough to be correct sometimes. The system must know when it is likely to be right. Without reliable calibration, models can mislead researchers into wasting time and resources on unproductive experiments.</p>
+      </section>
+
+      <!-- CONCLUSION -->
+      <section class="project-card">
+        <h2>CONCLUSION</h2>
+        <p>SciPredict is a strong reality check. Models can reason about experiments to some extent, but their accuracy remains low and their confidence signals are unreliable. The most important research direction here is calibration and trust signals that reflect real world feasibility. If that gap can be closed, predictive models could become a powerful filter for experimental planning. Until then, they are more of an exploratory aid than a decision tool.</p>
+        <h3>References</h3>
+        <p>Original paper: <a href="https://doi.org/10.48550/arXiv.2512.18099" target="_blank" rel="noopener">SciPredict: Can LLMs Predict the Outcomes of Research Experiments in Natural Sciences?</a>.</p>
+        <p>Project page: <a href="https://scale.com/research/scipredict" target="_blank" rel="noopener">SciPredict at Scale</a>.</p>
+      </section>
+
+    </main>
+  </div>
+
+
+  <!-- Particles.js Configuration -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+    });
+  </script>
+
+  <style>
+    /* Layout refinements for cleaner reading */
+    .article-header h1 { color: #092917; margin-bottom: 1rem; font-size: 2.2rem; }
+    .article-meta { display: flex; gap: 2rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .article-date { color: #2ecc71; font-weight: 600; font-size: 1rem; }
+    .article-type { color: #1a4731; font-weight: 500; background: rgba(46, 204, 113, 0.1); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.9rem; }
+    .article-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .tag { background: rgba(46, 204, 113, 0.12); color: #092917; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.8rem; font-weight: 500; }
+    .container { max-width: 1000px; }
+    main { line-height: 1.7; }
+    p { line-height: 1.7; }
+    .project-card { background: rgba(255,255,255,0.82); border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
+    @media (max-width: 768px) {
+      .article-header h1 { font-size: 1.8rem; }
+      .article-meta { flex-direction: column; gap: 0.5rem; }
+    }
+  </style>
+
+</body>
+</html>
