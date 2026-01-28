@@ -4,10 +4,274 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Recruitment – Evaluating AI-Driven XR Healthcare Simulation Using the DASEX Framework: A Pilot Validation Study (Ethics ID: 66081)">
-  <title>NPC Study Recruitment – AI-Driven XR Healthcare Simulation (Ethics 66081)</title>
+  <title>DASEX1 Study Recruitment – AI-Driven XR Healthcare Simulation (Ethics 66081)</title>
   <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+  <style>
+    :root {
+      --bg: #eff4ea;
+      --bg-2: #e3efe4;
+      --ink: #0f1e12;
+      --muted: #3f5a46;
+      --accent: #1e8a4a;
+      --accent-2: #2ecc71;
+      --card: #ffffff;
+      --stroke: #d5e4d6;
+      --shadow: 0 18px 40px rgba(12, 39, 22, 0.12);
+    }
+
+    body {
+      font-family: "Manrope", sans-serif;
+      color: var(--ink);
+      background: linear-gradient(135deg, #2ecc71 0%, #092917 100%);
+    }
+
+    #particles-js {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 4rem;
+      margin-top: 5.5rem;
+      margin-bottom: 2.5rem;
+      top: 0;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: 2.5rem;
+      align-items: start;
+      margin-bottom: 3rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+      background: rgba(30, 138, 74, 0.15);
+      color: #145c33;
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3 {
+      font-family: "Fraunces", serif;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+
+    h1 {
+      font-size: clamp(2.1rem, 3vw, 3rem);
+      margin: 0.6rem 0 0.4rem;
+    }
+
+    .lead {
+      font-size: 1.05rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin: 1rem 0 1.5rem;
+    }
+
+    .hero-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .meta-item {
+      padding: 0.75rem 1rem;
+      border-radius: 14px;
+      border: 1px solid var(--stroke);
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(6px);
+    }
+
+    .meta-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 0.35rem;
+      font-weight: 600;
+    }
+
+    .hero-right {
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    .info-stack {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .info-tile {
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: 16px;
+      padding: 1rem 1.1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .info-tile strong {
+      display: block;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .cta-card {
+      background: linear-gradient(140deg, #ffffff 0%, #f4fbf6 100%);
+      border-radius: 18px;
+      padding: 1.25rem;
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow);
+    }
+
+    .cta-card a.button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      padding: 0.65rem 1.1rem;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 600;
+      box-shadow: 0 10px 24px rgba(30, 138, 74, 0.25);
+    }
+
+    .section {
+      margin-bottom: 2.5rem;
+    }
+
+    .section-title {
+      font-size: 1.6rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 18px;
+      border: 1px solid var(--stroke);
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+
+    .card p {
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .list {
+      margin: 0.75rem 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 0.6rem;
+    }
+
+    .list li {
+      padding: 0.6rem 0.75rem;
+      background: #f3fbf6;
+      border-radius: 12px;
+      border: 1px solid #d9ead9;
+      color: #1d3b26;
+      font-weight: 500;
+    }
+
+    .callout {
+      margin-top: 1rem;
+      padding: 0.85rem 1rem;
+      border-left: 4px solid var(--accent);
+      background: #f0faf2;
+      border-radius: 12px;
+      color: #1b3b27;
+      font-weight: 500;
+    }
+
+    .doc-links {
+      display: grid;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .doc-links a {
+      display: block;
+      padding: 0.85rem 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--stroke);
+      background: #ffffff;
+      text-decoration: none;
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .contact-card {
+      display: grid;
+      gap: 0.5rem;
+      background: #0f2a1a;
+      color: #ffffff;
+      border-radius: 18px;
+      padding: 1.5rem;
+    }
+
+    .contact-card a {
+      color: #b8ffd4;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    footer {
+      position: relative;
+      z-index: 1;
+      margin-top: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .container {
+        padding: 2.5rem 1.25rem 3.5rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero-meta {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -22,98 +286,124 @@
     </ul>
   </nav>
 
-  <!-- Particles Background -->
   <div id="particles-js"></div>
 
   <div class="container">
     <main>
-      <section id="about" style="margin-bottom: 2rem;">
-        <div class="about-content">
-          <p class="pill" style="display:inline-block; margin:0 0 0.75rem; padding:0.35rem 0.75rem; border-radius:999px; background:rgba(46,204,113,0.15); color:#1f6b3a; font-weight:600; font-size:0.9rem;">30‑minute session</p>
+      <section class="hero">
+        <div>
+          <p class="pill">30-minute session</p>
           <h1>Help Shape the Future of Medical Training with AI &amp; XR</h1>
-          <h2>Participant Recruitment – AI-Driven NPC Healthcare Simulation</h2>
-          <p><strong>Full title:</strong> Evaluating AI-Driven XR Healthcare Simulation Using the DASEX Framework: A Pilot Validation Study</p>
-          <p><strong>Ref &amp; Version:</strong> 1 &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Ethics ID:</strong> 66081 &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Date:</strong> Q1 2026</p>
-          <p><strong>Researcher:</strong> David Dasa (PhD Researcher) – <a href="mailto:ddasa@bournemouth.ac.uk">ddasa@bournemouth.ac.uk</a></p>
-          <p><strong>Supervisor:</strong> Professor Wen Tang – <a href="mailto:wtang@bournemouth.ac.uk">wtang@bournemouth.ac.uk</a></p>
+          <p class="lead">Participant recruitment for the DASEX1 pilot validation study evaluating an AI-driven XR healthcare simulation featuring intelligent NPCs.</p>
+          <div class="hero-meta">
+            <div class="meta-item">
+              <span class="meta-label">Study title</span>
+              <strong>Evaluating AI-Driven XR Healthcare Simulation Using the DASEX Framework</strong>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Ethics ID</span>
+              <strong>66081</strong>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Date</span>
+              <strong>Q1 2026</strong>
+            </div>
+          </div>
+        </div>
+        <div class="hero-right">
+          <div class="info-stack">
+            <div class="info-tile">
+              <strong>Location</strong>
+              Bournemouth Gateway Building, Lansdowne Campus
+            </div>
+            <div class="info-tile">
+              <strong>Dates</strong>
+              Q1 2026
+            </div>
+            <div class="info-tile">
+              <strong>Session Duration</strong>
+              30 minutes (approx.)
+            </div>
+            <div class="info-tile">
+              <strong>Thank-you gift</strong>
+              £5 Amazon e-gift card after each stage (£10 total)
+            </div>
+          </div>
+          <div class="cta-card">
+            <h3>Ready to take part?</h3>
+            <p>Email us to register your interest. We will set up a session at your earliest convenience.</p>
+            <a class="button" href="mailto:ddasa@bournemouth.ac.uk">Email ddasa@bournemouth.ac.uk</a>
+          </div>
         </div>
       </section>
 
-      <section class="project-card">
-        <h2>About the Study</h2>
-        <p>We are evaluating an AI-driven Extended Reality (XR) simulation featuring intelligent Non‑Player Characters (NPCs) designed for healthcare training. You'll try a short XR scenario and share your feedback to help improve realism, usability, and training effectiveness.</p>
-        <h2>Eligibility</h2>
-        <ul class="skills-list">
-          <li>BU Healthcare students (Year 2 and above)</li>
-          <li>Comfortable using a VR headset</li>
-          <li>Able to complete the study session and a 3‑week follow‑up survey</li>
-        </ul>
-        <h2>What's involved</h2>
-        <ul class="skills-list">
-          <li>Orientation to the VR equipment and study overview</li>
-          <li>Complete a short AI‑driven XR simulation scenario</li>
-          <li>Immediate feedback: short checklist and quick survey</li>
-          <li>3‑week follow‑up: brief JISC survey (by email)</li>
-        </ul>
-        <h2>Why participate?</h2>
-        <ul class="skills-list">
-          <li>Contribute to the next generation of AI‑driven healthcare training</li>
-          <li>Get early access to a cutting‑edge XR simulation</li>
-          <li>Your feedback directly shapes realism, usability, and learning impact</li>
-        </ul>
+      <section class="section">
+        <h2 class="section-title">Study overview</h2>
+        <div class="card-grid">
+          <article class="card">
+            <h3>About the study</h3>
+            <p>We are evaluating an AI-driven Extended Reality (XR) simulation featuring intelligent Non-Player Characters (NPCs) designed for healthcare training. You'll try a short XR scenario and share your feedback to help improve realism, usability, and training effectiveness.</p>
+          </article>
+          <article class="card">
+            <h3>Eligibility</h3>
+            <ul class="list">
+              <li>BU healthcare students (Year 2 and above)</li>
+              <li>Comfortable using a VR headset</li>
+              <li>Able to complete the study session and a 3-week follow-up survey</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>What's involved</h3>
+            <ul class="list">
+              <li>Orientation to the VR equipment and study overview</li>
+              <li>Complete a short AI-driven XR simulation scenario</li>
+              <li>Immediate feedback: short checklist and quick survey</li>
+              <li>3-week follow-up: brief JISC survey (by email)</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Why participate?</h3>
+            <ul class="list">
+              <li>Contribute to the next generation of AI-driven healthcare training</li>
+              <li>Get early access to a cutting-edge XR simulation</li>
+              <li>Your feedback directly shapes realism, usability, and learning impact</li>
+            </ul>
+          </article>
+        </div>
+        <div class="callout"><strong>Research team:</strong> David Dasa (PhD Researcher) and Professor Wen Tang (Supervisor).</div>
       </section>
 
-      <section class="project-card info-card">
-        <h2>Location, Dates and Duration</h2>
-        <ul class="info-list">
-          <li><strong>Location</strong><span>Bournemouth Gateway Building, Lansdowne Campus</span></li>
-          <li><strong>Dates</strong><span>Q1 2026</span></li>
-          <li><strong>Session Duration</strong><span>30 minutes (approx.)</span></li>
-        </ul>
-        <h3>Thank‑you gift</h3>
-        <p class="info-note">£5 Amazon e‑gift card after each stage (£10 total).</p>
-        <h3>Ready to take part?</h3>
-        <p class="info-note">Please drop a mail to <a href="mailto:ddasa@bournemouth.ac.uk">ddasa@bournemouth.ac.uk</a> if you would like to participate, and we will set up a session at your earliest convenience.</p>
-        <h3>Participant Information &amp; Agreement</h3>
-        <p class="info-note">You may review the study documents in advance. Paper or digital copies will also be available at the session.</p>
-        <ul class="info-links">
-          <li>
-            <a href="DASEX%20Participant%20Information%20Sheet3.pdf" target="_blank" rel="noopener noreferrer" download>
-              Participant Information Sheet (PDF)
-            </a>
-          </li>
-          <li>
-            <a href="DASEX%20Participant%20Agreement%20form%20(2).pdf" target="_blank" rel="noopener noreferrer" download>
-              Participant Agreement Form (PDF)
-            </a>
-          </li>
-        </ul>
-        <p class="info-subtle">These links can be updated later without changing the QR code page URL.</p>
+      <section class="section">
+        <h2 class="section-title">Participant information & documents</h2>
+        <p>You may review the study documents in advance. Paper or digital copies will also be available at the session.</p>
+        <div class="doc-links">
+          <a href="DASEX%20Participant%20Information%20Sheet3.pdf" target="_blank" rel="noopener noreferrer" download>
+            Participant Information Sheet (PDF)
+          </a>
+          <a href="DASEX%20Participant%20Agreement%20form%20(2).pdf" target="_blank" rel="noopener noreferrer" download>
+            Participant Agreement Form (PDF)
+          </a>
+        </div>
+        <p style="margin-top: 0.75rem; color: var(--muted);">These links can be updated later without changing the QR code page URL.</p>
       </section>
 
-      <section class="project-card">
-        <h2>Contact</h2>
-        <div class="contact-grid">
-          <div class="contact-item">
-            <p><strong>David Dasa</strong></p>
-            <p>PhD Researcher</p>
-            <p><a href="mailto:ddasa@bournemouth.ac.uk">ddasa@bournemouth.ac.uk</a></p>
-          </div>
-          <div class="contact-item">
-            <p><strong>Professor Wen Tang</strong></p>
-            <p>Professor of Games Technology</p>
-            <p><a href="mailto:wtang@bournemouth.ac.uk">wtang@bournemouth.ac.uk</a></p>
-          </div>
+      <section class="section">
+        <h2 class="section-title">Contact</h2>
+        <div class="contact-card">
+          <strong>David Dasa</strong>
+          <span>PhD Researcher</span>
+          <a href="mailto:ddasa@bournemouth.ac.uk">ddasa@bournemouth.ac.uk</a>
+          <span>Professor Wen Tang</span>
+          <a href="mailto:wtang@bournemouth.ac.uk">wtang@bournemouth.ac.uk</a>
         </div>
       </section>
     </main>
   </div>
 
   <footer>
-    <p>&copy; 2025 David Dasa</p>
+    <p>&copy; 2026 David Dasa</p>
   </footer>
 
-  <!-- Particles.js Configuration -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       particlesJS('particles-js', {
