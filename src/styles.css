@@ -330,6 +330,71 @@ body {
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   }
 
+  .info-card h2 {
+    margin-bottom: 0.75rem;
+  }
+
+  .info-card h3 {
+    margin-top: 1.25rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.05rem;
+    color: #1f6b3a;
+  }
+
+  .info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .info-list li {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 0.6rem 0.8rem;
+    border-radius: 0.65rem;
+    background: #eef9f1;
+  }
+
+  .info-list li strong {
+    min-width: 140px;
+    color: #1f6b3a;
+    font-weight: 700;
+  }
+
+  .info-links {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0;
+  }
+
+  .info-links li + li {
+    margin-top: 0.35rem;
+  }
+
+  .info-note {
+    margin: 0;
+  }
+
+  .info-subtle {
+    margin-top: 0.6rem;
+    font-size: 0.95rem;
+    color: #4a4a4a;
+  }
+
+  @media (max-width: 640px) {
+    .info-list li {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .info-list li strong {
+      min-width: auto;
+    }
+  }
+
 /* Style for the form container */
 form {
   margin-top: 20px;

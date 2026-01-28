@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
   const form = document.getElementById('imageUploadForm');
   const fileInput = document.querySelector('input[name="imageFile"]');
   const submitButton = document.querySelector('input[type="submit"]');
-  const sasToken = document.getElementById('sasToken').value;
+  const sasToken = document.getElementById('sasToken').value.trim();
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault(); // Prevent form submission
@@ -22,13 +22,18 @@ document.addEventListener('DOMContentLoaded', async (event) => {
       return;
     }
 
+    if (!sasToken) {
+      alert('Upload token is missing. Please provide a valid SAS token.');
+      return;
+    }
+
     try {
+      submitButton.disabled = true; // Prevent double submits
       const randomString = generateRandomString(8);
       const blobName = `kerastb${randomString}`;
       const formAction = form.action + '?' + sasToken; // Include SAS token in query string
-      form.action = formAction;
 
-      const response = await fetch(form.action, {
+      const response = await fetch(formAction, {
         method: 'PUT',
         body: file,
         headers: {

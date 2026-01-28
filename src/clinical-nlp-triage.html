@@ -218,14 +218,14 @@
       const lowerText = text.toLowerCase();
       let foundRedFlags = [];
       let foundUrgent = [];
-      let annotatedText = text;
+      let annotatedText = escapeHtml(text);
 
       // Simple Entity Extraction
       RED_FLAGS.forEach(flag => {
         if (lowerText.includes(flag)) {
           foundRedFlags.push(flag);
           // Highlight in text (case insensitive replace)
-          const regex = new RegExp(`(${flag})`, 'gi');
+          const regex = new RegExp(`(${escapeRegExp(flag)})`, 'gi');
           annotatedText = annotatedText.replace(regex, '<span class="highlight">$1</span>');
         }
       });
@@ -234,7 +234,7 @@
         URGENT_TERMS.forEach(term => {
           if (lowerText.includes(term)) {
             foundUrgent.push(term);
-            const regex = new RegExp(`(${term})`, 'gi');
+            const regex = new RegExp(`(${escapeRegExp(term)})`, 'gi');
             annotatedText = annotatedText.replace(regex, '<b>$1</b>');
           }
         });
@@ -288,6 +288,16 @@
       `;
 
       addMessage(fullResponse, 'bot', true);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function escapeRegExp(text) {
+      return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
     // Initialize particles
