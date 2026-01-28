@@ -7,7 +7,273 @@
   <title>Field Study Recruitment – AI-Driven Healthcare Training (Ethics 68822)</title>
   <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+  <style>
+    :root {
+      --bg: #eff4ea;
+      --bg-2: #e3efe4;
+      --ink: #0f1e12;
+      --muted: #3f5a46;
+      --accent: #1e8a4a;
+      --accent-2: #2ecc71;
+      --card: #ffffff;
+      --stroke: #d5e4d6;
+      --shadow: 0 18px 40px rgba(12, 39, 22, 0.12);
+    }
+
+    body {
+      font-family: "Manrope", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(1200px 600px at 10% -10%, #e6f4e6 0%, transparent 60%),
+        linear-gradient(180deg, var(--bg) 0%, #f7fbf6 55%, #f5faf4 100%);
+    }
+
+    #particles-js {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 4rem;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: 2.5rem;
+      align-items: start;
+      margin-bottom: 3rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+      background: rgba(30, 138, 74, 0.15);
+      color: #145c33;
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3 {
+      font-family: "Fraunces", serif;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+
+    h1 {
+      font-size: clamp(2.1rem, 3vw, 3rem);
+      margin: 0.6rem 0 0.4rem;
+    }
+
+    .lead {
+      font-size: 1.05rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin: 1rem 0 1.5rem;
+    }
+
+    .hero-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .meta-item {
+      padding: 0.75rem 1rem;
+      border-radius: 14px;
+      border: 1px solid var(--stroke);
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(6px);
+    }
+
+    .meta-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 0.35rem;
+      font-weight: 600;
+    }
+
+    .hero-right {
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    .info-stack {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .info-tile {
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: 16px;
+      padding: 1rem 1.1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .info-tile strong {
+      display: block;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .cta-card {
+      background: linear-gradient(140deg, #ffffff 0%, #f4fbf6 100%);
+      border-radius: 18px;
+      padding: 1.25rem;
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow);
+    }
+
+    .cta-card a.button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      padding: 0.65rem 1.1rem;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 600;
+      box-shadow: 0 10px 24px rgba(30, 138, 74, 0.25);
+    }
+
+    .section {
+      margin-bottom: 2.5rem;
+    }
+
+    .section-title {
+      font-size: 1.6rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 18px;
+      border: 1px solid var(--stroke);
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+
+    .card p {
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .list {
+      margin: 0.75rem 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 0.6rem;
+    }
+
+    .list li {
+      padding: 0.6rem 0.75rem;
+      background: #f3fbf6;
+      border-radius: 12px;
+      border: 1px solid #d9ead9;
+      color: #1d3b26;
+      font-weight: 500;
+    }
+
+    .study-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .study-card h3 {
+      margin-top: 0;
+    }
+
+    .callout {
+      margin-top: 1rem;
+      padding: 0.85rem 1rem;
+      border-left: 4px solid var(--accent);
+      background: #f0faf2;
+      border-radius: 12px;
+      color: #1b3b27;
+      font-weight: 500;
+    }
+
+    .doc-links {
+      display: grid;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .doc-links a {
+      display: block;
+      padding: 0.85rem 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--stroke);
+      background: #ffffff;
+      text-decoration: none;
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .contact-card {
+      display: grid;
+      gap: 0.5rem;
+      background: #0f2a1a;
+      color: #ffffff;
+      border-radius: 18px;
+      padding: 1.5rem;
+    }
+
+    .contact-card a {
+      color: #b8ffd4;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .container {
+        padding: 2.5rem 1.25rem 3.5rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero-meta {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -22,105 +288,155 @@
     </ul>
   </nav>
 
-  <!-- Particles Background -->
   <div id="particles-js"></div>
 
   <div class="container">
     <main>
-      <section id="about" style="margin-bottom: 2rem;">
-        <div class="about-content">
-          <p class="pill" style="display:inline-block; margin:0 0 0.75rem; padding:0.35rem 0.75rem; border-radius:999px; background:rgba(46,204,113,0.15); color:#1f6b3a; font-weight:600; font-size:0.9rem;">Supervised session</p>
+      <section class="hero">
+        <div>
+          <p class="pill">Supervised session</p>
           <h1>Help Shape the Future of Healthcare Training using AI and Simulation</h1>
-          <h2>Participant Recruitment – Nigeria Field Study</h2>
-          <p><strong>BU Ethics ID:</strong> 68822</p>
-          <p><strong>Researcher:</strong> David Dasa (PhD Researcher) – <a href="mailto:ddasa@bournemouth.ac.uk">ddasa@bournemouth.ac.uk</a></p>
-          <p><strong>Faculty:</strong> Faculty of Media, Science and Technology</p>
+          <p class="lead">Participant recruitment for a field study in Nigeria evaluating how AI-driven healthcare simulations perform across VR and mobile devices in low-infrastructure settings.</p>
+          <div class="hero-meta">
+            <div class="meta-item">
+              <span class="meta-label">BU Ethics ID</span>
+              <strong>68822</strong>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Researcher</span>
+              <strong>David Dasa (PhD Researcher)</strong>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Faculty</span>
+              <strong>Media, Science and Technology</strong>
+            </div>
+          </div>
+        </div>
+        <div class="hero-right">
+          <div class="info-stack">
+            <div class="info-tile">
+              <strong>Location</strong>
+              Achievers University, Owo
+            </div>
+            <div class="info-tile">
+              <strong>Dates</strong>
+              Exact venue and time slots to be confirmed
+            </div>
+            <div class="info-tile">
+              <strong>Session Duration</strong>
+              Single supervised session (approx.)
+            </div>
+            <div class="info-tile">
+              <strong>Thank-you gift</strong>
+              Participants receive a ₦5,000 token
+            </div>
+          </div>
+          <div class="cta-card">
+            <h3>Ready to take part?</h3>
+            <p>Email us to register your interest. We will set up a session at your earliest convenience.</p>
+            <a class="button" href="mailto:ddasa@bournemouth.ac.uk">Email ddasa@bournemouth.ac.uk</a>
+          </div>
         </div>
       </section>
 
-      <section class="project-card">
-        <h2>About the Study</h2>
-        <p>We are evaluating AI‑driven healthcare training simulations delivered in Nigeria using VR and mobile devices. Your feedback helps us test educational quality, safety signalling, and usability in low‑infrastructure settings.</p>
-        <h2>Core scientific aim</h2>
-        <p>The central question the field trip addresses is:</p>
-        <p><strong>Can AI driven healthcare training simulations maintain educational quality, safety signalling, and usability when delivered under constrained infrastructure and across lower cost devices?</strong></p>
-        <p>To answer this, the trip operationalises two tightly controlled comparative studies conducted during a single visit.</p>
-        <h2>Eligibility</h2>
-        <ul class="skills-list">
-          <li>Year 2+ students enrolled in a healthcare related programme</li>
-          <li>Able to use a virtual reality headset and a smartphone</li>
-        </ul>
-        <h2>What's Involved</h2>
-        <ul class="skills-list">
-          <li>One supervised simulation session using AI supported clinical training technology</li>
-          <li>Delivered using a virtual reality headset and or a mobile phone</li>
-          <li>Completion of short feedback questionnaires immediately after the session</li>
-          <li>Optional follow up questionnaire approximately three weeks later</li>
-        </ul>
-        <h2>Study structure on the ground</h2>
+      <section class="section">
+        <h2 class="section-title">Study overview</h2>
+        <div class="card-grid">
+          <article class="card">
+            <h3>About the study</h3>
+            <p>We are evaluating AI-driven healthcare training simulations delivered in Nigeria using VR and mobile devices. Your feedback helps us test educational quality, safety signalling, and usability in low-infrastructure settings.</p>
+          </article>
+          <article class="card">
+            <h3>Core scientific aim</h3>
+            <p><strong>Can AI-driven healthcare training simulations maintain educational quality, safety signalling, and usability when delivered under constrained infrastructure and across lower-cost devices?</strong></p>
+            <p>To answer this, the trip operationalises two tightly controlled comparative studies conducted during a single visit.</p>
+          </article>
+          <article class="card">
+            <h3>Eligibility</h3>
+            <ul class="list">
+              <li>Year 2+ students enrolled in a healthcare-related programme</li>
+              <li>Able to use a virtual reality headset and a smartphone</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>What's involved</h3>
+            <ul class="list">
+              <li>One supervised simulation session using AI-supported clinical training technology</li>
+              <li>Delivered using a virtual reality headset and/or a mobile phone</li>
+              <li>Completion of short feedback questionnaires immediately after the session</li>
+              <li>Optional follow-up questionnaire approximately three weeks later</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">Study structure on the ground</h2>
         <p>The field trip contains two linked studies, referred to as Study A and Study B, delivered to healthcare students only.</p>
-        <h3>Study A</h3>
-        <p>VR headset with AI simulation versus VR headset without AI reasoning.</p>
-        <ul class="skills-list">
-          <li>Same headset, same scenario, same interface</li>
-          <li>Only difference is the presence or absence of cloud based LLM driven reasoning</li>
-          <li>Tests robustness under poor or absent connectivity</li>
-          <li>Treats connectivity as a graded operational variable rather than a binary requirement</li>
-        </ul>
-        <p>This study asks whether an offline or non LLM fallback can be non inferior for training quality.</p>
-        <h3>Study B</h3>
-        <p>VR headset with AI simulation versus mobile phone with AI simulation.</p>
-        <ul class="skills-list">
-          <li>Same AI logic and safety constraints</li>
-          <li>Same clinical scenario and assessment framework</li>
-          <li>Different device class and fidelity level</li>
-        </ul>
-        <p>This study asks whether a mobile first AI simulation can deliver comparable value to immersive VR in an LMIC educational context.</p>
-        <p><strong>Both studies use a within participant crossover design to control for learner variability.</strong></p>
-        <h2>Why participate?</h2>
-        <ul class="skills-list">
-          <li>Contribute to the next generation of AI‑driven healthcare training</li>
-          <li>Get early access to cutting‑edge AI‑supported clinical simulations</li>
-          <li>Your feedback directly shapes realism, usability, and learning impact</li>
-        </ul>
+        <div class="study-grid">
+          <article class="card study-card">
+            <h3>Study A</h3>
+            <p>VR headset with AI simulation versus VR headset without AI reasoning.</p>
+            <ul class="list">
+              <li>Same headset, same scenario, same interface</li>
+              <li>Only difference is the presence or absence of cloud-based LLM-driven reasoning</li>
+              <li>Tests robustness under poor or absent connectivity</li>
+              <li>Treats connectivity as a graded operational variable rather than a binary requirement</li>
+            </ul>
+            <div class="callout">This study asks whether an offline or non-LLM fallback can be non-inferior for training quality.</div>
+          </article>
+          <article class="card study-card">
+            <h3>Study B</h3>
+            <p>VR headset with AI simulation versus mobile phone with AI simulation.</p>
+            <ul class="list">
+              <li>Same AI logic and safety constraints</li>
+              <li>Same clinical scenario and assessment framework</li>
+              <li>Different device class and fidelity level</li>
+            </ul>
+            <div class="callout">This study asks whether a mobile-first AI simulation can deliver comparable value to immersive VR in an LMIC educational context.</div>
+          </article>
+        </div>
+        <div class="callout" style="margin-top: 1.5rem;"><strong>Both studies use a within-participant crossover design to control for learner variability.</strong></div>
       </section>
 
-      <section class="project-card info-card">
-        <h2>Location, Dates and Duration</h2>
-        <ul class="info-list">
-          <li><strong>Location</strong><span>Achievers University, Owo</span></li>
-          <li><strong>Dates</strong><span>Exact venue and time slots to be confirmed</span></li>
-          <li><strong>Session Duration</strong><span>Single supervised session (approx.)</span></li>
-        </ul>
-        <h3>Thank‑you gift</h3>
-        <p class="info-note">Participants will receive a ₦5,000 token in appreciation for their time.</p>
-        <h3>Ready to take part?</h3>
-        <p class="info-note">Please drop a mail to <a href="mailto:ddasa@bournemouth.ac.uk">ddasa@bournemouth.ac.uk</a> if you would like to participate, and we will set up a session at your earliest convenience.</p>
-        <h3>Participant Information &amp; Agreement</h3>
-        <p class="info-note">You may review the study documents in advance. Paper or digital copies will also be available at the session.</p>
-        <ul class="info-links">
-          <li>
-            <a href="DASEX2%20Participant%20Information%20Sheet.pdf" target="_blank" rel="noopener noreferrer" download>
-              Participant Information Sheet (PDF)
-            </a>
-          </li>
-          <li>
-            <a href="DASEX2%20Participant%20Agreement%20form.pdf" target="_blank" rel="noopener noreferrer" download>
-              Participant Agreement Form (PDF)
-            </a>
-          </li>
-        </ul>
-        <p class="info-subtle">These links can be updated later without changing the QR code page URL.</p>
+      <section class="section">
+        <h2 class="section-title">Why participate?</h2>
+        <div class="card-grid">
+          <article class="card">
+            <h3>Contribute to research</h3>
+            <p>Help build the next generation of AI-driven healthcare training.</p>
+          </article>
+          <article class="card">
+            <h3>Early access</h3>
+            <p>Experience cutting-edge AI-supported clinical simulations before they are widely available.</p>
+          </article>
+          <article class="card">
+            <h3>Shape the design</h3>
+            <p>Your feedback directly impacts realism, usability, and learning outcomes.</p>
+          </article>
+        </div>
       </section>
 
-      <section class="project-card">
-        <h2>Contact</h2>
-        <div class="contact-grid">
-          <div class="contact-item">
-            <p><strong>David Dasa</strong></p>
-            <p>PhD Researcher</p>
-            <p><a href="mailto:ddasa@bournemouth.ac.uk">ddasa@bournemouth.ac.uk</a></p>
-          </div>
+      <section class="section">
+        <h2 class="section-title">Participant information & documents</h2>
+        <p>You may review the study documents in advance. Paper or digital copies will also be available at the session.</p>
+        <div class="doc-links">
+          <a href="DASEX2%20Participant%20Information%20Sheet.pdf" target="_blank" rel="noopener noreferrer" download>
+            Participant Information Sheet (PDF)
+          </a>
+          <a href="DASEX2%20Participant%20Agreement%20form.pdf" target="_blank" rel="noopener noreferrer" download>
+            Participant Agreement Form (PDF)
+          </a>
+        </div>
+        <p style="margin-top: 0.75rem; color: var(--muted);">These links can be updated later without changing the QR code page URL.</p>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">Contact</h2>
+        <div class="contact-card">
+          <strong>David Dasa</strong>
+          <span>PhD Researcher</span>
+          <a href="mailto:ddasa@bournemouth.ac.uk">ddasa@bournemouth.ac.uk</a>
         </div>
       </section>
     </main>
@@ -130,7 +446,6 @@
     <p>&copy; 2026 David Dasa</p>
   </footer>
 
-  <!-- Particles.js Configuration -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       particlesJS('particles-js', {
