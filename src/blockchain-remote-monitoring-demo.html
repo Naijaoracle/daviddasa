@@ -1,0 +1,1584 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RPM Proof-of-Proximity Demo</title>
+  <style>
+    :root {
+      --bg: #f3f7f2;
+      --card: #ffffff;
+      --ink: #0e1f14;
+      --muted: #4a6252;
+      --ok: #146c2e;
+      --warn: #9f5b00;
+      --danger: #8f1212;
+      --line: #d4dfd2;
+      --accent: #1f6f4a;
+      --banner-bg: #fff3d9;
+      --banner-border: #d89b2d;
+      --banner-ink: #5f3900;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 10%, #dbe9d7 0, transparent 35%),
+        radial-gradient(circle at 90% 20%, #d2e8dc 0, transparent 30%),
+        var(--bg);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .wrap {
+      max-width: 1600px;
+      width: min(96vw, 1600px);
+      margin: 24px auto;
+      padding: 0 16px 32px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .banner {
+      background: linear-gradient(180deg, #fff8e8 0%, #fff3d9 100%);
+      border: 1px solid var(--banner-border);
+      border-left: 6px solid var(--banner-border);
+      color: var(--banner-ink);
+      font-weight: 700;
+      width: 100%;
+      display: block;
+      line-height: 1.35;
+      white-space: normal;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 14px;
+    }
+
+    .setup-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      align-items: start;
+    }
+    .setup-panel {
+      grid-column: auto;
+      width: 100%;
+      max-width: none;
+      min-width: 0;
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fbfdfb;
+      padding: 14px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .card {
+      grid-column: span 12;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 8px 20px rgba(21, 48, 31, 0.06);
+    }
+
+    .card.half { grid-column: span 6; min-width: 0; }
+    @media (max-width: 900px) {
+      .card.half { grid-column: span 12; }
+      .setup-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+      .setup-panel {
+        width: 100%;
+        margin: 0;
+      }
+    }
+
+    h1 { margin: 0 0 4px; font-size: 1.5rem; }
+    h2 { margin: 0 0 10px; font-size: 1rem; }
+    p, li { color: var(--muted); }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 10px 0;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 140px minmax(0, 1fr);
+      gap: 8px 10px;
+      align-items: center;
+      margin-top: 6px;
+    }
+
+    .form-grid label {
+      margin: 0;
+      font-weight: 700;
+      color: #2e5140;
+      font-size: 0.9rem;
+    }
+
+    .form-grid input,
+    .form-grid select {
+      margin: 0;
+      width: 100%;
+    }
+
+    .action-row {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .action-row button {
+      flex: 1 1 220px;
+      min-height: 40px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      background: var(--accent);
+      color: white;
+      font-weight: 700;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: opacity 0.15s, background 0.15s;
+    }
+    button.alt  { background: #2b4b39; }
+    button.warn { background: var(--warn); }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    input, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 9px 10px;
+      font-size: 0.95rem;
+      margin: 4px 0 8px;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(31, 111, 74, 0.12);
+    }
+
+    /* ── Status bar ── */
+    .status {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: #f6faf7;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--accent);
+      border-radius: 10px;
+      padding: 10px;
+      min-height: 46px;
+      white-space: pre-wrap;
+      transition: background 0.3s, border-left-color 0.3s;
+    }
+    .status.ok  { border-left-color: var(--ok);     background: #f0faf3; }
+    .status.err { border-left-color: var(--danger);  background: #fdf5f5; }
+
+    /* ── Progress stepper ── */
+    .stepper {
+      display: flex;
+      align-items: flex-start;
+      margin: 16px 0 2px;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      flex: 0 0 auto;
+      min-width: 60px;
+    }
+
+    .step-connector {
+      flex: 1;
+      height: 2px;
+      background: var(--line);
+      margin-top: 12px;
+      border-radius: 2px;
+      transition: background 0.45s;
+    }
+    .step-connector.done { background: var(--ok); }
+
+    .step-bubble {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--line);
+      color: #8aaa98;
+      font-size: 0.78rem;
+      font-weight: 800;
+      display: grid;
+      place-items: center;
+      transition: background 0.45s, color 0.45s, box-shadow 0.45s;
+    }
+    .step.active .step-bubble {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 0 0 4px rgba(31, 111, 74, 0.16);
+    }
+    .step.done .step-bubble {
+      background: var(--ok);
+      color: #fff;
+    }
+
+    .step-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #8aaa98;
+      white-space: nowrap;
+      text-align: center;
+      line-height: 1.2;
+      transition: color 0.45s;
+    }
+    .step.active .step-label { color: var(--accent); }
+    .step.done   .step-label { color: var(--ok); }
+
+    /* ── Actor cards ── */
+    .actors {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .actor {
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      background: #f8fcf8;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .actor:hover {
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.09);
+      transform: translateY(-1px);
+    }
+    .actor-peripheral { border-left-color: #4f8ddf; }
+    .actor-central    { border-left-color: #37a06f; }
+    .actor-validators { border-left-color: #8f6fc8; }
+    .actor-ledger     { border-left-color: #5b7382; }
+    .actor-dashboard  { border-left-color: #2f9f8f; }
+
+    .actor-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+
+    .actor h3 {
+      margin: 0 0 4px;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .actor p {
+      margin: 0;
+      font-size: 0.85rem;
+    }
+
+    /* ── Collapsible architecture sections ── */
+    .arch-details > summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+      border-radius: 6px;
+      padding: 3px 6px;
+      margin: -3px -6px 0;
+      transition: background 0.15s;
+    }
+    .arch-details > summary::-webkit-details-marker { display: none; }
+    .arch-details > summary h2 {
+      margin: 0;
+      pointer-events: none;
+    }
+    .arch-details > summary:hover { background: #f2f8f4; }
+
+    .arch-toggle-icon {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 700;
+      pointer-events: none;
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+    .arch-details[open] .arch-toggle-icon { transform: rotate(180deg); }
+
+    /* ── Diagram ── */
+    .diagram {
+      margin-top: 10px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: linear-gradient(180deg, #fcfffd 0%, #f3faf6 100%);
+      padding: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .diagram-head {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: #355344;
+      font-size: 0.85rem;
+      margin: 0 0 10px;
+    }
+
+    .mmd-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      width: 100%;
+      flex-wrap: wrap;
+      padding-bottom: 6px;
+    }
+
+    .mmd-node {
+      min-width: 120px;
+      flex: 1 1 120px;
+      border: 2px solid #8ebaa2;
+      border-radius: 8px;
+      background: #eef8f2;
+      color: #173122;
+      padding: 9px 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.78rem;
+      line-height: 1.35;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .mmd-node .id {
+      display: inline-block;
+      margin-bottom: 4px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: #dff1e6;
+      border: 1px solid #acd4bc;
+      color: #274639;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .mmd-node.ledger { background: #fffaf0; border-color: #dfc28d; }
+    .mmd-node.target { background: #edf3ff; border-color: #9cb4df; }
+
+    .mmd-edge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      flex: 0 0 auto;
+      color: #2e5140;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.74rem;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .mmd-edge .arrow {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #1d4130;
+      margin-top: 2px;
+    }
+
+    /* ── Flow list ── */
+    .flow-list {
+      margin: 10px 0 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: flowstep;
+    }
+
+    .flow-list > li {
+      counter-increment: flowstep;
+      position: relative;
+      padding-left: 36px;
+      margin-bottom: 8px;
+    }
+
+    .flow-list > li::before {
+      content: counter(flowstep);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.78rem;
+      display: grid;
+      place-items: center;
+    }
+
+    .flow-list ul { margin-top: 6px; }
+
+    /* ── Table / Ledger ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      table-layout: fixed;
+    }
+    th, td {
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      padding: 8px 6px;
+      vertical-align: top;
+      overflow: hidden;
+    }
+    tbody tr:hover { background: #f7fbf8; }
+
+    .pill {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      background: #e6f4ea;
+      color: var(--ok);
+    }
+
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+    .hash-clip {
+      display: inline-block;
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: bottom;
+    }
+
+    /* ── 3D scene ── */
+    .sim3d { padding: 0; overflow: hidden; }
+    .sim3d-head { padding: 14px 16px 8px; }
+
+    #rpm3dRoot {
+      position: relative;
+      width: 100%;
+      height: 380px;
+      background: linear-gradient(180deg, #ecf5ff 0%, #f7fbff 55%, #eef7ef 100%);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .sim3d-overlay {
+      position: absolute;
+      left: 12px;
+      top: 10px;
+      z-index: 3;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.82rem;
+      color: #264636;
+      pointer-events: none;
+      line-height: 1.35;
+      transition: opacity 0.3s;
+    }
+
+    .sim3d-stats {
+      position: absolute;
+      right: 12px;
+      top: 10px;
+      z-index: 3;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.82rem;
+      color: #223e31;
+      min-width: 200px;
+    }
+
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      margin-top: 3px;
+    }
+    .metric .k { color: #466555; font-size: 0.76rem; }
+    .metric .v { font-weight: 800; font-size: 0.96rem; color: #173a2a; }
+
+    .sim3d-foot {
+      padding: 10px 16px 14px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .sim3d-label-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    .sim3d-node-label {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      pointer-events: auto;
+    }
+
+    .sim3d-node-label button {
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.94);
+      color: #1f3d2f;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 9px;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+      white-space: nowrap;
+    }
+
+    .sim3d-node-label button.active {
+      background: #2ecc71;
+      color: #fff;
+      border-color: #1f9e56;
+    }
+
+    .sim3d-pane {
+      width: 100%;
+      border-top: 1px solid var(--line);
+      background: #f7fbf8;
+      padding: 10px 16px;
+      color: #1f3d2f;
+      font-size: 0.82rem;
+      line-height: 1.4;
+    }
+
+    .sim3d-pane-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .sim3d-pane-title { font-weight: 800; font-size: 0.85rem; }
+
+    .sim3d-pane-toggle {
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      background: #fff;
+      color: #1f3d2f;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .sim3d-pane.collapsed #sim3dPaneBody { display: none; }
+
+    .sim3d-pane h3 { margin: 0 0 4px; font-size: 0.88rem; }
+    .sim3d-pane p  { margin: 0 0 4px; color: #385646; font-size: 0.8rem; }
+    .sim3d-pane ul { margin: 0; padding-left: 18px; }
+    .sim3d-pane .mono { font-size: 0.75rem; color: #274639; }
+
+    /* ── Loading button ── */
+    .btn-loading { opacity: 0.85; }
+    .btn-loading::after { content: " ..."; font-weight: 700; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      #rpm3dRoot { height: 300px; }
+      .sim3d-overlay, .sim3d-stats { font-size: 0.75rem; }
+      .sim3d-stats { min-width: 160px; }
+      .hash-clip { max-width: 100px; }
+      .mmd-row {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+      .mmd-node {
+        min-width: 0;
+        width: 100%;
+        flex: 1 1 auto;
+      }
+      .mmd-edge .arrow { transform: rotate(90deg); }
+      .form-grid { grid-template-columns: 1fr; }
+      .action-row button { flex: 1 1 100%; }
+      .step { min-width: 46px; }
+      .step-label { font-size: 0.65rem; }
+    }
+
+    @media (max-width: 900px) {
+      .diagram::after,
+      .diagram::before { content: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="card banner">
+      DEMO ONLY: This page is for local prototyping. It is not production-safe, does not use hardware-backed keys, and stores data in browser memory only.
+    </section>
+
+    <!-- Header + progress stepper -->
+    <div class="card">
+      <h1>Remote Patient Monitoring Demo</h1>
+      <p style="margin-bottom:10px;">Single-file browser simulation of BLE proximity payload, double-signing, validation, replay checks, and immutable-style in-memory ledger.</p>
+      <div id="status" class="status" role="status" aria-live="polite">Ready.</div>
+      <div class="stepper" aria-label="Workflow progress">
+        <div class="step active" id="step1">
+          <div class="step-bubble">1</div>
+          <div class="step-label">Initialize</div>
+        </div>
+        <div class="step-connector" id="conn1"></div>
+        <div class="step" id="step2">
+          <div class="step-bubble">2</div>
+          <div class="step-label">Measure</div>
+        </div>
+        <div class="step-connector" id="conn2"></div>
+        <div class="step" id="step3">
+          <div class="step-bubble">3</div>
+          <div class="step-label">Review Ledger</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actors with color coding matching 3D nodes -->
+    <section class="card">
+      <h2>Devices / Actors</h2>
+      <div class="actors">
+        <article class="actor actor-peripheral">
+          <h3><span class="actor-dot" style="background:#4f8ddf"></span>Peripheral Medical Device</h3>
+          <p>BLE sensor capturing measurements and creating the first signed payload.</p>
+        </article>
+        <article class="actor actor-central">
+          <h3><span class="actor-dot" style="background:#37a06f"></span>Central Device</h3>
+          <p>Patient phone or central processor receiving BLE payloads and applying a second signature.</p>
+        </article>
+        <article class="actor actor-validators">
+          <h3><span class="actor-dot" style="background:#8f6fc8"></span>Validator Network</h3>
+          <p>Healthcare-provider validators that verify signatures, proximity, and replay constraints.</p>
+        </article>
+        <article class="actor actor-ledger">
+          <h3><span class="actor-dot" style="background:#5b7382"></span>Ledger</h3>
+          <p>Blockchain-style storage for accepted and validated measurement records.</p>
+        </article>
+        <article class="actor actor-dashboard">
+          <h3><span class="actor-dot" style="background:#2f9f8f"></span>Clinician Dashboard</h3>
+          <p>Provider system consuming validated records for monitoring and decisions.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Collapsible: current architecture -->
+    <section class="card">
+      <details class="arch-details" open>
+        <summary>
+          <h2>Current Local Demo Architecture</h2>
+          <span class="arch-toggle-icon">&#9660;</span>
+        </summary>
+        <div class="diagram" aria-label="Current local demo architecture flow">
+          <p class="diagram-head">flowchart LR</p>
+          <div class="mmd-row">
+            <div class="mmd-node">
+              <span class="id">UI</span>
+              Portal UI<br><span class="mono">portal.html</span>
+            </div>
+            <div class="mmd-edge"><span class="arrow">--&gt;</span></div>
+            <div class="mmd-node">
+              <span class="id">API</span>
+              Local Demo API<br><span class="mono">portal-server.js</span>
+            </div>
+            <div class="mmd-edge">simulate peripheral<span class="arrow">--&gt;</span></div>
+            <div class="mmd-node">
+              <span class="id">BLE</span>
+              BLEService.js<br>simulated peripheral
+            </div>
+            <div class="mmd-edge">sign / verify<span class="arrow">--&gt;</span></div>
+            <div class="mmd-node">
+              <span class="id">CRYPTO</span>
+              CryptoUtils.js<br>sign/verify
+            </div>
+            <div class="mmd-edge">validation + replay checks<span class="arrow">--&gt;</span></div>
+            <div class="mmd-node">
+              <span class="id">BC</span>
+              BlockchainService.js<br>validation + replay checks
+            </div>
+            <div class="mmd-edge"><span class="arrow">--&gt;</span></div>
+            <div class="mmd-node ledger">
+              <span class="id">MEM</span>
+              In-memory Ledger
+            </div>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- Collapsible: target architecture -->
+    <section class="card">
+      <details class="arch-details" open>
+        <summary>
+          <h2>Intended System Architecture (Target)</h2>
+          <span class="arch-toggle-icon">&#9660;</span>
+        </summary>
+        <div class="diagram" aria-label="Target architecture flow">
+          <p class="diagram-head">flowchart LR</p>
+          <div class="mmd-row">
+            <div class="mmd-node target">
+              <span class="id">D</span>
+              Peripheral Device<br>BLE sensor
+            </div>
+            <div class="mmd-edge">signed measurement<span class="arrow">--&gt;</span></div>
+            <div class="mmd-node target">
+              <span class="id">C</span>
+              Central Device<br>phone/app
+            </div>
+            <div class="mmd-edge">add central signature + timestamp<span class="arrow">--&gt;</span></div>
+            <div class="mmd-node target">
+              <span class="id">V</span>
+              PoA Validators<br>healthcare providers
+            </div>
+            <div class="mmd-edge">validate rules, signatures,<br>proximity, replay<span class="arrow">--&gt;</span></div>
+            <div class="mmd-node target">
+              <span class="id">M</span>
+              Measurement Contract
+            </div>
+            <div class="mmd-edge"><span class="arrow">--&gt;</span></div>
+            <div class="mmd-node target ledger">
+              <span class="id">L</span>
+              Immutable Ledger
+            </div>
+            <div class="mmd-edge"><span class="arrow">--&gt;</span></div>
+            <div class="mmd-node target">
+              <span class="id">H</span>
+              Provider Systems / Dashboard
+            </div>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- Collapsible: flow -->
+    <section class="card">
+      <details class="arch-details" open>
+        <summary>
+          <h2>Flow (End-to-End)</h2>
+          <span class="arch-toggle-icon">&#9660;</span>
+        </summary>
+        <ol class="flow-list">
+          <li>Peripheral captures measurement and signs payload.</li>
+          <li>Central receives via BLE (proof-of-proximity signal), adds timestamp, signs again.</li>
+          <li>Validator checks:
+            <ul>
+              <li>peripheral signature valid</li>
+              <li>central signature valid</li>
+              <li>proximity window valid</li>
+              <li>challenge not replayed</li>
+            </ul>
+          </li>
+          <li>If valid, record is accepted and written to ledger.</li>
+          <li>Providers query/read validated records.</li>
+        </ol>
+      </details>
+    </section>
+
+    <!-- 3D view -->
+    <section class="card sim3d">
+      <div class="sim3d-head">
+        <h2>3D Activity View (Live Demo Pipeline)</h2>
+        <p>Animated scene of Peripheral &rarr; Central &rarr; Validators &rarr; Ledger &rarr; Dashboard. Submit a measurement to watch packets move through the system.</p>
+      </div>
+      <div id="rpm3dRoot" aria-label="3D visualization of RPM validation pipeline">
+        <div class="sim3d-overlay">
+          <div><strong>Actors:</strong> Peripheral, Central, Validators, Ledger, Dashboard</div>
+          <div>Camera auto-orbits. Green packets = accepted. Red = rejected.</div>
+        </div>
+        <div id="sim3dLabelLayer" class="sim3d-label-layer"></div>
+        <div id="sim3dStats" class="sim3d-stats">
+          <div><strong>Live Metrics</strong></div>
+          <div class="metric"><span class="k">Total attempts</span><span class="v" id="mAttempts">0</span></div>
+          <div class="metric"><span class="k">Accepted</span><span class="v" id="mAccepted">0</span></div>
+          <div class="metric"><span class="k">Rejected</span><span class="v" id="mRejected">0</span></div>
+          <div class="metric"><span class="k">Ledger records</span><span class="v" id="mLedger">0</span></div>
+          <div class="metric"><span class="k">Last status</span><span class="v" id="mLast">Ready</span></div>
+        </div>
+      </div>
+      <div id="sim3dPane" class="sim3d-pane">
+        <div class="sim3d-pane-top">
+          <div class="sim3d-pane-title">Node Details</div>
+          <button id="sim3dPaneToggle" type="button" class="sim3d-pane-toggle" aria-expanded="true">Collapse</button>
+        </div>
+        <div id="sim3dPaneBody">
+          <h3>Peripheral Device</h3>
+          <p>BLE sensor that signs the initial measurement payload.</p>
+          <ul>
+            <li>Role: data origin</li>
+            <li>Current status: waiting for measurement</li>
+          </ul>
+          <div class="mono">Click any node label for details.</div>
+        </div>
+      </div>
+      <div class="sim3d-foot">
+        Simplified 3D representation for communication and debugging, aligned to the local demo and target architecture.
+      </div>
+    </section>
+
+    <!-- Action cards -->
+    <section class="card">
+      <h2>Capture &amp; Validate</h2>
+      <div class="setup-grid">
+        <div class="setup-panel">
+          <h2>1) Device &amp; Validator Setup</h2>
+          <div class="form-grid">
+            <label for="deviceId">Device ID</label>
+            <input id="deviceId" value="DEVICE_001" />
+            <label for="centralId">Central ID</label>
+            <input id="centralId" value="CENTRAL_PHONE_001" />
+            <label for="validatorId">Validator ID</label>
+            <input id="validatorId" value="hospital-validator-1" />
+          </div>
+          <div class="action-row">
+            <button id="initBtn">Initialize Demo Keys</button>
+            <button id="resetBtn" class="warn">Reset Demo State</button>
+          </div>
+        </div>
+
+        <div class="setup-panel">
+          <h2>2) Measurement</h2>
+          <div class="form-grid">
+            <label for="measureType">Type</label>
+            <select id="measureType">
+              <option value="heart_rate">heart_rate</option>
+              <option value="spo2">spo2</option>
+              <option value="glucose">glucose</option>
+              <option value="blood_pressure">blood_pressure</option>
+            </select>
+            <label for="measureValue">Value</label>
+            <input id="measureValue" type="number" step="any" value="75" />
+            <label for="measureUnit">Unit</label>
+            <input id="measureUnit" value="bpm" />
+          </div>
+          <div class="action-row">
+            <button id="submitBtn" class="alt" disabled>Submit Signed Measurement</button>
+            <button id="replayBtn" class="warn" disabled title="Replays the previous challenge to test anti-replay validation">Replay Attack (expect fail)</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ledger -->
+    <section class="card">
+      <h2>3) Ledger</h2>
+      <p><span class="pill">In-memory only</span> Records disappear on page refresh.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Tx Hash</th>
+            <th>Measurement</th>
+            <th>Timestamps</th>
+            <th>Validator</th>
+            <th>Challenge (hashed)</th>
+          </tr>
+        </thead>
+        <tbody id="ledgerBody"></tbody>
+      </table>
+    </section>
+  </div>
+
+  <script>
+    const state = {
+      device: null,
+      central: null,
+      validatorId: null,
+      usedChallenges: new Set(),
+      ledger: new Map(),
+      lastPayload: null,
+      PROXIMITY_WINDOW_SECONDS: 15,
+      MAX_CLOCK_SKEW_SECONDS: 30,
+    };
+
+    const el = {
+      status: document.getElementById('status'),
+      deviceId: document.getElementById('deviceId'),
+      centralId: document.getElementById('centralId'),
+      validatorId: document.getElementById('validatorId'),
+      measureType: document.getElementById('measureType'),
+      measureValue: document.getElementById('measureValue'),
+      measureUnit: document.getElementById('measureUnit'),
+      ledgerBody: document.getElementById('ledgerBody'),
+      initBtn: document.getElementById('initBtn'),
+      resetBtn: document.getElementById('resetBtn'),
+      submitBtn: document.getElementById('submitBtn'),
+      replayBtn: document.getElementById('replayBtn'),
+    };
+
+    // ── Progress stepper ──────────────────────────────────────────────────────
+    function updateStepper(step) {
+      [1, 2, 3].forEach((n) => {
+        const s = document.getElementById(`step${n}`);
+        if (!s) return;
+        s.classList.toggle('done', n < step);
+        s.classList.toggle('active', n === step);
+      });
+      [1, 2].forEach((n) => {
+        const c = document.getElementById(`conn${n}`);
+        if (c) c.classList.toggle('done', n < step);
+      });
+    }
+
+    // ── Status ────────────────────────────────────────────────────────────────
+    function setStatus(text, type = '') {
+      el.status.className = `status ${type}`.trim();
+      const prefix = type === 'ok' ? '[OK] ' : type === 'err' ? '[ERROR] ' : '';
+      el.status.textContent = `${prefix}${text}`;
+      window.dispatchEvent(new CustomEvent('rpm-status', {
+        detail: { text, type, ledgerSize: state.ledger.size, ts: Date.now() }
+      }));
+    }
+
+    // ── Crypto helpers ────────────────────────────────────────────────────────
+    function bytesToHex(buffer) {
+      return [...new Uint8Array(buffer)].map((b) => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function b64FromArrayBuffer(buffer) {
+      let bin = '';
+      const bytes = new Uint8Array(buffer);
+      const chunk = 0x8000;
+      for (let i = 0; i < bytes.length; i += chunk) {
+        bin += String.fromCharCode(...bytes.subarray(i, i + chunk));
+      }
+      return btoa(bin);
+    }
+
+    function arrayBufferFromB64(b64) {
+      const bin = atob(b64);
+      const out = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+      return out.buffer;
+    }
+
+    function canonicalize(value) {
+      if (value === null || typeof value !== 'object') return JSON.stringify(value);
+      if (Array.isArray(value)) return `[${value.map(canonicalize).join(',')}]`;
+      const keys = Object.keys(value).sort();
+      return `{${keys.map((k) => `${JSON.stringify(k)}:${canonicalize(value[k])}`).join(',')}}`;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    async function sha256Hex(input) {
+      const data = new TextEncoder().encode(input);
+      const digest = await crypto.subtle.digest('SHA-256', data);
+      return bytesToHex(digest);
+    }
+
+    async function genEcdsaKeyPair() {
+      return crypto.subtle.generateKey(
+        { name: 'ECDSA', namedCurve: 'P-256' },
+        true,
+        ['sign', 'verify']
+      );
+    }
+
+    async function signData(data, privateKey) {
+      const payload = new TextEncoder().encode(canonicalize(data));
+      const sig = await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, privateKey, payload);
+      return b64FromArrayBuffer(sig);
+    }
+
+    async function verifyData(data, signatureB64, publicKey) {
+      try {
+        const payload = new TextEncoder().encode(canonicalize(data));
+        return crypto.subtle.verify(
+          { name: 'ECDSA', hash: 'SHA-256' },
+          publicKey,
+          arrayBufferFromB64(signatureB64),
+          payload
+        );
+      } catch {
+        return false;
+      }
+    }
+
+    function nowSec() { return Math.floor(Date.now() / 1000); }
+
+    function randomChallenge() {
+      const bytes = new Uint8Array(16);
+      crypto.getRandomValues(bytes);
+      return [...bytes].map((b) => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // ── Ledger render ─────────────────────────────────────────────────────────
+    function renderLedger() {
+      const rows = [...state.ledger.entries()].reverse();
+      if (!rows.length) {
+        el.ledgerBody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align:center; padding:16px; color:#5c7766;">
+              No records yet. Initialize keys and submit a measurement.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      el.ledgerBody.innerHTML = rows.map(([txHash, rec]) => `
+        <tr>
+          <td class="mono" title="${escapeHtml(txHash)}"><span class="hash-clip">${escapeHtml(txHash)}</span></td>
+          <td class="mono">${escapeHtml(rec.measurementData.type)}: ${escapeHtml(rec.measurementData.value)} ${escapeHtml(rec.measurementData.unit)}</td>
+          <td class="mono" style="font-size:0.8rem;">P: ${rec.timestampPeripheral}<br>C: ${rec.timestampCentral}</td>
+          <td>${escapeHtml(rec.validatedBy)}</td>
+          <td class="mono" title="${escapeHtml(rec.challengeHash)}"><span class="hash-clip">${escapeHtml(rec.challengeHash)}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    // ── Initialize ────────────────────────────────────────────────────────────
+    async function initialize() {
+      const deviceId = el.deviceId.value.trim();
+      const centralId = el.centralId.value.trim();
+      const validatorId = el.validatorId.value.trim();
+      if (!deviceId || !centralId || !validatorId) {
+        setStatus('Missing Device ID, Central ID, or Validator ID.', 'err');
+        return;
+      }
+
+      const [deviceKeys, centralKeys] = await Promise.all([genEcdsaKeyPair(), genEcdsaKeyPair()]);
+      state.device = { id: deviceId, keys: deviceKeys };
+      state.central = { id: centralId, keys: centralKeys };
+      state.validatorId = validatorId;
+      state.usedChallenges.clear();
+      state.ledger.clear();
+      state.lastPayload = null;
+      renderLedger();
+      el.submitBtn.disabled = false;
+      el.replayBtn.disabled = false;
+      updateStepper(2);
+      setStatus(`Initialized demo keys for ${deviceId} and ${centralId}.`, 'ok');
+    }
+
+    // ── Submit / replay ───────────────────────────────────────────────────────
+    async function buildAndSubmit({ forceReplay = false } = {}) {
+      if (!state.device || !state.central || !state.validatorId) {
+        setStatus('Initialize demo keys first.', 'err');
+        return;
+      }
+
+      const measurementData = {
+        type: el.measureType.value,
+        value: el.measureValue.value,
+        unit: el.measureUnit.value,
+      };
+
+      const timestampPeripheral = nowSec();
+      const timestampCentral = nowSec();
+      const challenge = forceReplay && state.lastPayload ? state.lastPayload.challenge : randomChallenge();
+
+      const peripheralPayload = {
+        deviceAddress: state.device.id,
+        centralDeviceAddress: state.central.id,
+        timestampPeripheral,
+        challenge,
+        measurementData,
+      };
+
+      const peripheralSignature = await signData(peripheralPayload, state.device.keys.privateKey);
+
+      const centralPayload = {
+        ...peripheralPayload,
+        peripheralSignature,
+        timestampCentral,
+      };
+
+      const centralSignature = await signData(centralPayload, state.central.keys.privateKey);
+      const full = { ...centralPayload, centralSignature };
+
+      const isPeripheralValid = await verifyData(peripheralPayload, full.peripheralSignature, state.device.keys.publicKey);
+      const isCentralValid    = await verifyData(centralPayload,    full.centralSignature,    state.central.keys.publicKey);
+
+      if (!isPeripheralValid) { setStatus('Rejected: invalid peripheral signature.', 'err'); return; }
+      if (!isCentralValid)    { setStatus('Rejected: invalid central signature.', 'err');    return; }
+
+      if (Math.abs(full.timestampCentral - full.timestampPeripheral) > state.PROXIMITY_WINDOW_SECONDS) {
+        setStatus('Rejected: proximity window exceeded.', 'err'); return;
+      }
+      if (Math.abs(nowSec() - full.timestampCentral) > state.MAX_CLOCK_SKEW_SECONDS) {
+        setStatus('Rejected: stale measurement.', 'err'); return;
+      }
+      if (state.usedChallenges.has(full.challenge)) {
+        setStatus('Rejected: replay detected (challenge already used).', 'err'); return;
+      }
+
+      const challengeHash   = await sha256Hex(full.challenge);
+      const measurementHash = await sha256Hex(canonicalize(centralPayload));
+      const txHash = '0x' + await sha256Hex(canonicalize({ full, measurementHash, challengeHash, i: state.ledger.size }));
+
+      state.usedChallenges.add(full.challenge);
+      state.lastPayload = full;
+      state.ledger.set(txHash, {
+        ...full,
+        validatedBy: state.validatorId,
+        validatedAt: nowSec(),
+        challengeHash: '0x' + challengeHash,
+        measurementHash: '0x' + measurementHash,
+      });
+
+      renderLedger();
+
+      // Advance stepper to step 3 on first accepted record
+      if (state.ledger.size === 1) updateStepper(3);
+
+      setStatus(`Accepted and recorded.\nTx: ${txHash}\nMeasurement hash: 0x${measurementHash.slice(0, 20)}...\nChallenge hash: 0x${challengeHash.slice(0, 20)}...`, 'ok');
+    }
+
+    // ── Reset ─────────────────────────────────────────────────────────────────
+    function resetAll() {
+      state.device = null;
+      state.central = null;
+      state.validatorId = null;
+      state.usedChallenges.clear();
+      state.ledger.clear();
+      state.lastPayload = null;
+      renderLedger();
+      el.submitBtn.disabled = true;
+      el.replayBtn.disabled = true;
+      updateStepper(1);
+      setStatus('State reset. Initialize demo keys to continue.');
+    }
+
+    // ── Button busy state ─────────────────────────────────────────────────────
+    function setBusy(btn, busy, busyText) {
+      if (!btn) return;
+      if (!btn.dataset.defaultText) btn.dataset.defaultText = btn.textContent;
+      if (busy) {
+        btn.disabled = true;
+        btn.classList.add('btn-loading');
+        btn.textContent = busyText || btn.dataset.defaultText;
+      } else {
+        btn.disabled = false;
+        btn.classList.remove('btn-loading');
+        btn.textContent = btn.dataset.defaultText;
+      }
+    }
+
+    // ── Event listeners ───────────────────────────────────────────────────────
+    el.initBtn.addEventListener('click', async () => {
+      setBusy(el.initBtn, true, 'Initializing');
+      try {
+        await initialize();
+      } catch (e) {
+        setStatus(`Error: ${e.message}`, 'err');
+      } finally {
+        setBusy(el.initBtn, false);
+      }
+    });
+
+    el.submitBtn.addEventListener('click', async () => {
+      setBusy(el.submitBtn, true, 'Submitting');
+      try {
+        await buildAndSubmit();
+      } catch (e) {
+        setStatus(`Error: ${e.message}`, 'err');
+      } finally {
+        setBusy(el.submitBtn, false);
+        el.submitBtn.disabled = !state.device || !state.central || !state.validatorId;
+      }
+    });
+
+    el.replayBtn.addEventListener('click', async () => {
+      setBusy(el.replayBtn, true, 'Replaying');
+      try {
+        await buildAndSubmit({ forceReplay: true });
+      } catch (e) {
+        setStatus(`Error: ${e.message}`, 'err');
+      } finally {
+        setBusy(el.replayBtn, false);
+        el.replayBtn.disabled = !state.device || !state.central || !state.validatorId;
+      }
+    });
+
+    el.resetBtn.addEventListener('click', resetAll);
+
+    window.rpmDemo = {
+      getState: () => ({
+        ledgerSize: state.ledger.size,
+        hasDevice: !!state.device,
+        hasCentral: !!state.central,
+        validatorId: state.validatorId || null
+      })
+    };
+
+    renderLedger();
+  </script>
+
+  <script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+    const root          = document.getElementById('rpm3dRoot');
+    const mAttempts     = document.getElementById('mAttempts');
+    const mAccepted     = document.getElementById('mAccepted');
+    const mRejected     = document.getElementById('mRejected');
+    const mLedger       = document.getElementById('mLedger');
+    const mLast         = document.getElementById('mLast');
+    const labelLayer    = document.getElementById('sim3dLabelLayer');
+    const detailPane    = document.getElementById('sim3dPane');
+    const detailPaneBody   = document.getElementById('sim3dPaneBody');
+    const detailPaneToggle = document.getElementById('sim3dPaneToggle');
+    const simOverlay    = root.querySelector('.sim3d-overlay');
+
+    if (!root) throw new Error('Missing rpm3dRoot');
+
+    const metrics = { attempts: 0, accepted: 0, rejected: 0 };
+
+    function updateMetrics({ accepted = false, rejected = false } = {}) {
+      metrics.attempts += 1;
+      if (accepted) metrics.accepted += 1;
+      if (rejected) metrics.rejected += 1;
+      const ledgerSize = window.rpmDemo?.getState?.().ledgerSize ?? 0;
+      mAttempts.textContent = String(metrics.attempts);
+      mAccepted.textContent = String(metrics.accepted);
+      mRejected.textContent = String(metrics.rejected);
+      mLedger.textContent   = String(ledgerSize);
+    }
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xeef5ff);
+    scene.fog = new THREE.Fog(0xeef5ff, 10, 40);
+
+    const camera = new THREE.PerspectiveCamera(50, root.clientWidth / root.clientHeight, 0.1, 100);
+    camera.position.set(0, 8, 12);
+    camera.lookAt(0, 0.7, 0);
+
+    let renderer = null;
+    let renderEnabled = true;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(root.clientWidth, root.clientHeight);
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      root.appendChild(renderer.domElement);
+    } catch {
+      renderEnabled = false;
+      mLast.textContent = '3D unavailable';
+      const fallback = document.createElement('div');
+      fallback.style.cssText = 'position:absolute;inset:0;display:grid;place-items:center;font-size:0.9rem;color:#3d5a4b;background:linear-gradient(180deg,#f0f7ff 0%,#ecf7ef 100%)';
+      fallback.textContent = 'WebGL unavailable in this browser/session. Simulation metrics still update.';
+      root.appendChild(fallback);
+    }
+
+    const hemi = new THREE.HemisphereLight(0xffffff, 0xbad8bf, 1.05);
+    scene.add(hemi);
+    const sun = new THREE.DirectionalLight(0xfff4cf, 1.2);
+    sun.position.set(6, 12, 8);
+    scene.add(sun);
+
+    const floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(40, 18),
+      new THREE.MeshStandardMaterial({ color: 0xdceadf, roughness: 0.95, metalness: 0.02 })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -0.6;
+    scene.add(floor);
+
+    const lane = new THREE.Mesh(
+      new THREE.PlaneGeometry(22, 2),
+      new THREE.MeshStandardMaterial({ color: 0x8ea2ad, roughness: 0.92 })
+    );
+    lane.rotation.x = -Math.PI / 2;
+    lane.position.set(0, -0.58, 0);
+    scene.add(lane);
+
+    for (let i = -9.5; i <= 9.5; i += 2.2) {
+      const dash = new THREE.Mesh(
+        new THREE.BoxGeometry(0.15, 0.02, 0.8),
+        new THREE.MeshStandardMaterial({ color: 0xf2f4f5 })
+      );
+      dash.position.set(i, -0.56, 0);
+      scene.add(dash);
+    }
+
+    function makeActor({ x, color, h = 1.2 }) {
+      const group = new THREE.Group();
+      const base = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.42, 0.42, 0.14, 20),
+        new THREE.MeshStandardMaterial({ color: 0x6a7f89, roughness: 0.8 })
+      );
+      base.position.y = -0.45;
+      group.add(base);
+
+      const tower = new THREE.Mesh(
+        new THREE.BoxGeometry(0.9, h, 0.9),
+        new THREE.MeshStandardMaterial({ color, roughness: 0.45, metalness: 0.2 })
+      );
+      tower.position.y = -0.45 + h / 2 + 0.08;
+      group.add(tower);
+
+      const halo = new THREE.Mesh(
+        new THREE.TorusGeometry(0.55, 0.05, 10, 40),
+        new THREE.MeshStandardMaterial({ color: 0x9bd0b2, emissive: 0x9bd0b2, emissiveIntensity: 0.15 })
+      );
+      halo.rotation.x = Math.PI / 2;
+      halo.position.y = 0.45;
+      group.add(halo);
+
+      group.position.set(x, 0, 0);
+      scene.add(group);
+      return { group, halo, tower };
+    }
+
+    const peripheral = makeActor({ x: -8.0, color: 0x4f8ddf, h: 1.1  });
+    const central    = makeActor({ x: -4.4, color: 0x37a06f, h: 1.35 });
+    const validators = makeActor({ x: -0.9, color: 0x8f6fc8, h: 1.55 });
+    const contract   = makeActor({ x:  2.7, color: 0xd08c3f, h: 1.45 });
+    const ledger     = makeActor({ x:  6.1, color: 0x5b7382, h: 1.75 });
+    const dashboard  = makeActor({ x:  8.8, color: 0x2f9f8f, h: 1.2  });
+
+    const nodeDefs = [
+      { id: 'peripheral', label: 'Peripheral', actor: peripheral,
+        desc: 'BLE sensor that captures a measurement and signs the base payload.',
+        bullets: ['origin of truth for measurement', 'adds peripheral signature'] },
+      { id: 'central', label: 'Central', actor: central,
+        desc: 'Patient phone/app receives BLE payload and applies central signature + timestamp.',
+        bullets: ['proof-of-proximity context', 'adds central signature'] },
+      { id: 'validators', label: 'Validators', actor: validators,
+        desc: 'Provider-side validator network executes checks before acceptance.',
+        bullets: ['verify both signatures', 'check proximity window and replay'] },
+      { id: 'contract', label: 'Contract', actor: contract,
+        desc: 'Measurement contract applies acceptance logic and prepares record write.',
+        bullets: ['gate for acceptance/rejection', 'creates canonical write payload'] },
+      { id: 'ledger', label: 'Ledger', actor: ledger,
+        desc: 'Immutable-style blockchain storage of validated records.',
+        bullets: ['append-only record history', 'query source for provider systems'] },
+      { id: 'dashboard', label: 'Dashboard', actor: dashboard,
+        desc: 'Clinical consumer for validated records and monitoring.',
+        bullets: ['reads validated measurements', 'supports downstream clinical workflows'] }
+    ];
+
+    let selectedNodeId = 'peripheral';
+    const labelEls = new Map();
+
+    function getNodeRuntimeStatus(id) {
+      const last = (mLast.textContent || '').trim() || 'Ready';
+      if (id === 'ledger') return `records=${window.rpmDemo?.getState?.().ledgerSize ?? 0}`;
+      if (id === 'validators' || id === 'contract') return `pipeline=${last.toLowerCase()}`;
+      return `status=${last.toLowerCase()}`;
+    }
+
+    function renderPane(id) {
+      const node = nodeDefs.find((n) => n.id === id) || nodeDefs[0];
+      if (!detailPaneBody) return;
+      detailPaneBody.innerHTML = `
+        <h3>${node.label}</h3>
+        <p>${node.desc}</p>
+        <ul>${node.bullets.map((b) => `<li>${b}</li>`).join('')}</ul>
+        <div class="mono">Live: ${getNodeRuntimeStatus(node.id)}</div>
+      `;
+    }
+
+    function hideOverlay() {
+      if (simOverlay && simOverlay.style.display !== 'none') {
+        simOverlay.style.opacity = '0';
+        setTimeout(() => { if (simOverlay) simOverlay.style.display = 'none'; }, 320);
+      }
+    }
+
+    function setSelectedNode(id) {
+      selectedNodeId = id;
+      labelEls.forEach((btn, key) => btn.classList.toggle('active', key === id));
+      renderPane(id);
+      hideOverlay();
+    }
+
+    function createNodeLabels() {
+      if (!labelLayer) return;
+      nodeDefs.forEach((n) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'sim3d-node-label';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = n.label;
+        btn.addEventListener('click', () => setSelectedNode(n.id));
+        wrap.appendChild(btn);
+        labelLayer.appendChild(wrap);
+        labelEls.set(n.id, btn);
+        n.labelWrap = wrap;
+      });
+      setSelectedNode(selectedNodeId);
+    }
+
+    function updateNodeLabelPositions() {
+      const w = root.clientWidth;
+      const h = root.clientHeight;
+      const v = new THREE.Vector3();
+      nodeDefs.forEach((n) => {
+        if (!n.labelWrap) return;
+        v.copy(n.actor.group.position);
+        v.y += 1.75;
+        v.project(camera);
+        const visible = v.z < 1;
+        n.labelWrap.style.display = visible ? 'block' : 'none';
+        if (!visible) return;
+        n.labelWrap.style.left = `${(v.x * 0.5 + 0.5) * w}px`;
+        n.labelWrap.style.top  = `${(-v.y * 0.5 + 0.5) * h}px`;
+      });
+    }
+
+    const linkMat = new THREE.MeshStandardMaterial({ color: 0x9fb8c7, roughness: 0.7, metalness: 0.15 });
+    const links = [];
+    [[-6.2, 1.8], [-2.6, 1.8], [0.9, 1.8], [4.4, 1.7], [7.4, 1.4]].forEach(([x, w]) => {
+      const bar = new THREE.Mesh(new THREE.BoxGeometry(w, 0.1, 0.2), linkMat);
+      bar.position.set(x, 0.45, 0);
+      scene.add(bar);
+      links.push(bar);
+    });
+
+    const packets = [];
+
+    function spawnPacket(ok = true) {
+      const packet = new THREE.Mesh(
+        new THREE.SphereGeometry(0.16, 16, 16),
+        new THREE.MeshStandardMaterial({
+          color: ok ? 0x2ecc71 : 0xef4f4f,
+          emissive: ok ? 0x2ecc71 : 0xef4f4f,
+          emissiveIntensity: 0.5
+        })
+      );
+      packet.position.set(-8.0, 0.72, 0);
+      scene.add(packet);
+      packets.push({ mesh: packet, t: 0, ok });
+    }
+
+    function pulseActor(actor, intensity) {
+      actor.tower.material.emissive = new THREE.Color(0x8cd8b0);
+      actor.tower.material.emissiveIntensity = intensity;
+      actor.halo.material.emissiveIntensity = 0.2 + intensity * 0.8;
+    }
+
+    function mapPacketPosition(t) {
+      if (t <= 0.2)  return -8.0 + (t / 0.2) * 3.6;
+      if (t <= 0.45) return -4.4 + ((t - 0.2) / 0.25) * 3.5;
+      if (t <= 0.72) return -0.9 + ((t - 0.45) / 0.27) * 3.6;
+      if (t <= 0.9)  return  2.7 + ((t - 0.72) / 0.18) * 3.4;
+      return 6.1 + ((t - 0.9) / 0.1) * 2.7;
+    }
+
+    function animatePackets(dt) {
+      for (let i = packets.length - 1; i >= 0; i--) {
+        const p = packets[i];
+        p.t += dt * 0.21;
+        p.mesh.position.x = mapPacketPosition(Math.min(1, p.t));
+        p.mesh.position.y = 0.72 + Math.sin((p.t * 13) + i) * 0.05;
+        if (!p.ok && p.t > 0.52) p.mesh.position.z = Math.sin(p.t * 30) * 0.7;
+        if (p.t >= 1.04 || (!p.ok && p.t >= 0.62)) {
+          scene.remove(p.mesh);
+          p.mesh.geometry.dispose();
+          p.mesh.material.dispose();
+          packets.splice(i, 1);
+        }
+      }
+    }
+
+    let autoAngle = 0;
+    let last = performance.now();
+    function tick(now) {
+      const dt = Math.min(0.04, (now - last) / 1000);
+      last = now;
+      autoAngle += dt * 0.16;
+      camera.position.x = Math.sin(autoAngle) * 8.6;
+      camera.position.z = Math.cos(autoAngle) * 11.4;
+      camera.lookAt(0.5, 0.7, 0);
+
+      const pulse = 0.35 + (Math.sin(now * 0.003) + 1) * 0.25;
+      pulseActor(peripheral, pulse * 0.6);
+      pulseActor(central,    pulse * 0.5);
+      pulseActor(validators, pulse * 0.45);
+      pulseActor(contract,   pulse * 0.38);
+      pulseActor(ledger,     pulse * 0.34);
+      pulseActor(dashboard,  pulse * 0.32);
+
+      links.forEach((l, idx) => {
+        l.material.emissive = new THREE.Color(0x9bd3ea);
+        l.material.emissiveIntensity = 0.12 + Math.max(0, Math.sin(now * 0.004 - idx * 0.65)) * 0.2;
+      });
+
+      animatePackets(dt);
+      updateNodeLabelPositions();
+      if (renderEnabled && renderer) renderer.render(scene, camera);
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    function onResize() {
+      const w = root.clientWidth;
+      const h = root.clientHeight;
+      if (!w || !h) return;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      if (renderEnabled && renderer) renderer.setSize(w, h);
+    }
+    window.addEventListener('resize', onResize);
+
+    window.addEventListener('rpm-status', (ev) => {
+      const detail   = ev.detail || {};
+      const text     = (detail.text || '').toLowerCase();
+      const accepted = detail.type === 'ok'  && text.includes('accepted');
+      const rejected = detail.type === 'err' && text.includes('rejected');
+
+      if (accepted || rejected) {
+        updateMetrics({ accepted, rejected });
+        for (let i = 0; i < (accepted ? 3 : 2); i++) {
+          setTimeout(() => spawnPacket(accepted), i * 130);
+        }
+        hideOverlay();
+      }
+
+      mLedger.textContent = String(detail.ledgerSize ?? window.rpmDemo?.getState?.().ledgerSize ?? 0);
+      mLast.textContent   = detail.type === 'ok'  ? 'Accepted'
+                          : detail.type === 'err' ? 'Rejected'
+                          : 'Updated';
+      renderPane(selectedNodeId);
+    });
+
+    detailPaneToggle?.addEventListener('click', () => {
+      const collapsed = detailPane.classList.toggle('collapsed');
+      detailPaneToggle.textContent = collapsed ? 'Expand' : 'Collapse';
+      detailPaneToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    });
+
+    createNodeLabels();
+    onResize();
+  </script>
+</body>
+</html>
