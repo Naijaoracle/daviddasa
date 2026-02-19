@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Blockchain Explainer</title>
+  <style>
+    :root {
+      --bg: #f0f4f1;
+      --card: #ffffff;
+      --ink: #102217;
+      --muted: #4f6858;
+      --line: #d0ddd2;
+      --accent: #1f6f4a;
+      --accent-light: #e8f5ee;
+      --shadow: 0 2px 8px rgba(16,34,23,.08);
+
+      --state-genesis: #2563eb;
+      --state-genesis-bg: #eff6ff;
+      --state-genesis-border: #bfdbfe;
+      --state-ok: #16a34a;
+      --state-ok-bg: #f0fdf4;
+      --state-ok-border: #bbf7d0;
+      --state-tampered: #d97706;
+      --state-tampered-bg: #fffbeb;
+      --state-tampered-border: #fde68a;
+      --state-broken: #dc2626;
+      --state-broken-bg: #fef2f2;
+      --state-broken-border: #fecaca;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: linear-gradient(160deg, #e8f2eb 0%, #f0f4f1 60%);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    h1 { margin: 0 0 6px; font-size: 1.5rem; }
+    h2 { margin: 0 0 10px; font-size: 1rem; color: var(--ink); }
+    p { margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.5; }
+
+    /* ── Controls ── */
+    .controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fff;
+      padding: 9px 14px;
+      font-size: 0.875rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity .15s, background .15s;
+    }
+    button:hover:not(:disabled) { opacity: .88; }
+    button:disabled { opacity: .45; cursor: default; }
+    button.alt { background: #7f8f84; }
+    button.danger { background: #dc2626; }
+
+    .counter {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-left: auto;
+    }
+    .counter strong { color: var(--ink); }
+
+    /* ── Status pill ── */
+    #status {
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: #f0f4f1;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      transition: background .2s, color .2s, border-color .2s;
+    }
+    #status.ok   { background: var(--state-ok-bg);       color: var(--state-ok);       border-color: var(--state-ok-border); }
+    #status.warn { background: var(--state-tampered-bg); color: var(--state-tampered); border-color: var(--state-tampered-border); }
+    #status.err  { background: var(--state-broken-bg);   color: var(--state-broken);   border-color: var(--state-broken-border); }
+
+    /* ── Explainer boxes ── */
+    .explainer {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+    .explain-box {
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.83rem;
+      line-height: 1.55;
+    }
+    .explain-box.simple  { background: #f5f3ff; border: 1px solid #ddd6fe; color: #4c1d95; }
+    .explain-box.actual  { background: #f0fdf4; border: 1px solid #bbf7d0; color: #14532d; }
+    .explain-box h3 { margin: 0 0 5px; font-size: 0.85rem; }
+    .explain-box code {
+      background: rgba(0,0,0,.07);
+      border-radius: 4px;
+      padding: 1px 4px;
+      font-size: 0.8rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    /* ── Chain panels ── */
+    .panels {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .chain-panel { display: flex; flex-direction: column; gap: 10px; }
+    .chain-panel h2 { margin-bottom: 4px; }
+
+    .chain {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      max-height: 64vh;
+      overflow-y: auto;
+      padding-right: 4px;
+      scroll-behavior: smooth;
+    }
+
+    /* ── Block card ── */
+    .block-wrap { display: flex; flex-direction: column; }
+
+    .block {
+      border: 1.5px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: #f8fcf9;
+      transition: border-color .2s, background .2s;
+      position: relative;
+    }
+
+    .block.state-genesis  { border-color: var(--state-genesis-border);  background: var(--state-genesis-bg); }
+    .block.state-ok       { border-color: var(--state-ok-border);       background: var(--state-ok-bg); }
+    .block.state-tampered { border-color: var(--state-tampered-border); background: var(--state-tampered-bg); }
+    .block.state-broken   { border-color: var(--state-broken-border);   background: var(--state-broken-bg); }
+
+    .block-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .state-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 20px;
+      letter-spacing: .03em;
+      text-transform: uppercase;
+    }
+    .state-genesis  .state-badge { background: var(--state-genesis-border);  color: var(--state-genesis); }
+    .state-ok       .state-badge { background: var(--state-ok-border);       color: var(--state-ok); }
+    .state-tampered .state-badge { background: var(--state-tampered-border); color: var(--state-tampered); }
+    .state-broken   .state-badge { background: var(--state-broken-border);   color: var(--state-broken); }
+
+    .block-index {
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--ink);
+    }
+    .tamper-btn {
+      margin-left: auto;
+      font-size: 0.72rem;
+      padding: 3px 9px;
+      border-radius: 6px;
+      background: #f5f3ff;
+      color: #6d28d9;
+      border: 1px solid #ddd6fe;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .tamper-btn:hover { background: #ede9fe; }
+    .tamper-btn:disabled { opacity: .4; cursor: default; }
+
+    .block .row {
+      margin: 2px 0;
+      font-size: 0.83rem;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .k { font-weight: 700; color: #2b4b3b; white-space: nowrap; }
+    .v {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: #2e4b3d;
+      word-break: break-all;
+    }
+    .v.stale { color: var(--state-broken); text-decoration: line-through; }
+
+    .arrow {
+      text-align: center;
+      color: #94a89c;
+      font-size: 1.1rem;
+      line-height: 1;
+      padding: 3px 0;
+      user-select: none;
+    }
+
+    /* ── Legend ── */
+    .legend {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      align-items: center;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .legend-item { display: flex; align-items: center; gap: 5px; }
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+    .legend-dot.genesis  { background: var(--state-genesis); }
+    .legend-dot.ok       { background: var(--state-ok); }
+    .legend-dot.tampered { background: var(--state-tampered); }
+    .legend-dot.broken   { background: var(--state-broken); }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .empty-state .icon { font-size: 2rem; margin-bottom: 8px; }
+
+    @media (max-width: 760px) {
+      .panels, .explainer { grid-template-columns: 1fr; }
+      .counter { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- Header -->
+    <section class="card">
+      <h1>Simple vs Actual Blockchain</h1>
+      <p>Add blocks to both chains simultaneously. The <strong>Simple Chain</strong> links blocks using a short arithmetic formula. The <strong>Actual Chain</strong> uses real SHA-256 cryptographic hashes — the same method used in Bitcoin. Try tampering with a block to see how it breaks the chain. Once tampered, no new blocks can be added — just like in a real network, where peers reject a broken chain.</p>
+    </section>
+
+    <!-- Controls -->
+    <section class="card controls">
+      <button id="addBtn">+ Add Block</button>
+      <button id="resetBtn" class="alt">Reset</button>
+      <span id="status" role="status" aria-live="polite">Ready.</span>
+      <span class="counter"><strong id="blockCount">0</strong> / <span id="maxText">20</span> blocks</span>
+    </section>
+
+    <!-- Explainer -->
+    <div class="explainer">
+      <div class="explain-box simple">
+        <h3>Simple Chain — Arithmetic Link</h3>
+        Each block stores a link value computed as:<br>
+        <code>link = (prev_link × 31 + amount) mod 100,000</code><br><br>
+        Fast and easy to verify mentally, but trivially forgeable — you can compute any value you want with the right inputs.
+      </div>
+      <div class="explain-box actual">
+        <h3>Actual Chain — SHA-256 Hash</h3>
+        Each block stores <code>SHA-256(index + amount + prevHash + nonce)</code>. The hash is a 256-bit fingerprint — any change to any field produces a completely different hash, breaking the link to the next block.
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="card" style="padding: 10px 16px;">
+      <div class="legend">
+        <span style="font-weight:700; font-size:.78rem; color:var(--ink);">Block states:</span>
+        <span class="legend-item"><span class="legend-dot genesis"></span> Genesis</span>
+        <span class="legend-item"><span class="legend-dot ok"></span> Valid</span>
+        <span class="legend-item"><span class="legend-dot tampered"></span> Tampered</span>
+        <span class="legend-item"><span class="legend-dot broken"></span> Broken (downstream)</span>
+      </div>
+    </div>
+
+    <!-- Chain panels -->
+    <section class="panels">
+      <article class="card chain-panel">
+        <h2>Simple Chain</h2>
+        <div id="simpleChain" class="chain"></div>
+      </article>
+
+      <article class="card chain-panel">
+        <h2>Actual Chain (SHA-256)</h2>
+        <div id="actualChain" class="chain"></div>
+      </article>
+    </section>
+
+  </div>
+
+  <script>
+    const MAX_BLOCKS = 20;
+    let chain = [];
+
+    const GENESIS_PREV_HASH = '0'.repeat(64);
+
+    const simpleEl  = document.getElementById('simpleChain');
+    const actualEl  = document.getElementById('actualChain');
+    const statusEl  = document.getElementById('status');
+    const addBtn    = document.getElementById('addBtn');
+    const resetBtn  = document.getElementById('resetBtn');
+    const blockCountEl = document.getElementById('blockCount');
+    document.getElementById('maxText').textContent = String(MAX_BLOCKS);
+
+    // ── Status helper ─────────────────────────────────────────────────────────
+    function setStatus(text, type = '') {
+      statusEl.textContent = text;
+      statusEl.className = type; // '', 'ok', 'warn', 'err'
+    }
+
+    // ── Crypto helpers ────────────────────────────────────────────────────────
+    async function sha256Hex(input) {
+      const data = new TextEncoder().encode(input);
+      const digest = await crypto.subtle.digest('SHA-256', data);
+      return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function simpleLink(prevLink, amount) {
+      return (prevLink * 31 + amount) % 100000;
+    }
+
+    function shortHash(h) {
+      return `${h.slice(0, 16)}…${h.slice(-8)}`;
+    }
+
+    // ── Block state ───────────────────────────────────────────────────────────
+    // state: 'genesis' | 'ok' | 'tampered' | 'broken'
+    function blockState(b) {
+      if (b.forceBroken) return 'broken';
+      if (b.tampered)   return 'tampered';
+      if (b.index === 0) return 'genesis';
+      return 'ok';
+    }
+
+    function stateBadgeLabel(state) {
+      return { genesis: 'Genesis', ok: 'Valid', tampered: 'Tampered', broken: 'Broken' }[state] ?? state;
+    }
+
+    // ── Rendering ─────────────────────────────────────────────────────────────
+    function buildSimpleBlock(b, isLast) {
+      const state = blockState(b);
+      const stale = b.tampered || b.forceBroken;
+      return `
+        <div class="block-wrap">
+          <div class="block state-${state}">
+            <div class="block-header">
+              <span class="block-index">Block #${b.index}</span>
+              <span class="state-badge">${stateBadgeLabel(state)}</span>
+              ${b.index > 0 ? `<button class="tamper-btn" onclick="tamperBlock(${b.index})" ${stale ? 'disabled' : ''} title="Alter this block's data to break the chain">Tamper</button>` : ''}
+            </div>
+            <div class="row"><span class="k">amount:</span> <span class="v">${b.amount}</span></div>
+            <div class="row"><span class="k">prev&nbsp;link:</span> <span class="v">${b.prevSimple}</span></div>
+            <div class="row"><span class="k">link:</span> <span class="v ${stale ? 'stale' : ''}">${b.simple}</span></div>
+          </div>
+          ${!isLast ? '<div class="arrow">↓</div>' : ''}
+        </div>`;
+    }
+
+    function buildActualBlock(b, isLast) {
+      const state = blockState(b);
+      const stale = b.tampered || b.forceBroken;
+      return `
+        <div class="block-wrap">
+          <div class="block state-${state}">
+            <div class="block-header">
+              <span class="block-index">Block #${b.index}</span>
+              <span class="state-badge">${stateBadgeLabel(state)}</span>
+            </div>
+            <div class="row"><span class="k">amount:</span> <span class="v">${b.amount}</span></div>
+            <div class="row"><span class="k">prevHash:</span> <span class="v" title="${b.prevHash}">${shortHash(b.prevHash)}</span></div>
+            <div class="row"><span class="k">hash:</span> <span class="v ${stale ? 'stale' : ''}" title="${b.hash}">${shortHash(b.hash)}</span></div>
+          </div>
+          ${!isLast ? '<div class="arrow">↓</div>' : ''}
+        </div>`;
+    }
+
+    function renderChains() {
+      const empty = `<div class="empty-state"><div class="icon">🔗</div>No blocks yet — click Add Block.</div>`;
+
+      if (chain.length === 0) {
+        simpleEl.innerHTML = empty;
+        actualEl.innerHTML = empty;
+        blockCountEl.textContent = '0';
+        return;
+      }
+
+      simpleEl.innerHTML = chain.map((b, i) => buildSimpleBlock(b, i === chain.length - 1)).join('');
+      actualEl.innerHTML = chain.map((b, i) => buildActualBlock(b, i === chain.length - 1)).join('');
+      blockCountEl.textContent = String(chain.length);
+    }
+
+    function scrollToBottom() {
+      simpleEl.scrollTop = simpleEl.scrollHeight;
+      actualEl.scrollTop = actualEl.scrollHeight;
+    }
+
+    // ── Sync scroll between panels ────────────────────────────────────────────
+    let syncLock = false;
+    function syncScroll(src, dst) {
+      if (syncLock) return;
+      syncLock = true;
+      const ratio = src.scrollTop / (src.scrollHeight - src.clientHeight || 1);
+      dst.scrollTop = ratio * (dst.scrollHeight - dst.clientHeight);
+      syncLock = false;
+    }
+    simpleEl.addEventListener('scroll', () => syncScroll(simpleEl, actualEl));
+    actualEl.addEventListener('scroll', () => syncScroll(actualEl, simpleEl));
+
+    // ── Add block ─────────────────────────────────────────────────────────────
+    async function addBlock() {
+      if (chain.length >= MAX_BLOCKS) {
+        setStatus(`Limit of ${MAX_BLOCKS} blocks reached. Reset to continue.`, 'warn');
+        addBtn.disabled = true;
+        return;
+      }
+
+      const index    = chain.length;
+      const prev     = chain[chain.length - 1];
+      const prevHash   = prev ? prev.hash    : GENESIS_PREV_HASH;
+      const prevSimple = prev ? prev.simple  : 0;
+      const amount   = 1 + Math.floor(Math.random() * 99); // 1–99
+      const nonce    = Math.floor(Math.random() * 1000000);
+
+      const simple  = simpleLink(prevSimple, amount);
+      const payload = JSON.stringify({ index, amount, prevHash, nonce });
+      const hash    = await sha256Hex(payload);
+
+      chain.push({ index, amount, nonce, prevSimple, simple, prevHash, hash,
+                   tampered: false, forceBroken: false });
+
+      renderChains();
+      scrollToBottom();
+      setStatus(`Block #${index} added (amount=${amount}).`, 'ok');
+
+      if (chain.length >= MAX_BLOCKS) {
+        addBtn.disabled = true;
+        setStatus(`Block #${index} added. Limit of ${MAX_BLOCKS} reached.`, 'warn');
+      }
+    }
+
+    // ── Tamper ────────────────────────────────────────────────────────────────
+    function tamperBlock(index) {
+      const b = chain[index];
+      if (!b || b.index === 0) return;
+
+      // Alter the amount by ±1 (but keep it positive)
+      b.amount = b.amount > 1 ? b.amount - 1 : b.amount + 1;
+      b.tampered = true;
+
+      // Mark all downstream blocks as broken (their prevHash no longer matches)
+      for (let i = index + 1; i < chain.length; i++) {
+        chain[i].forceBroken = true;
+      }
+
+      renderChains();
+      addBtn.disabled = true;
+      setStatus(`Block #${index} tampered — chain is broken. Reset to continue.`, 'err');
+    }
+
+    // ── Reset ─────────────────────────────────────────────────────────────────
+    function resetChain() {
+      chain = [];
+      addBtn.disabled = false;
+      renderChains();
+      setStatus('Reset. Ready.', '');
+    }
+
+    // ── Button wiring ─────────────────────────────────────────────────────────
+    addBtn.addEventListener('click', () => {
+      addBtn.disabled = true;
+      addBlock()
+        .catch((e) => setStatus(`Error: ${e.message}`, 'err'))
+        .finally(() => {
+          // Only re-enable if we haven't hit the limit
+          if (chain.length < MAX_BLOCKS) addBtn.disabled = false;
+        });
+    });
+
+    resetBtn.addEventListener('click', resetChain);
+
+    // ── Boot ──────────────────────────────────────────────────────────────────
+    resetChain();
+  </script>
+</body>
+</html>
