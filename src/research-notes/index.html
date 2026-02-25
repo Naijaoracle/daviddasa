@@ -92,11 +92,11 @@
         <h2>Research Insights</h2>
         <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin: 1rem 0;">
           <div class="stat-item" style="background: rgba(46, 204, 113, 0.1); padding: 1.5rem; border-radius: 1rem; text-align: center;">
-            <h3 style="margin: 0; color: #092917; font-size: 2rem;" id="total-notes">6</h3>
+            <h3 style="margin: 0; color: #092917; font-size: 2rem;" id="total-notes">9</h3>
             <p style="margin: 0.5rem 0 0; color: #4a4a4a;">Research Notes</p>
           </div>
           <div class="stat-item" style="background: rgba(46, 204, 113, 0.1); padding: 1.5rem; border-radius: 1rem; text-align: center;">
-            <h3 style="margin: 0; color: #092917; font-size: 2rem;" id="paper-count">5</h3>
+            <h3 style="margin: 0; color: #092917; font-size: 2rem;" id="paper-count">6</h3>
             <p style="margin: 0.5rem 0 0; color: #4a4a4a;">Papers Analyzed</p>
           </div>
           <div class="stat-item" style="background: rgba(46, 204, 113, 0.1); padding: 1.5rem; border-radius: 1rem; text-align: center;">
@@ -166,6 +166,33 @@
 
       // Sample data structure (in practice, this would come from a database or API)
       const researchNotes = [
+        {
+          date: '2026-02-25',
+          type: 'Paper',
+          title: 'The Delegation Problem: What Google DeepMind\'s Framework Means for Clinical AI',
+          description: 'Google DeepMind\'s framework for intelligent AI delegation — covering authority, trust, accountability, and the "zone of indifference" — gives healthcare AI the precise governance vocabulary it has been missing for safe multi-agent clinical workflows.',
+          tags: ['AI Agents', 'Multi-Agent Systems', 'AI Safety', 'Healthcare AI', 'Clinical Workflow'],
+          link: 'intelligent-ai-delegation-google-deepmind.html',
+          dataTags: 'paper ai-ml digital-health'
+        },
+        {
+          date: '2026-02-25',
+          type: 'Guidance',
+          title: 'High Risk by Default: The EU AI Act Through a Healthcare Lens',
+          description: 'Almost every AI system embedded in a medical device, used for clinical triage, or profiling patient health data is automatically high-risk under the EU AI Act — triggering a substantial compliance burden for developers and deployers alike, with key deadlines in 2026 and 2027.',
+          tags: ['Regulation', 'EU AI Act', 'Digital Health', 'Healthcare AI', 'Medical Devices'],
+          link: 'eu-ai-act-healthcare.html',
+          dataTags: 'paper digital-health'
+        },
+        {
+          date: '2026-02-25',
+          type: 'Guidance',
+          title: 'The FDA Draws a Line: What the 2026 CDS Guidance Means for Healthcare AI',
+          description: 'A clinician\'s guide to the FDA\'s updated January 2026 guidance on Clinical Decision Support software — what the four-criterion test means in practice, and why the transparency requirement (Criterion 4) is the one that most AI tools will struggle with.',
+          tags: ['Regulation', 'Clinical Decision Support', 'Digital Health', 'Healthcare AI', 'FDA'],
+          link: 'fda-cds-guidance-2026.html',
+          dataTags: 'paper digital-health'
+        },
         {
           date: '2026-01-28',
           type: 'Paper',

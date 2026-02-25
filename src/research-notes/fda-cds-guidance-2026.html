@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="FDA Clinical Decision Support Software Guidance 2026 - Research Note by David Dasa">
+  <title>The FDA Draws a Line: What the 2026 CDS Guidance Means for Healthcare AI - Research Notes - David Dasa</title>
+  <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+      <li><a href="https://www.daviddasa.com/about">About</a></li>
+      <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
+      <li><a href="https://www.daviddasa.com/skills">Skills</a></li>
+      <li><a href="https://www.daviddasa.com/research-notes">Research Notes</a></li>
+      <li><a href="https://www.daviddasa.com/contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <main>
+      <!-- Back Navigation -->
+      <div style="margin-bottom: 2rem;">
+        <a href="../research-notes/" style="color: #2ecc71; text-decoration: none; font-weight: 500;">← Back to Research Notes</a>
+      </div>
+
+      <!-- Article Header -->
+      <section class="project-card">
+        <div class="article-header">
+          <h1>The FDA Draws a Line: What the 2026 CDS Guidance Means for Healthcare AI</h1>
+          <div class="article-meta">
+            <span class="article-date">February 25, 2026</span>
+            <span class="article-type">Guidance</span>
+          </div>
+          <div class="article-tags">
+            <span class="tag">Regulation</span>
+            <span class="tag">Clinical Decision Support</span>
+            <span class="tag">Digital Health</span>
+            <span class="tag">Healthcare AI</span>
+            <span class="tag">FDA</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- TLDR -->
+      <section class="project-card">
+        <h2>TLDR</h2>
+        <p>The FDA's updated January 2026 guidance on Clinical Decision Support (CDS) software draws a clear regulatory line: software that supports a clinician's judgment with transparent, reviewable recommendations is largely exempt from device oversight, while software that processes medical images or signals, or that makes autonomous determinations without meaningful human review, remains a regulated medical device. For anyone building AI tools in healthcare, Criterion 4 — the transparency and reviewability requirement — is the one that will make or break your regulatory classification.</p>
+      </section>
+
+      <!-- Intro / Clinical Hook -->
+      <section class="project-card">
+        <h2>A Tale of Two Alerts</h2>
+
+        <p>Imagine two software tools sitting side by side in a hospital's electronic health record. The first tool flags a patient on warfarin whose new antibiotic prescription creates a significant interaction risk. It shows you the INR trend, cites the relevant guideline, and says: "Consider dose adjustment — review with pharmacy." You can see exactly why it flagged the patient. You can agree, disagree, or override with confidence.</p>
+
+        <p>The second tool analyses the same patient's continuous cardiac monitor data, applies a proprietary algorithm, and outputs: "High risk of ventricular fibrillation in next 4 hours." It offers no visible reasoning. You can accept or dismiss, but you cannot independently interrogate the basis for its conclusion.</p>
+
+        <p>Both tools are described as "clinical decision support." But under the FDA's updated 2026 guidance, they sit in entirely different regulatory universes — and understanding why has never been more important as AI-powered tools proliferate across clinical environments.</p>
+      </section>
+
+      <!-- Content -->
+      <section class="project-card">
+        <h2>The Regulatory Framework</h2>
+
+        <p>The FDA issued this updated guidance on January 29, 2026, superseding its January 2026 predecessor. It flows from the 21st Century Cures Act (2016), which amended the Federal Food, Drug, and Cosmetic Act to carve certain software functions out of the definition of a "device." The relevant provision — section 520(o)(1)(E) of the FD&C Act — excludes CDS software from device regulation if, and only if, it meets all four of the following criteria simultaneously.</p>
+
+        <h3>Criterion 1: No Medical Images or Signals</h3>
+        <p>The software must not be intended to acquire, process, or analyse a medical image (CT, MRI, X-ray, pathology slides, ultrasound), a signal from an in vitro diagnostic device (IVD), or a pattern or signal from a signal acquisition system such as an ECG or continuous glucose monitor. This is a hard boundary. If your algorithm ingests raw waveform data, processes retinal images, or interprets next-generation sequencing output, you do not clear Criterion 1 and you remain a regulated device — regardless of how the output is framed.</p>
+
+        <p>The FDA is careful to distinguish a single discrete measurement result (e.g., a reported potassium of 4.0 mmol/L from a lab system — medical information) from the continuous stream of raw electrochemical signals that generated that result (a pattern from a signal acquisition system — not medical information for this purpose). The processed, reported result can feed into Non-Device CDS. The raw signal cannot.</p>
+
+        <h3>Criterion 2: Medical Information as Input</h3>
+        <p>The software must be intended to display, analyse, or print medical information about a patient or other medical information. This covers the kinds of data that HCPs routinely communicate — demographics, symptoms, lab results (reported values), clinical notes, discharge summaries, clinical practice guidelines, and peer-reviewed studies. In practice, most software that feeds on structured EHR data and clinical literature will satisfy this criterion.</p>
+
+        <h3>Criterion 3: Supporting an HCP's Judgment</h3>
+        <p>The software must be intended to support or provide recommendations to a health care professional about prevention, diagnosis, or treatment. This criterion excludes tools aimed directly at patients or caregivers without HCP intermediation, and it excludes software that substitutes for — rather than augments — clinical judgment. The FDA draws a distinction between a tool that provides a differential diagnosis for an HCP to consider and revise, versus one that renders a definitive diagnostic output that directly directs care. The former supports judgment; the latter replaces it.</p>
+
+        <h3>Criterion 4: The Transparency Test — The Critical One</h3>
+        <p>This is where most modern AI tools are most likely to stumble. The software must be intended to enable the HCP to independently review the basis for the recommendations — such that it is not the intent that the HCP rely primarily on the recommendations to make a clinical decision.</p>
+
+        <p>This criterion has two interlocking requirements. First, the basis for each recommendation must be presented to the clinician in a form they can meaningfully review — not just a confidence score, but the reasoning, the evidence, the clinical factors that drove the output. Second, the design intent must be that the clinician exercises independent judgment rather than deferring to the software. An alert that says "High risk: action recommended" without surfacing its reasoning fails Criterion 4. An alert that says "High risk based on age >70, eGFR <30, and concurrent NSAID use (see NICE CG182, section 1.4)" passes it — because the clinician can look at those factors and reach their own conclusion.</p>
+
+        <p>The FDA's examples make this concrete. A software function that predicts 90-day post-transplant mortality from published clinical evidence, where the output is reviewed by an HCP in shared decision-making, is Non-Device CDS. A software function that predicts intraoperative mortality from near-real-time physiological measurements to guide immediate escalation is a device — the time pressure and the absence of meaningful independent review disqualify it.</p>
+      </section>
+
+      <!-- Implications for AI -->
+      <section class="project-card">
+        <h2>What This Means for AI-Powered CDS</h2>
+
+        <p>The tension between Criterion 4 and modern machine learning is not subtle. Large language models and deep learning systems often generate outputs through processes that are not easily rendered human-interpretable. A model that synthesises thousands of features from an EHR to produce a risk score cannot simply print out its "reasoning" in the way a rule-based system can cite a guideline paragraph. This is the explainability problem made regulatory.</p>
+
+        <p>Several approaches are emerging in response. Retrieval-augmented generation (RAG) systems that surface cited source passages alongside recommendations go a long way toward satisfying Criterion 4 — the HCP can read the same guideline the model drew upon. Risk scores accompanied by the top contributing clinical features (and their direction of effect) give the clinician a foothold for independent review. Explicit uncertainty quantification — "this recommendation is based on limited evidence for patients with this comorbidity profile" — is another mechanism for transparency that the guidance implicitly encourages.</p>
+
+        <p>What does not satisfy Criterion 4 is a well-calibrated black box. High accuracy is not a substitute for reviewability. The FDA is not asking whether the software is right; it is asking whether the HCP can independently assess whether it is right. These are different questions, and conflating them has significant regulatory and patient safety implications.</p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+          <div style="background: rgba(46, 204, 113, 0.1); padding: 1rem; border-radius: 0.5rem; text-align: center;">
+            <h4 style="margin: 0; color: #092917;">Non-Device CDS</h4>
+            <p style="margin: 0.5rem 0 0; color: #4a4a4a; font-size: 0.9rem;">Transparent recommendations HCPs can independently review and override</p>
+          </div>
+          <div style="background: rgba(46, 204, 113, 0.1); padding: 1rem; border-radius: 0.5rem; text-align: center;">
+            <h4 style="margin: 0; color: #092917;">Device CDS</h4>
+            <p style="margin: 0.5rem 0 0; color: #4a4a4a; font-size: 0.9rem;">Image/signal processing, black-box outputs, or autonomous clinical directives</p>
+          </div>
+          <div style="background: rgba(46, 204, 113, 0.1); padding: 1rem; border-radius: 0.5rem; text-align: center;">
+            <h4 style="margin: 0; color: #092917;">The Key Question</h4>
+            <p style="margin: 0.5rem 0 0; color: #4a4a4a; font-size: 0.9rem;">Can the clinician independently verify the basis for this recommendation?</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Conclusion -->
+      <section class="project-card">
+        <h2>Conclusion</h2>
+
+        <p>The FDA's 2026 CDS guidance is one of the more practically useful regulatory documents to emerge in digital health in recent years. It does not try to predict every edge case, but its four-criterion framework provides a workable test that developers, clinical informaticists, and procurement teams can apply to real systems.</p>
+
+        <p>The deeper message is about the appropriate role of the clinician in AI-assisted care. The guidance preserves the HCP as a meaningful decision-maker rather than a rubber stamp. Criterion 4 — the transparency and reviewability requirement — is a regulatory encoding of something we should want for clinical and safety reasons regardless of regulation: healthcare AI that augments human judgment rather than displacing it.</p>
+
+        <p>For developers, the practical implication is build for explainability from the start, not as a compliance afterthought. For clinicians evaluating tools, the question to ask is not just "is this accurate?" but "can I see why, and would I know when it is wrong?" The FDA has essentially made the second question a legal requirement. That is good medicine dressed up as regulation.</p>
+
+        <h3>References</h3>
+        <p>Original guidance: <a href="https://www.fda.gov/regulatory-information/search-fda-guidance-documents/clinical-decision-support-software" target="_blank" rel="noopener">Clinical Decision Support Software — FDA Guidance for Industry and Food and Drug Administration Staff</a>, issued January 29, 2026.</p>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Footer Section -->
+  <footer>
+    <p>&copy; 2026 David Dasa</p>
+  </footer>
+
+  <!-- Particles.js Configuration -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+    });
+  </script>
+
+  <style>
+    .article-header h1 { color: #092917; margin-bottom: 1rem; font-size: 2.2rem; }
+    .article-meta { display: flex; gap: 2rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .article-date { color: #2ecc71; font-weight: 600; font-size: 1rem; }
+    .article-type { color: #1a4731; font-weight: 500; background: rgba(46, 204, 113, 0.1); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.9rem; }
+    .article-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .tag { background: rgba(46, 204, 113, 0.12); color: #092917; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.8rem; font-weight: 500; }
+    .container { max-width: 1000px; }
+    main { line-height: 1.7; }
+    p { line-height: 1.7; }
+    .project-card { background: rgba(255,255,255,0.82); border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
+    @media (max-width: 768px) {
+      .article-header h1 { font-size: 1.8rem; }
+      .article-meta { flex-direction: column; gap: 0.5rem; }
+    }
+  </style>
+
+</body>
+</html>
