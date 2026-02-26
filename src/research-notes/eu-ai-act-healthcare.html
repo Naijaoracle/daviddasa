@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="The EU AI Act and Healthcare - Research Note by David Dasa">
-  <title>High Risk by Default: The EU AI Act Through a Healthcare Lens - Research Notes - David Dasa</title>
+  <meta name="description" content="The EU AI Act and Healthcare | Research Note by David Dasa">
+  <title>High Risk by Default: The EU AI Act Through a Healthcare Lens | Research Notes | David Dasa</title>
   <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="../styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
@@ -55,7 +55,7 @@
       <!-- TLDR -->
       <section class="project-card">
         <h2>TLDR</h2>
-        <p>The EU AI Act — the world's first comprehensive AI regulation — entered into force in August 2024 and is rolling out in phases through 2027. For healthcare, the central fact is this: almost any AI system embedded in a medical device, used for clinical triage, or processing patient health data for profiling is automatically classified as <em>high-risk</em>, triggering a significant compliance burden on both developers and deployers. With high-risk Annex III obligations coming into effect in August 2026 and medical device AI following in August 2027, the compliance clock is ticking. The Act applies extraterritorially — if your AI touches patients in the EU, it applies to you regardless of where you're based.</p>
+        <p>The EU AI Act, the world's first comprehensive AI regulation, entered into force in August 2024 and is rolling out in phases through 2027. For healthcare, the central fact is this: almost any AI system embedded in a medical device, used for clinical triage, or processing patient health data for profiling is automatically classified as <em>high-risk</em>, triggering a significant compliance burden on both developers and deployers. With high-risk Annex III obligations coming into effect in August 2026 and medical device AI following in August 2027, the compliance clock is ticking. The Act applies extraterritorially, if your AI touches patients in the EU, it applies to you regardless of where you're based.</p>
       </section>
 
       <!-- Clinical Hook -->
@@ -64,7 +64,7 @@
 
         <p>Picture a sepsis prediction model running continuously on Ward 7 of a teaching hospital in Hamburg. It ingests vital signs, lab trends, and nursing observations from the EHR every hour and flags patients at elevated risk, prompting earlier review. The hospital bought it from a US healthtech company. The model itself was fine-tuned on top of a large language model foundation. It has been in use for three years.</p>
 
-        <p>Under the EU AI Act, how many compliance obligations apply to this single tool? The answer involves at least three layers: the US vendor as a foreign provider placing a product on the EU market; the hospital as a deployer of a high-risk system; and potentially the foundation model provider at the GPAI layer. The hospital's procurement team, the vendor's legal counsel, and the clinicians who designed the integration pathway all have skin in this game — whether or not they know it yet.</p>
+        <p>Under the EU AI Act, how many compliance obligations apply to this single tool? The answer involves at least three layers: the US vendor as a foreign provider placing a product on the EU market, the hospital as a deployer of a high-risk system, and potentially the foundation model provider at the GPAI layer. The hospital's procurement team, the vendor's legal counsel, and the clinicians who designed the integration pathway all have skin in this game, whether or not they know it yet.</p>
 
         <p>The EU AI Act is not primarily a technology story. It is a risk governance story, and for healthcare, risk is precisely the domain we have always operated in. Understanding the Act is not optional for anyone building or deploying AI in European clinical environments.</p>
       </section>
@@ -78,25 +78,25 @@
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
           <div style="background: rgba(200, 50, 50, 0.1); padding: 1rem; border-radius: 0.5rem; border-left: 4px solid rgba(200,50,50,0.5);">
             <h4 style="margin: 0 0 0.5rem; color: #092917;">Prohibited</h4>
-            <p style="margin: 0; color: #4a4a4a; font-size: 0.9rem;">Banned outright. Unacceptable risk to safety, security, or fundamental rights.</p>
+            <p style="margin: 0, color: #4a4a4a, font-size: 0.9rem;">Banned outright. Unacceptable risk to safety, security, or fundamental rights.</p>
           </div>
           <div style="background: rgba(230, 120, 0, 0.1); padding: 1rem; border-radius: 0.5rem; border-left: 4px solid rgba(230,120,0,0.4);">
             <h4 style="margin: 0 0 0.5rem; color: #092917;">High-Risk</h4>
-            <p style="margin: 0; color: #4a4a4a; font-size: 0.9rem;">Permitted with significant obligations: risk management, human oversight, conformity assessment.</p>
+            <p style="margin: 0, color: #4a4a4a, font-size: 0.9rem;">Permitted with significant obligations: risk management, human oversight, conformity assessment.</p>
           </div>
           <div style="background: rgba(46, 204, 113, 0.1); padding: 1rem; border-radius: 0.5rem; border-left: 4px solid rgba(46,204,113,0.4);">
             <h4 style="margin: 0 0 0.5rem; color: #092917;">Limited Risk</h4>
-            <p style="margin: 0; color: #4a4a4a; font-size: 0.9rem;">Permitted with transparency requirements — users must know they are interacting with AI.</p>
+            <p style="margin: 0, color: #4a4a4a, font-size: 0.9rem;">Permitted with transparency requirements, users must know they are interacting with AI.</p>
           </div>
           <div style="background: rgba(46, 204, 113, 0.08); padding: 1rem; border-radius: 0.5rem; border-left: 4px solid rgba(46,204,113,0.2);">
             <h4 style="margin: 0 0 0.5rem; color: #092917;">Minimal Risk</h4>
-            <p style="margin: 0; color: #4a4a4a; font-size: 0.9rem;">Largely unregulated beyond voluntary codes of conduct.</p>
+            <p style="margin: 0, color: #4a4a4a, font-size: 0.9rem;">Largely unregulated beyond voluntary codes of conduct.</p>
           </div>
         </div>
 
-        <p>The Act applies a broad definition of an AI system — one derived from the OECD — covering any machine-based system that infers predictions, recommendations, or decisions from inputs with varying levels of autonomy. This captures neural networks and deep learning, but also rules-based systems and probabilistic models that go beyond simple data processing. Critically, the risk classification is determined by <em>use case</em>, not by the underlying technology. The same model fine-tuned for spam filtering (minimal risk) or clinical sepsis prediction (high-risk) sits in entirely different regulatory categories.</p>
+        <p>The Act applies a broad definition of an AI system, one derived from the OECD, covering any machine-based system that infers predictions, recommendations, or decisions from inputs with varying levels of autonomy. This captures neural networks and deep learning, but also rules-based systems and probabilistic models that go beyond simple data processing. Critically, the risk classification is determined by <em>use case</em>, not by the underlying technology. The same model fine-tuned for spam filtering (minimal risk) or clinical sepsis prediction (high-risk) sits in entirely different regulatory categories.</p>
 
-        <p>General Purpose AI (GPAI) models — foundation models and large generative AI systems — are regulated through a parallel track. All GPAI providers must publish technical documentation and training data summaries; those whose models meet the systemic risk threshold (10²⁵ FLOPS of training compute) face additional obligations including adversarial testing, incident reporting, and cybersecurity requirements.</p>
+        <p>General Purpose AI (GPAI) models, foundation models and large generative AI systems, are regulated through a parallel track. All GPAI providers must publish technical documentation and training data summaries, those whose models meet the systemic risk threshold (10²⁵ FLOPS of training compute) face additional obligations including adversarial testing, incident reporting, and cybersecurity requirements.</p>
       </section>
 
       <!-- Healthcare Classification -->
@@ -106,32 +106,32 @@
         <p>Healthcare is unique in the AI Act's architecture because it catches clinical AI from two separate angles, either of which is sufficient to trigger the high-risk classification.</p>
 
         <h3>Annex II: The Medical Device Route</h3>
-        <p>Any AI system that functions as a safety component of a product covered by EU harmonisation legislation — explicitly including medical devices — is automatically classified as high-risk. This is the Annex II route. It does not matter what the AI does, how modest its scope is, or how low the clinical team believes the risk to be. If it is embedded in or constitutes a safety component of a CE-marked medical device, it is high-risk under the AI Act. These obligations do not bite until August 2027 — the longest runway in the Act's phased rollout — but August 2027 is not far away for systems that require fundamental redesign.</p>
+        <p>Any AI system that functions as a safety component of a product covered by EU harmonisation legislation, explicitly including medical devices, is automatically classified as high-risk. This is the Annex II route. It does not matter what the AI does, how modest its scope is, or how low the clinical team believes the risk to be. If it is embedded in or constitutes a safety component of a CE-marked medical device, it is high-risk under the AI Act. These obligations do not bite until August 2027, the longest runway in the Act's phased rollout, but August 2027 is not far away for systems that require fundamental redesign.</p>
 
         <h3>Annex III: The Use Case Route</h3>
         <p>Annex III captures AI systems whose use cases pose a significant risk of harm to health, safety, or fundamental rights. For healthcare the directly relevant entries are:</p>
 
         <ul style="line-height: 1.9;">
-          <li><strong>Emergency call classification and patient triage</strong> — AI systems that evaluate and classify emergency calls, including dispatch prioritisation for medical aid and urgent patient triage. Any automated triage tool used in an ED or ambulance control room falls here.</li>
-          <li><strong>Health and life insurance risk assessments</strong> — AI used to price or assess risk in health and life insurance, with relevance for any predictive model used in insurance-adjacent clinical pathways.</li>
-          <li><strong>Profiling for health purposes</strong> — Crucially, the Act states that AI systems are <em>always</em> considered high-risk if they profile individuals by processing personal data to assess aspects of their lives including health. A system that continuously scores a patient's risk of deterioration based on their health record is, by this definition, a profiling system and is high-risk regardless of whether it falls into another Annex III category.</li>
+          <li><strong>Emergency call classification and patient triage</strong>, AI systems that evaluate and classify emergency calls, including dispatch prioritisation for medical aid and urgent patient triage. Any automated triage tool used in an ED or ambulance control room falls here.</li>
+          <li><strong>Health and life insurance risk assessments</strong>, AI used to price or assess risk in health and life insurance, with relevance for any predictive model used in insurance-adjacent clinical pathways.</li>
+          <li><strong>Profiling for health purposes</strong>, Crucially, the Act states that AI systems are <em>always</em> considered high-risk if they profile individuals by processing personal data to assess aspects of their lives including health. A system that continuously scores a patient's risk of deterioration based on their health record is, by this definition, a profiling system and is high-risk regardless of whether it falls into another Annex III category.</li>
         </ul>
 
-        <p>The Annex III obligations come into effect in August 2026 — meaning healthcare deployers have months, not years, to prepare for compliance with these requirements.</p>
+        <p>The Annex III obligations come into effect in August 2026, meaning healthcare deployers have months, not years, to prepare for compliance with these requirements.</p>
 
         <h3>The Prohibited Category: Directly Relevant Provisions</h3>
-        <p>Two prohibitions deserve particular attention in clinical contexts. First, AI systems that exploit vulnerabilities related to age or disability to distort behaviour — a prohibition that could catch manipulative nudging tools in mental health, dementia care, or paediatric settings. Second, AI systems that use subliminal or deceptive techniques to impair informed decision-making — directly relevant to tools that guide patients toward treatment decisions without transparent disclosure. These prohibitions have been in force since February 2025.</p>
+        <p>Two prohibitions deserve particular attention in clinical contexts. First, AI systems that exploit vulnerabilities related to age or disability to distort behaviour, a prohibition that could catch manipulative nudging tools in mental health, dementia care, or paediatric settings. Second, AI systems that use subliminal or deceptive techniques to impair informed decision-making, directly relevant to tools that guide patients toward treatment decisions without transparent disclosure. These prohibitions have been in force since February 2025.</p>
       </section>
 
       <!-- What High-Risk Means in Practice -->
       <section class="project-card">
         <h2>What High-Risk Compliance Actually Requires</h2>
 
-        <p>The compliance burden for high-risk AI is substantial, and it sits primarily on providers (developers) though deployers carry meaningful obligations too. For developers, the requirements include establishing a risk management system throughout the system's entire lifecycle — not just at launch; rigorous data governance to ensure training, validation, and test datasets are representative, accurate, and fit for purpose; comprehensive technical documentation; automatic record-keeping to enable audit; and a quality management system. The system must be designed to allow deployers to implement meaningful human oversight — an obligation that directly mirrors the FDA's Criterion 4 transparency requirement, arriving at the same principle by a different legislative route.</p>
+        <p>The compliance burden for high-risk AI is substantial, and it sits primarily on providers (developers) though deployers carry meaningful obligations too. For developers, the requirements include establishing a risk management system throughout the system's entire lifecycle, not just at launch, rigorous data governance to ensure training, validation, and test datasets are representative, accurate, and fit for purpose, comprehensive technical documentation, automatic record-keeping to enable audit, and a quality management system. The system must be designed to allow deployers to implement meaningful human oversight, an obligation that directly mirrors the FDA's Criterion 4 transparency requirement, arriving at the same principle by a different legislative route.</p>
 
-        <p>For deployers — hospitals, NHS trusts, clinic networks — the obligations are lighter but not negligible. They must use high-risk AI systems in accordance with the provider's instructions, assign qualified human oversight, monitor performance, report serious incidents to the provider, and conduct fundamental rights impact assessments for certain uses. A hospital cannot purchase a high-risk AI tool, deploy it, and consider its regulatory obligations discharged. Post-deployment monitoring is a legal requirement.</p>
+        <p>For deployers, hospitals, NHS trusts, clinic networks, the obligations are lighter but not negligible. They must use high-risk AI systems in accordance with the provider's instructions, assign qualified human oversight, monitor performance, report serious incidents to the provider, and conduct fundamental rights impact assessments for certain uses. A hospital cannot purchase a high-risk AI tool, deploy it, and consider its regulatory obligations discharged. Post-deployment monitoring is a legal requirement.</p>
 
-        <p>Before placing a high-risk system on the EU market, providers must complete a pre-market conformity assessment. For most systems this can be done by self-assessment against harmonised standards (currently under development). In limited cases a third-party assessment by an accredited notified body is required. The CE mark under existing medical device regulation does not automatically confer AI Act compliance — these are distinct legal requirements that must both be satisfied.</p>
+        <p>Before placing a high-risk system on the EU market, providers must complete a pre-market conformity assessment. For most systems this can be done by self-assessment against harmonised standards (currently under development). In limited cases a third-party assessment by an accredited notified body is required. The CE mark under existing medical device regulation does not automatically confer AI Act compliance, these are distinct legal requirements that must both be satisfied.</p>
       </section>
 
       <!-- GPAI Complication -->
@@ -140,34 +140,34 @@
 
         <p>The rapid adoption of LLM-based clinical tools creates a layered compliance challenge that the Act is only beginning to address. Consider a hospital deploying a clinical summarisation tool built by a healthtech startup on top of GPT-4 or Claude. Three compliance layers are now in play simultaneously.</p>
 
-        <p>The foundation model provider (OpenAI, Anthropic, etc.) has GPAI obligations: technical documentation, training data summaries, and — if the model is systemic — adversarial testing and incident reporting. These obligations applied from August 2025. The healthtech startup that built the clinical application is a downstream GPAI system provider and also, if the clinical use is high-risk, a high-risk AI system provider. The hospital deploying it carries deployer obligations for the high-risk application. Each layer has its own compliance obligations, and they must be met coherently.</p>
+        <p>The foundation model provider (OpenAI, Anthropic, etc.) has GPAI obligations: technical documentation, training data summaries, and, if the model is systemic, adversarial testing and incident reporting. These obligations applied from August 2025. The healthtech startup that built the clinical application is a downstream GPAI system provider and also, if the clinical use is high-risk, a high-risk AI system provider. The hospital deploying it carries deployer obligations for the high-risk application. Each layer has its own compliance obligations, and they must be met coherently.</p>
 
-        <p>The Act requires GPAI providers to supply downstream developers with the information they need to understand the model's capabilities and limitations and to meet their own compliance obligations. In practice, this means foundation model providers must publish meaningful technical documentation — not just terms of service — and clinical AI developers must understand the provenance and characteristics of the models they are building on.</p>
+        <p>The Act requires GPAI providers to supply downstream developers with the information they need to understand the model's capabilities and limitations and to meet their own compliance obligations. In practice, this means foundation model providers must publish meaningful technical documentation, not just terms of service, and clinical AI developers must understand the provenance and characteristics of the models they are building on.</p>
       </section>
 
       <!-- Enforcement and Penalties -->
       <section class="project-card">
         <h2>Enforcement, Penalties, and the Global Reach</h2>
 
-        <p>The extraterritorial scope of the Act is perhaps its most important feature for the global healthtech industry. The Act applies to any provider that places an AI system on the EU market or puts it into service in the EU — regardless of where that provider is headquartered. A US company, an Indian healthtech startup, a UK NHS spinout: if their AI system is used by patients or clinicians in the EU, they are in scope. The output of the AI system being used in the EU is sufficient; the provider need not have any physical presence there.</p>
+        <p>The extraterritorial scope of the Act is perhaps its most important feature for the global healthtech industry. The Act applies to any provider that places an AI system on the EU market or puts it into service in the EU, regardless of where that provider is headquartered. A US company, an Indian healthtech startup, a UK NHS spinout: if their AI system is used by patients or clinicians in the EU, they are in scope. The output of the AI system being used in the EU is sufficient, the provider need not have any physical presence there.</p>
 
-        <p>Enforcement is handled by national competent authorities in each Member State, coordinated through the EU AI Office established within the European Commission. Financial penalties are significant: up to 7% of global annual turnover for prohibited AI violations, and up to 3% for noncompliance with requirements for high-risk systems. For large healthtech companies, these numbers are not theoretical; they are material financial risks that boards and executive teams need to own.</p>
+        <p>Enforcement is handled by national competent authorities in each Member State, coordinated through the EU AI Office established within the European Commission. Financial penalties are significant: up to 7% of global annual turnover for prohibited AI violations, and up to 3% for noncompliance with requirements for high-risk systems. For large healthtech companies, these numbers are not theoretical, they are material financial risks that boards and executive teams need to own.</p>
 
-        <p>AI regulatory sandboxes are available — notably for SMEs — allowing companies to test and validate their systems in a supervised environment before market placement. For startups developing novel clinical AI, engaging with sandbox processes early may be the most practical path to compliant deployment.</p>
+        <p>AI regulatory sandboxes are available, notably for SMEs, allowing companies to test and validate their systems in a supervised environment before market placement. For startups developing novel clinical AI, engaging with sandbox processes early may be the most practical path to compliant deployment.</p>
       </section>
 
       <!-- Conclusion -->
       <section class="project-card">
         <h2>Conclusion: Two Regulators, One Principle</h2>
 
-        <p>Reading the EU AI Act alongside the FDA's 2026 CDS guidance, what strikes me most is convergence. Two regulators, two continents, two very different legislative traditions — and they have arrived at essentially the same principle: AI in healthcare must be designed to support human judgment, not supplant it, and must be transparent enough that the human exercising that judgment can meaningfully do so.</p>
+        <p>Reading the EU AI Act alongside the FDA's 2026 CDS guidance, what strikes me most is convergence. Two regulators, two continents, two very different legislative traditions, and they have arrived at essentially the same principle: AI in healthcare must be designed to support human judgment, not supplant it, and must be transparent enough that the human exercising that judgment can meaningfully do so.</p>
 
-        <p>The EU AI Act encodes this in its human oversight requirement for high-risk systems. The FDA encodes it in Criterion 4 of the CDS framework. The language differs but the clinical logic is identical: a clinician who cannot see the basis for an AI recommendation cannot exercise independent judgment, and an AI tool that does not allow independent judgment is not a support tool — it is a decision-maker operating without a licence.</p>
+        <p>The EU AI Act encodes this in its human oversight requirement for high-risk systems. The FDA encodes it in Criterion 4 of the CDS framework. The language differs but the clinical logic is identical: a clinician who cannot see the basis for an AI recommendation cannot exercise independent judgment, and an AI tool that does not allow independent judgment is not a support tool, it is a decision-maker operating without a licence.</p>
 
         <p>The timelines are now pressing. Annex III high-risk obligations arrive in August 2026. Medical device AI follows in August 2027. For healthcare organisations deploying AI in the EU, the immediate practical steps are clear: inventory every AI system in use, assess its risk classification, understand where in the value chain your organisation sits, and begin building the governance infrastructure that high-risk compliance requires. That work takes longer than the time remaining on the compliance clock.</p>
 
         <h3>References</h3>
-        <p>EY: <em>The European Union Artificial Intelligence Act — Latest developments and key takeaways</em>, 2 February 2024.</p>
+        <p>EY: <em>The European Union Artificial Intelligence Act, Latest developments and key takeaways</em>, 2 February 2024.</p>
         <p>Future of Life Institute: <em>High-level summary of the AI Act</em>, 30 May 2024. Available at <a href="https://artificialintelligenceact.eu/high-level-summary" target="_blank" rel="noopener">artificialintelligenceact.eu/high-level-summary</a>.</p>
         <p>Official text: <a href="https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689" target="_blank" rel="noopener">Regulation (EU) 2024/1689 of the European Parliament and of the Council (EU AI Act)</a>.</p>
       </section>
@@ -177,7 +177,7 @@
 
   <!-- Footer Section -->
   <footer>
-    <p>&copy; 2026 David Dasa</p>
+    <p>&copy, 2026 David Dasa</p>
   </footer>
 
   <!-- Particles.js Configuration -->

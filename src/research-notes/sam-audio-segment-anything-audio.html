@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="SAM Audio: Segment Anything in Audio - Research Note by David Dasa">
-  <title>SAM Audio: Segment Anything in Audio - Research Notes - David Dasa</title>
+  <meta name="description" content="SAM Audio: Segment Anything in Audio | Research Note by David Dasa">
+  <title>SAM Audio: Segment Anything in Audio | Research Notes | David Dasa</title>
   <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="../styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
@@ -61,10 +61,10 @@
         <h2>CONTENT</h2>
 
         <h3>Why this matters</h3>
-        <p>Audio separation is a core building block for multimodal AI systems that need to understand sound. The field has strong models in narrow domains - speech enhancement, speaker separation, and music demixing - but they are typically locked to fixed taxonomies and single prompt types. The paper argues that open-domain mixtures and ambiguous sound boundaries require a more flexible interface, and that text alone is often insufficient for precise disambiguation.</p>
+        <p>Audio separation is a core building block for multimodal AI systems that need to understand sound. The field has strong models in narrow domains, speech enhancement, speaker separation, and music demixing, but they are typically locked to fixed taxonomies and single prompt types. The paper argues that open-domain mixtures and ambiguous sound boundaries require a more flexible interface, and that text alone is often insufficient for precise disambiguation.</p>
 
         <h3>Unified prompting: text, visual, and span</h3>
-        <p>SAM Audio lets a user specify what to separate with natural language, where to separate using a visual mask (positive/negative clicks), and when to separate using a temporal span prompt. These prompts can be used independently or together. The span prompt is the most novel piece - a temporal conditioning signal that allows the model to focus on a time window without needing a reference clip.</p>
+        <p>SAM Audio lets a user specify what to separate with natural language, where to separate using a visual mask (positive/negative clicks), and when to separate using a temporal span prompt. These prompts can be used independently or together. The span prompt is the most novel piece, a temporal conditioning signal that allows the model to focus on a time window without needing a reference clip.</p>
 
         <h3>Model overview</h3>
         <p>The architecture is a diffusion transformer trained with flow matching, operating in a DAC-VAE latent space. At inference, the model produces a target stem and a residual stem. This framing is practical: the user gets the sound they asked for, and the remainder stays coherent rather than being treated as noise.</p>
@@ -73,7 +73,7 @@
         <p>The paper reports state-of-the-art performance across speech, music, and general sound separation, including both in-the-wild and professional audio. Beyond accuracy, the authors call out a core evaluation problem in separation research: SDR-style metrics are weakly correlated with human perception, and many benchmarks rely on synthetic mixtures. To address this, they introduce SAM Audio-Bench with real-world, human-labeled prompts and a reference-free evaluation model that correlates strongly with human judgments.</p>
 
         <h3>What I am taking forward</h3>
-        <p>For applied research, the key shift is prompt flexibility. If you can separate a target using text, visual context, or a time span, you can adapt the system to messy real-world data without rebuilding the model. The other practical takeaway is evaluation - reference-free metrics aligned with human listening could be more useful than SDR when building interactive tools or clinical workflows where perception matters most.</p>
+        <p>For applied research, the key shift is prompt flexibility. If you can separate a target using text, visual context, or a time span, you can adapt the system to messy real-world data without rebuilding the model. The other practical takeaway is evaluation, reference-free metrics aligned with human listening could be more useful than SDR when building interactive tools or clinical workflows where perception matters most.</p>
       </section>
 
       <!-- CONCLUSION -->

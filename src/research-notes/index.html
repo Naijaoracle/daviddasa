@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Research Notes - David Dasa's collection of interesting papers, projects, and repositories">
-  <title>Research Notes - David Dasa</title>
+  <meta name="description" content="Research Notes | David Dasa's collection of interesting papers, projects, and repositories">
+  <title>Research Notes | David Dasa</title>
   <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="../styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
@@ -92,20 +92,20 @@
         <h2>Research Insights</h2>
         <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin: 1rem 0;">
           <div class="stat-item" style="background: rgba(46, 204, 113, 0.1); padding: 1.5rem; border-radius: 1rem; text-align: center;">
-            <h3 style="margin: 0; color: #092917; font-size: 2rem;" id="total-notes">9</h3>
-            <p style="margin: 0.5rem 0 0; color: #4a4a4a;">Research Notes</p>
+            <h3 style="margin: 0; color: #092917; font-size: 2rem;" id="total-notes">10</h3>
+            <p style="margin: 0.5rem 0 0, color: #4a4a4a;">Research Notes</p>
           </div>
           <div class="stat-item" style="background: rgba(46, 204, 113, 0.1); padding: 1.5rem; border-radius: 1rem; text-align: center;">
-            <h3 style="margin: 0; color: #092917; font-size: 2rem;" id="paper-count">6</h3>
-            <p style="margin: 0.5rem 0 0; color: #4a4a4a;">Papers Analyzed</p>
+            <h3 style="margin: 0; color: #092917; font-size: 2rem;" id="paper-count">7</h3>
+            <p style="margin: 0.5rem 0 0, color: #4a4a4a;">Papers Analyzed</p>
           </div>
           <div class="stat-item" style="background: rgba(46, 204, 113, 0.1); padding: 1.5rem; border-radius: 1rem; text-align: center;">
             <h3 style="margin: 0; color: #092917; font-size: 2rem;" id="project-count">1</h3>
-            <p style="margin: 0.5rem 0 0; color: #4a4a4a;">Projects Reviewed</p>
+            <p style="margin: 0.5rem 0 0, color: #4a4a4a;">Projects Reviewed</p>
           </div>
           <div class="stat-item" style="background: rgba(46, 204, 113, 0.1); padding: 1.5rem; border-radius: 1rem; text-align: center;">
             <h3 style="margin: 0; color: #092917; font-size: 2rem;" id="repo-count">1</h3>
-            <p style="margin: 0.5rem 0 0; color: #4a4a4a;">Repositories Explored</p>
+            <p style="margin: 0.5rem 0 0, color: #4a4a4a;">Repositories Explored</p>
           </div>
         </div>
       </section>
@@ -123,7 +123,7 @@
 
   <!-- Footer Section -->
   <footer>
-    <p>&copy; 2025 David Dasa</p>
+    <p>&copy, 2025 David Dasa</p>
   </footer>
 
   <!-- Particles.js Configuration -->
@@ -167,10 +167,19 @@
       // Sample data structure (in practice, this would come from a database or API)
       const researchNotes = [
         {
+          date: '2026-02-26',
+          type: 'Paper',
+          title: 'Beyond AUC: The SA-ROC Framework for Operational Safety in Clinical AI',
+          description: 'Kim et al. introduce the Safety-Aware Receiver Operating Characteristic (SA-ROC) framework, which defines operational safety through clinician-set reliability targets, partitions AI predictions into Safe Zones and a Gray Zone, and reveals a striking reversal: the FDA-cleared model with the higher AUC was operationally inferior at maximal safety.',
+          tags: ['Operational Safety', 'Clinical AI Governance', 'Uncertainty Quantification', 'Clinical Decision Support', 'Healthcare AI'],
+          link: 'operational-safety-clinical-ai-sa-roc.html',
+          dataTags: 'paper ai-ml digital-health'
+        },
+        {
           date: '2026-02-25',
           type: 'Paper',
           title: 'The Delegation Problem: What Google DeepMind\'s Framework Means for Clinical AI',
-          description: 'Google DeepMind\'s framework for intelligent AI delegation — covering authority, trust, accountability, and the "zone of indifference" — gives healthcare AI the precise governance vocabulary it has been missing for safe multi-agent clinical workflows.',
+          description: 'Google DeepMind\'s framework for intelligent AI delegation, covering authority, trust, accountability, and the "zone of indifference", gives healthcare AI the precise governance vocabulary it has been missing for safe multi-agent clinical workflows.',
           tags: ['AI Agents', 'Multi-Agent Systems', 'AI Safety', 'Healthcare AI', 'Clinical Workflow'],
           link: 'intelligent-ai-delegation-google-deepmind.html',
           dataTags: 'paper ai-ml digital-health'
@@ -179,7 +188,7 @@
           date: '2026-02-25',
           type: 'Guidance',
           title: 'High Risk by Default: The EU AI Act Through a Healthcare Lens',
-          description: 'Almost every AI system embedded in a medical device, used for clinical triage, or profiling patient health data is automatically high-risk under the EU AI Act — triggering a substantial compliance burden for developers and deployers alike, with key deadlines in 2026 and 2027.',
+          description: 'Almost every AI system embedded in a medical device, used for clinical triage, or profiling patient health data is automatically high-risk under the EU AI Act, triggering a substantial compliance burden for developers and deployers alike, with key deadlines in 2026 and 2027.',
           tags: ['Regulation', 'EU AI Act', 'Digital Health', 'Healthcare AI', 'Medical Devices'],
           link: 'eu-ai-act-healthcare.html',
           dataTags: 'paper digital-health'
@@ -188,7 +197,7 @@
           date: '2026-02-25',
           type: 'Guidance',
           title: 'The FDA Draws a Line: What the 2026 CDS Guidance Means for Healthcare AI',
-          description: 'A clinician\'s guide to the FDA\'s updated January 2026 guidance on Clinical Decision Support software — what the four-criterion test means in practice, and why the transparency requirement (Criterion 4) is the one that most AI tools will struggle with.',
+          description: 'A clinician\'s guide to the FDA\'s updated January 2026 guidance on Clinical Decision Support software, what the four-criterion test means in practice, and why the transparency requirement (Criterion 4) is the one that most AI tools will struggle with.',
           tags: ['Regulation', 'Clinical Decision Support', 'Digital Health', 'Healthcare AI', 'FDA'],
           link: 'fda-cds-guidance-2026.html',
           dataTags: 'paper digital-health'
@@ -286,9 +295,9 @@
         return [...notes].sort((a, b) => {
           switch (sortType) {
             case 'date-desc':
-              return new Date(b.date) - new Date(a.date);
+              return new Date(b.date); new Date(a.date);
             case 'date-asc':
-              return new Date(a.date) - new Date(b.date);
+              return new Date(a.date); new Date(b.date);
             case 'title':
               return a.title.localeCompare(b.title);
             default:
@@ -336,7 +345,7 @@
         updateStats(filteredNotes);
         updatePagination(sortedNotes.length);
 
-        const start = itemsPerPage === 'all' ? 0 : (currentPage - 1) * itemsPerPage;
+        const start = itemsPerPage === 'all' ? 0 : (currentPage; 1) * itemsPerPage;
         const end = itemsPerPage === 'all' ? sortedNotes.length : start + itemsPerPage;
         const paginatedNotes = sortedNotes.slice(start, end);
 

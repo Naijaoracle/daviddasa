@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Defining Operational Safety in Clinical AI Systems (SA-ROC Framework, npj Digital Medicine 2026) | Research Note by David Dasa">
+  <title>Beyond AUC: The SA-ROC Framework for Operational Safety in Clinical AI | Research Notes | David Dasa</title>
+  <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+      <li><a href="https://www.daviddasa.com/about">About</a></li>
+      <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
+      <li><a href="https://www.daviddasa.com/skills">Skills</a></li>
+      <li><a href="https://www.daviddasa.com/research-notes">Research Notes</a></li>
+      <li><a href="https://www.daviddasa.com/contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <main>
+      <!-- Back Navigation -->
+      <div style="margin-bottom: 2rem;">
+        <a href="../research-notes/" style="color: #2ecc71; text-decoration: none; font-weight: 500;">← Back to Research Notes</a>
+      </div>
+
+      <!-- Article Header -->
+      <section class="project-card">
+        <div class="article-header">
+          <h1>Beyond AUC: The SA-ROC Framework for Operational Safety in Clinical AI</h1>
+          <div class="article-meta">
+            <span class="article-date">February 26, 2026</span>
+            <span class="article-type">Paper</span>
+          </div>
+          <div class="article-tags">
+            <span class="tag">Operational Safety</span>
+            <span class="tag">Clinical AI Governance</span>
+            <span class="tag">Uncertainty Quantification</span>
+            <span class="tag">Clinical Decision Support</span>
+            <span class="tag">Healthcare AI</span>
+            <span class="tag">Selective Automation</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- TLDR -->
+      <section class="project-card">
+        <h2>TLDR</h2>
+        <p>Kim, Kim, Bahl, Lev, González, Gee, and Do (Massachusetts General Hospital / Harvard Medical School) introduce the <strong>Safety-Aware Receiver Operating Characteristic (SA-ROC)</strong> framework, which reframes the question of clinical AI trustworthiness from "how accurate is this model?" to "under exactly which conditions can a clinician act on this model's recommendation?" The framework partitions an AI's predictions into three zones, a Rule-in Safe Zone, a Rule-out Safe Zone, and a Gray Zone, based on clinician-defined reliability targets (safety levels α+ and α−). The Gray Zone Area (Γ<sub>Area</sub>) quantifies the operational cost of indecision. A case study of two FDA-cleared mammography AIs reveals a striking reversal: the model with the higher AUC (0.928 vs. 0.882) was operationally <em>inferior</em> at maximal safety, safely ruling out only 16.7% of the cohort versus 29.0% for the lower-AUC model. This is a paper that should change how clinical AI is procured, governed, and validated.</p>
+      </section>
+
+      <!-- Clinical Hook -->
+      <section class="project-card">
+        <h2>The Question AUC Cannot Answer</h2>
+
+        <p>When a hospital is deciding whether to deploy an AI system, a mammography reader, a deterioration predictor, a sepsis alert, the conversation almost always arrives at AUC. The vendor presents a receiver operating characteristic curve. The AUC is 0.91. Someone asks whether that is good. Someone else says it depends on the prevalence. The radiologist asks what the false-negative rate is at the operating threshold. The meeting ends with a vague sense that the model performs well, a request for more local validation data, and no clearer answer to the question everyone is actually wrestling with: <em>when can we trust this thing to act on its own, and when do we need a human in the loop?</em></p>
+
+        <p>AUC is a summary statistic measuring the overall discriminative ability of a classifier across all possible thresholds. It tells you nothing about the model's reliability at any specific operating point. It says nothing about whether the confidence scores are well-calibrated. It does not distinguish a model whose errors cluster in a narrow band of uncertainty from one whose errors are scattered unpredictably across the score range. Two models can have identical AUCs and radically different operational profiles. This paper proves that empirically, with FDA-cleared devices, using real patient data, and provides the framework to measure it.</p>
+
+        <p>The authors call the gap between statistical validation and clinical trust a "validation debt" that must be paid at the point of care. I think that is exactly the right framing. Institutions that deploy AI on the basis of benchmark AUC are borrowing trust they have not yet earned, and the interest accrues in clinical risk.</p>
+      </section>
+
+      <!-- The Framework -->
+      <section class="project-card">
+        <h2>How SA-ROC Works</h2>
+
+        <p>The framework's central insight is that safe AI automation is not a binary, it is a function of <em>which cases</em> the AI is being asked to handle. The same model may be reliably safe for the highest-confidence predictions and unreliable for everything in between. SA-ROC makes this structure visible and actionable.</p>
+
+        <h3>The Safety Level (α)</h3>
+        <p>The framework introduces a single hyperparameter set by the clinician: the <strong>safety level (α)</strong>. This represents the minimum performance threshold required to establish actionable trust, defined in two directions:</p>
+        <ul>
+          <li><strong>Rule-in safety level (α+)</strong>: the minimum acceptable positive predictive value (PPV) required to trust a rule-in action, i.e., the AI flagging a case as high-risk and triggering autonomous escalation.</li>
+          <li><strong>Rule-out safety level (α−)</strong>: the minimum acceptable negative predictive value (NPV) required to trust a rule-out action, i.e., the AI classifying a case as low-risk and safely removing it from the worklist.</li>
+        </ul>
+        <p>These are not statistical parameters, they are clinical policy decisions. Setting α+ = 99% for a specialist referral pathway encodes the clinical judgment that one in a hundred incorrect escalations is the maximum tolerable rate. Setting α− = 100% for a cancer screening workflow encodes a policy of zero tolerance for missed disease. The framework then takes these clinical mandates and automatically identifies the prediction score thresholds required to satisfy them on the local data.</p>
+
+        <h3>Three Zones of Operation</h3>
+        <p>From these two thresholds, the framework partitions every prediction the model makes into one of three distinct zones:</p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+          <div style="background: rgba(46, 204, 113, 0.08); padding: 1.25rem; border-radius: 0.5rem; border-left: 4px solid rgba(46,204,113,0.5);">
+            <h4 style="margin: 0 0 0.5rem; color: #092917;">Rule-in Safe Zone</h4>
+            <p style="margin: 0, color: #4a4a4a, font-size: 0.9rem;">High-score predictions where the model's PPV meets or exceeds α+. Cases here are deemed reliable enough for autonomous escalation or action, the AI can act without mandating human review first.</p>
+          </div>
+          <div style="background: rgba(46, 204, 113, 0.08); padding: 1.25rem; border-radius: 0.5rem; border-left: 4px solid rgba(46,204,113,0.5);">
+            <h4 style="margin: 0 0 0.5rem; color: #092917;">Rule-out Safe Zone</h4>
+            <p style="margin: 0, color: #4a4a4a, font-size: 0.9rem;">Low-score predictions where the model's NPV meets or exceeds α−. Cases here are deemed reliable enough for autonomous de-prioritisation, the AI can safely remove them from the clinical workload.</p>
+          </div>
+          <div style="background: rgba(46, 204, 113, 0.08); padding: 1.25rem; border-radius: 0.5rem; border-left: 4px solid rgba(46,204,113,0.5);">
+            <h4 style="margin: 0 0 0.5rem; color: #092917;">Gray Zone</h4>
+            <p style="margin: 0, color: #4a4a4a, font-size: 0.9rem;">The intermediate range where the model fails to meet either target. These are the diagnostically challenging cases, designated by design for mandatory human expert review, not autonomous action.</p>
+          </div>
+        </div>
+
+        <h3>The Gray Zone Area (Γ<sub>Area</sub>)</h3>
+        <p>The size of the Gray Zone directly measures the operational burden of deploying this AI at the chosen safety level. A large Gray Zone means the AI handles fewer cases autonomously and pushes more work to human reviewers. A small Gray Zone means the AI can safely manage a larger proportion of the caseload. The paper introduces Γ<sub>Area</sub> (Gray Zone Area) as a formal metric quantifying this cost, enabling institutions to evaluate the trade-off between the desired safety level (α) and the consequential cost of indecision before deploying a system.</p>
+
+        <p>This is a fundamentally important capability. Procurement decisions can now model the staffing implications of different safety policies. A radiology department can ask: "if we set α− = 100% for this mammography AI, what proportion of our screening workload will still require radiologist review?" The SA-ROC framework answers that question directly from the validation data.</p>
+      </section>
+
+      <!-- Results -->
+      <section class="project-card">
+        <h2>What the Results Show</h2>
+
+        <h3>Score Distribution Determines Operational Value</h3>
+        <p>Before the clinical case study, the authors use simulation to demonstrate a key principle: AUC alone cannot predict operational performance. They analyse four synthetic AI models:</p>
+        <ul>
+          <li>A model with AUC 0.768, but with prediction scores <em>sharply peaked</em> for positive cases, established a robust Rule-in Safe Zone, making it highly effective for high-confidence confirmation tasks despite a modest overall AUC.</li>
+          <li>A model with AUC 0.780, but with scores <em>skewed towards negative cases</em>, produced an expansive Rule-out Safe Zone, ideal for high-volume screening to clear a large proportion of the worklist with confidence.</li>
+          <li>Two models with nearly identical AUCs of 0.960 diverged dramatically at maximal safety (α = 100%): the model with wider, overlapping score distributions yielded Γ<sub>Area</sub> = 0.709 (high burden, little safe automation), the model with narrow, well-separated distributions yielded Γ<sub>Area</sub> = 0.344 (substantially more safe automation possible).</li>
+        </ul>
+        <p>The practical lesson: a model's <em>score distribution profile</em>, not its AUC, determines its operational character. An AI optimised for a specific clinical function (confident rule-out, or confident rule-in) may be far more useful in practice than a higher-AUC general-purpose model, even when aggregate benchmarks show no difference.</p>
+
+        <h3>The Performance Reversal That Should Reshape Procurement</h3>
+        <p>The clinical case study is the paper's most striking contribution. The authors apply SA-ROC to two FDA-cleared mammography AI solutions, comparing their operational profiles on a real patient cohort:</p>
+        <ul>
+          <li><strong>AI Solution #1</strong>: AUC = 0.928 (statistically superior)</li>
+          <li><strong>AI Solution #2</strong>: AUC = 0.882</li>
+        </ul>
+        <p>At moderate safety levels (α &lt, 95%), AI #1's higher AUC translated into better operational efficiency, its Gray Zone reduced more rapidly as safety requirements were relaxed. This is the scenario that conventional procurement would capture.</p>
+        <p>But at the highest safety level (α− = 100%), where zero false negatives in the Rule-out Safe Zone are tolerated, the results reverse entirely:</p>
+        <ul>
+          <li>AI #2 confidently ruled out <strong>290 cases (29.0% of the entire patient cohort)</strong>, safely removing them from the radiologist's worklist.</li>
+          <li>AI #1 could only confidently rule out <strong>167 cases (16.7%)</strong>, a difference of 123 cases (95% CI: 87.0 to 150.0).</li>
+          <li>Crucially, 163 of the cases AI #1 left in its uncertain Gray Zone were <em>confidently ruled out</em> by AI #2.</li>
+        </ul>
+        <p>A hospital deploying AI #1 on the basis of its superior AUC, intending to use it for maximal-safety screening automation, would achieve 12.3 percentage points less workload reduction than a hospital that looked beyond AUC and deployed AI #2. The higher-performing model by conventional metrics is the worse operational choice for the highest-stakes use case.</p>
+        <p>The authors also identify a synergistic possibility: a hybrid workflow using AI #2 first for high-confidence rule-outs (clearing 29% of cases), then routing remaining ambiguous cases through AI #1 for its superior moderate-confidence discrimination, could capitalise on the distinct strengths of both systems. This kind of workflow design is not possible without a framework that makes operational zones explicit.</p>
+
+        <h3>Human Diagnostic Behaviour in the Safety Zones</h3>
+        <p>The SA-ROC stratification also enables a novel analysis of human-AI alignment, and surfaces a counterintuitive result that has direct clinical implications.</p>
+        <p>In the <strong>Rule-out Safe Zone</strong>, the cases where the AI was most confident about low risk, human radiologist accuracy was paradoxically at its <em>lowest</em>, driven by a high rate of false positives. In other words, radiologists were frequently flagging as suspicious the exact cases the AI was most certain were benign. This is the pattern of diagnostic over-calling that is well-recognised in high-stakes screening: when a clinician knows they are looking for cancer, every ambiguous finding gets escalated. The AI's systematic reliability in this zone could counterbalance this human cognitive bias, potentially reducing unnecessary recalls.</p>
+        <p>In the <strong>Rule-in Safe Zone</strong>, human accuracy confirmed the framework's logic: above 98% radiologist accuracy at α+ = 100% validated that the AI had successfully identified the highest-likelihood-of-disease cases.</p>
+        <p>In the <strong>Gray Zone</strong>, both AI and humans struggled equally, confirming this as the genuine domain of shared uncertainty where focused, high-quality expert attention is most needed.</p>
+        <p>This stratification provides something procurement and clinical governance teams rarely have: a data-driven map of <em>where AI and human judgment align, where they diverge, and where collaboration rather than replacement is the appropriate model</em>.</p>
+      </section>
+
+      <!-- Conclusion -->
+      <section class="project-card">
+        <h2>Conclusion</h2>
+
+        <p>The SA-ROC framework solves a problem that has sat at the centre of clinical AI deployment for years: how do you translate a statistical performance benchmark into an operational trust decision? The answer the field has been using, AUC at a single operating threshold, is demonstrably insufficient. This paper provides the evidence and the alternative.</p>
+
+        <p>Three aspects particularly resonate for anyone working on clinical AI governance. First, the Gray Zone Area (Γ<sub>Area</sub>) is the closest thing to a "cost of indecision" metric that clinical AI has had. It bridges the gap between statistical validation and workforce planning in a way that AUC never could. Second, the concept of policy-driven automation, where clinical priorities expressed as α+ and α− are computationally translated into specific AI operating thresholds, gives governance bodies a mechanism to operationalise their mandates rather than merely stating them. Third, the performance reversal case study is a powerful demonstration that the most statistically accurate model is not always the most operationally appropriate one for a specific clinical context.</p>
+
+        <p>Read alongside the FDA's 2026 CDS guidance (which requires transparency about how a tool reaches its output) and the EU AI Act (which mandates human oversight for high-risk systems), the SA-ROC framework provides the technical infrastructure that those regulatory requirements assume exists but do not specify. It makes the conditions for safe automation explicit, auditable, and adjustable, which is exactly what active governance of clinical AI requires.</p>
+
+        <p>The paper is published as an Article in Press in <em>npj Digital Medicine</em> (accepted 8 February 2026) and represents work from the Department of Radiology at Massachusetts General Hospital and Harvard Medical School. It does not yet address longitudinal monitoring, what happens to the Gray Zone over time as case mix shifts or the model drifts, but as a framework for initial deployment decision-making and active governance, it is one of the most practically useful contributions to clinical AI safety methodology I have read.</p>
+
+        <h3>References</h3>
+        <p>Original paper: Kim, Y.-T., Kim, H., Bahl, M., Lev, M. H., González, R. G., Gee, M. S., &amp, Do, S. (2026). Defining operational safety in clinical artificial intelligence systems. <em>npj Digital Medicine</em>. <a href="https://www.nature.com/articles/s41746-026-02450-7" target="_blank" rel="noopener">https://www.nature.com/articles/s41746-026-02450-7</a></p>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Footer Section -->
+  <footer>
+    <p>&copy, 2026 David Dasa</p>
+  </footer>
+
+  <!-- Particles.js Configuration -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+    });
+  </script>
+
+  <style>
+    .article-header h1 { color: #092917; margin-bottom: 1rem; font-size: 2.2rem; }
+    .article-meta { display: flex; gap: 2rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .article-date { color: #2ecc71; font-weight: 600; font-size: 1rem; }
+    .article-type { color: #1a4731; font-weight: 500; background: rgba(46, 204, 113, 0.1); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.9rem; }
+    .article-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .tag { background: rgba(46, 204, 113, 0.12); color: #092917; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.8rem; font-weight: 500; }
+    .container { max-width: 1000px; }
+    main { line-height: 1.7; }
+    p { line-height: 1.7; }
+    ul { line-height: 1.7; padding-left: 1.5rem; }
+    li { margin-bottom: 0.4rem; }
+    .project-card { background: rgba(255,255,255,0.82); border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
+    @media (max-width: 768px) {
+      .article-header h1 { font-size: 1.8rem; }
+      .article-meta { flex-direction: column; gap: 0.5rem; }
+    }
+  </style>
+
+</body>
+</html>
