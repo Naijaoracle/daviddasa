@@ -93,19 +93,19 @@
         <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin: 1rem 0;">
           <div class="stat-item" style="background: rgba(46, 204, 113, 0.1); padding: 1.5rem; border-radius: 1rem; text-align: center;">
             <h3 style="margin: 0; color: #092917; font-size: 2rem;" id="total-notes">10</h3>
-            <p style="margin: 0.5rem 0 0, color: #4a4a4a;">Research Notes</p>
+            <p style="margin: 0.5rem 0 0; color: #4a4a4a;">Research Notes</p>
           </div>
           <div class="stat-item" style="background: rgba(46, 204, 113, 0.1); padding: 1.5rem; border-radius: 1rem; text-align: center;">
             <h3 style="margin: 0; color: #092917; font-size: 2rem;" id="paper-count">7</h3>
-            <p style="margin: 0.5rem 0 0, color: #4a4a4a;">Papers Analyzed</p>
+            <p style="margin: 0.5rem 0 0; color: #4a4a4a;">Papers Analyzed</p>
           </div>
           <div class="stat-item" style="background: rgba(46, 204, 113, 0.1); padding: 1.5rem; border-radius: 1rem; text-align: center;">
             <h3 style="margin: 0; color: #092917; font-size: 2rem;" id="project-count">1</h3>
-            <p style="margin: 0.5rem 0 0, color: #4a4a4a;">Projects Reviewed</p>
+            <p style="margin: 0.5rem 0 0; color: #4a4a4a;">Projects Reviewed</p>
           </div>
           <div class="stat-item" style="background: rgba(46, 204, 113, 0.1); padding: 1.5rem; border-radius: 1rem; text-align: center;">
             <h3 style="margin: 0; color: #092917; font-size: 2rem;" id="repo-count">1</h3>
-            <p style="margin: 0.5rem 0 0, color: #4a4a4a;">Repositories Explored</p>
+            <p style="margin: 0.5rem 0 0; color: #4a4a4a;">Repositories Explored</p>
           </div>
         </div>
       </section>
@@ -123,7 +123,7 @@
 
   <!-- Footer Section -->
   <footer>
-    <p>&copy, 2025 David Dasa</p>
+    <p>&copy; 2025 David Dasa</p>
   </footer>
 
   <!-- Particles.js Configuration -->
@@ -295,9 +295,9 @@
         return [...notes].sort((a, b) => {
           switch (sortType) {
             case 'date-desc':
-              return new Date(b.date); new Date(a.date);
+              return new Date(b.date) - new Date(a.date);
             case 'date-asc':
-              return new Date(a.date); new Date(b.date);
+              return new Date(a.date) - new Date(b.date);
             case 'title':
               return a.title.localeCompare(b.title);
             default:
@@ -345,7 +345,7 @@
         updateStats(filteredNotes);
         updatePagination(sortedNotes.length);
 
-        const start = itemsPerPage === 'all' ? 0 : (currentPage; 1) * itemsPerPage;
+        const start = itemsPerPage === 'all' ? 0 : (currentPage - 1) * itemsPerPage;
         const end = itemsPerPage === 'all' ? sortedNotes.length : start + itemsPerPage;
         const paginatedNotes = sortedNotes.slice(start, end);
 
@@ -383,7 +383,9 @@
       });
 
       document.getElementById('next-page').addEventListener('click', () => {
-        const totalPages = Math.ceil(filterNotes(researchNotes, currentFilter).length / itemsPerPage);
+        const totalPages = itemsPerPage === 'all'
+          ? 1
+          : Math.ceil(filterNotes(researchNotes, currentFilter).length / itemsPerPage);
         if (currentPage < totalPages) {
           currentPage++;
           renderNotes();
