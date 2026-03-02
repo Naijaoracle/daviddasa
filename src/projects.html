@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="David Dasa's Portfolio of Digital Health & AI Projects">
-  <title>Projects - David Dasa</title>
+  <meta name="description" content="Research and projects by David Dasa — DASEX framework, rPPG equity study, healthcare AI analysis, and interactive clinical demonstrators.">
+  <title>Projects & Research — David Dasa</title>
   <link rel="icon" type="image/svg+xml" href="/src/favicon-DD-monogram.svg">
   <link rel="alternate icon" href="/src/favicon.ico">
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
 
@@ -40,13 +39,50 @@
         </div>
       </section>
 
-      <!-- Featured Projects -->
+      <!-- 1. Featured Research -->
       <section class="project-card">
-        <h2>Featured Projects</h2>
+        <h2>Featured Research</h2>
         <div class="project-grid">
+
           <div class="project-item">
-            <h3>Secure Remote Patient Monitoring</h3>
-            <p>An innovative system combining Bluetooth low energy medical devices with blockchain verification for secure, reliable patient monitoring.</p>
+            <p style="font-size: 0.85rem; color: #2ecc71; margin-bottom: 0.5rem; font-weight: 600;">Artificial Intelligence in Medicine &middot; Sep 2025 &middot; DOI: 10.1016/j.artmed.2025.103270</p>
+            <h3>DASEX Framework & XR-NPC Clinical Simulator</h3>
+            <p>The DASEX framework is the first structured methodology for evaluating AI-driven non-player characters in XR healthcare simulations, published in <em>Artificial Intelligence in Medicine</em>. The accompanying XR-NPC simulator embeds multi-agent AI clinical colleagues into virtual ward environments for team-based training, enabling safe and repeatable high-stakes scenario practice.</p>
+            <ul class="skills-list">
+              <li>DASEX Framework Evaluation</li>
+              <li>XR Healthcare Simulation</li>
+              <li>AI-Driven NPCs</li>
+              <li>Clinical Training</li>
+              <li>Multi-agent Systems</li>
+            </ul>
+            <div class="project-links">
+              <a href="https://doi.org/10.1016/j.artmed.2025.103270" class="project-link" target="_blank" rel="noopener">View Paper</a>
+              <a href="/xr-npc-dasex-evaluator.html" class="project-link">DASEX Evaluator Tool</a>
+              <a href="/xr-npc-simulators.html" class="project-link">XR-NPC Prototypes</a>
+              <a href="/research-artefacts/README.md" class="project-link">Research Artefacts</a>
+            </div>
+          </div>
+
+          <div class="project-item">
+            <p style="font-size: 0.85rem; color: #2ecc71; margin-bottom: 0.5rem; font-weight: 600;">medRxiv &middot; Oct 2025 &middot; 306 participants &middot; Nigeria</p>
+            <h3>rPPG Equity Study</h3>
+            <p>A field study investigating remote photoplethysmography (rPPG) for contactless blood pressure screening, with 306 participants recruited in Nigeria. The study exposes skin tone bias in existing models and provides evidence for equity-focused design of remote monitoring tools for underserved populations.</p>
+            <ul class="skills-list">
+              <li>Remote Photoplethysmography</li>
+              <li>Hypertension Screening</li>
+              <li>Health Equity</li>
+              <li>Computer Vision</li>
+              <li>Field Research</li>
+            </ul>
+            <div class="project-links">
+              <a href="https://www.medrxiv.org/content/10.1101/2025.10.01.25314744" class="project-link" target="_blank" rel="noopener">View Preprint</a>
+            </div>
+          </div>
+
+          <div class="project-item">
+            <p style="font-size: 0.85rem; color: #2ecc71; margin-bottom: 0.5rem; font-weight: 600;">MSc Project &middot; Bournemouth University</p>
+            <h3>Blockchain Remote Patient Monitoring</h3>
+            <p>A secure remote patient monitoring system combining Bluetooth Low Energy medical devices with blockchain verification for proximity-based data integrity — ensuring readings originate from trusted devices before committing to a distributed ledger.</p>
             <ul class="skills-list">
               <li>Blockchain Technology</li>
               <li>IoT Integration</li>
@@ -56,17 +92,47 @@
             <div class="project-links">
               <a href="https://github.com/Naijaoracle/remote-patient-monitoring-system" class="project-link">View on GitHub</a>
               <a href="https://www.researchgate.net/publication/377029947_A_proposal_for_improving_the_data_security_of_remote_patient_monitoring_systems_by_proximity_verification_using_blockchain" class="project-link">Read Research Paper</a>
-              <a href="/blockchain-remote-monitoring-demo.html" class="project-link">Open Interactive RPM Demo</a>
-              <a href="/blockchain-explainer.html" class="project-link">Open Simple Blockchain Explainer</a>
+              <a href="/blockchain-remote-monitoring-demo.html" class="project-link">Interactive RPM Demo</a>
+              <a href="/blockchain-explainer.html" class="project-link">Blockchain Explainer</a>
             </div>
           </div>
+
         </div>
       </section>
 
-      <!-- Healthcare Analytics -->
+      <!-- 2. Research Analysis -->
       <section class="project-card">
-        <h2>Healthcare Analytics</h2>
+        <h2>Research Analysis</h2>
         <div class="project-grid">
+
+          <div class="project-item">
+            <h3>HealthBench Q&A (from OpenAI) Analysis</h3>
+            <p>Comprehensive evaluation of OpenAI's HealthBench medical question-answering benchmark, analyzing model performance across diverse healthcare domains and question complexities.</p>
+            <ul class="skills-list">
+              <li>Natural Language Processing</li>
+              <li>Question Answering</li>
+              <li>Model Evaluation</li>
+              <li>Healthcare NLP</li>
+            </ul>
+            <div class="project-links">
+              <a href="https://www.daviddasa.com/healthbench-qna-analysis" class="project-link">View Analysis</a>
+            </div>
+          </div>
+
+          <div class="project-item">
+            <h3>AfriMed Q&A (from Google Health) Analysis</h3>
+            <p>Google Health's AfriMed evaluation of general language models in African clinical contexts, revealing that specialty choice matters more than country-specific factors and structured outputs help maintain performance.</p>
+            <ul class="skills-list">
+              <li>Cross-cultural AI Evaluation</li>
+              <li>African Healthcare Context</li>
+              <li>Specialty-specific Analysis</li>
+              <li>Structured Output Optimization</li>
+            </ul>
+            <div class="project-links">
+              <a href="https://www.daviddasa.com/afrimed-qna-analysis" class="project-link">View Analysis</a>
+            </div>
+          </div>
+
           <div class="project-item">
             <h3>Medical Imaging Analysis</h3>
             <p>Comprehensive AI-powered analysis of medical imaging datasets:</p>
@@ -92,6 +158,7 @@
               <a href="https://www.daviddasa.com/nih-chest-xray-analysis" class="project-link">NIH Chest X-ray Analysis</a>
             </div>
           </div>
+
           <div class="project-item">
             <h3>Africa & Nigeria Population Health Dashboard</h3>
             <p>Interactive dashboard analyzing WorldPop.org data to visualize population distribution, healthcare access disparities, and digital health infrastructure readiness across Africa and Nigeria. Includes insights for resource allocation and telemedicine deployment strategies.</p>
@@ -105,7 +172,50 @@
               <a href="/worldpop-africa-dashboard.html" class="project-link">View Dashboard</a>
             </div>
           </div>
-          
+
+        </div>
+      </section>
+
+      <!-- 3. Interactive Demos -->
+      <section class="project-card">
+        <h2>Interactive Demos</h2>
+        <p style="margin-bottom: 1.5rem; opacity: 0.8;">Demonstrators illustrating healthcare AI concepts through interactive interfaces.</p>
+        <div class="project-grid">
+
+          <div class="project-item">
+            <h3>Visualizers</h3>
+            <p>Interactive demonstrations showcasing healthcare AI technologies and their applications in medical data analysis:</p>
+            <ul class="skills-list">
+              <li>rPPG Fairness Analysis</li>
+              <li>BP Prediction Models</li>
+              <li>Drug Interaction Networks</li>
+              <li>ML Decision Boundaries</li>
+            </ul>
+            <div class="project-links">
+              <a href="https://www.daviddasa.com/bppredictionvizualizer" class="project-link">BP Prediction Visualizer</a>
+              <a href="https://www.daviddasa.com/rppg-visualizer" class="project-link">rPPG Visualizer</a>
+              <a href="/drug-interaction-visualizer.html" class="project-link">Drug Interaction Visualizer</a>
+              <a href="/ml-boundaries-visualizer.html" class="project-link">ML Decision Boundaries</a>
+            </div>
+          </div>
+
+          <div class="project-item">
+            <h3>Simulators</h3>
+            <p>Advanced simulation environments for healthcare training, resource management, and system optimization:</p>
+            <ul class="skills-list">
+              <li>Hospital Resource Management</li>
+              <li>XR-NPC Healthcare Training</li>
+              <li>Epidemic Modeling</li>
+              <li>Robotic Precision Control</li>
+            </ul>
+            <div class="project-links">
+              <a href="/hospital-simulation/index.html" class="project-link">Hospital Simulation</a>
+              <a href="/xr-npc-simulators.html" class="project-link">XR-NPC Ward Simulator</a>
+              <a href="/epidemic-simulator.html" class="project-link">Epidemic Spread Simulator</a>
+              <a href="/surgical-robotics-trainer.html" class="project-link">Surgical Robotics Trainer</a>
+            </div>
+          </div>
+
           <div class="project-item">
             <h3>Medical Image Intelligence Viewer</h3>
             <p>A browser-based diagnostic tool demonstrating AI-assisted medical imaging workflows. Features include real-time X-ray analysis simulation, lesion detection overlays, heatmaps, and interactive measurement tools for clinical decision support.</p>
@@ -119,55 +229,18 @@
               <a href="/medical-image-viewer.html" class="project-link">Launch Viewer</a>
             </div>
           </div>
+
         </div>
       </section>
 
-      <!-- Medical AI & NLP -->
+      <!-- 4. Utilities -->
       <section class="project-card">
-        <h2>Medical AI & Natural Language Processing</h2>
+        <h2>Utilities</h2>
+        <p style="margin-bottom: 1.5rem; opacity: 0.8;">Small tools built as learning exercises.</p>
         <div class="project-grid">
-          <div class="project-item">
-            <h3>HealthBench Q&A (from OpenAI) Analysis</h3>
-            <p>Comprehensive evaluation of OpenAI’s HealthBench medical question-answering benchmark, analyzing model performance across diverse healthcare domains and question complexities.</p>
-            <ul class="skills-list">
-              <li>Natural Language Processing</li>
-              <li>Question Answering</li>
-              <li>Model Evaluation</li>
-              <li>Healthcare NLP</li>
-            </ul>
-            <div class="project-links">
-              <a href="https://www.daviddasa.com/healthbench-qna-analysis" class="project-link">View Analysis</a>
-            </div>
-          </div>
-          <div class="project-item">
-            <h3>AfriMed Q&A (from Google Health) Analysis</h3>
-            <p>Google Health’s AfriMed evaluation of general language models in African clinical contexts, revealing that specialty choice matters more than country-specific factors and structured outputs help maintain performance.</p>
-            <ul class="skills-list">
-              <li>Cross-cultural AI Evaluation</li>
-              <li>African Healthcare Context</li>
-              <li>Specialty-specific Analysis</li>
-              <li>Structured Output Optimization</li>
-            </ul>
-            <div class="project-links">
-              <a href="https://www.daviddasa.com/afrimed-qna-analysis" class="project-link">View Analysis</a>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <!-- Digital Health Tools -->
-      <section class="project-card">
-        <h2>Digital Health Tools</h2>
-        <div class="project-grid">
           <div class="project-item">
             <h3>Healthcare Web Tools</h3>
-            <p>A collection of demonstrator web-based tools designed to showcase healthcare technology concepts and improve accessibility:</p>
-            <ul class="skills-list">
-              <li>BMI Calculator</li>
-              <li>Digital Health Quiz</li>
-              <li>Hearing Assessment Tools</li>
-              <li>Medication Reminders</li>
-            </ul>
             <div class="project-links">
               <a href="https://www.daviddasa.com/bmi-calculator" class="project-link">BMI Calculator</a>
               <a href="https://www.daviddasa.com/DHAIquiz" class="project-link">Digital Health Quiz</a>
@@ -175,88 +248,7 @@
               <a href="https://www.daviddasa.com/medication-reminder" class="project-link">Medication Reminder</a>
             </div>
           </div>
-          <div class="project-item">
-            <h3>Visualizers</h3>
-            <p>Interactive demonstrations showcasing healthcare AI technologies and their applications in medical data analysis:</p>
-            <ul class="skills-list">
-              <li>rPPG Fairness Analysis</li>
-              <li>BP Prediction Models</li>
-              <li>Healthcare AI Education</li>
-              <li>Interactive Data Viz</li>
-              <li>Drug Interaction Networks</li>
-            </ul>
-            <div class="project-links">
-              <a href="https://www.daviddasa.com/rppg-visualizer" class="project-link">rPPG Visualizer</a>
-              <a href="https://www.daviddasa.com/bppredictionvizualizer" class="project-link">BP Prediction Visualizer</a>
-              <a href="/drug-interaction-visualizer.html" class="project-link">Drug Interaction Visualizer</a>
-              <a href="/ml-boundaries-visualizer.html" class="project-link">ML Decision Boundaries</a>
-            </div>
-          </div>
-          <div class="project-item">
-            <h3>Simulators</h3>
-            <p>Advanced simulation environments for healthcare training, resource management, and system optimization:</p>
-            <ul class="skills-list">
-              <li>Hospital Resource Management</li>
-              <li>XR-NPC Healthcare Training</li>
-              <li>Patient Flow Simulation</li>
-              <li>AI-Driven Interactions</li>
-              <li>Epidemic Modeling</li>
-              <li>Robotic Precision Control</li>
-            </ul>
-            <div class="project-links">
-              <a href="/hospital-simulation/index.html" class="project-link">Hospital Simulation</a>
-              <a href="/xr-npc-simulators.html" class="project-link">XR-NPC Simulators</a>
-              <a href="/epidemic-simulator.html" class="project-link">Epidemic Spread Simulator</a>
-              <a href="/surgical-robotics-trainer.html" class="project-link">Surgical Robotics Trainer</a>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <!-- Cloud & Infrastructure -->
-      <section class="project-card">
-        <h2>Cloud Infrastructure</h2>
-        <div class="project-grid">
-          <div class="project-item">
-            <h3>Azure Cloud Deployment</h3>
-            <p>This portfolio website is deployed on Azure Cloud, showcasing modern web development and cloud infrastructure practices.</p>
-            <ul class="skills-list">
-              <li>Azure Cloud</li>
-              <li>Docker</li>
-              <li>CI/CD</li>
-              <li>Web Development</li>
-            </ul>
-            <div class="project-links">
-              <a href="https://github.com/Naijaoracle/daviddasa" class="project-link">View Source</a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Research Methodology & Frameworks -->
-      <section class="project-card">
-        <h2>Research Methodology & Frameworks</h2>
-        <div class="project-grid">
-          <div class="project-item">
-            <h3>Evaluation Methodologies for AI-Driven Healthcare Simulations</h3>
-            <p>Comprehensive research artefacts documenting the methodological foundations for evaluating AI-driven XR healthcare simulations. These conceptual frameworks support the DASEX evaluation framework and provide structured approaches to scenario design, synthetic data generation, and validation.</p>
-            <ul class="skills-list">
-              <li>DASEX Framework Evaluation</li>
-              <li>Synthetic Data Principles</li>
-              <li>Digital Twin Assumptions</li>
-              <li>AI Interaction Models</li>
-              <li>Scenario Management</li>
-              <li>Validation Protocols</li>
-              <li>Governance & Ethics</li>
-            </ul>
-            <div class="project-links">
-              <a href="/research-artefacts/README.md" class="project-link">View Research Artefacts</a>
-              <a href="/xr-npc-dasex-evaluator.html" class="project-link">DASEX Evaluator Tool</a>
-            </div>
-            <div style="margin-top: 1rem; padding: 1rem; background: rgba(46, 204, 113, 0.1); border-radius: 8px; border-left: 3px solid #2ecc71;">
-              <p style="margin: 0; font-size: 0.9rem;"><strong>Research Context:</strong> These artefacts support PhD research on Advanced NPC Systems for XR Healthcare Simulation at Bournemouth University. They define evaluation criteria, assumptions, and frameworks without exposing implementation details.</p>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -273,7 +265,7 @@
 
   <!-- Footer Section -->
   <footer>
-    <p>&copy; 2025 David Dasa</p>
+    <p>&copy; 2026 David Dasa</p>
   </footer>
 
   <!-- Particles.js Configuration -->
