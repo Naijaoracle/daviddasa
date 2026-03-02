@@ -1129,7 +1129,7 @@
       // RR target from drive, hypoxia, fatigue
       const rrTarget = clamp(18*phys.metabolic + 10*(PaO2<60 ? (60-PaO2)/30 : 0) - 8*phys.fatigue, 8, 48);
 
-      // Stroke volume and cardiac output — make hypovolaemia actually low SV
+      // Stroke volume and cardiac output: make hypovolaemia actually low SV
       let SVml = 70*preload*inotropy/(1+0.35*(SVR-1));
       SVml = clamp(SVml, 8, 110);
       const baseHR = 70+30*phys.catechol+10*phys.epiLevel-15*phys.sedation+7*(phys.tempSet-37);

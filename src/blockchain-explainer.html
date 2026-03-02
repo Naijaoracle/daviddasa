@@ -267,7 +267,7 @@
     <!-- Header -->
     <section class="card">
       <h1>Simple vs Actual Blockchain</h1>
-      <p>Add blocks to both chains simultaneously. The <strong>Simple Chain</strong> links blocks using a short arithmetic formula. The <strong>Actual Chain</strong> uses real SHA-256 cryptographic hashes — the same method used in Bitcoin. Try tampering with a block to see how it breaks the chain. Once tampered, no new blocks can be added — just like in a real network, where peers reject a broken chain.</p>
+      <p>Add blocks to both chains simultaneously. The <strong>Simple Chain</strong> links blocks using a short arithmetic formula. The <strong>Actual Chain</strong> uses real SHA-256 cryptographic hashes, the same method used in Bitcoin. Try tampering with a block to see how it breaks the chain. Once tampered, no new blocks can be added, just like in a real network, where peers reject a broken chain.</p>
     </section>
 
     <!-- Controls -->
@@ -281,14 +281,14 @@
     <!-- Explainer -->
     <div class="explainer">
       <div class="explain-box simple">
-        <h3>Simple Chain — Arithmetic Link</h3>
+        <h3>Simple Chain - Arithmetic Link</h3>
         Each block stores a link value computed as:<br>
         <code>link = (prev_link × 31 + amount) mod 100,000</code><br><br>
-        Fast and easy to verify mentally, but trivially forgeable — you can compute any value you want with the right inputs.
+        Fast and easy to verify mentally, but trivially forgeable; you can compute any value you want with the right inputs.
       </div>
       <div class="explain-box actual">
-        <h3>Actual Chain — SHA-256 Hash</h3>
-        Each block stores <code>SHA-256(index + amount + prevHash + nonce)</code>. The hash is a 256-bit fingerprint — any change to any field produces a completely different hash, breaking the link to the next block.
+        <h3>Actual Chain - SHA-256 Hash</h3>
+        Each block stores <code>SHA-256(index + amount + prevHash + nonce)</code>. The hash is a 256-bit fingerprint; any change to any field produces a completely different hash, breaking the link to the next block.
       </div>
     </div>
 
@@ -405,7 +405,7 @@
     }
 
     function renderChains() {
-      const empty = `<div class="empty-state"><div class="icon">🔗</div>No blocks yet — click Add Block.</div>`;
+      const empty = `<div class="empty-state"><div class="icon">🔗</div>No blocks yet. Click Add Block.</div>`;
 
       if (chain.length === 0) {
         simpleEl.innerHTML = empty;
@@ -484,7 +484,7 @@
 
       renderChains();
       addBtn.disabled = true;
-      setStatus(`Block #${index} tampered — chain is broken. Reset to continue.`, 'err');
+      setStatus(`Block #${index} tampered. Chain is broken. Reset to continue.`, 'err');
     }
 
     // ── Reset ─────────────────────────────────────────────────────────────────

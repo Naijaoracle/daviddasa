@@ -177,7 +177,7 @@
           <button data-type="VI" role="tab">VI</button>
         </div>
         <span class="spacer"></span>
-        <span class="muted" id="scoreText">Signal quality: <strong>—</strong></span>
+        <span class="muted" id="scoreText">Signal quality: <strong>N/A</strong></span>
       </div>
 
             <div class="scene">
@@ -344,7 +344,7 @@
 
             <!-- explainer between charts -->
             <div class="explain" style="margin:4px 2px">
-              <strong>Why the waveform changes with skin tone</strong> — Melanin in the <em>epidermis</em> absorbs more of the incoming light, especially in the green band that rPPG relies on. Less green light returning → lower pulsatile signal at the sensor → a smaller, noisier waveform above. The curve below relates higher melanin content to a higher Fitzpatrick score.
+              <strong>Why the waveform changes with skin tone</strong>: Melanin in the <em>epidermis</em> absorbs more of the incoming light, especially in the green band that rPPG relies on. Less green light returning → lower pulsatile signal at the sensor → a smaller, noisier waveform above. The curve below relates higher melanin content to a higher Fitzpatrick score.
             </div>
 
             <!-- NEW: Fitzpatrick vs Melanin chart -->
@@ -389,13 +389,13 @@
       <section class="project-card">
         <h2>Why skin tone matters in rPPG</h2>
         <div class="project-item">
-          <p>Remote photoplethysmography (rPPG) estimates vital signs by measuring tiny, periodic color changes in facial skin caused by blood volume pulses. The math behind it is the Beer–Lambert law: light entering the skin is absorbed by chromophores (notably hemoglobin), and the reflected signal that a camera sees is converted into a pulse waveform. Many rPPG methods lean heavily on the green channel of RGB video because hemoglobin absorbs strongly there—so if anything else also absorbs green light, the usable signal shrinks. Melanin is a broadband absorber in visible light, which means higher melanin content can reduce the signal-to-noise ratio (SNR) that rPPG needs, especially in the green band. Poor SNR makes the pulse harder to separate from motion, compression, and lighting artifacts.</p>
+          <p>Remote photoplethysmography (rPPG) estimates vital signs by measuring tiny, periodic color changes in facial skin caused by blood volume pulses. The math behind it is the Beer-Lambert law: light entering the skin is absorbed by chromophores (notably hemoglobin), and the reflected signal that a camera sees is converted into a pulse waveform. Many rPPG methods lean heavily on the green channel of RGB video because hemoglobin absorbs strongly there, so if anything else also absorbs green light, the usable signal shrinks. Melanin is a broadband absorber in visible light, which means higher melanin content can reduce the signal-to-noise ratio (SNR) that rPPG needs, especially in the green band. Poor SNR makes the pulse harder to separate from motion, compression, and lighting artifacts.</p>
           
-          <p>This physics interacts with data and design choices. Historically, several widely used rPPG datasets underrepresented darker skin tones—for example, published summaries report roughly ~10% dark-skinned participants in MMSE-HR, ~0% in AFRL, and ~5% in UBFC. Models trained on such distributions risk learning shortcuts that generalize poorly to the darkest skin types (Fitzpatrick V–VI). The problem isn't intent; it's coverage. When particular groups are sparse in training and validation data, even small changes in lighting, camera gain, or motion can push those users into "low-confidence" or failure modes more often.</p>
+          <p>This physics interacts with data and design choices. Historically, several widely used rPPG datasets underrepresented darker skin tones; for example, published summaries report roughly ~10% dark-skinned participants in MMSE-HR, ~0% in AFRL, and ~5% in UBFC. Models trained on such distributions risk learning shortcuts that generalize poorly to the darkest skin types (Fitzpatrick V-VI). The problem isn't intent; it's coverage. When particular groups are sparse in training and validation data, even small changes in lighting, camera gain, or motion can push those users into "low-confidence" or failure modes more often.</p>
           
           <p>Large-scale validation efforts in rPPG have also, at times, included very few participants at the extremes of skin tone, limiting statistical power to detect accuracy gaps. In one published dataset used for algorithm development, the estimated representation of Fitzpatrick V and VI was extremely small, which makes it hard to rule out clinically meaningful performance differences for those groups.</p>
           
-          <p>Real-world usage adds further nuance. Anything that alters skin optics—make-up, facial tattoos/markings, or culturally significant scarification—can change the light path and reduce recoverable pulsatility in camera signals. That doesn't mean rPPG can't work; it means systems must detect and communicate "signal quality" transparently and provide safe fallbacks. Field studies in West Africa, for example, have highlighted how very dark skin and prominent facial markings can coincide with lower measurement success or accuracy if conditions and algorithms aren't tuned for them.</p>
+          <p>Real-world usage adds further nuance. Anything that alters skin optics, including make-up, facial tattoos/markings, or culturally significant scarification, can change the light path and reduce recoverable pulsatility in camera signals. That doesn't mean rPPG can't work; it means systems must detect and communicate "signal quality" transparently and provide safe fallbacks. Field studies in West Africa, for example, have highlighted how very dark skin and prominent facial markings can coincide with lower measurement success or accuracy if conditions and algorithms aren't tuned for them.</p>
           
           <h3>What fair rPPG looks like</h3>
           
@@ -405,7 +405,7 @@
           
           <p><strong>Human-centered safeguards:</strong> Provide clear quality indicators, avoid overconfident outputs on low-SNR frames, and encourage confirmatory measurements when confidence is low.</p>
           
-          <p>In short, skin tone is not an edge case in rPPG—it's central to the physics of the signal and to the ethical obligation to build tools that work reliably for everyone.</p>
+          <p>In short, skin tone is not an edge case in rPPG; it's central to the physics of the signal and to the ethical obligation to build tools that work reliably for everyone.</p>
         </div>
       </section>
     </main>

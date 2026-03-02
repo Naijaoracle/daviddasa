@@ -618,11 +618,11 @@
             <div class="sep"></div>
             <div class="grid">
               <div class="stat">
-                <label>MAE (last 72h) — Systolic</label>
+                <label>MAE (last 72h): Systolic</label>
                 <div class="v" id="maeSys">–</div>
               </div>
               <div class="stat">
-                <label>MAE (last 72h) — Diastolic</label>
+                <label>MAE (last 72h): Diastolic</label>
                 <div class="v" id="maeDia">–</div>
               </div>
             </div>
@@ -656,7 +656,7 @@
           <p>
             This page is a working sketch of an idea: if we have a few days of recent blood-pressure readings,
             can a small, transparent model say something sensible about the next forty-eight hours? The
-            answer here is “sometimes”—and that’s deliberate. You’ll see the familiar daily rhythm:
+            answer here is “sometimes”, and that’s deliberate. You’ll see the familiar daily rhythm:
             lower values while sleeping, a rise after waking, and small wobbles across the day. The
             forecast traces that rhythm forward and adds a shaded band to show uncertainty. When the band
             is wide, we’re telling you the model is unsure.
@@ -664,7 +664,7 @@
 
           <p>
             Two simple baselines sit under the hood. The first is an
-            <em>ARX(1)</em> model that remembers yesterday’s level and adjusts for the time of day—think
+            <em>ARX(1)</em> model that remembers yesterday’s level and adjusts for the time of day. Think
             “short memory plus a day/night heartbeat.” The second is a tiny gradient-boosted model that
             learns a few bends and kinks in the curve from recent history. Neither is meant to be a final
             word; they’re here because their assumptions are easy to see, easy to question, and easy to
@@ -690,8 +690,8 @@
         <h2>How a production system would go further</h2>
         <div class="project-item">
           <p>
-            A practical system would weave in more context—wearable activity and sleep, medication timing,
-            travel and shift-work patterns—and personalise the model to you over time. It would favour
+            A practical system would weave in more context: wearable activity and sleep, medication timing,
+            travel and shift-work patterns, and personalise the model to you over time. It would favour
             uncertainty-aware forecasts, show clear <em>“no forecast”</em> states when the signal is poor,
             and surface gentle, actionable prompts like “take a reading this evening.” Most importantly,
             it would continuously evaluate fairness and accuracy across age, sex, ethnicity, and device types,

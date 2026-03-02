@@ -1,4 +1,4 @@
-# David Dasa — Digital Health & AI Research Portfolio
+# David Dasa - Digital Health & AI Research Portfolio
 
 Medical Doctor and PhD researcher at Bournemouth University. Published work in AI-driven XR healthcare simulation and remote blood pressure screening equity. Visit [daviddasa.com](https://www.daviddasa.com).
 
@@ -21,9 +21,9 @@ Secure remote patient monitoring combining Bluetooth Low Energy devices with blo
 
 ## Research Analysis
 
-- [HealthBench Q&A Analysis](https://www.daviddasa.com/healthbench-qna-analysis) — OpenAI's medical QA benchmark
-- [AfriMed Q&A Analysis](https://www.daviddasa.com/afrimed-qna-analysis) — Google Health's African clinical context evaluation
-- [NIH Chest X-ray Analysis](https://www.daviddasa.com/nih-chest-xray-analysis) — 112,120 images, 14 pathologies
+- [HealthBench Q&A Analysis](https://www.daviddasa.com/healthbench-qna-analysis): OpenAI's medical QA benchmark
+- [AfriMed Q&A Analysis](https://www.daviddasa.com/afrimed-qna-analysis): Google Health's African clinical context evaluation
+- [NIH Chest X-ray Analysis](https://www.daviddasa.com/nih-chest-xray-analysis): 112,120 images, 14 pathologies
 - [Breast Cancer Mammography Analysis](https://www.daviddasa.com/breast-cancer-analysis)
 - [Africa & Nigeria Population Health Dashboard](https://www.daviddasa.com/worldpop-africa-dashboard)
 
