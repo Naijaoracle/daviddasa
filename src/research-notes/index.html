@@ -53,6 +53,7 @@
           <button class="filter-btn" data-filter="ai-ml">AI/ML</button>
           <button class="filter-btn" data-filter="digital-health">Digital Health</button>
           <button class="filter-btn" data-filter="xr">Extended Reality</button>
+          <button class="filter-btn" data-filter="regulatory">Regulatory</button>
         </div>
       </section>
 
@@ -123,7 +124,7 @@
 
   <!-- Footer Section -->
   <footer>
-    <p>&copy; 2025 David Dasa</p>
+    <p>&copy; 2026 David Dasa</p>
   </footer>
 
   <!-- Particles.js Configuration -->
@@ -166,6 +167,33 @@
 
       // Sample data structure (in practice, this would come from a database or API)
       const researchNotes = [
+        {
+          date: '2026-03-18',
+          type: 'Guidance',
+          title: 'FDA Guidance on Predetermined Change Control Plans for AI-Enabled Devices',
+          description: 'The FDA\'s PCCP guidance enables manufacturers of AI-enabled medical devices to prespecify planned modifications in a submitted plan, allowing those changes to be implemented without separate marketing submissions, resolving the fundamental tension between regulatory stability and the iterative improvement that clinical AI requires.',
+          tags: ['FDA', 'Medical Devices', 'AI Regulation', 'PCCP', 'Device Software'],
+          link: 'fda-predetermined-change-control-plan.html',
+          dataTags: 'guidance regulatory digital-health'
+        },
+        {
+          date: '2026-03-15',
+          type: 'Guidance',
+          title: 'The AI Playbook for the UK Government',
+          description: 'Published by DSIT in February 2025, the AI Playbook sets out ten principles for responsible AI adoption across UK government and public services, covering governance, risk management, legal compliance, transparency, data protection, inclusiveness, societal impact, human oversight, and continuous monitoring, developed with input from the NHS, GCHQ, and major technology companies.',
+          tags: ['AI Policy', 'UK Government', 'Public Sector', 'DSIT', 'Governance'],
+          link: 'uk-ai-playbook-government.html',
+          dataTags: 'guidance regulatory'
+        },
+        {
+          date: '2026-03-14',
+          type: 'Guidance',
+          title: 'Ethics and Governance of AI for Health: WHO Guidance',
+          description: 'The World Health Organization\'s 2021 guidance establishes six principles for responsible AI in medicine and public health: protecting autonomy, promoting well-being and safety, ensuring transparency, fostering accountability, ensuring inclusiveness and equity, and promoting responsive and sustainable AI, framing ethical governance as the precondition for innovation rather than a constraint on it.',
+          tags: ['AI Ethics', 'WHO', 'Digital Health', 'Governance', 'Global Health'],
+          link: 'who-ai-ethics-health-governance.html',
+          dataTags: 'guidance regulatory digital-health'
+        },
         {
           date: '2026-03-02',
           type: 'Editorial',

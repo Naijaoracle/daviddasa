@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="FDA Guidance on Predetermined Change Control Plans for AI-Enabled Devices | Research Note by David Dasa">
+  <title>FDA Predetermined Change Control Plans for AI-Enabled Devices | Research Notes | David Dasa</title>
+  <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+      <li><a href="https://www.daviddasa.com/about">About</a></li>
+      <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
+      <li><a href="https://www.daviddasa.com/skills">Skills</a></li>
+      <li><a href="https://www.daviddasa.com/research-notes">Research Notes</a></li>
+      <li><a href="https://www.daviddasa.com/contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <main>
+      <!-- Back Navigation -->
+      <div style="margin-bottom: 2rem;">
+        <a href="../research-notes/" style="color: #2ecc71; text-decoration: none; font-weight: 500;">← Back to Research Notes</a>
+      </div>
+
+      <!-- Article Header -->
+      <section class="project-card">
+        <div class="article-header">
+          <h1>FDA Guidance on Predetermined Change Control Plans for AI-Enabled Devices</h1>
+          <div class="article-meta">
+            <span class="article-date">March 18, 2026</span>
+            <span class="article-type">Guidance</span>
+          </div>
+          <div class="article-tags">
+            <span class="tag">FDA</span>
+            <span class="tag">Medical Devices</span>
+            <span class="tag">AI Regulation</span>
+            <span class="tag">PCCP</span>
+            <span class="tag">Device Software</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- TLDR -->
+      <section class="project-card">
+        <h2>TLDR</h2>
+        <p>The FDA's guidance on Predetermined Change Control Plans addresses one of the fundamental regulatory tensions in AI-enabled medical devices: the need for iterative model improvement versus the traditional regulatory assumption that an approved device remains materially static. A PCCP is a prespecified plan submitted as part of a marketing authorisation that describes what changes may be made to an AI-enabled device software function, the methods and controls governing those changes, and an assessment of their impact on safety and effectiveness. Changes made within an approved PCCP do not require a separate marketing submission, enabling continuous learning within a regulatory framework designed to ensure that continuous learning remains safe. The statutory basis is Section 515C of the FD&C Act, introduced by the Food and Drug Omnibus Reform Act of 2022.</p>
+      </section>
+
+      <!-- Intro -->
+      <section class="project-card">
+        <h2>The Regulatory Problem That PCCPs Solve</h2>
+
+        <p>Traditional medical device regulation is built on a model of discrete submissions. A manufacturer designs a device, generates evidence supporting its safety and effectiveness, submits that evidence to the FDA, and if authorised, brings a defined device to market. Subsequent changes, depending on their nature and significance, may require new submissions or at least formal notifications. The device that reaches patients is the device that was reviewed.</p>
+
+        <p>AI-enabled medical devices challenge this model at a fundamental level. A machine learning algorithm that never updates after its initial training is, in many clinical contexts, an algorithm that is gradually degrading. Patient populations shift. Clinical practices evolve. New data becomes available that could improve performance. The expectation that a reviewed algorithm will be frozen in time is simultaneously a safety guarantee and an innovation constraint, and it is a constraint that falls most heavily on the kinds of continuous learning systems that represent the frontier of clinical AI.</p>
+
+        <p>The PCCP mechanism is FDA's response to this tension. It does not abandon the principle of regulatory oversight; it shifts the timing and scope of that oversight. Instead of reviewing changes after they are made, the FDA reviews the plan for how changes will be made. If the plan is credible, the controls are adequate, and the impact assessment is sound, then changes executed within the plan can be implemented without triggering a new submission. The regulatory review has moved upstream.</p>
+      </section>
+
+      <!-- Three Components -->
+      <section class="project-card">
+        <h2>The Three Components of a PCCP</h2>
+
+        <h3>Description of Anticipated Modifications</h3>
+        <p>The first component specifies, with precision, what changes are being planned. This is not a blank authorisation for any future modification: it is a defined scope, bounded by what the manufacturer has thought through in advance. Modifications might include retraining a model on an expanded dataset, adjusting performance thresholds, incorporating new input features, or updating software components. Each type of modification must be described in terms of what it involves, what it is intended to achieve, and what boundaries constrain it. The precision of this description is what makes downstream FDA review credible: a vague description of potential future changes cannot support a meaningful assessment of their impact.</p>
+
+        <h3>Modification Protocol</h3>
+        <p>The second component is the process by which planned modifications will be implemented and validated. The guidance identifies four elements of a sound modification protocol: data management practices governing the collection, curation, and use of data for retraining; retraining procedures specifying how models will be updated and what quality controls apply; performance evaluation methods defining how the modified device will be assessed against its performance specifications before deployment; and update procedures governing how changes will be implemented in the field, including version management and any requirements for communicating changes to users or healthcare providers. The modification protocol is the operational specification that gives the PCCP its teeth. An approval that specifies what can be changed but not how it will be controlled offers limited safety assurance.</p>
+
+        <h3>Impact Assessment</h3>
+        <p>The third component analyses the implications of planned modifications for the safety and effectiveness of the device. The impact assessment must address both the direct consequences of a modification, for example, changes in sensitivity or specificity following a model retrain, and the indirect consequences: effects on user behaviour, effects on clinical workflow integration, and effects on the populations for whom the device is intended. The assessment should also consider cumulative impact: a series of modifications that are each individually low-risk may have different implications in combination. Where modifications could affect performance in specific subpopulations, the impact assessment must address that differential explicitly.</p>
+      </section>
+
+      <!-- Context -->
+      <section class="project-card">
+        <h2>What Changes Within a PCCP and What Does Not</h2>
+
+        <p>The PCCP mechanism applies specifically to AI-enabled device software functions, the FDA's term for software components of medical devices that use machine learning or other AI techniques. Not every change to such a function is eligible for a PCCP: changes that would alter the indications for use, that would introduce new risks not contemplated in the original marketing authorisation, or that would require independent review to assess adequately fall outside the scope of a PCCP and require the standard submission pathway. The PCCP is a mechanism for managing planned, bounded, well-understood changes, not a general licence for unlimited modification.</p>
+
+        <p>This distinction is important for understanding what the guidance is and is not doing. It is not deregulating AI-enabled medical devices. It is creating a pathway for a specific type of anticipated change that, with sufficient advance planning and adequate controls, can be managed within the scope of an existing authorisation. The standards for demonstrating safety and effectiveness do not change; the mechanism for demonstrating them does.</p>
+
+        <p>The guidance also addresses the relationship between PCCPs and other regulatory mechanisms, including quality system requirements and post-market surveillance obligations. A PCCP does not replace these; it operates alongside them. Manufacturers with approved PCCPs still have obligations to monitor device performance, report adverse events, and maintain quality systems. The PCCP adds a planned change management layer on top of the baseline regulatory infrastructure, not in place of it.</p>
+      </section>
+
+      <!-- Why This Matters -->
+      <section class="project-card">
+        <h2>Why PCCPs Matter for Clinical AI Development</h2>
+
+        <p>For those building and deploying clinical AI, the PCCP guidance represents a significant and practical development. The historical regulatory pathway for AI-enabled devices was designed for static software and created genuine disincentives to improvement: each meaningful model update potentially triggered a new submission process, with the associated cost, delay, and uncertainty. That disincentive was not theoretical; developers made design choices to avoid triggering it, sometimes at the expense of clinical performance.</p>
+
+        <p>The PCCP pathway shifts the economics of continuous improvement. A manufacturer who invests in the upfront work of designing a credible modification plan, including the data management processes, the validation methods, and the impact assessments, gains the ability to update within that plan without re-entering the full submission queue. The investment is front-loaded rather than distributed across each individual change.</p>
+
+        <p>This matters beyond the US market. The PCCP concept is being adopted by other regulators and is referenced in international harmonisation discussions at IMDRF and elsewhere. Developers who build PCCP-capable processes are positioning themselves for a regulatory landscape in which planned change management is likely to become a standard expectation across major markets. The FDA has, in a sense, created a template that others are beginning to follow.</p>
+
+        <h3>References</h3>
+        <p>Original guidance: <a href="https://www.fda.gov/regulatory-information/search-fda-guidance-documents/marketing-submission-recommendations-predetermined-change-control-plan-artificial-intelligence" target="_blank" rel="noopener">US Food and Drug Administration. Marketing Submission Recommendations for a Predetermined Change Control Plan for Artificial Intelligence-Enabled Device Software Functions. FDA; December 2024, updated August 2025.</a></p>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Footer Section -->
+  <footer>
+    <p>&copy; 2026 David Dasa</p>
+  </footer>
+
+  <!-- Particles.js Configuration -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+    });
+  </script>
+
+  <style>
+    .article-header h1 { color: #092917; margin-bottom: 1rem; font-size: 2.2rem; }
+    .article-meta { display: flex; gap: 2rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .article-date { color: #2ecc71; font-weight: 600; font-size: 1rem; }
+    .article-type { color: #1a4731; font-weight: 500; background: rgba(46, 204, 113, 0.1); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.9rem; }
+    .article-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .tag { background: rgba(46, 204, 113, 0.12); color: #092917; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.8rem; font-weight: 500; }
+    .container { max-width: 1000px; }
+    main { line-height: 1.7; }
+    p { line-height: 1.7; }
+    .project-card { background: rgba(255,255,255,0.82); border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
+    @media (max-width: 768px) {
+      .article-header h1 { font-size: 1.8rem; }
+      .article-meta { flex-direction: column; gap: 0.5rem; }
+    }
+  </style>
+
+</body>
+</html>
