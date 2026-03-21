@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MHRA Software and AI as a Medical Device: UK Regulatory Framework | Research Note by David Dasa">
+  <title>MHRA Software and AI as a Medical Device | Research Notes | David Dasa</title>
+  <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+      <li><a href="https://www.daviddasa.com/about">About</a></li>
+      <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
+      <li><a href="https://www.daviddasa.com/skills">Skills</a></li>
+      <li><a href="https://www.daviddasa.com/research-notes">Research Notes</a></li>
+      <li><a href="https://www.daviddasa.com/contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <main>
+      <!-- Back Navigation -->
+      <div style="margin-bottom: 2rem;">
+        <a href="../research-notes/" style="color: #2ecc71; text-decoration: none; font-weight: 500;">← Back to Research Notes</a>
+      </div>
+
+      <!-- Article Header -->
+      <section class="project-card">
+        <div class="article-header">
+          <h1>MHRA Software and AI as a Medical Device: The UK Regulatory Framework</h1>
+          <div class="article-meta">
+            <span class="article-date">March 19, 2026</span>
+            <span class="article-type">Guidance</span>
+          </div>
+          <div class="article-tags">
+            <span class="tag">MHRA</span>
+            <span class="tag">Medical Devices</span>
+            <span class="tag">UK Regulation</span>
+            <span class="tag">SaMD</span>
+            <span class="tag">AI Safety</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- TLDR -->
+      <section class="project-card">
+        <h2>TLDR</h2>
+        <p>The MHRA's guidance on software and AI as a medical device, updated in February 2025 by the MHRA Software Group, sets out the UK regulatory framework for qualifying and classifying software that meets the definition of a medical device, including AI-enabled systems. Rooted in the Change Programme Roadmap launched in October 2022, it addresses qualification and classification, post-market surveillance and vigilance obligations, the application of good machine learning practice, the use of predetermined change control plans, transparency obligations, and the specific considerations applying to digital mental health technology. The guidance reflects close alignment with FDA and Health Canada approaches and situates the UK as an active contributor to international regulatory harmonisation for AI in medicine.</p>
+      </section>
+
+      <!-- Intro -->
+      <section class="project-card">
+        <h2>The UK's Distinct Regulatory Position</h2>
+
+        <p>Since leaving the European Union, the UK has been building its own regulatory framework for medical devices. The MHRA no longer applies EU MDR or IVDR directly and is developing legislation and guidance that reflects UK priorities while maintaining alignment with international standards. For software and AI, this has created both opportunity and complexity: opportunity because the UK can design its framework from the ground up without inheriting the specific constraints of the EU approach, and complexity because developers need to understand where the UK framework converges with and diverges from the systems they may already be building for FDA or EU authorisation.</p>
+
+        <p>The Change Programme Roadmap, launched in October 2022, is the MHRA's plan for modernising medical device regulation comprehensively. Software and AI represent one of its most active workstreams, reflecting both the pace of innovation in this space and the volume of devices and applications that the guidance must address. The MHRA Software Group, which produced this guidance, has been particularly active in international regulatory collaboration, working with FDA and Health Canada on joint initiatives including the original GMLP principles and the transparency principles for AI-enabled medical devices.</p>
+      </section>
+
+      <!-- Key Areas -->
+      <section class="project-card">
+        <h2>Key Regulatory Areas</h2>
+
+        <h3>Qualification and Classification</h3>
+        <p>Not all software that does something medically relevant meets the legal definition of a medical device. Qualification is the process of determining whether a software product crosses that threshold: whether it meets the statutory definition and therefore falls within the scope of medical device regulation. The MHRA guidance provides a decision framework for qualification that covers general-purpose software used in clinical contexts, AI tools used to support clinical decisions, and software embedded in connected health technologies.</p>
+
+        <p>Classification determines the risk tier to which a qualifying software device is assigned, and therefore the conformity assessment route it must follow before it can be placed on the UK market. The guidance applies a risk-based classification approach in which the potential severity of harm from a device malfunction, the reversibility of that harm, the vulnerability of the patient population, and the role of the clinician in interpreting the device output all influence the classification outcome. Higher-risk devices face more demanding conformity assessment requirements.</p>
+
+        <h3>Post-Market Surveillance and Vigilance</h3>
+        <p>Once a software device is on the market, its manufacturer has ongoing obligations to monitor its performance and safety, to investigate and report serious incidents, and to take corrective action where required. The guidance addresses how these obligations apply to AI-enabled devices, where the relationship between a specific software version and a specific adverse event may be less straightforward than in hardware devices. Post-market surveillance plans for AI systems must account for the possibility of performance drift, the aggregation of individually minor performance changes into clinically significant degradation, and the specific challenges of detecting problems in systems whose outputs influence rather than directly control clinical decisions.</p>
+
+        <h3>Good Machine Learning Practice</h3>
+        <p>The MHRA was a co-author of the original ten GMLP principles published with FDA and Health Canada in 2021, and the guidance directly references those principles and their IMDRF successor as the expected standard for AI-enabled device development. This alignment is deliberate: the MHRA's position is that the GMLP principles represent the international consensus on what good development practice for medical AI looks like, and that developers seeking UK regulatory authorisation should build to that standard. The guidance also references how GMLP considerations map onto the conformity assessment requirements that manufacturers must satisfy, providing a practical bridge between the development-focused GMLP principles and the regulatory pathway.</p>
+
+        <h3>Predetermined Change Control Plans</h3>
+        <p>The MHRA explicitly addresses PCCPs as a mechanism for managing planned modifications to AI-enabled medical devices, reflecting the work done jointly with FDA and Health Canada on this topic. The UK approach is closely aligned with the FDA guidance on PCCPs: manufacturers can submit a plan specifying what changes are anticipated, how they will be controlled, and what their expected impact is, with changes made within an approved plan not requiring a separate marketing submission. The guidance emphasises that this mechanism requires genuine advance planning rather than a retrospective description of changes already implemented, and that the controls specified in a PCCP must be operationally credible rather than aspirational.</p>
+
+        <h3>Transparency with International Regulators</h3>
+        <p>The MHRA has made international regulatory alignment a stated priority and publishes information about its engagement with FDA, Health Canada, and other major regulators on shared AI-related regulatory questions. This transparency serves multiple purposes: it signals to developers that building to internationally harmonised standards is the right strategic approach for UK authorisation, it creates accountability for regulatory positions that might otherwise develop in isolation, and it contributes to the broader project of international regulatory convergence that benefits both developers and patients.</p>
+
+        <h3>Digital Mental Health Technology</h3>
+        <p>The guidance includes a specific section on digital mental health technology, reflecting the distinctive characteristics of this category. Mental health apps and AI-enabled tools for mental health support present regulatory questions that do not arise in the same form for physical diagnostics or surgical AI: the line between a therapeutic device and a general wellness application is not always clear, the evidence base for many digital mental health interventions is still developing, and the populations who use these tools include individuals with particular vulnerability. The MHRA's work on digital mental health technology has been supported by Wellcome Trust funding and represents one of the more detailed areas of guidance development for a specific AI application domain.</p>
+      </section>
+
+      <!-- Why This Matters -->
+      <section class="project-card">
+        <h2>Navigating the UK Market</h2>
+
+        <p>For developers building AI-enabled medical software for the UK market, the MHRA guidance is a necessary starting point. The regulatory landscape it describes is still evolving: the UK Medical Devices Regulations are being updated, the international harmonisation agenda is ongoing, and new guidance is published regularly. Staying current with the MHRA's evolving position requires active monitoring rather than a one-time read.</p>
+
+        <p>That said, the direction of travel is clear. The UK is building a risk-proportionate, internationally aligned framework that places GMLP at its centre, treats PCCPs as a legitimate innovation-enabling mechanism, and expects transparency from developers about the capabilities and limitations of their systems. Developers who build to these standards for FDA or IMDRF purposes will find a broadly familiar framework in the UK, with specific features that reflect the MHRA's own regulatory priorities and the UK's post-EU context.</p>
+
+        <p>The MHRA's position also reflects something worth noting at a broader level: the era of each major jurisdiction developing entirely distinct approaches to AI medical device regulation appears to be giving way, slowly, to a period of genuine convergence. The shared authorship of GMLP principles, the alignment on PCCPs, the joint transparency statements: these are signs of a regulatory community that has concluded, correctly, that patients benefit from coherent international standards rather than a patchwork of incompatible requirements.</p>
+
+        <h3>References</h3>
+        <p>Original guidance: <a href="https://www.gov.uk/government/publications/software-and-artificial-intelligence-ai-as-a-medical-device/software-and-artificial-intelligence-ai-as-a-medical-device" target="_blank" rel="noopener">Medicines and Healthcare products Regulatory Agency. Software and artificial intelligence (AI) as a medical device. London: MHRA; updated February 3, 2025.</a></p>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Footer Section -->
+  <footer>
+    <p>&copy; 2026 David Dasa</p>
+  </footer>
+
+  <!-- Particles.js Configuration -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+    });
+  </script>
+
+  <style>
+    .article-header h1 { color: #092917; margin-bottom: 1rem; font-size: 2.2rem; }
+    .article-meta { display: flex; gap: 2rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .article-date { color: #2ecc71; font-weight: 600; font-size: 1rem; }
+    .article-type { color: #1a4731; font-weight: 500; background: rgba(46, 204, 113, 0.1); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.9rem; }
+    .article-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .tag { background: rgba(46, 204, 113, 0.12); color: #092917; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.8rem; font-weight: 500; }
+    .container { max-width: 1000px; }
+    main { line-height: 1.7; }
+    p { line-height: 1.7; }
+    .project-card { background: rgba(255,255,255,0.82); border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
+    @media (max-width: 768px) {
+      .article-header h1 { font-size: 1.8rem; }
+      .article-meta { flex-direction: column; gap: 0.5rem; }
+    }
+  </style>
+
+</body>
+</html>
