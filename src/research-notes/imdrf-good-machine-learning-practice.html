@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="IMDRF Good Machine Learning Practice for Medical Device Development: N88 Guiding Principles | Research Note by David Dasa">
+  <title>IMDRF Good Machine Learning Practice: N88 Guiding Principles | Research Notes | David Dasa</title>
+  <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+      <li><a href="https://www.daviddasa.com/about">About</a></li>
+      <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
+      <li><a href="https://www.daviddasa.com/skills">Skills</a></li>
+      <li><a href="https://www.daviddasa.com/research-notes">Research Notes</a></li>
+      <li><a href="https://www.daviddasa.com/contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <main>
+      <!-- Back Navigation -->
+      <div style="margin-bottom: 2rem;">
+        <a href="../research-notes/" style="color: #2ecc71; text-decoration: none; font-weight: 500;">← Back to Research Notes</a>
+      </div>
+
+      <!-- Article Header -->
+      <section class="project-card">
+        <div class="article-header">
+          <h1>Good Machine Learning Practice for Medical Device Development: IMDRF N88 Guiding Principles</h1>
+          <div class="article-meta">
+            <span class="article-date">March 17, 2026</span>
+            <span class="article-type">Guidance</span>
+          </div>
+          <div class="article-tags">
+            <span class="tag">Medical Devices</span>
+            <span class="tag">IMDRF</span>
+            <span class="tag">Machine Learning</span>
+            <span class="tag">Regulatory</span>
+            <span class="tag">AI Safety</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- TLDR -->
+      <section class="project-card">
+        <h2>TLDR</h2>
+        <p>Published by the International Medical Device Regulators Forum in January 2025, the N88 document sets out ten guiding principles for good machine learning practice in medical device development. Building on earlier joint work by the FDA, Health Canada, and MHRA, the principles address the full development lifecycle: from defining intended use and managing training data, through model selection and clinical validation, to post-market monitoring and the governance of human-AI interaction. The N88 document is notable for explicitly addressing generative AI, extending the GMLP framework to technologies that did not exist in meaningful medical device form when the original principles were drafted. It is not a regulatory requirement but a benchmark against which regulators in multiple jurisdictions will evaluate AI-enabled device submissions.</p>
+      </section>
+
+      <!-- Intro -->
+      <section class="project-card">
+        <h2>The Origins of GMLP</h2>
+
+        <p>Good machine learning practice is the AI equivalent of good manufacturing practice: a set of principles that define what responsible development looks like, intended to ensure that the outputs of a process meet defined quality and safety standards. Where good manufacturing practice governs how drugs and devices are physically produced, GMLP governs how AI models for medical use are designed, trained, validated, and deployed.</p>
+
+        <p>The concept emerged from a joint effort by the FDA, Health Canada, and the UK's MHRA, who published an initial set of ten GMLP principles in 2021. The IMDRF, which brings together medical device regulators from across the world's major markets, took up the work and produced the N88 document as an internationally harmonised successor. Published on 27 January 2025, N88 refines and extends the original principles, adds specific guidance on generative AI, and reflects four additional years of regulatory experience with AI-enabled device submissions.</p>
+
+        <p>The significance of IMDRF's involvement is that it creates a degree of regulatory convergence. A device developer who builds to the N88 principles is, in principle, building to a standard that regulators in the US, Canada, the UK, the EU, Japan, Australia, and other IMDRF member jurisdictions will recognise. That convergence is valuable in a regulatory landscape that has historically varied considerably across markets.</p>
+      </section>
+
+      <!-- Ten Principles -->
+      <section class="project-card">
+        <h2>The Ten Guiding Principles</h2>
+
+        <h3>1. Clearly Define the Intended Use Across the Full Lifecycle</h3>
+        <p>The intended use of an AI-enabled device must be defined with precision and must remain the anchor for all subsequent development decisions. N88 emphasises that intended use is not just a regulatory label; it is the specification against which every design choice, every dataset selection, and every performance metric must be evaluated. Lifecycle thinking is integral: the intended use should be defined in a way that accommodates the evolution of the device over time, including the changes to training data, clinical context, and patient population that may occur after initial deployment.</p>
+
+        <h3>2. Ensure Good Software Engineering and Security Practices</h3>
+        <p>AI-enabled medical devices are software, and the same quality engineering principles that apply to software as a medical device apply here. N88 calls for rigorous version control, documented development processes, cybersecurity risk management, and design choices that support auditability and transparency. Security is particularly important for AI systems because adversarial inputs, data poisoning, and model inversion attacks represent categories of risk that do not have direct analogues in traditional medical device development.</p>
+
+        <h3>3. Use Representative Data That Reflects the Intended Patient Population</h3>
+        <p>The representativeness of training data is one of the most consistently documented failure modes of medical AI. A model trained predominantly on data from one demographic group, one clinical setting, or one geographic context will not generalise reliably to different populations or settings. N88 calls for deliberate curation of training datasets to ensure they reflect the diversity of the populations in which the device will be used, and for documentation of known limitations in training data coverage.</p>
+
+        <h3>4. Maintain Independent Training and Test Sets</h3>
+        <p>Performance claims for AI-enabled devices must be based on evaluation against data that played no role in training the model. N88 is explicit about the requirements for independence: test sets should be temporally or institutionally separated from training sets where possible, and the process by which data is split must be documented and reproducible. This principle addresses a well-known inflation risk in reported AI performance: models evaluated on data that overlaps with or resembles their training data reliably outperform the same models when tested on genuinely independent datasets.</p>
+
+        <h3>5. Use Fit-for-Purpose Reference Standards</h3>
+        <p>The ground truth against which AI model outputs are evaluated must be derived from processes that are themselves credible and appropriate to the clinical context. Reference standards that are poorly defined, inconsistently applied, or derived from biased sources will produce misleading performance metrics even if the statistical analysis is technically correct. N88 calls for transparency about how reference standards were established and what their limitations are, including inter-rater variability in expert labelling and the sensitivity of performance metrics to the choice of standard.</p>
+
+        <h3>6. Tailor Model Design to the Available Data and Intended Purpose</h3>
+        <p>The choice of model architecture, complexity, and training approach should be driven by the characteristics of the available data and the requirements of the intended clinical application, not by a preference for novel or state-of-the-art methods. N88 explicitly addresses this as a discipline of fit-for-purpose engineering: a simpler model that performs reliably on available data is preferable to a complex model that achieves marginally higher benchmark performance but is less interpretable, less robust, or more data-hungry than the deployment context can support.</p>
+
+        <h3>7. Assess and Document Human-AI Team Performance</h3>
+        <p>Most medical AI operates in a context where clinicians interact with model outputs rather than acting on them directly. N88 calls for systematic assessment of how the combination of human and AI performs, not just how the AI performs in isolation. This includes studying how clinicians use, override, or defer to AI recommendations in practice, and whether the presence of the AI tool improves or degrades the quality of clinical decisions relative to unaided human performance. The human-AI interaction is a design parameter, not an afterthought.</p>
+
+        <h3>8. Test Clinical Performance in Clinically Relevant Settings</h3>
+        <p>Benchmark performance on curated datasets is necessary but not sufficient for demonstrating safety and effectiveness. N88 requires that clinical performance be evaluated in settings that resemble the intended deployment context: the same patient population, the same clinical workflow, the same hardware and software environment, and ideally the same kinds of users. Performance that holds up in a research database may not hold up in the messier conditions of routine clinical use.</p>
+
+        <h3>9. Provide Clear and Essential Information to Users</h3>
+        <p>The people who interact with AI-enabled medical devices, whether clinicians, patients, or administrators, need information that allows them to use those devices safely and effectively. N88 calls for labelling and user documentation that clearly communicates what the device does and does not do, what its known limitations and failure modes are, what actions users should take when the device produces uncertain or anomalous outputs, and how performance may vary across different patient groups or clinical contexts. This principle addresses a persistent gap in medical AI deployment: devices that perform well technically but that are used in ways their developers did not intend because the guidance provided is inadequate.</p>
+
+        <h3>10. Monitor Deployed Models and Manage Performance Degradation</h3>
+        <p>AI models can drift from their validated performance characteristics after deployment, as the data they encounter changes, clinical workflows evolve, or the patient populations they serve shift. N88 requires that post-market surveillance plans for AI-enabled devices include specific mechanisms for detecting performance degradation, defined thresholds for intervention, and clear processes for updating or retiring models that no longer meet their performance specifications. This is the GMLP equivalent of adverse event reporting: a structured mechanism for identifying and responding to problems in deployed systems.</p>
+      </section>
+
+      <!-- Generative AI -->
+      <section class="project-card">
+        <h2>Extending GMLP to Generative AI</h2>
+
+        <p>One of the most significant additions in N88 relative to the 2021 principles is its explicit treatment of generative AI. Large language models, image generation systems, and multimodal foundation models present challenges that the original GMLP framework was not designed to address: outputs that are probabilistic and variable rather than deterministic, failure modes including hallucination that have no direct analogue in traditional discriminative AI, and deployment patterns in which a single model may be used across a wide range of clinical contexts simultaneously.</p>
+
+        <p>N88 does not create a separate framework for generative AI but instead extends the existing principles to address these characteristics. The intended use principle becomes more demanding when the same model might be applied to tasks ranging from clinical documentation to patient education to diagnostic support. The human-AI interaction principle becomes more critical when outputs are generated in natural language and may be accepted uncritically by users who lack the technical context to evaluate them. The monitoring principle takes on new dimensions when the outputs to be monitored are open-ended text rather than a classification or a risk score.</p>
+
+        <p>For developers building generative AI applications for clinical use, N88 sets a clear expectation: the principles apply, and the burden of demonstrating how they apply in a generative context falls on the developer. This is a proportionate and technically informed position.</p>
+
+        <h3>References</h3>
+        <p>Original guidance: <a href="https://www.imdrf.org/documents/good-machine-learning-practice-medical-device-development-guiding-principles" target="_blank" rel="noopener">International Medical Device Regulators Forum. Good Machine Learning Practice for Medical Device Development: Guiding Principles. IMDRF/AIML WG/N88 FINAL. January 27, 2025.</a></p>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Footer Section -->
+  <footer>
+    <p>&copy; 2026 David Dasa</p>
+  </footer>
+
+  <!-- Particles.js Configuration -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+    });
+  </script>
+
+  <style>
+    .article-header h1 { color: #092917; margin-bottom: 1rem; font-size: 2.2rem; }
+    .article-meta { display: flex; gap: 2rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .article-date { color: #2ecc71; font-weight: 600; font-size: 1rem; }
+    .article-type { color: #1a4731; font-weight: 500; background: rgba(46, 204, 113, 0.1); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.9rem; }
+    .article-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .tag { background: rgba(46, 204, 113, 0.12); color: #092917; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.8rem; font-weight: 500; }
+    .container { max-width: 1000px; }
+    main { line-height: 1.7; }
+    p { line-height: 1.7; }
+    .project-card { background: rgba(255,255,255,0.82); border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
+    @media (max-width: 768px) {
+      .article-header h1 { font-size: 1.8rem; }
+      .article-meta { flex-direction: column; gap: 0.5rem; }
+    }
+  </style>
+
+</body>
+</html>
