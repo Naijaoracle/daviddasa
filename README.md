@@ -7,10 +7,10 @@ Medical Doctor and PhD researcher at Bournemouth University. Published work in A
 ### DASEX Framework
 **Artificial Intelligence in Medicine · Sep 2025 · DOI: [10.1016/j.artmed.2025.103270](https://doi.org/10.1016/j.artmed.2025.103270)**
 
-The first structured methodology for evaluating AI-driven non-player characters (NPCs) in XR healthcare simulations. Defines criteria for realism, clinical accuracy, and educational effectiveness. Accompanied by an interactive [DASEX Evaluator Tool](https://www.daviddasa.com/xr-npc-dasex-evaluator) and [XR-NPC Prototypes](https://www.daviddasa.com/xr-npc-simulators).
+The first structured methodology for evaluating AI-driven non-player characters (NPCs) in XR healthcare simulations. Defines criteria for realism, clinical accuracy, and educational effectiveness. Accompanied by an interactive [DASEX Evaluator Tool](https://www.daviddasa.com/dasex-evaluator) and [Clinical Simulation Prototypes](https://www.daviddasa.com/clinical-simulators).
 
-### rPPG Equity Study
-**medRxiv · Oct 2025 · 306 participants · Nigeria**
+### Skin Tone and Diagnostic Equity in Contactless Blood Pressure Screening: A Prospective Observational Field Evaluation of Remote Photoplethysmography in Nigeria
+**D Dasa, P Davies · BMJ Open · 2026 · Volume 16, e119311 · DOI: [10.1136/bmjopen-2026-119311](https://doi.org/10.1136/bmjopen-2026-119311)**
 
 Field study on remote photoplethysmography (rPPG) for contactless blood pressure screening in individuals with darker skin tones. Exposes skin tone bias in existing models and informs equity-focused design of remote monitoring tools.
 
