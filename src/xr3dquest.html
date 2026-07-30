@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="XR3DQuest: a research platform for AI driven clinical simulation in extended reality, by David Dasa">
+  <title>XR3DQuest | David Dasa</title>
+  <link rel="icon" type="image/svg+xml" href="/src/favicon-DD-monogram.svg">
+  <link rel="alternate icon" href="/src/favicon.ico">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
+
+  <!-- Navigation Section -->
+  <nav>
+    <ul>
+      <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+      <li class="home-link"><a href="https://www.daviddasa.com/">Home</a></li>
+      <li><a href="https://www.daviddasa.com/about">About</a></li>
+      <li><a href="https://www.daviddasa.com/projects">Projects</a></li>
+      <li><a href="https://www.daviddasa.com/skills">Skills</a></li>
+      <li><a href="https://www.daviddasa.com/research-notes">Research Notes</a></li>
+      <li><a href="https://www.daviddasa.com/contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <main>
+
+      <!-- Article Header -->
+      <section class="project-card">
+        <div class="article-header">
+          <h1>XR3DQuest</h1>
+          <div class="article-meta">
+            <span class="article-date">PhD Research &middot; Bournemouth University</span>
+            <span class="article-type">Platform</span>
+          </div>
+          <div class="article-tags">
+            <span class="tag">Extended Reality</span>
+            <span class="tag">Clinical Simulation</span>
+            <span class="tag">AI Driven NPCs</span>
+            <span class="tag">DASEX</span>
+          </div>
+        </div>
+        <p>A research platform for AI driven clinical simulation in extended reality.</p>
+      </section>
+
+      <!-- Intro -->
+      <section class="project-card">
+        <p>XR3DQuest places a learner in an emergency clinical scenario alongside AI driven colleagues who respond to what the learner actually does. A physiological engine runs underneath, updating vital signs and NEWS2 scoring in response to interventions and to the passage of time. Every clinical action is captured against a structured taxonomy, and the session ends with an automatically generated debrief built from what happened rather than from a script.</p>
+
+        <p>It is a research platform rather than a product. It exists to make specific questions about AI driven simulation empirically testable, and every design decision in it has been made with that purpose in mind. It has been used with 134 healthcare trainees across two countries to date.</p>
+
+        <p>The platform is built for extended reality, and its clinical core is deliberately separated from everything that presents it. That modularity has allowed the same simulation to be adapted across devices and across game engines when a research question called for it, without any of the clinical logic being rewritten.</p>
+
+        <p>It has been implemented in both Unity and Unreal Engine, running the same scenario. Development continued in Unity for the deployable builds, and every study described on this page used the Unity implementation. Putting participants through two engine implementations of the same scenario would need a research reason, and there was not one.</p>
+      </section>
+
+      <!-- Version 1 -->
+      <section class="project-card">
+        <h2>Two Generations</h2>
+        <h3>Version 1</h3>
+        <p>The first generation runs on Meta Quest 2 with live inference at every turn.</p>
+
+        <p>Learners interact through free text or speech, converted on device, with a structured action menu available alongside. AI driven colleagues hold distinct clinical roles and respond in character to the evolving state of the patient. Actions are organised by an ABCDE taxonomy covering airway, breathing, circulation and disability interventions, from airway assessment and jaw thrust through to intramuscular adrenaline, fluid bolus and glucose check. Unsafe medication attempts are blocked rather than silently executed.</p>
+
+        <p>The debrief is generated at the end of the session and attributes contributions across the team, identifying who led, what was done, what was omitted, and where sequencing departed from guideline expectations.</p>
+
+        <figure style="margin: 1.5rem 0;">
+          <img src="img/xr3dquest-v1-medication-select.jpg" alt="Learner selecting from the resus trolley in version 1 on Meta Quest 2. Available interventions include intramuscular adrenaline, oxygen mask, IV cannula and IV fluids. AI driven colleagues are labelled by clinical role." style="width: 100%; border-radius: 0.75rem;">
+          <figcaption style="color: #4a4a4a; font-size: 0.9rem; margin-top: 0.5rem;">Version 1 on Meta Quest 2. Selecting an intervention from the resus trolley, with AI driven colleagues in role alongside.</figcaption>
+        </figure>
+
+        <figure style="margin: 1.5rem 0;">
+          <img src="img/xr3dquest-v1-action-taxonomy.jpg" alt="The structured action taxonomy in version 1, with every available intervention tagged by ABCDE category, from airway assessment through to glucose check." style="width: 100%; border-radius: 0.75rem;">
+          <figcaption style="color: #4a4a4a; font-size: 0.9rem; margin-top: 0.5rem;">Every learner action maps to a structured clinical category. Tagging by ABCDE keeps the action space clinically meaningful rather than a flat list of buttons.</figcaption>
+        </figure>
+
+        <figure style="margin: 1.5rem 0;">
+          <img src="img/xr3dquest-v1-debrief.jpg" alt="Version 1 in session, showing the live vital signs panel with NEWS2 score, speech to text input ready, and the automatically generated end of scenario debrief attributing contributions across the clinical team." style="width: 100%; border-radius: 0.75rem;">
+          <figcaption style="color: #4a4a4a; font-size: 0.9rem; margin-top: 0.5rem;">Live NEWS2 and vital signs, speech to text input, and the automated debrief. The debrief is assembled from the session's own event log, not selected from a fixed set of endings.</figcaption>
+        </figure>
+
+        <p>Version 1 is the build behind the technical and safety verification paper accepted to AI in Healthcare 2026 at Imperial College London, and behind both Bournemouth University validation studies.</p>
+
+        <h3>Version 1.1</h3>
+        <p>The second generation keeps the entire clinical core of version 1 and changes two things: the character models and environment are substantially revised, and three delivery variants were developed to support the <a href="/research-notes/twenty-six-days-in-owo.html">Nigerian field study</a>.</p>
+
+        <div style="overflow-x: auto; margin: 1.5rem 0;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="background: rgba(46, 204, 113, 0.12); text-align: left;">
+                <th style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Variant</th>
+                <th style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Hardware</th>
+                <th style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">AI delivery</th>
+                <th style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Interaction</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Headset online</td>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Meta Quest 2</td>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Live model inference</td>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Free text, speech, or structured menu</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Headset offline</td>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Meta Quest 2</td>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Pre-sampled response library, no network</td>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Structured choice menu</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Mobile</td>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Android smartphone</td>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Live model inference</td>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Touch first, screen space interface</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>The variants exist because the study needed them. Comparing delivery modes only tells you something if the thing being delivered is genuinely identical, so all three run the same scenario, the same physiological engine, the same action logic and the same debrief system. Only the presentation layer, the input modality and the inference path differ. That separation is the experimental control, not a feature list.</p>
+
+        <figure style="margin: 1.5rem 0;">
+          <img src="img/xr3dquest-v11-ward.png" alt="Version 1.1 ward environment with revised character models, as deployed at Achievers University, Nigeria." style="width: 100%; border-radius: 0.75rem;">
+          <figcaption style="color: #4a4a4a; font-size: 0.9rem; margin-top: 0.5rem;">Version 1.1. The clinical logic is unchanged from version 1; the environment and characters are rebuilt.</figcaption>
+        </figure>
+
+        <figure style="margin: 1.5rem 0;">
+          <img src="img/xr3dquest-v11-headset-online.jpg" alt="The version 1.1 headset online variant, showing free text and speech input alongside live protocol coverage feedback." style="width: 100%; border-radius: 0.75rem;">
+          <figcaption style="color: #4a4a4a; font-size: 0.9rem; margin-top: 0.5rem;">Headset online. Free text and speech input generate live dialogue, with structured protocol coverage feedback alongside.</figcaption>
+        </figure>
+
+        <figure style="margin: 1.5rem 0;">
+          <img src="img/xr3dquest-v11-headset-offline.jpg" alt="The version 1.1 headset offline variant, showing the structured choice menu served from the pre-sampled response library with no network connection." style="width: 100%; border-radius: 0.75rem;">
+          <figcaption style="color: #4a4a4a; font-size: 0.9rem; margin-top: 0.5rem;">Headset offline. Dialogue is served from a library generated in advance, with no network connection at any point during the session.</figcaption>
+        </figure>
+
+        <figure style="margin: 1.5rem 0;">
+          <img src="img/xr3dquest-v11-mobile.jpg" alt="The version 1.1 mobile variant running on an affordable Android smartphone, showing the vital signs panel, narrative dialogue and touch first controls." style="width: 100%; border-radius: 0.75rem;">
+          <figcaption style="color: #4a4a4a; font-size: 0.9rem; margin-top: 0.5rem;">Mobile. The same scenario on an affordable Android handset, with a touch first interface and the same underlying clinical logic.</figcaption>
+        </figure>
+      </section>
+
+      <!-- Architecture -->
+      <section class="project-card">
+        <h2>Architecture</h2>
+        <p><strong>One simulation core, three presentation layers.</strong> Scenario state, physiology, NEWS2 calculation, action parsing, safety logic and debrief generation live in a single shared layer. Each variant supplies its own scene, input handling and bootstrap path. Nothing clinical is duplicated across variants.</p>
+
+        <p><strong>Inference behind an interface.</strong> Live model calls and the offline library sit behind the same client interface, so the simulation core does not know or care which is answering. Swapping one for the other changes no clinical code.</p>
+
+        <p><strong>A pre-sampled response library.</strong> The offline variant serves dialogue generated in advance across the reachable clinical state space, keyed by turn, speaker and clinical state. Debriefs are held separately and retrieved by a compact encoding of the decisions taken during the session. Lookup is local and near instantaneous, and the variant makes no network calls at any point.</p>
+
+        <p><strong>Speech on device.</strong> Speech to text and text to speech run locally rather than through a cloud service, which matters for both latency and connectivity independence.</p>
+      </section>
+
+      <!-- Studies -->
+      <section class="project-card">
+        <h2>Studies</h2>
+        <div style="overflow-x: auto; margin: 1.5rem 0;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="background: rgba(46, 204, 113, 0.12); text-align: left;">
+                <th style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Study</th>
+                <th style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Version</th>
+                <th style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Site</th>
+                <th style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Participants</th>
+                <th style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Initial validation (pilot)</td>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">v1</td>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Bournemouth University</td>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">28</td>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Manuscript in preparation</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Second validation</td>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">v1</td>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Bournemouth University</td>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Recruitment planned</td>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Q3 to Q4 2026</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Delivery mode and platform field study</td>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">v1.1</td>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Achievers University, Nigeria</td>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">106</td>
+                <td style="padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.08);">Analyses in preparation</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p><strong>Bournemouth University studies.</strong> Conducted under BU Research Ethics Committee ID 66081. The first study examined whether DASEX produces scorable and interpretable data following a single simulation session with a heterogeneous healthcare student cohort. The second uses a revised instrument with a new cohort from the same pool, following the same design.</p>
+
+        <p><strong>Achievers University field study.</strong> Conducted under BU Research Ethics Committee ID 68822 and Achievers University Health Research Ethics Committee ID AUO/REC/2026/182, with fieldwork in June and July 2026 supported by a Turing Scheme International Mobility Award. Two independent within-subject parts asked whether offline delivery holds up against live inference on the same headset, and whether mobile delivery holds up against headset delivery using the same model. Field notes from this study are <a href="/research-notes/twenty-six-days-in-owo.html">written up here</a>.</p>
+
+        <p>The protocol, the variant architecture document and the device selection analysis are pre-registered on the Open Science Framework: <a href="https://osf.io/vhwqz/overview?view_only=5fbdfea84f31452f8838259c82c69eb7" target="_blank" rel="noopener">osf.io/vhwqz</a></p>
+
+        <p>Results from these studies are not reported here. Manuscripts are in preparation or under review, and findings will be linked from <a href="/research-notes/index.html">Research Notes</a> as they appear.</p>
+      </section>
+
+      <!-- Evaluation -->
+      <section class="project-card">
+        <h2>Evaluation</h2>
+        <p>XR3DQuest is evaluated using <a href="/dasex-evaluator.html">DASEX</a>, a 25 item instrument covering five domains: Diagnosis, Adaptation, Safety, Engagement and Teamwork, and eXplainability. DASEX was developed to capture properties specific to AI driven simulation, such as real time adaptivity, safety behaviour and algorithmic transparency, which conventional simulation and usability instruments were not built to assess.</p>
+
+        <p>The framework emerged from a systematic review of AI driven characters in XR healthcare simulation published in <em>Artificial Intelligence in Medicine</em> (<a href="https://doi.org/10.1016/j.artmed.2025.103270" target="_blank" rel="noopener">10.1016/j.artmed.2025.103270</a>).</p>
+      </section>
+
+      <!-- What is not claimed -->
+      <section class="project-card">
+        <h2>What Is Not Claimed</h2>
+        <p>XR3DQuest has been evaluated for learner rated simulation quality, usability and workload. It has not been evaluated for clinical competence, knowledge gain, skill retention or patient outcomes, and no claim of educational effectiveness against conventional teaching is made or implied.</p>
+
+        <p>Work to date covers a single emergency scenario, two institutions and undergraduate healthcare students. Any conclusions belong to those conditions.</p>
+      </section>
+
+      <!-- Browser demo -->
+      <section class="project-card">
+        <h2>See the Idea in a Browser</h2>
+        <p>Not everyone reading this has a headset to hand. The <a href="/hospital-simulation/index.html">browser demo</a> is a small interactive piece built so that the concept can be seen rather than described: a ward, a deteriorating patient, a resus trolley, a NEWS2 panel, and a set of scenarios to move between.</p>
+
+        <p>It is a demonstrator, and it does its job well. It is also not XR3DQuest. It runs simplified logic in a browser, it does not carry the platform's clinical modelling or AI behaviour, and no result on this site comes from it. Treat it as a window onto the idea rather than a sample of the research build.</p>
+      </section>
+
+      <p style="color: #4a4a4a; font-size: 0.9rem; margin: 1.5rem 0;">XR3DQuest is developed as part of doctoral research at Bournemouth University, supported by a CfACTs Plus PhD Studentship. Collaboration enquiries are welcome.</p>
+
+    </main>
+  </div>
+
+  <!-- Footer Section -->
+  <footer>
+    <p>&copy; 2026 David Dasa</p>
+  </footer>
+
+  <!-- Particles.js Configuration -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#2ecc71' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5, random: false },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#2ecc71',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+    });
+  </script>
+
+  <style>
+    .article-header h1 { color: #092917; margin-bottom: 1rem; font-size: 2.2rem; }
+    .article-meta { display: flex; gap: 2rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .article-date { color: #2ecc71; font-weight: 600; font-size: 1rem; }
+    .article-type { color: #1a4731; font-weight: 500; background: rgba(46, 204, 113, 0.1); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.9rem; }
+    .article-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .tag { background: rgba(46, 204, 113, 0.12); color: #092917; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.8rem; font-weight: 500; }
+    .container { max-width: 1000px; }
+    main { line-height: 1.7; }
+    p { line-height: 1.7; }
+    .project-card { background: rgba(255,255,255,0.82); border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
+    @media (max-width: 768px) {
+      .article-header h1 { font-size: 1.8rem; }
+      .article-meta { flex-direction: column; gap: 0.5rem; }
+    }
+  </style>
+
+</body>
+</html>
