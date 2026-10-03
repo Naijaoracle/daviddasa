@@ -1,0 +1,9 @@
+{
+  "bundle_id": "synthetic-multimodal-demo-site-v2",
+  "schema": "public_synthetic_demo_v2",
+  "data_class": "synthetic",
+  "participant_data": false,
+  "description": "Fully synthetic session, TimesFM-3 and Pulse outputs computed offline on that synthetic input, and a separate Pulse/OpenBF model cycle.",
+  "seed": 20261003,
+  "public_payload_sha256": "e9d84d80586a79406727fba449c5d55b74242bf28d056a278313336823619f1a"
+}
