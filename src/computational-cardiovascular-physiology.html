@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="How cardiovascular measurements could support a continuously updated computational representation of a patient.">
+  <title>Computational Cardiovascular Physiology | David Dasa</title>
+  <link rel="icon" href="/src/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
+  <nav><ul>
+    <li class="logo"><a href="https://www.daviddasa.com"><img src="https://github.com/Naijaoracle/daviddasa/blob/9556670c224c56b73e2a7f21ce1a4e27cbc1a90e/src/DD_logo.png?raw=true" alt="Logo" width="50" height="50"></a></li>
+    <li class="home-link"><a href="/">Home</a></li><li><a href="/about">About</a></li><li><a href="/projects">Projects</a></li><li><a href="/skills">Skills</a></li><li><a href="/research-notes">Research Notes</a></li><li><a href="/contact">Contact</a></li>
+  </ul></nav>
+  <div id="particles-js"></div>
+  <div class="container"><main>
+    <div class="back-link"><a href="/projects">← Back to Projects</a></div>
+    <section class="project-card">
+      <div class="article-header">
+        <h1>Computational Cardiovascular Physiology</h1>
+        <p class="subtitle">From physiological measurement to digital patient models and clinical AI</p>
+        <div class="article-meta"><span class="article-type">Research programme</span></div>
+        <div class="article-tags"><span class="tag">Hypertension</span><span class="tag">Physiological sensing</span><span class="tag">Simulation</span><span class="tag">Clinical AI</span></div>
+      </div>
+      <p class="lead">My research asks how we can move from a real patient, through imperfect measurements of the cardiovascular system, towards a computational representation that can be updated, tested and used carefully by clinicians and AI systems.</p>
+      <p>The work began with <a href="https://doi.org/10.13140/RG.2.2.30037.19689" target="_blank" rel="noopener">blood pressure prediction</a> and clinical validation of contactless measurement. It grew into mechanistic physiology, arterial flow, electrical, optical and acoustic sensing, and comparisons between machine learning and physiological forecasting.</p>
+      <blockquote>What was measured? What does it tell us about the patient's internal state? What remains uncertain? What can we responsibly predict or do next?</blockquote>
+    </section>
+
+    <section class="project-card">
+      <h2>What I have investigated</h2>
+      <h3>Population physiology and hypertension</h3>
+      <p>I investigated how the Pulse Physiology Engine represents cardiovascular states associated with hypertension, using population evidence to examine the range the model can express and where its limits become visible. Blood pressure is a useful target, but reproducing a reading does not establish the mechanism behind it. Distinct simulated states can produce similar pressures and behave differently when conditions change. <a href="https://github.com/Naijaoracle/htn-coupling/blob/main/paper/htn_paper.pdf" target="_blank" rel="noopener">Read the Pulse manuscript</a>.</p>
+      <blockquote>Matching an observable does not uniquely identify the mechanism that produced it.</blockquote>
+      <h3>Connecting whole-body physiology to arterial flow</h3>
+      <p>I coupled Pulse outputs to openBF, a model of pressure and flow through an arterial network. This lets the programme examine waveform behaviour alongside whole-body physiology. It also reveals a crucial boundary: a modelled carotid waveform is not a facial camera measurement. The path through smaller vessels, skin and optics needs its own validated observation model. I keep that link explicitly unresolved.</p>
+      <h3>Testing what sensors observe</h3>
+      <p>I have worked with ECG, contact photoplethysmography (PPG), camera RGB and cardiovascular audio. ECG provides cardiac timing; contact PPG captures optical changes at the skin; a camera records reflected light from which software may estimate a pulse; and a stethoscope and microphone capture cardiovascular sounds. Each gives a partial view, with its own timing, quality and interpretation problems.</p>
+      <h3>Contactless measurement in clinical and signal studies</h3>
+      <p>In a published prospective study in Nigeria, 306 adults took part in an evaluation of contactless blood pressure screening using remote PPG. The study examined measurement performance across skin tones in a real clinical setting. It showed why a device producing a reading, being acceptable to users and performing adequately as a diagnostic screen are separate questions. <a href="https://doi.org/10.1136/bmjopen-2026-119311" target="_blank" rel="noopener">Read the BMJ Open study</a>.</p>
+      <p>Later signal-level experiments asked what information survives in camera RGB before blood pressure estimation. Cardiac-rate-consistent information was often present even when a blind estimator selected a slower competing component. Trying simple ways of selecting a signal did not reliably remove that ambiguity. The narrower conclusion is that information can survive measurement without being reliably recovered by an algorithm. <a href="https://github.com/Naijaoracle/htn-coupling/blob/main/paper/remote_rgb_observability_masking.pdf" target="_blank" rel="noopener">Read the remote RGB manuscript</a>.</p>
+    </section>
+
+    <section class="project-card">
+      <h2>Forecasting: two different questions</h2>
+      <p><strong>TimesFM-3</strong> forecasts the future of the time series it receives. It does not, on its own, explain the patient's hidden cardiovascular state. <strong>Pulse</strong> projects what its represented physiological system would do under specified starting conditions and inputs. Neither output becomes an individual prediction simply by appearing beside a person's measurements.</p>
+      <blockquote>Machine learning forecasts a measured series. A mechanistic model projects the behaviour of the physiological system it represents.</blockquote>
+      <p>I compared the approaches in short exercise-recovery episodes. TimesFM, persistence and a linear trend used the first 30 seconds of ECG-derived heart rate to predict the next 30. A frozen family of 72 Pulse exercise-recovery simulations was weighted using six observations from that first interval and then evaluated on the same future interval.</p>
+      <p>Under those assumptions, the Pulse ensemble did not consistently outperform simple empirical baselines, and it did not beat the strongest simple baseline in any of the three recovery episodes. In several episodes it fitted the observed context poorly even before forecasting began. I left the candidate family unchanged after seeing the held-out future. The result illustrates the gap between generic physiological simulation and an individual state inferred from observations. These were repeated episodes, not independent participants.</p>
+    </section>
+
+    <section class="project-card">
+      <h2>How the pieces fit together</h2>
+      <ol class="research-chain" aria-label="Research stack from patient to clinical action">
+        <li><strong>Real patient and hidden physiology</strong><span>Cardiovascular state changes with disease, activity and treatment.</span></li>
+        <li><strong>Observable evidence</strong><span>Electrical, optical, pressure and acoustic effects carry partial information about that state.</span></li>
+        <li><strong>Measurement and data integrity</strong><span>Sensors, clinical instruments, timestamps, identity and provenance determine what can be trusted.</span></li>
+        <li><strong>Interpretation</strong><span>Signal processing and observation models turn recordings into estimates, each with limitations.</span></li>
+        <li><strong>State inference and representation</strong><span>A future model would retain plausible physiological states, persistent properties and uncertainty.</span></li>
+        <li><strong>Prediction and action</strong><span>Mechanistic simulation and data-driven forecasts inform questions posed by clinicians and AI systems.</span></li>
+      </ol>
+      <p class="loop-note">An intervention changes the real patient. New measurements must then challenge and update the representation. Every connection in this loop requires evidence; a dashboard, estimator or simulation alone does not make a patient-specific digital twin.</p>
+    </section>
+
+    <section class="project-card">
+      <h2>From measurements to a computational patient</h2>
+      <p>The aim is to infer physiological states that could plausibly explain observations together, while retaining competing explanations. In other words, the problem is to reason about the patient's changing physiological state and relatively persistent characteristics using the measurements available so far, while retaining uncertainty rather than forcing a single explanation.</p>
+      <p>I have not yet built that complete individual-state inference layer. The current work tests many of the measurements, models and forecast comparisons it would require. Until inference and validation exist, a generic Pulse run must not be presented as a recorded person's hidden physiology.</p>
+    </section>
+
+    <section class="project-card">
+      <h2>A separate layer: clinical AI</h2>
+      <p>A useful patient representation would still leave another question: can an AI system act safely with it? <a href="https://github.com/Naijaoracle/SHOBench" target="_blank" rel="noopener">SHOBench</a> addresses this separate layer. In a simulated electronic health record, it evaluates whether an agent gathers information before acting, sequences care safely, recognises deterioration, reassesses after time passes and documents its decisions. It is an agent evaluation environment, not part of the cardiovascular physiology engine.</p>
+      <p class="loop-note"><strong>Conceptual loop:</strong> observe → represent → predict → act → check what happened.</p>
+    </section>
+
+    <section class="project-card">
+      <h2>What the public demonstrations show</h2>
+      <p>The underlying multimodal research includes real physiological recordings. Those recordings are not published on this website. The interactive demonstration uses independently generated synthetic ECG-like, PPG-like, RGB and acoustic signals to show the structure of the work without releasing the underlying private physiological recordings.</p>
+      <p>The public bundle applies actual signal estimators and an offline TimesFM-3 forecast to synthetic inputs. It also includes genuine non-participant Pulse and openBF model outputs. Aggregate findings from the real experiments are displayed separately from the synthetic traces. The synthetic RGB is for display and estimator illustration; it is not a validated model of skin, optics or camera acquisition.</p>
+      <div class="project-links"><a href="/hypertension-coupling-observatory.html" class="project-link">Hypertension Coupling Observatory</a><a href="/multimodal-demo" class="project-link">Multimodal Digital Patient</a></div>
+    </section>
+
+    <section class="project-card">
+      <h2>What remains unsolved</h2>
+      <ul>
+        <li>A validated link from arterial haemodynamics through facial microcirculation and tissue optics to camera RGB.</li>
+        <li>Inference of an individual's cardiovascular state and parameters from several imperfect signals.</li>
+        <li>Prospective validation and uncertainty calibration for mechanistic forecasts.</li>
+        <li>Evidence that any resulting system improves clinical decisions safely.</li>
+      </ul>
+      <p>The current programme is a research architecture and a set of experiments towards a digital patient, not a clinically validated individual digital twin.</p>
+    </section>
+
+    <section class="project-card">
+      <h2>Selected outputs and demonstrations</h2>
+      <p><strong>Review</strong><br><a href="https://doi.org/10.13140/RG.2.2.30037.19689" target="_blank" rel="noopener">Exploring machine learning models for blood pressure prediction in hypertension: A comprehensive review</a> (2023).</p>
+      <p><strong>Published clinical study</strong><br><a href="https://doi.org/10.1136/bmjopen-2026-119311" target="_blank" rel="noopener">Skin tone and diagnostic equity in contactless blood pressure screening: a prospective observational field evaluation of remote photoplethysmography in Nigeria</a> — <em>BMJ Open</em> (2026).</p>
+      <p><strong>Research manuscripts</strong><br><a href="https://github.com/Naijaoracle/htn-coupling/blob/main/paper/htn_paper.pdf" target="_blank" rel="noopener">Characterising and extending the Pulse Physiology Engine for hypertensive older adults: population coverage, physiological parameterisation and haemorrhage response</a><br><a href="https://github.com/Naijaoracle/htn-coupling/blob/main/paper/remote_rgb_observability_masking.pdf" target="_blank" rel="noopener">Remote RGB Cardiac-Rate Information Under Spectral Masking</a></p>
+      <p><strong>Interactive demonstrations</strong><br><a href="/hypertension-coupling-observatory.html">Hypertension Coupling Observatory</a><br><a href="/multimodal-demo">Multimodal Digital Patient</a></p>
+    </section>
+
+    <section class="project-card">
+      <h2>The eventual aim</h2>
+      <p>I am working towards a continuously updated computational representation in which observations, physiological state, uncertainty and possible futures remain explicitly connected. A clinician or AI system should be able to ask what was observed, what we think is happening, why, what else could explain it, what the models predict and whether reality later agreed.</p>
+      <p><strong>Research repositories:</strong> <a href="https://github.com/Naijaoracle/htn-coupling" target="_blank" rel="noopener">htn-coupling</a> documents the cardiovascular modelling, multimodal observation and forecasting work. <a href="https://github.com/Naijaoracle/SHOBench" target="_blank" rel="noopener">SHOBench</a> develops the separate clinical agent evaluation layer.</p>
+    </section>
+  </main></div>
+  <footer><p>&copy; 2026 David Dasa</p></footer>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof particlesJS !== 'function') return;
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } }, color: { value: '#2ecc71' }, shape: { type: 'circle' }, opacity: { value: 0.5, random: false }, size: { value: 3, random: true },
+          line_linked: { enable: true, distance: 150, color: '#2ecc71', opacity: 0.4, width: 1 },
+          move: { enable: true, speed: 2, direction: 'none', random: false, straight: false, out_mode: 'out', bounce: false }
+        },
+        interactivity: { detect_on: 'canvas', events: { onhover: { enable: true, mode: 'repulse' }, onclick: { enable: true, mode: 'push' }, resize: true } }, retina_detect: true
+      });
+    });
+  </script>
+  <style>
+    .container { max-width: 1000px; } main, main p { line-height: 1.7; }
+    .back-link { margin-bottom: 2rem; } .back-link a { color: #2ecc71; text-decoration: none; font-weight: 500; }
+    .article-header h1 { color: #092917; margin-bottom: 1rem; font-size: 2.2rem; }
+    .article-meta { display: flex; gap: 2rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .article-date { color: #2ecc71; font-weight: 600; }
+    .article-type { color: #1a4731; font-weight: 500; background: rgba(46,204,113,.1); padding: .25rem .75rem; border-radius: 1rem; font-size: .9rem; }
+    .article-tags { display: flex; gap: .5rem; flex-wrap: wrap; }
+    .tag { background: rgba(46,204,113,.12); color: #092917; padding: .25rem .75rem; border-radius: 1rem; font-size: .8rem; font-weight: 500; }
+    .project-card { background: rgba(255,255,255,.82); border: 1px solid rgba(0,0,0,.06); box-shadow: 0 6px 18px rgba(0,0,0,.04); }
+    .lead { font-size: 1.15rem; } .subtitle { color: #1a4731; font-size: 1.2rem; margin-top: -.4rem; } blockquote { margin: 1.5rem 0; padding: .9rem 1.2rem; border-left: 3px solid #2ecc71; background: rgba(46,204,113,.08); font-weight: 600; } .research-chain { list-style: none; padding: 0; margin: 1.5rem 0; counter-reset: layer; }
+    .research-chain li { counter-increment: layer; position: relative; padding: .85rem 1rem .85rem 3.4rem; margin-bottom: .65rem; background: rgba(46,204,113,.08); border-left: 3px solid #2ecc71; border-radius: .35rem; }
+    .research-chain li::before { content: counter(layer); position: absolute; left: 1rem; top: .9rem; color: #126437; font-weight: 700; }
+    .research-chain strong, .research-chain span { display: block; } .loop-note { padding: .8rem 1rem; border-left: 3px solid #1a4731; }
+    @media (max-width: 768px) { .article-header h1 { font-size: 1.8rem; } .article-meta { gap: .5rem; } }
+  </style>
+</body>
+</html>

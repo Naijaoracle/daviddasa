@@ -10,6 +10,9 @@
     <loc>https://www.daviddasa.com/about.html</loc>
   </url>
   <url>
+    <loc>https://www.daviddasa.com/computational-cardiovascular-physiology.html</loc>
+  </url>
+  <url>
     <loc>https://www.daviddasa.com/afrimed-qna-analysis.html</loc>
   </url>
   <url>
@@ -140,18 +143,6 @@
   </url>
   <url>
     <loc>https://www.daviddasa.com/research-artefacts/benchmarking/reproducibility-checklist.html</loc>
-  </url>
-  <url>
-    <loc>https://www.daviddasa.com/research-artefacts/deployment/non-operational-boundary.html</loc>
-  </url>
-  <url>
-    <loc>https://www.daviddasa.com/research-artefacts/digital-twin/fidelity-validity-plan.html</loc>
-  </url>
-  <url>
-    <loc>https://www.daviddasa.com/research-artefacts/digital-twin/physiological-assumptions.html</loc>
-  </url>
-  <url>
-    <loc>https://www.daviddasa.com/research-artefacts/digital-twin/workflow-assumptions.html</loc>
   </url>
   <url>
     <loc>https://www.daviddasa.com/research-artefacts/evaluation/failure-mode-taxonomy.html</loc>
