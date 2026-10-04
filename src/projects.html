@@ -8,9 +8,20 @@
   <link rel="icon" type="image/svg+xml" href="/src/favicon-DD-monogram.svg">
   <link rel="alternate icon" href="/src/favicon.ico">
   <link rel="stylesheet" href="styles.css">
+  <style>
+    .projects-page .container { width: 94%; max-width: 1500px; }
+    .projects-page .showcase-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+    .projects-page .showcase-grid .project-item { min-width: 0; }
+    @media (max-width: 1279px) {
+      .projects-page .showcase-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 768px) {
+      .projects-page .showcase-grid { grid-template-columns: 1fr; }
+    }
+  </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
 </head>
-<body>
+<body class="projects-page">
 
   <!-- Navigation Section -->
   <nav>
@@ -42,7 +53,7 @@
       <!-- 1. Featured Research -->
       <section class="project-card">
         <h2>Featured Research</h2>
-        <div class="project-grid">
+        <div class="project-grid showcase-grid">
 
           <div class="project-item">
             <p style="font-size: 0.85rem; color: #2ecc71; margin-bottom: 0.5rem; font-weight: 600;">Research programme &middot; Cardiovascular physiology</p>
@@ -111,7 +122,7 @@
       <!-- 2. Research Analysis -->
       <section class="project-card">
         <h2>Research Analysis</h2>
-        <div class="project-grid">
+        <div class="project-grid showcase-grid">
 
           <div class="project-item">
             <h3>HealthBench Q&A (from OpenAI) Analysis</h3>
@@ -188,7 +199,7 @@
       <section class="project-card">
         <h2>Interactive Demos</h2>
         <p style="margin-bottom: 1.5rem; opacity: 0.8;">Demonstrators illustrating healthcare AI concepts through interactive interfaces.</p>
-        <div class="project-grid">
+        <div class="project-grid showcase-grid">
 
           <div class="project-item">
             <h3>Visualizers</h3>
