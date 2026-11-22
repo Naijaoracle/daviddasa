@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="XRNPC is an event-driven intelligence system designed to make virtual characters in XR healthcare simulations more responsive to clinical events, learner actions and team interactions.">
+  <meta name="theme-color" content="#092917">
+  <title>XRNPC | Event-Driven Intelligence for XR Healthcare Simulation | David Dasa</title>
+  <style>
+    :root { --deep:#092917;--forest:#154a2e;--green:#28bd69;--mint:#eaf8ed;--cream:#f0eee5;--paper:#fffefa;--ink:#14251e;--muted:#52685a;--hair:#dce9dd;--white:#fff; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; background:radial-gradient(ellipse at 0% 3%,#236e42 0%,#0d3722 42%,#071d12 100%); color:var(--ink); font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif; line-height:1.65; }
+    a { color:#147a47; text-underline-offset:3px; }
+    a:focus-visible,button:focus-visible { outline:3px solid #53e69b; outline-offset:4px; }
+    .site-nav { position:sticky;top:0;z-index:20; background:rgba(9,41,23,.97);border-bottom:1px solid rgba(255,255,255,.12);backdrop-filter:blur(12px); }
+    .nav-inner { max-width:1210px;margin:0 auto; min-height:72px; display:flex; align-items:center; gap:22px; padding:10px 30px; }
+    .site-mark { display:flex;align-items:center;gap:11px;text-decoration:none;color:white;min-width:190px; }
+    .monogram { width:42px;height:42px;border:1px solid #51cb83;border-radius:12px;display:grid;place-items:center;background:linear-gradient(140deg,#1f6f42,#0a2c1b);font-weight:800;letter-spacing:-.1em;font-size:17px;color:white;padding-right:3px; }
+    .brand-copy { font-size:14px;font-weight:750;letter-spacing:-.01em;line-height:1.2; }
+    .brand-copy span { display:block;font-size:10px;font-weight:500;color:#b7dbca;letter-spacing:.13em;margin-top:5px;text-transform:uppercase; }
+    .nav-links { margin-left:auto;display:flex;gap:25px;align-items:center;flex-wrap:wrap; }
+    .nav-links a {text-decoration:none;color:#d8ede0;font-size:13px;font-weight:600;white-space:nowrap;transition:color .2s;}
+    .nav-links a:hover {color:white;}
+    .nav-links a:last-child { color:#9de2b8; }
+    .page-shell {max-width:1150px;margin:48px auto 76px;background:var(--cream);padding:20px;border-radius:25px;box-shadow:0 25px 80px rgba(0,0,0,.21);}
+    main { overflow:hidden;border-radius:16px;background:#f7f7f1; }
+    .hero { position:relative; overflow:hidden; background:linear-gradient(116deg,#fffefa 0%,#fbfdf8 50%,#e8f5e8 100%);padding:68px 60px 60px; }
+    .hero:before { content:"";position:absolute;width:550px;height:550px;right:-210px;top:-260px;border:1px solid rgba(35,130,71,.13);border-radius:50%;box-shadow:0 0 0 65px rgba(34,126,67,.03),0 0 0 130px rgba(34,126,67,.025);pointer-events:none; }
+    .breadcrumb {display:flex;gap:10px;align-items:center;color:#5d7465;font-size:11px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;margin-bottom:32px;}
+    .breadcrumb .dot {width:5px;height:5px;border-radius:50%;background:#35bc6b;}
+    .hero-layout {display:grid;grid-template-columns:minmax(0,1.22fr) minmax(305px,.78fr);gap:40px;align-items:center;}
+    .hero h1 {margin:0;max-width:720px;font-size:clamp(39px,5.6vw,69px);line-height:1.09;letter-spacing:-.065em;color:var(--deep);font-weight:790;}
+    .hero h1 em {color:#258a50;font-style:normal;}
+    .hero-lede {max-width:660px;font-size:19px;line-height:1.65;color:#45594a;margin:25px 0 22px;}
+    .hero-tagline {border-left:3px solid #35b86b;padding:0 0 0 16px;color:#44624d;font-size:14px;max-width:580px;margin:28px 0 0;}
+    .hero-visual {position:relative;max-width:400px;justify-self:end;width:100%;padding:18px 5px 20px;}
+    .scene-top {font-size:11px;letter-spacing:.12em;color:#346645;font-weight:800;text-transform:uppercase;margin-bottom:14px;}
+    .scene-card {background:#143e29;color:white;padding:19px 20px;border-radius:15px;box-shadow:0 19px 30px rgba(9,41,23,.17);position:relative;}
+    .scene-card + .scene-card {margin-top:12px;}
+    .scene-line {display:flex;justify-content:space-between;gap:12px;align-items:start;}
+    .scene-title {font-size:11px;color:#b8ddc5;letter-spacing:.12em;text-transform:uppercase;font-weight:800;}
+    .scene-card p {font-size:15px;line-height:1.5;margin:8px 0 0;color:white;font-weight:530;}
+    .scene-card.secondary {margin-left:23px;background:#fff;box-shadow:0 12px 28px rgba(14,62,35,.10);border:1px solid #cde5d2;color:var(--ink);}
+    .scene-card.secondary .scene-title {color:#238148;}
+    .scene-card.secondary p {color:#173e27;}
+    .scene-pill {font-size:10px;border-radius:99px;padding:3px 8px;white-space:nowrap;background:rgba(140,238,172,.15);color:#b6e9c5;}
+    .scene-card.secondary .scene-pill {background:#ecf8ec;color:#23784c;}
+    .scene-note {font-size:11px;line-height:1.5;color:#617268;margin:14px 5px 0;}
+    .section {padding:58px 62px;border-top:1px solid #e2ebe1;}
+    .eyebrow {font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#22834c;font-weight:800;margin:0 0 13px;}
+    h2 {color:var(--deep);font-size:clamp(27px,3.2vw,41px);letter-spacing:-.045em;line-height:1.19;font-weight:770;margin:0 0 22px;}
+    .section-lede {font-size:18px;color:#486254;max-width:830px;line-height:1.72;margin:0 0 20px;}
+    p {font-size:15.5px;line-height:1.85;color:#46594d;}
+    .section p:last-child {margin-bottom:0;}
+    .intro-grid {display:grid;grid-template-columns:1fr 1fr;gap:38px;align-items:start;}
+    .statement {margin:3px 0 0;padding:24px 26px;background:#eaf6eb;border-left:3px solid #39b86d;border-radius:0 14px 14px 0;color:#1b4d2d;font-size:17px;line-height:1.68;font-weight:600;}
+    .light-section {background:#fffefa;}
+    .section-context {margin-top:0;max-width:850px;}
+    .capability-layout {display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:30px;}
+    .capability {border:1px solid #dce7dd;background:#fbfdf9;border-radius:14px;padding:27px 23px 26px;}
+    .capability .number {font-size:12px;letter-spacing:.13em;color:#238850;font-weight:800;}
+    .capability h3 {font-size:21px;letter-spacing:-.035em;color:var(--deep);line-height:1.25;margin:18px 0 12px;}
+    .capability p {font-size:14px;line-height:1.75;margin:0;}
+    .scenario {background:#0e3120;color:white;padding:56px 62px;position:relative;overflow:hidden;}
+    .scenario:after {content:"";position:absolute;right:-125px;bottom:-220px;border:1px solid rgba(125,222,157,.2);border-radius:50%;width:500px;height:500px;box-shadow:0 0 0 65px rgba(125,222,157,.025),0 0 0 125px rgba(125,222,157,.02);}
+    .scenario .eyebrow {color:#8ce0a6;}
+    .scenario h2 {color:#fff;max-width:710px;}
+    .scenario > p {color:#c7ddce;max-width:790px;position:relative;z-index:1;}
+    .moments {position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin:30px 0 0;}
+    .moment {background:rgba(255,255,255,.065);border:1px solid rgba(200,238,211,.17);border-radius:12px;padding:20px 20px 23px;}
+    .moment .moment-label {font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#80db9c;font-weight:800;display:block;margin-bottom:12px;}
+    .moment strong {font-size:16px;line-height:1.4;color:#fff;display:block;}
+    .moment p {font-size:13px;line-height:1.65;color:#b9d6c4;margin:10px 0 0;}
+    .illustration-disclaimer {font-size:11px;color:#9dc2a9;margin:17px 0 0;}
+    .split {display:grid;grid-template-columns:1fr .8fr;gap:44px;align-items:center;}
+    .quote {background:#e9f5e9;border-radius:17px;padding:28px 30px;border:1px solid #d1e5d5;}
+    .quote-icon {color:#228649;font-size:29px;font-weight:700;line-height:1;margin-bottom:10px;}
+    .quote p {font-size:18px;font-weight:600;color:#1e4b31;line-height:1.65;margin:0 0 17px;}
+    .quote a {font-weight:800;font-size:14px;}
+    .closing {background:#f2f8ef;}
+    .closing p {max-width:830px;}
+    .footer {background:#0c291a;color:#d5e8db;padding:26px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;font-size:12px;}
+    .footer a {color:#b6e8c9;text-decoration:none;}
+    .footer a:hover {text-decoration:underline;}
+    .footer-links {display:flex;gap:22px;flex-wrap:wrap;}
+    @media(max-width:950px){.nav-inner {padding:12px 22px;}.nav-links {gap:16px;}.nav-links a {font-size:12px;}.hero {padding:54px 40px;}.hero-layout {gap:22px;}.section,.scenario {padding:50px 42px;}.page-shell {margin:24px 18px 48px;}.capability-layout {gap:10px;}.capability {padding:20px;}}
+    @media(max-width:700px){.site-nav {position:relative;}.nav-inner {min-height:unset;display:block;padding:13px 16px;}.site-mark {min-width:unset;}.nav-links {margin:14px 0 0;gap:14px 17px;}.page-shell {padding:8px;border-radius:14px;margin:15px 9px 35px;}main {border-radius:9px;}.hero {padding:35px 23px 37px;}.breadcrumb {margin-bottom:19px;}.hero-layout,.intro-grid,.split {grid-template-columns:1fr;}.hero h1 {font-size:clamp(38px,9vw,58px);}.hero-lede {font-size:17px;}.hero-visual {justify-self:stretch;max-width:100%;margin-top:15px;}.section,.scenario {padding:39px 23px;}.capability-layout,.moments {grid-template-columns:1fr;}.capability {padding:22px;}.capability h3 {margin:11px 0;}.section-lede {font-size:16px;}.footer {align-items:flex-start;flex-direction:column;padding:25px 23px;}.statement {font-size:15.5px;}.quote {padding:22px;}}
+    @media(prefers-reduced-motion:reduce){html {scroll-behavior:auto;}}
+  </style>
+</head>
+<body>
+  <nav class="site-nav" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a class="site-mark" href="https://www.daviddasa.com/" aria-label="David Dasa home page">
+        <span class="monogram" aria-hidden="true">DD</span>
+        <span class="brand-copy">David Dasa<span>Research &amp; Engineering</span></span>
+      </a>
+      <div class="nav-links">
+        <a href="https://www.daviddasa.com/">Home</a>
+        <a href="https://www.daviddasa.com/about">About</a>
+        <a href="https://www.daviddasa.com/projects">Projects</a>
+        <a href="https://www.daviddasa.com/research-notes">Research Notes</a>
+        <a href="https://www.daviddasa.com/contact">Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-shell">
+    <main id="main-content">
+      <header class="hero">
+        <div class="breadcrumb"><span class="dot" aria-hidden="true"></span><span>Software engineering</span><span aria-hidden="true">/</span><span>XR healthcare simulation</span></div>
+        <div class="hero-layout">
+          <div>
+            <h1>XRNPC<br><em>Beyond scripted characters.</em></h1>
+            <p class="hero-lede">An event-driven intelligence system that allows virtual clinical colleagues to respond to what is happening within a healthcare simulation, rather than simply following a predefined script.</p>
+            <p class="hero-tagline">Designed to extend existing immersive simulation experiences through more context-sensitive character interaction.</p>
+          </div>
+          <aside class="hero-visual" aria-label="Illustrative interaction between a simulated clinical event and a virtual colleague">
+            <div class="scene-top">An illustrative clinical moment</div>
+            <div class="scene-card">
+              <div class="scene-line"><span class="scene-title">Simulated patient</span><span class="scene-pill">Change in condition</span></div>
+              <p>The patient shows signs of deterioration during the scenario.</p>
+            </div>
+            <div class="scene-card secondary">
+              <div class="scene-line"><span class="scene-title">Virtual colleague</span><span class="scene-pill">Contextual response</span></div>
+              <p>“The patient's condition is changing. Shall I help with the next assessment?”</p>
+            </div>
+            <p class="scene-note">Illustrative example of intended interaction, not a recorded system output.</p>
+          </aside>
+        </div>
+      </header>
+
+      <section class="section light-section" aria-labelledby="beyond-scripted">
+        <p class="eyebrow">01 / The challenge</p>
+        <h2 id="beyond-scripted">Clinical encounters rarely follow a script.</h2>
+        <div class="intro-grid">
+          <div>
+            <p>In a clinical simulation, a learner may act earlier than expected, overlook an emerging problem, ask an unexpected question or change direction as new information becomes available. The other members of the simulated team need to make sense of those changes.</p>
+            <p>Traditionally scripted non-player characters can be effective in controlled scenarios, but their responses are often tied to anticipated triggers and fixed dialogue sequences. That can make it difficult to represent the fluid nature of teamwork in an unfolding clinical situation.</p>
+          </div>
+          <p class="statement">The central challenge is not to make a character say more. It is to make its response relevant to the moment, the patient and the rest of the team.</p>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="introducing">
+        <p class="eyebrow">02 / The approach</p>
+        <h2 id="introducing">Introducing XRNPC</h2>
+        <p class="section-lede">XRNPC brings an event-driven approach to virtual character behaviour in XR healthcare simulation. It is designed to connect character interactions with events and conditions within the wider simulation, allowing responses to reflect the situation as it unfolds.</p>
+        <p>Rather than treating dialogue as a sequence detached from the environment, the system relates virtual colleagues' interactions to the learner's decisions, simulated patient changes and the activity of the clinical team. The aim is to support characters that participate more meaningfully in the scenario while remaining bounded by its clinical context and rules.</p>
+      </section>
+
+      <section class="section light-section" aria-labelledby="responsive-teams">
+        <p class="eyebrow">03 / What it enables</p>
+        <h2 id="responsive-teams">More responsive virtual clinical teams</h2>
+        <p class="section-lede section-context">The value of an event-driven character is experienced through its behaviour. Several characteristics matter especially in simulated team-based care.</p>
+        <div class="capability-layout">
+          <article class="capability"><span class="number">01</span><h3>Awareness of changing context</h3><p>Character responses can take account of relevant developments in the scenario, rather than relying on a single predetermined conversational path.</p></article>
+          <article class="capability"><span class="number">02</span><h3>Meaningful team interaction</h3><p>Virtual colleagues can respond to requests, participate in simulated clinical activity and adapt their contributions as the situation changes.</p></article>
+          <article class="capability"><span class="number">03</span><h3>Behaviour within boundaries</h3><p>Flexible interaction remains situated within the constraints of the scenario, helping distinguish plausible character behaviour from unrestricted model output.</p></article>
+        </div>
+      </section>
+
+      <section class="scenario" aria-labelledby="scenario-moment">
+        <p class="eyebrow">04 / An example</p>
+        <h2 id="scenario-moment">One clinical moment. More than one possible response.</h2>
+        <p>Consider a simulated patient whose condition deteriorates while the learner is engaged in another task. In a purely scripted experience, the next character line may depend on a fixed trigger. In an event-driven experience, the character's response can instead relate to the emerging situation and the learner's subsequent actions.</p>
+        <div class="moments">
+          <div class="moment"><span class="moment-label">The situation</span><strong>A patient's condition changes.</strong><p>The simulated clinical context no longer matches the starting conditions.</p></div>
+          <div class="moment"><span class="moment-label">The interaction</span><strong>The learner responds in their own way.</strong><p>They may ask for assistance, continue an assessment or address a different priority.</p></div>
+          <div class="moment"><span class="moment-label">The virtual team</span><strong>A colleague responds to that context.</strong><p>The exchange reflects the unfolding scenario instead of only the next line in a fixed sequence.</p></div>
+        </div>
+        <p class="illustration-disclaimer">Conceptual illustration, not an empirical demonstration or transcript of an XRNPC session.</p>
+      </section>
+
+      <section class="section light-section" aria-labelledby="existing-simulations">
+        <p class="eyebrow">05 / Existing simulation environments</p>
+        <div class="split">
+          <div>
+            <h2 id="existing-simulations">Extending what simulation environments can do</h2>
+            <p>Immersive healthcare simulations already provide virtual spaces, clinical scenarios and opportunities for practice. XRNPC is designed to build on those experiences by adding more dynamic behaviour to the characters who inhabit them.</p>
+            <p>This approach places the emphasis on enriching interactions within an existing simulation experience rather than requiring a wholly new virtual environment.</p>
+          </div>
+          <aside class="quote">
+            <div class="quote-icon" aria-hidden="true">“</div>
+            <p>XRNPC was developed to the specifications of i3 Simulations Ltd, with the aim of making virtual character interactions within healthcare simulations more adaptive and responsive.</p>
+            <a href="https://i3simulations.com/" target="_blank" rel="noopener noreferrer">About i3 Simulations Ltd &#8599;</a>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section closing" aria-labelledby="why-it-matters">
+        <p class="eyebrow">The wider significance</p>
+        <h2 id="why-it-matters">Towards more adaptive healthcare simulation</h2>
+        <p>Healthcare teamwork depends on more than the actions of any single participant. It involves communicating under uncertainty, noticing changes in a patient's condition, responding to requests and adapting to others. Virtual characters that can engage with this changing context offer a different way to design immersive simulation experiences.</p>
+        <p>XRNPC reflects a broader engineering question: how can intelligent character behaviour make a simulation more responsive without losing the structure and safeguards that clinical training requires? Its focus is on that intersection between adaptive interaction and the demands of a clinical scenario.</p>
+      </section>
+    </main>
+    <footer class="footer">
+      <span>&copy; 2026 David Dasa</span>
+      <div class="footer-links">
+        <a href="https://www.daviddasa.com/">Home</a>
+        <a href="https://www.daviddasa.com/projects">Other projects</a>
+        <a href="https://i3simulations.com/" target="_blank" rel="noopener noreferrer">i3 Simulations Ltd</a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
